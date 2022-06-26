@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>LinqQL</id>
+        <authors>Stanislav Silin</authors>
+        <owners>Stanislav Silin</owners>
+        <license type="expression">MIT</license>
+        <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <projectUrl>https://github.com/byme8/LinqQL</projectUrl>
+        <repository type="git" url="https://github.com/byme8/LinqQL" branch="master"/>
+        <description>The GraphQL client with LINQ interface.</description>
+        <tags>graphql client</tags>
+        <dependencies>
+            <group targetFramework=".NETStandard2.0">
+<!--                <dependency id="LinqQL.SourceGenerator" version="$version$"-->
+<!--                            exclude="build,compile,runtime,contentFiles,native" include='analyzers'/>-->
+                <dependency id="LinqQL.Core" version="$version$" exclude="build,analyzers"/>
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="**" exclude="**"/>
+    </files>
+</package>

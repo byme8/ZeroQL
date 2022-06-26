@@ -1,0 +1,13 @@
+﻿<Project>
+    <PropertyGroup>
+        <Version>0.1.0</Version>
+        <Authors>Stanislav Silin</Authors>
+        <Owners>Stanislav Silin</Owners>
+        <PackageProjectUrl>https://github.com/byme8/LinqQL</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/byme8/LinqQL</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageTags>graphql client</PackageTags>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+</Project>
