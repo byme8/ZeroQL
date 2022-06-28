@@ -10,6 +10,17 @@ public class Query
 [ExtendObjectType(typeof(Query))]
 public class UserGraphQLExtensions
 {
+    public User[] GetUsers(int page, int size)
+    {
+        return Enumerable.Range(0, size)
+            .Select(o => new User
+            {
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString()
+            })
+            .ToArray();
+    }
+
     public User GetUser(int id)
     {
         return new User
@@ -17,6 +28,11 @@ public class UserGraphQLExtensions
             FirstName = "Jon",
             LastName = "Smith"
         };
+    }
+
+    public User? GetAdmin(int id)
+    {
+        return null;
     }
 }
 
