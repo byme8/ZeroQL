@@ -11,7 +11,10 @@ namespace LinqQL.Tests.CLI
         {
             using var console = new FakeInMemoryConsole();
             var generateCommand = new GenerateCommand();
-            generateCommand.Project = "../../../../LinqQL.TestApp/LinqQL.TestApp.csproj";
+            generateCommand.Schema = "../../../../LinqQL.TestApp/schema.graphql";
+            generateCommand.Namespace = "GraphQL.TestServer";
+            generateCommand.QueryName = "TestServerQuery";
+            generateCommand.Output = "../../../../LinqQL.TestApp/Generated/GraphQL.g.cs";
 
             await generateCommand.ExecuteAsync(console);
         }
