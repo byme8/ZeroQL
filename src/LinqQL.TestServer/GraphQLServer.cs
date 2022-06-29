@@ -7,6 +7,26 @@ public class Query
 
 }
 
+[ExtendObjectType(typeof(User))]
+public class RoleGraphQLExtension
+{
+    public Role GetRole([Parent]User user)
+    {
+        return new Role()
+        {
+            Id = 42,
+            Name = "Admin"
+        };
+    }
+}
+
+public class Role
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+}
+
 [ExtendObjectType(typeof(Query))]
 public class UserGraphQLExtensions
 {

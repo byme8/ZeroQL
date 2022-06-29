@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\LinqQL.CLI\LinqQL.CLI.csproj" />
         <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
         <ProjectReference Include="..\LinqQL.TestServer\LinqQL.TestServer.csproj" />
     </ItemGroup>

@@ -19,7 +19,8 @@ public class Program
 
         builder.Services.AddGraphQLServer()
             .AddQueryType<Query>()
-            .AddTypeExtension<UserGraphQLExtensions>();
+            .AddTypeExtension<UserGraphQLExtensions>()
+            .AddTypeExtension<RoleGraphQLExtension>();
 
         var app = builder.Build();
 

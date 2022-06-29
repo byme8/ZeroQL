@@ -1,5 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace LinqQL.Core.Extensions;
 
 public static class NodeExtensions

@@ -7,4 +7,15 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\LinqQL\LinqQL.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <GraphQLSchema Include="schema.graphql" Namespace="GraphQL.TestServer" QueryName="TestServerGraphQLQuery" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="GraphQL\TestServer" />
+    </ItemGroup>
 </Project>

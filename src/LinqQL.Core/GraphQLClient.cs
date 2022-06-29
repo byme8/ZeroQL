@@ -1,9 +1,14 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+
 namespace LinqQL.Core;
 
-public class GraphQLClient : IDisposable
+public class GraphQLClient<TQuery> : IDisposable
 {
     private readonly HttpClient httpClient;
 
@@ -12,6 +17,11 @@ public class GraphQLClient : IDisposable
         this.httpClient = httpClient;
     }
 
+    public TResult Query<TArguments, TResult>(TArguments arguments, Func<TArguments, TQuery, TResult> query)
+    {
+        return query(arguments, default);
+    }
+    
     public async Task<T> Execute<T>(string query)
     {
         var response = await httpClient.PostAsync("", new StringContent(query, Encoding.UTF8, "application/json"));

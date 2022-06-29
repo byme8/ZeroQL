@@ -1,4 +1,6 @@
-﻿using GraphQLParser;
+﻿using System;
+using System.Linq;
+using GraphQLParser;
 using GraphQLParser.AST;
 using LinqQL.Core.Extensions;
 using LinqQL.Core.Schema;
@@ -10,9 +12,9 @@ using TypeKind = LinqQL.Core.Schema.TypeKind;
 
 namespace LinqQL.Core.Bootstrap;
 
-public static class SchemaHelper
+public static class GraphQLGenerator
 {
-    public static string GraphQLSchemaToCSharp(string graphql, string clientNamespace)
+    public static string ToCSharp(string graphql, string clientNamespace)
     {
         var context = new TypeFormatter();
         var schema = Parser.Parse(graphql);
@@ -59,7 +61,7 @@ public static class SchemaHelper
             .WithMembers(List<MemberDeclarationSyntax>(classesDeclaration));
 
         var formattedSource = namespaceDeclaration.NormalizeWhitespace().ToFullString();
-        return formattedSource;
+        return "using System.Text.Json.Serialization;\n\n" + formattedSource;
     }
 
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)

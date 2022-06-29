@@ -1,5 +1,7 @@
-﻿using GraphQLParser.AST;
+﻿using System.Collections.Generic;
+using GraphQLParser.AST;
 using LinqQL.Core.Schema;
+
 namespace LinqQL.Core.Bootstrap
 {
     public class TypeFormatter

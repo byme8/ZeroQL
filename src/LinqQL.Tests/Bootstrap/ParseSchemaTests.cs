@@ -13,7 +13,7 @@ public class ParseSchemaTests
 {
     public ParseSchemaTests()
     {
-        Csharp = SchemaHelper.GraphQLSchemaToCSharp(TestSchema.RawSchema, "TestApp");
+        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp");
         SyntaxTree = CSharpSyntaxTree.ParseText(Csharp);
     }
 
