@@ -1,26 +1,26 @@
 ﻿using GraphQL.TestServer;
 using LinqQL.Core;
 
-var httpClient = new HttpClient
+namespace LinqQL.TestApp
 {
-    BaseAddress = new("http://localhost:10000/")
-};
-
-var qlClient = new GraphQLClient<Query>(httpClient);
-var result = qlClient
-    .Query(
-        new { FirstId = 10, SecondId = 20 },
-        static (a, q) => new
+    public class Program
+    {
+        public static void Stub()
         {
-            User = q.User(a.FirstId, o => new User(o.FirstName, o.LastName, o.Role(o => o.Name))),
-            SecondUser = q.User(a.SecondId, o => new
+            
+        }
+        
+        public static void Main()
+        {
+            var httpClient = new HttpClient
             {
-                o.FirstName
-            })
-        });
+                BaseAddress = new("http://localhost:10000/")
+            };
 
-var firstUser = result.User;
-var secondUser = result.SecondUser;
+            var qlClient = new GraphQLClient<Query>(httpClient);
+            // place for query
+        }
+    }
 
-
-public record User(string FirstName, string LastName, string Role);
+    public record User(string FirstName, string LastName, string Role);
+}

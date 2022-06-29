@@ -4,12 +4,19 @@ namespace GraphQL.TestServer
 {
     public class Query
     {
+        [JsonPropertyName("Me")]
+        User _Me;
         [JsonPropertyName("Users")]
         User[] _Users;
         [JsonPropertyName("User")]
         User _User;
         [JsonPropertyName("Admin")]
         User? _Admin;
+        public T Me<T>(Func<User, T> selector)
+        {
+            return selector(_Me);
+        }
+
         public T Users<T>(int page, int size, Func<User[], T> selector)
         {
             return selector(_Users);

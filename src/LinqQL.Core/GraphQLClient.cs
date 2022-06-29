@@ -17,9 +17,24 @@ public class GraphQLClient<TQuery> : IDisposable
         this.httpClient = httpClient;
     }
 
+    public TResult Query<TArguments, TResult>(string name, TArguments arguments, Func<TArguments, TQuery, TResult> query)
+    {
+        return query(arguments, default);
+    }
+    
+    public TResult Query<TResult>(string name, Func<TQuery, TResult> query)
+    {
+        return query(default);
+    }
+    
     public TResult Query<TArguments, TResult>(TArguments arguments, Func<TArguments, TQuery, TResult> query)
     {
         return query(arguments, default);
+    }
+    
+    public TResult Query<TResult>(Func<TQuery, TResult> query)
+    {
+        return query(default);
     }
     
     public async Task<T> Execute<T>(string query)

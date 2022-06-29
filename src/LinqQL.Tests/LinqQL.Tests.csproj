@@ -9,19 +9,16 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
         <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="3.10.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.2.0" />
+        <PackageReference Include="Buildalyzer" Version="4.1.4" />
+        <PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\LinqQL.CLI\LinqQL.CLI.csproj" />
         <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
+        <ProjectReference Include="..\LinqQL.SourceGenerators\LinqQL.SourceGenerators.csproj" />
         <ProjectReference Include="..\LinqQL.TestServer\LinqQL.TestServer.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="Data\TestServer.graphql">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 
 </Project>

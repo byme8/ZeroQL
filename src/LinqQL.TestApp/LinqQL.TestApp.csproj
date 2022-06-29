@@ -8,14 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LinqQL\LinqQL.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <GraphQLSchema Include="schema.graphql" Namespace="GraphQL.TestServer" QueryName="TestServerGraphQLQuery" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GraphQL\TestServer" />
+      <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
+      <ProjectReference Include="..\LinqQL.SourceGenerators\LinqQL.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>

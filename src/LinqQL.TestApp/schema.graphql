@@ -3,6 +3,7 @@ schema {
 }
 
 type Query {
+  me: User!
   users(page: Int! size: Int!): [User!]!
   user(id: Int!): User!
   admin(id: Int!): User

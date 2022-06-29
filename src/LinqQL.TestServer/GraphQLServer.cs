@@ -30,6 +30,15 @@ public class Role
 [ExtendObjectType(typeof(Query))]
 public class UserGraphQLExtensions
 {
+    public User Me()
+    {
+        return new User
+        {
+            FirstName = "Jon",
+            LastName = "Smith"
+        };
+    }
+    
     public User[] GetUsers(int page, int size)
     {
         return Enumerable.Range(0, size)
