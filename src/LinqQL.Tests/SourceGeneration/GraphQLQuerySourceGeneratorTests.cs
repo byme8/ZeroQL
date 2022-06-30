@@ -155,4 +155,16 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
         result.Data.Should().Be(-431);
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
+
+    [Fact(Skip = "To Do")]
+    public void SupportForEnums()
+    {
+        
+    }
+    
+    [Fact(Skip = "To Do")]
+    public void SupportForArray()
+    {
+        
+    }
 }

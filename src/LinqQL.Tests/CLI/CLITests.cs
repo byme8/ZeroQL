@@ -1,5 +1,7 @@
 using CliFx.Infrastructure;
 using LinqQL.CLI.Commands;
+using LinqQL.Tests.Core;
+using LinqQL.Tests.Data;
 using Xunit;
 
 namespace LinqQL.Tests.CLI
@@ -17,6 +19,8 @@ namespace LinqQL.Tests.CLI
             generateCommand.Output = "../../../../LinqQL.TestApp/Generated/GraphQL.g.cs";
 
             await generateCommand.ExecuteAsync(console);
+
+            await TestProject.Project.CompileToRealAssembly();
         }
     }
 }

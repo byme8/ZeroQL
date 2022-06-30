@@ -1,27 +1,28 @@
 ﻿using System.Collections.Generic;
 using GraphQLParser.AST;
 using LinqQL.Core.Schema;
+using Microsoft.Build.Framework;
 
 namespace LinqQL.Core.Bootstrap
 {
     public class TypeFormatter
     {
-        public Dictionary<GraphQLType, TypeDefinition> Cache = new();
-
         public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
         {
             { "String", "string" },
-            { "Int", "int" }
+            { "Short", "short" },
+            { "Int", "int" },
+            { "Long", "long" },
+            { "Float", "float" },
+            { "Double", "double" },
+            { "Date", "DateTime" },
+            { "UUID", "Guid" },
+            { "Boolean", "bool" },
+            { "DateTime", "DateTime" },
         };
 
         public TypeDefinition GetTypeDefinition(GraphQLType type)
         {
-            var cacheValue = Cache.GetValueOrDefault(type);
-            if (cacheValue is not null)
-            {
-                return cacheValue;
-            }
-
             switch (type)
             {
                 case GraphQLNonNullType { Type: GraphQLNamedType nonNullType }:
@@ -36,6 +37,18 @@ namespace LinqQL.Core.Bootstrap
                     };
                 }
                 case GraphQLNonNullType { Type: GraphQLListType listType }:
+                {
+                    var elementType = GetTypeDefinition(listType.Type);
+                    var fieldKind = TypeKind.Object;
+                    var typeName = elementType.Name + "[]";
+
+                    return new TypeDefinition
+                    {
+                        Name = typeName,
+                        TypeKind = fieldKind,
+                    };
+                }
+                case GraphQLListType listType:
                 {
                     var elementType = GetTypeDefinition(listType.Type);
                     var fieldKind = TypeKind.Object;
