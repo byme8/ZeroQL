@@ -31,14 +31,20 @@ public class GraphQLClient<TQuery> : IDisposable
         return query(default);
     }
 
-    public TResult Query<TArguments, TResult>(TArguments arguments, Func<TArguments, TQuery, TResult> query)
+    public async Task<GraphQLResponse<TResult>> Query<TVariables, TResult>(TVariables variables, Func<TVariables, TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
     {
-        return query(arguments, default);
+        var result = await Execute<TQuery>(variables, queryKey);
+        var formatted = query(variables, result.Data);
+
+        return new GraphQLResponse<TResult>
+        {
+            Data = formatted
+        };
     }
 
     public async Task<GraphQLResponse<TResult>> Query<TResult>(Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
     {
-        var result = await Execute<TQuery>(queryKey);
+        var result = await Execute<TQuery>(null, queryKey);
         var formatted = query(result.Data);
 
         return new GraphQLResponse<TResult>
@@ -47,7 +53,7 @@ public class GraphQLClient<TQuery> : IDisposable
         };
     }
 
-    public async Task<GraphQLResponse<T>> Execute<T>(string queryKey)
+    public async Task<GraphQLResponse<T>> Execute<T>(object? arguments, string queryKey)
     {
         if (!GraphQLQueryStore.Query.TryGetValue(queryKey, out var query))
         {
@@ -56,6 +62,7 @@ public class GraphQLClient<TQuery> : IDisposable
 
         var queryRequest = new GraphQLRequest
         {
+            Variables = arguments,
             Query = query
         };
         
@@ -75,6 +82,7 @@ public class GraphQLClient<TQuery> : IDisposable
 
 public class GraphQLRequest
 {
+    public object? Variables { get; set; }
     public string Query { get; set; }
 }
 

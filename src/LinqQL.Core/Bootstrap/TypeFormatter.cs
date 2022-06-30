@@ -8,7 +8,7 @@ namespace LinqQL.Core.Bootstrap
     {
         public Dictionary<GraphQLType, TypeDefinition> Cache = new();
 
-        public Dictionary<string, string> ScalarTypes = new()
+        public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
         {
             { "String", "string" },
             { "Int", "int" }
@@ -68,10 +68,10 @@ namespace LinqQL.Core.Bootstrap
         {
             var fieldKind = GetScalarity(nonNullType);
             var typeName = nonNullType.Name.StringValue;
-            return fieldKind == TypeKind.Object ? typeName : ScalarTypes[typeName];
+            return fieldKind == TypeKind.Object ? typeName : GraphQLToCsharpScalarTypes[typeName];
         }
 
         private TypeKind GetScalarity(GraphQLNamedType namedType)
-            => ScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Object;
+            => GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Object;
     }
 }

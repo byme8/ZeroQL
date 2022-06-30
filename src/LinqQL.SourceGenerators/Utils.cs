@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
+
 namespace LinqQL.SourceGenerators
 {
     public static class Utils
@@ -12,7 +13,7 @@ namespace LinqQL.SourceGenerators
 
             return first.ToLower() + tail;
         }
-        
+
         public static string Join(this IEnumerable<string> values, string separator = ", ")
         {
             return string.Join(separator, values);
@@ -26,6 +27,33 @@ namespace LinqQL.SourceGenerators
         public static string JoinWithNewLine(this IEnumerable<string> values, string separator = "")
         {
             return string.Join($"{separator}{Environment.NewLine}", values);
+        }
+
+        private static Dictionary<string, string> CSharpToGraphQL = new Dictionary<string, string>
+        {
+            { "Int32", "Int" },
+            { "string", "String" }
+        };
+
+        public static string ToStringWithNullable(this ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.NullableAnnotation switch
+            {
+                NullableAnnotation.None => Map(typeSymbol.Name),
+                NullableAnnotation.NotAnnotated => Map(typeSymbol.Name) + "!",
+                NullableAnnotation.Annotated => Map(typeSymbol.Name),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            string Map(string name)
+            {
+                if (CSharpToGraphQL.ContainsKey(name))
+                {
+                    return CSharpToGraphQL[name];
+                }
+
+                return name;
+            }
         }
     }
 }

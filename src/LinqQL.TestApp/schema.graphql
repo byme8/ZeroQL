@@ -15,6 +15,7 @@ type Role {
 }
 
 type User {
+  id: Int!
   firstName: String!
   lastName: String!
   role: Role!

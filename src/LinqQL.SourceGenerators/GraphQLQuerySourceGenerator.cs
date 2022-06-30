@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -72,31 +73,60 @@ namespace {context.Compilation.Assembly.Name}
             var queryExpression = invocation.ArgumentList.Arguments.Last().Expression;
             if (parameterNames.SequenceEqual(new[] { "name", "query", "queryKey" }))
             {
-                return GenerateGraphQLQuery(semanticModel, invocation.ArgumentList.Arguments.First().ToString(), queryExpression);
+                return GenerateGraphQLQuery(semanticModel, invocation.ArgumentList.Arguments.First().ToString(), null, queryExpression);
+            }
+
+            if (parameterNames.SequenceEqual(new[] { "variables", "query", "queryKey" }))
+            {
+                var variablesExpression = invocation.ArgumentList.Arguments.First().Expression;
+                return GenerateGraphQLQuery(semanticModel, string.Empty, variablesExpression, queryExpression);
             }
 
             if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
             {
-                return GenerateGraphQLQuery(semanticModel, string.Empty, queryExpression);
+                return GenerateGraphQLQuery(semanticModel, string.Empty, null, queryExpression);
             }
 
             return "query { }";
         }
 
-        public string GenerateGraphQLQuery(SemanticModel semanticModel, string name, ExpressionSyntax query)
+        public string GenerateGraphQLQuery(SemanticModel semanticModel, string name, ExpressionSyntax? variablesExpression, ExpressionSyntax query)
         {
-            if (!(query is SimpleLambdaExpressionSyntax lambda))
+            if (!(query is LambdaExpressionSyntax lambda))
             {
                 return "";
             }
 
-            var queryArgumentName = lambda.Parameter.Identifier.ValueText;
-            var body = GenerateBody(semanticModel, queryArgumentName, lambda.Body);
+            var inputs = GetQueryInputs(lambda);
+            var variables = GetVariables(semanticModel, variablesExpression);
+            var availableVariables = inputs.VariablesName is null ? new Dictionary<string, string>()
+                : variables
+                    .ToDictionary(
+                        o => $"{inputs.VariablesName}.{o.Name}",
+                        o => "$" + o.Name.FirstToLower());
+
+            var context = new GraphQLQueryGenerationContext
+            {
+                QueryVariableName = inputs.QueryName,
+                AvailableVariables = availableVariables,
+                SemanticModel = semanticModel
+            };
+
+            var body = GenerateBody(context, lambda.Body);
             var stringBuilder = new StringBuilder();
             stringBuilder.Append("query");
             if (!string.IsNullOrEmpty(name))
             {
                 stringBuilder.Append($" {name}");
+            }
+            if (inputs.VariablesName != null)
+            {
+                var variablesBody = variables
+                    .Select(o => $"${o.Name.FirstToLower()}: {o.Type}")
+                    .Join()
+                    .Wrap(" (", ")");
+
+                stringBuilder.Append(variablesBody);
             }
             stringBuilder.Append(" { ");
             stringBuilder.Append(body);
@@ -105,13 +135,46 @@ namespace {context.Compilation.Assembly.Name}
             return stringBuilder.ToString();
         }
 
-        private string GenerateBody(SemanticModel semanticModel, string queryArgumentName, CSharpSyntaxNode lambdaBody)
+        private static (string? VariablesName, string QueryName) GetQueryInputs(LambdaExpressionSyntax lambda)
+        {
+            if (lambda is SimpleLambdaExpressionSyntax simpleLambda)
+            {
+                return (null, simpleLambda.Parameter.Identifier.ValueText);
+            }
+
+            if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda)
+            {
+                var parameters = parenthesizedLambda.ParameterList.Parameters;
+                return (parameters.First().Identifier.ValueText, parameters.Last().Identifier.ValueText);
+            }
+
+            return default;
+        }
+
+        private (string Name, string Type)[] GetVariables(SemanticModel semanticModel, ExpressionSyntax? variablesExpression)
+        {
+            if (!(variablesExpression is AnonymousObjectCreationExpressionSyntax anonymousObject))
+            {
+                Failed(variablesExpression);
+
+                return Array.Empty<(string Name, string Type)>();
+            }
+
+            var ctor = semanticModel.GetSymbolInfo(anonymousObject).Symbol as IMethodSymbol;
+            var type = ctor.ContainingType;
+            return type.GetMembers()
+                .OfType<IPropertySymbol>()
+                .Select(o => (o.Name, o.Type.ToStringWithNullable()))
+                .ToArray();
+        }
+
+        private string GenerateBody(GraphQLQueryGenerationContext context, CSharpSyntaxNode lambdaBody)
         {
             switch (lambdaBody)
             {
                 case InvocationExpressionSyntax invocation:
                 {
-                    var symbol = semanticModel.GetSymbolInfo(invocation);
+                    var symbol = context.SemanticModel.GetSymbolInfo(invocation);
                     if (!(symbol.Symbol is IMethodSymbol method))
                     {
                         return Failed(invocation);
@@ -119,22 +182,22 @@ namespace {context.Compilation.Assembly.Name}
 
                     var argumentNames = method.Parameters
                         .Take(method.Parameters.Length - 1)
-                        .Select(o => $"${o.Name.FirstToLower()}: ")
+                        .Select(o => $"{o.Name.FirstToLower()}: ")
                         .ToArray();
-                    
+
                     var stringBuilder = new StringBuilder();
                     stringBuilder.Append(method.Name.FirstToLower());
                     if (argumentNames.Any())
                     {
                         var graphQLArguments = invocation.ArgumentList.Arguments
                             .Take(argumentNames.Length)
-                            .Select((o, i) =>$"{argumentNames[i]}{GenerateBody(semanticModel, queryArgumentName, o)}")
+                            .Select((o, i) => $"{argumentNames[i]}{GenerateBody(context, o)}")
                             .Join()
                             .Wrap("(", ")");
-                        
+
                         stringBuilder.Append(graphQLArguments);
                     }
-                    stringBuilder.Append($" {{ {GenerateBody(semanticModel, queryArgumentName, invocation.ArgumentList.Arguments.Last().Expression)} }} ");
+                    stringBuilder.Append($" {{ {GenerateBody(context, invocation.ArgumentList.Arguments.Last().Expression)} }} ");
 
                     return stringBuilder.ToString();
                 }
@@ -144,7 +207,7 @@ namespace {context.Compilation.Assembly.Name}
                 }
                 case IdentifierNameSyntax identifierNameSyntax:
                 {
-                    if (identifierNameSyntax.Identifier.ValueText == queryArgumentName)
+                    if (identifierNameSyntax.Identifier.ValueText == context.QueryVariableName)
                     {
                         return string.Empty;
                     }
@@ -153,7 +216,7 @@ namespace {context.Compilation.Assembly.Name}
                 }
                 case SimpleLambdaExpressionSyntax simpleLambda:
                 {
-                    return GenerateBody(semanticModel, simpleLambda.Parameter.Identifier.ValueText, simpleLambda.Body);
+                    return GenerateBody(context, simpleLambda.Body);
                 }
                 case ArgumentSyntax argument:
                 {
@@ -162,29 +225,43 @@ namespace {context.Compilation.Assembly.Name}
                         return literal.ToString();
                     }
 
+                    var value = argument.Expression.ToString();
+                    if (context.AvailableVariables.ContainsKey(value))
+                    {
+                        return context.AvailableVariables[value];
+                    }
+
                     return Failed(argument);
                 }
                 case AnonymousObjectCreationExpressionSyntax anonymous:
                 {
                     return anonymous.Initializers
-                        .Select(o => GenerateBody(semanticModel, queryArgumentName, o))
+                        .Select(o => GenerateBody(context, o))
                         .Join(" ");
                 }
                 case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
                 {
-                    return GenerateBody(semanticModel, queryArgumentName, anonymousMember.Expression);
+                    return GenerateBody(context, anonymousMember.Expression);
                 }
-                
             }
 
             return Failed(lambdaBody);
         }
 
-        private static string Failed(CSharpSyntaxNode lambdaBody)
+        private static string Failed(CSharpSyntaxNode? lambdaBody)
         {
-
-            return $"// Failed to generate query for: {lambdaBody.ToString()}";
+            return $"// Failed to generate query for: {lambdaBody?.ToString() ?? string.Empty}";
         }
+    }
+
+    public class GraphQLQueryGenerationContext
+    {
+        public string QueryVariableName { get; set; }
+
+
+        public Dictionary<string, string> AvailableVariables { get; set; }
+
+        public SemanticModel SemanticModel { get; set; }
     }
 
     public class QueryMethodSelector : ISyntaxReceiver

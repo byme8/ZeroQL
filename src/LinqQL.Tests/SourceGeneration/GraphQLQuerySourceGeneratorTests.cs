@@ -26,16 +26,14 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
         var result = (GraphQLResponse<string>)await execute();
 
         result.Data.Should().Be("Jon");
         GraphQLQueryStore.Query[MeQuery].Should().Be(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task AnonymousTypeQuery()
     {
@@ -47,13 +45,11 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task AnonymousTypeInQueryRoot()
     {
@@ -65,13 +61,18 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
-    
+
+    private static Func<Task<object>>? CreateExecuteDelegate(Assembly assembly)
+    {
+        return assembly.GetType("LinqQL.TestApp.Program")!
+            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
+            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+    }
+
     [Fact]
     public async Task AnonymousTypeWithMultipleFieldsQuery()
     {
@@ -83,13 +84,11 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
-    
+
     [Fact(Skip = "Think how to fix after release")]
     public async Task AnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
@@ -101,28 +100,59 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task AnonymousTypeWithConstantArgumentQuery()
     {
         var csharpQuery = "static q => new { User = q.User(42, o => new { o.FirstName, o.LastName }) }";
-        var graphqlQuery = @"query { user($id: 42) { firstName lastName } }";
+        var graphqlQuery = @"query { user(id: 42) { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = assembly.GetType("LinqQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+        var execute = CreateExecuteDelegate(assembly);
 
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
+
+    [Fact]
+    public async Task AnonymousTypeWithArgumentQuery()
+    {
+        var csharpQuery = "static (i, q) => new { User = q.User(i.Id, o => new { o.FirstName, o.LastName }) }";
+        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "new { Id = 42 }, " + csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+
+        var execute = CreateExecuteDelegate(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
+
+    [Fact]
+    public async Task AnonymousTypeWithPassedArgumentQuery()
+    {
+        var csharpQuery = "static (i, q) => q.User(i.Id, o => o.Id)";
+        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { id } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "new { Id = -431 }, " + csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+
+        var execute = CreateExecuteDelegate(assembly);
+
+        var result = (GraphQLResponse<int>)await execute();
+
+        result.Data.Should().Be(-431);
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
 }

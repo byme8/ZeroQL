@@ -10,7 +10,7 @@ public class Query
 [ExtendObjectType(typeof(User))]
 public class RoleGraphQLExtension
 {
-    public Role GetRole([Parent]User user)
+    public Role GetRole([Parent] User user)
     {
         return new Role()
         {
@@ -34,11 +34,12 @@ public class UserGraphQLExtensions
     {
         return new User
         {
+            Id = -1,
             FirstName = "Jon",
             LastName = "Smith"
         };
     }
-    
+
     public User[] GetUsers(int page, int size)
     {
         return Enumerable.Range(0, size)
@@ -54,6 +55,7 @@ public class UserGraphQLExtensions
     {
         return new User
         {
+            Id = id,
             FirstName = "Jon",
             LastName = "Smith"
         };
@@ -67,6 +69,8 @@ public class UserGraphQLExtensions
 
 public class User
 {
+    public int Id { get; set; }
+
     public string FirstName { get; set; }
 
     public string LastName { get; set; }
