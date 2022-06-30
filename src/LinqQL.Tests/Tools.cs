@@ -10,7 +10,6 @@ public class Tools : IntegrationTest
     {
         var httpClient = new HttpClient();
         var graphql = await httpClient.GetStringAsync("http://localhost:10000/graphql?sdl");
-        await File.WriteAllTextAsync("../../../Data/TestServer.graphql", graphql);
         await File.WriteAllTextAsync("../../../../LinqQL.TestApp/schema.graphql", graphql);
     }
 }

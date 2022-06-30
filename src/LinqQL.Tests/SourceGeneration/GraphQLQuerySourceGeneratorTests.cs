@@ -7,7 +7,7 @@ using Xunit;
 
 namespace LinqQL.Tests.SourceGeneration;
 
-public class GraphQLQuerySourceGeneratorTests
+public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 {
     [Fact]
     public async Task CompilationWorks()
@@ -21,15 +21,17 @@ public class GraphQLQuerySourceGeneratorTests
         var csharpQuery = @"static q => q.Me(o => o.FirstName)";
         var graphqlQuery = @"query { me { firstName } }";
 
-        var queryCall = $"qlClient.Query({csharpQuery});";
-        var project = await TestProject.Project.ReplacePartOfDocumentAsync("Program.cs", "// place for query", queryCall);
+        var project = TestProject.Project;
 
         var assembly = await project.CompileToRealAssembly();
 
-        var result = assembly.GetType("LinqQL.TestApp.Program")
-            .GetMethod("Stub", BindingFlags.Static | BindingFlags.Public)
-            .Invoke(null, null);
+        var execute = assembly.GetType("LinqQL.TestApp.Program")
+            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)
+            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+
+        var result = (GraphQLResponse<string>)(await execute());
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+        result.Data.Should().Be("Jon");
     }
 }

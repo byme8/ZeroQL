@@ -25,11 +25,11 @@ public static class NodeExtensions
             .First(o => o.Identifier.ValueText == name);
     }
     
-    public static FieldDeclarationSyntax GetField(this ClassDeclarationSyntax @class, string name)
+    public static PropertyDeclarationSyntax GetProperty(this ClassDeclarationSyntax @class, string name)
     {
         return @class.Members
-            .OfType<FieldDeclarationSyntax>()
-            .First(o => o.Declaration.Variables.First().Identifier.ValueText == name);
+            .OfType<PropertyDeclarationSyntax>()
+            .First(o => o.Identifier.ValueText == name);
     }
 }
 

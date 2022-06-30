@@ -55,6 +55,7 @@ public class ParseSchemaTests
         query.Should().NotBeNull();
         query.Members
             .OfType<PropertyDeclarationSyntax>()
+            .Where(o => !o.Identifier.ValueText.StartsWith("__"))
             .Select(o => o.Identifier.ValueText).Should()
             .Contain(propertiesNames).And.HaveCount(2);
     }
@@ -75,7 +76,7 @@ public class ParseSchemaTests
     public void BackedFieldsHasJsonPropertyNames()
     {
         var query = SyntaxTree.GetClass("Query");
-        var user = query.GetField("_User");
+        var user = query.GetProperty("__User");
 
         user.AttributeLists
             .SelectMany(o => o.Attributes)

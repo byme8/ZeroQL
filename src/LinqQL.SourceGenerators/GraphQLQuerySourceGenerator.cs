@@ -70,12 +70,12 @@ namespace {context.Compilation.Assembly.Name}
                 .ToArray();
 
             var queryExpression = invocation.ArgumentList.Arguments.Last().Expression;
-            if (parameterNames.SequenceEqual(new[] { "name", "query" }))
+            if (parameterNames.SequenceEqual(new[] { "name", "query", "queryKey" }))
             {
                 return GenerateGraphQLQuery(invocation.ArgumentList.Arguments.First().ToString(), queryExpression);
             }
 
-            if (parameterNames.SequenceEqual(new[] { "query" }))
+            if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
             {
                 return GenerateGraphQLQuery(string.Empty, queryExpression);
             }

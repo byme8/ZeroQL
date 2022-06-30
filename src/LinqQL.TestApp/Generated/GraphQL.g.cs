@@ -4,32 +4,36 @@ namespace GraphQL.TestServer
 {
     public class Query
     {
-        [JsonPropertyName("Me")]
-        User _Me;
-        [JsonPropertyName("Users")]
-        User[] _Users;
-        [JsonPropertyName("User")]
-        User _User;
-        [JsonPropertyName("Admin")]
-        User? _Admin;
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
+        public User __Me { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
+        public User[] __Users { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
+        public User __User { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Admin")]
+        public User? __Admin { get; set; }
+
         public T Me<T>(Func<User, T> selector)
         {
-            return selector(_Me);
+            return selector(__Me);
         }
 
         public T Users<T>(int page, int size, Func<User[], T> selector)
         {
-            return selector(_Users);
+            return selector(__Users);
         }
 
         public T User<T>(int id, Func<User, T> selector)
         {
-            return selector(_User);
+            return selector(__User);
         }
 
         public T Admin<T>(int id, Func<User?, T> selector)
         {
-            return selector(_Admin);
+            return selector(__Admin);
         }
     }
 
@@ -42,15 +46,16 @@ namespace GraphQL.TestServer
 
     public class User
     {
-        [JsonPropertyName("Role")]
-        Role _Role;
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
+        public Role __Role { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
         public T Role<T>(Func<Role, T> selector)
         {
-            return selector(_Role);
+            return selector(__Role);
         }
     }
 }

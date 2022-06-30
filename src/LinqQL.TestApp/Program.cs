@@ -12,13 +12,20 @@ namespace LinqQL.TestApp
         
         public static void Main()
         {
+
+        }
+
+        public static async Task<object> Execute()
+        {
             var httpClient = new HttpClient
             {
-                BaseAddress = new("http://localhost:10000/")
+                BaseAddress = new("http://localhost:10000/graphql")
             };
 
             var qlClient = new GraphQLClient<Query>(httpClient);
-            // place for query
+            var response = await qlClient.Query(static q => q.Me(o => o.FirstName));
+
+            return response;
         }
     }
 

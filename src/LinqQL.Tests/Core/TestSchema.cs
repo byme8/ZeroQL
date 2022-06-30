@@ -6,7 +6,7 @@
 
         static TestSchema()
         {
-            RawSchema = File.ReadAllText("Data/TestServer.graphql");
+            RawSchema = File.ReadAllText("../../../../LinqQL.TestApp/schema.graphql");
         }
     }
 }

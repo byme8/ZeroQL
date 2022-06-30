@@ -14,6 +14,7 @@ namespace LinqQL.Core.Bootstrap;
 
 public static class GraphQLGenerator
 {
+
     public static string ToCSharp(string graphql, string clientNamespace)
     {
         var context = new TypeFormatter();
@@ -33,19 +34,29 @@ public static class GraphQLGenerator
                     .Select(property =>
                     {
                         var jsonNameAttributes =
-                            AttributeList(
-                                SingletonSeparatedList(
-                                    Attribute(
-                                            IdentifierName("JsonPropertyName"))
+                            AttributeList()
+                                .AddAttributes(
+                                    Attribute(IdentifierName("global::System.ComponentModel.EditorBrowsable"))
+                                        .AddArgumentListArguments(
+                                            AttributeArgument(
+                                                ParseExpression("global::System.ComponentModel.EditorBrowsableState.Never"))),
+                                    Attribute(IdentifierName("JsonPropertyName"))
                                         .AddArgumentListArguments(
                                             AttributeArgument(
                                                 LiteralExpression(
                                                     SyntaxKind.StringLiteralExpression,
-                                                    Literal(property.Name))))));
-                        
-                        return FieldDeclaration(
-                            VariableDeclaration(ParseTypeName(property.TypeName))
-                                .AddVariables(VariableDeclarator("_" + property.Name)))
+                                                    Literal(property.Name))))
+                                );
+
+                        return PropertyDeclaration(
+                                ParseTypeName(property.TypeName),
+                                Identifier("__" + property.Name))
+                            .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                            .AddAccessorListAccessors(
+                                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                    .WithSemicolonToken(ParseToken(";")),
+                                AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                                    .WithSemicolonToken(ParseToken(";")))
                             .AddAttributeLists(jsonNameAttributes);
                     });
 
@@ -77,7 +88,7 @@ public static class GraphQLGenerator
             var selectorParameter = Parameter(Identifier("selector"))
                 .WithType(ParseTypeName($"Func<{field.TypeName}, T>"));
 
-           
+
 
             var genericMethodWithType = MethodDeclaration(
                     IdentifierName("T"),
@@ -91,7 +102,7 @@ public static class GraphQLGenerator
             var body = Block(
                 ReturnStatement(
                     InvocationExpression(IdentifierName("selector"))
-                        .AddArgumentListArguments(Argument(IdentifierName("_" + field.Name)))));
+                        .AddArgumentListArguments(Argument(IdentifierName("__" + field.Name)))));
 
             return genericMethodWithType
                 .WithBody(body);
