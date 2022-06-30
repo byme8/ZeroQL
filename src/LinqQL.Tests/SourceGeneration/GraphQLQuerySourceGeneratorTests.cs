@@ -90,11 +90,29 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
     
-    [Fact(Skip = "Fix after release")]
-    public async Task AnonymousTypeWithMultipleFieldsInRootQuery()
+    [Fact(Skip = "Think how to fix after release")]
+    public async Task AnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
         var csharpQuery = "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";
         var graphqlQuery = @"query { m1: me { firstName lastName } m2: me { firstName lastName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+
+        var execute = assembly.GetType("LinqQL.TestApp.Program")!
+            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
+            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
+    
+    [Fact]
+    public async Task AnonymousTypeWithConstantArgumentQuery()
+    {
+        var csharpQuery = "static q => new { User = q.User(42, o => new { o.FirstName, o.LastName }) }";
+        var graphqlQuery = @"query { user($id: 42) { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));

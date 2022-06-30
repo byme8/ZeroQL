@@ -40,7 +40,7 @@ namespace LinqQL.SourceGenerators
                 }
 
                 var key = invocation.ArgumentList.Arguments.Last().ToString();
-                var query = GetQuery(method, invocation);
+                var query = GetQuery(semanticModel, method, invocation);
 
                 queries[key] = query;
             }
@@ -63,7 +63,7 @@ namespace {context.Compilation.Assembly.Name}
             context.AddSource("LinqQLModuleInitializer.g.cs", source);
         }
 
-        private string GetQuery(IMethodSymbol method, InvocationExpressionSyntax invocation)
+        private string GetQuery(SemanticModel semanticModel, IMethodSymbol method, InvocationExpressionSyntax invocation)
         {
             var parameterNames = method.Parameters
                 .Select(p => p.Name)
@@ -72,18 +72,18 @@ namespace {context.Compilation.Assembly.Name}
             var queryExpression = invocation.ArgumentList.Arguments.Last().Expression;
             if (parameterNames.SequenceEqual(new[] { "name", "query", "queryKey" }))
             {
-                return GenerateGraphQLQuery(invocation.ArgumentList.Arguments.First().ToString(), queryExpression);
+                return GenerateGraphQLQuery(semanticModel, invocation.ArgumentList.Arguments.First().ToString(), queryExpression);
             }
 
             if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
             {
-                return GenerateGraphQLQuery(string.Empty, queryExpression);
+                return GenerateGraphQLQuery(semanticModel, string.Empty, queryExpression);
             }
 
             return "query { }";
         }
 
-        public string GenerateGraphQLQuery(string name, ExpressionSyntax query)
+        public string GenerateGraphQLQuery(SemanticModel semanticModel, string name, ExpressionSyntax query)
         {
             if (!(query is SimpleLambdaExpressionSyntax lambda))
             {
@@ -91,7 +91,7 @@ namespace {context.Compilation.Assembly.Name}
             }
 
             var queryArgumentName = lambda.Parameter.Identifier.ValueText;
-            var body = GenerateBody(queryArgumentName, lambda.Body);
+            var body = GenerateBody(semanticModel, queryArgumentName, lambda.Body);
             var stringBuilder = new StringBuilder();
             stringBuilder.Append("query");
             if (!string.IsNullOrEmpty(name))
@@ -105,12 +105,39 @@ namespace {context.Compilation.Assembly.Name}
             return stringBuilder.ToString();
         }
 
-        private string GenerateBody(string queryArgumentName, CSharpSyntaxNode lambdaBody)
+        private string GenerateBody(SemanticModel semanticModel, string queryArgumentName, CSharpSyntaxNode lambdaBody)
         {
             switch (lambdaBody)
             {
                 case InvocationExpressionSyntax invocation:
-                    return GenerateBody(queryArgumentName, invocation.Expression) + $" {{ {GenerateBody(queryArgumentName, invocation.ArgumentList)} }} ";
+                {
+                    var symbol = semanticModel.GetSymbolInfo(invocation);
+                    if (!(symbol.Symbol is IMethodSymbol method))
+                    {
+                        return Failed(invocation);
+                    }
+
+                    var argumentNames = method.Parameters
+                        .Take(method.Parameters.Length - 1)
+                        .Select(o => $"${o.Name.FirstToLower()}: ")
+                        .ToArray();
+                    
+                    var stringBuilder = new StringBuilder();
+                    stringBuilder.Append(method.Name.FirstToLower());
+                    if (argumentNames.Any())
+                    {
+                        var graphQLArguments = invocation.ArgumentList.Arguments
+                            .Take(argumentNames.Length)
+                            .Select((o, i) =>$"{argumentNames[i]}{GenerateBody(semanticModel, queryArgumentName, o)}")
+                            .Join()
+                            .Wrap("(", ")");
+                        
+                        stringBuilder.Append(graphQLArguments);
+                    }
+                    stringBuilder.Append($" {{ {GenerateBody(semanticModel, queryArgumentName, invocation.ArgumentList.Arguments.Last().Expression)} }} ");
+
+                    return stringBuilder.ToString();
+                }
                 case MemberAccessExpressionSyntax member:
                 {
                     return member.Name.Identifier.ValueText.FirstToLower();
@@ -124,25 +151,28 @@ namespace {context.Compilation.Assembly.Name}
 
                     return Failed(lambdaBody);
                 }
-                case ArgumentListSyntax argumentList:
+                case SimpleLambdaExpressionSyntax simpleLambda:
                 {
-                    var argument = argumentList.Arguments.First();
-                    if (!(argument.Expression is SimpleLambdaExpressionSyntax simpleLambda))
+                    return GenerateBody(semanticModel, simpleLambda.Parameter.Identifier.ValueText, simpleLambda.Body);
+                }
+                case ArgumentSyntax argument:
+                {
+                    if (argument.Expression is LiteralExpressionSyntax literal)
                     {
-                        return Failed(lambdaBody);
+                        return literal.ToString();
                     }
 
-                    return GenerateBody(simpleLambda.Parameter.Identifier.ValueText, simpleLambda.Body);
+                    return Failed(argument);
                 }
                 case AnonymousObjectCreationExpressionSyntax anonymous:
                 {
                     return anonymous.Initializers
-                        .Select(o => GenerateBody(queryArgumentName, o))
+                        .Select(o => GenerateBody(semanticModel, queryArgumentName, o))
                         .Join(" ");
                 }
                 case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
                 {
-                    return GenerateBody(queryArgumentName, anonymousMember.Expression);
+                    return GenerateBody(semanticModel, queryArgumentName, anonymousMember.Expression);
                 }
                 
             }
