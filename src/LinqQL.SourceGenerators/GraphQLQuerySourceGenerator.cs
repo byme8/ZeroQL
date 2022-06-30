@@ -134,6 +134,17 @@ namespace {context.Compilation.Assembly.Name}
 
                     return GenerateBody(simpleLambda.Parameter.Identifier.ValueText, simpleLambda.Body);
                 }
+                case AnonymousObjectCreationExpressionSyntax anonymous:
+                {
+                    return anonymous.Initializers
+                        .Select(o => GenerateBody(queryArgumentName, o))
+                        .Join(" ");
+                }
+                case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
+                {
+                    return GenerateBody(queryArgumentName, anonymousMember.Expression);
+                }
+                
             }
 
             return Failed(lambdaBody);
