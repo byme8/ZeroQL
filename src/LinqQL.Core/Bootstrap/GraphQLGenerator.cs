@@ -53,14 +53,15 @@ public static class GraphQLGenerator
         var typeDefinition = new ClassDefinition
         {
             Name = input.Name.StringValue,
-            Properties = CretePropertyDefinition(typeFormatter, input),
+            Properties = CretePropertyDefinition(typeFormatter, input)
         };
 
         return typeDefinition;
     }
 
     private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
-        => enums.Select(e =>
+    {
+        return enums.Select(e =>
             {
                 var members = e.Values.Select(o =>
                     {
@@ -76,9 +77,11 @@ public static class GraphQLGenerator
                 return enumSyntax;
             })
             .ToArray();
+    }
 
     private static ClassDeclarationSyntax[] GenerateTypes(ClassDefinition[] classes)
-        => classes
+    {
+        return classes
             .Select(o =>
             {
                 var backedFields = o.Properties
@@ -119,6 +122,7 @@ public static class GraphQLGenerator
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
             })
             .ToArray();
+    }
 
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
     {
@@ -198,7 +202,7 @@ public static class GraphQLGenerator
         var typeDefinition = new ClassDefinition
         {
             Name = type.Name.StringValue,
-            Properties = CretePropertyDefinition(typeFormatter, type),
+            Properties = CretePropertyDefinition(typeFormatter, type)
         };
 
         return typeDefinition;

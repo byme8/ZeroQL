@@ -6,8 +6,10 @@ namespace LinqQL.Tests.Core;
 
 public static class TestExtensions
 {
-    public static async Task<Project> ReplacePartOfDocumentAsync(this Project project, string documentName,
-        string textToReplace, string newText)
+    public static async Task<Project> ReplacePartOfDocumentAsync(this Project project,
+        string documentName,
+        string textToReplace,
+        string newText)
     {
         var document = project.Documents.First(o => o.Name == documentName);
         var text = await document.GetTextAsync();
@@ -15,8 +17,9 @@ public static class TestExtensions
             .WithText(SourceText.From(text.ToString().Replace(textToReplace, newText)))
             .Project;
     }
-        
-    public static async Task<Project> ReplacePartOfDocumentAsync(this Project project, string documentName,
+
+    public static async Task<Project> ReplacePartOfDocumentAsync(this Project project,
+        string documentName,
         params (string TextToReplace, string NewText)[] places)
     {
         foreach (var place in places)
@@ -56,7 +59,7 @@ public static class TestExtensions
         var error = compilation.GetDiagnostics()
             // .Concat(analyzerResults)
             .FirstOrDefault(o => o.Severity == DiagnosticSeverity.Error);
-            
+
         if (error != null)
         {
             throw new Exception(error.GetMessage());

@@ -12,7 +12,6 @@ public class TypeDefinition
     public string Name { get; set; }
 
     public TypeKind TypeKind { get; set; }
-
 }
 
 public enum TypeKind

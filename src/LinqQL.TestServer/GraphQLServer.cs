@@ -1,10 +1,7 @@
-﻿using HotChocolate.Types;
-
-namespace LinqQL.TestServer;
+﻿namespace LinqQL.TestServer;
 
 public class Query
 {
-
 }
 
 [ExtendObjectType(typeof(User))]
@@ -12,7 +9,7 @@ public class RoleGraphQLExtension
 {
     public Role GetRole([Parent] User user)
     {
-        return new Role()
+        return new Role
         {
             Id = 42,
             Name = "Admin"
@@ -117,7 +114,6 @@ public class TypesContainer
     public Dictionary<string, string>? Value28 { get; set; }
     public KeyValuePair<string, string> Value29 { get; set; }
     public KeyValuePair<string, string>? Value30 { get; set; }
-
 }
 
 public class UserFilterInput

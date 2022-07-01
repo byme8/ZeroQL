@@ -9,12 +9,12 @@ namespace LinqQL.Tests.SourceGeneration;
 
 public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 {
-    const string MeQuery = @"static q => q.Me(o => o.FirstName)";
+    private const string MeQuery = @"static q => q.Me(o => o.FirstName)";
 
     [Fact]
     public async Task CompilationWorks()
     {
-        var project = await TestProject.Project.CompileToRealAssembly();
+        await TestProject.Project.CompileToRealAssembly();
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -61,16 +61,16 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
 
-    private static Func<Task<object>>? CreateExecuteDelegate(Assembly assembly)
+    private static Func<Task<object>> CreateExecuteDelegate(Assembly assembly)
     {
-        return assembly.GetType("LinqQL.TestApp.Program")!
+        return (assembly.GetType("LinqQL.TestApp.Program")!
             .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>;
+            .CreateDelegate(typeof(Func<Task<object>>)) as Func<Task<object>>)!;
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -100,7 +100,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -116,7 +116,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -132,7 +132,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         var assembly = await project.CompileToRealAssembly();
 
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -164,7 +164,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
         var assembly = await project.CompileToRealAssembly();
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
@@ -182,7 +182,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, $"{arguments}, {csharpQuery}"));
 
         var assembly = await project.CompileToRealAssembly();
-        var execute = CreateExecuteDelegate(assembly);
+        CreateExecuteDelegate(assembly);
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }

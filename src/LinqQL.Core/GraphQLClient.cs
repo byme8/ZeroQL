@@ -10,7 +10,7 @@ namespace LinqQL.Core;
 public class GraphQLClient<TQuery> : IDisposable
 {
     private readonly HttpClient httpClient;
-    private JsonSerializerOptions options = new()
+    private readonly JsonSerializerOptions options = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -19,6 +19,11 @@ public class GraphQLClient<TQuery> : IDisposable
     public GraphQLClient(HttpClient httpClient)
     {
         this.httpClient = httpClient;
+    }
+
+    public void Dispose()
+    {
+        httpClient.Dispose();
     }
 
     public TResult Query<TArguments, TResult>(string name, TArguments arguments, Func<TArguments, TQuery, TResult> query)
@@ -65,18 +70,13 @@ public class GraphQLClient<TQuery> : IDisposable
             Variables = arguments,
             Query = query
         };
-        
+
         var json = JsonSerializer.Serialize(queryRequest, options);
         var response = await httpClient.PostAsync("", new StringContent(json, Encoding.UTF8, "application/json"));
         var stream = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<GraphQLResponse<T>>(stream, options);
 
         return result;
-    }
-
-    public void Dispose()
-    {
-        httpClient.Dispose();
     }
 }
 

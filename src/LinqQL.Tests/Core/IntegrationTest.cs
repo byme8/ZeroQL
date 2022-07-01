@@ -6,5 +6,4 @@ namespace LinqQL.Tests.Core;
 public class IntegrationTest
     : IClassFixture<TestServerFixture>
 {
-
 }

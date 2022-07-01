@@ -6,6 +6,12 @@ namespace LinqQL.SourceGenerators
 {
     public static class Utils
     {
+        private static readonly Dictionary<string, string> CSharpToGraphQL = new Dictionary<string, string>
+        {
+            { "Int32", "Int" },
+            { "string", "String" }
+        };
+
         public static string FirstToLower(this string text)
         {
             var first = text.Substring(0, 1);
@@ -28,12 +34,6 @@ namespace LinqQL.SourceGenerators
         {
             return string.Join($"{separator}{Environment.NewLine}", values);
         }
-
-        private static Dictionary<string, string> CSharpToGraphQL = new Dictionary<string, string>
-        {
-            { "Int32", "Int" },
-            { "string", "String" }
-        };
 
         public static string ToStringWithNullable(this ITypeSymbol typeSymbol)
         {

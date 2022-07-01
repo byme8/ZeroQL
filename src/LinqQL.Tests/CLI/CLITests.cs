@@ -4,23 +4,22 @@ using LinqQL.Tests.Core;
 using LinqQL.Tests.Data;
 using Xunit;
 
-namespace LinqQL.Tests.CLI
+namespace LinqQL.Tests.CLI;
+
+public class CLITests
 {
-    public class CLITests
+    [Fact]
+    public async Task Test()
     {
-        [Fact]
-        public async Task Test()
-        {
-            using var console = new FakeInMemoryConsole();
-            var generateCommand = new GenerateCommand();
-            generateCommand.Schema = "../../../../LinqQL.TestApp/schema.graphql";
-            generateCommand.Namespace = "GraphQL.TestServer";
-            generateCommand.QueryName = "TestServerQuery";
-            generateCommand.Output = "../../../../LinqQL.TestApp/Generated/GraphQL.g.cs";
+        using var console = new FakeInMemoryConsole();
+        var generateCommand = new GenerateCommand();
+        generateCommand.Schema = "../../../../LinqQL.TestApp/schema.graphql";
+        generateCommand.Namespace = "GraphQL.TestServer";
+        generateCommand.QueryName = "TestServerQuery";
+        generateCommand.Output = "../../../../LinqQL.TestApp/Generated/GraphQL.g.cs";
 
-            await generateCommand.ExecuteAsync(console);
+        await generateCommand.ExecuteAsync(console);
 
-            await TestProject.Project.CompileToRealAssembly();
-        }
+        await TestProject.Project.CompileToRealAssembly();
     }
 }

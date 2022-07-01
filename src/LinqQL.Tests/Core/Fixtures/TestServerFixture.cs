@@ -5,7 +5,7 @@ namespace LinqQL.Tests.Core.Fixtures;
 
 public class TestServerFixture : IAsyncLifetime
 {
-    private int count = 0;
+    private int count;
 
     public async Task InitializeAsync()
     {
@@ -13,7 +13,7 @@ public class TestServerFixture : IAsyncLifetime
         {
             var server = Program.StartServer(Array.Empty<string>());
         }
-        
+
         if (!await Program.VerifyServiceIsRunning())
         {
             throw new InvalidOperationException("Server failed to bootstrap");

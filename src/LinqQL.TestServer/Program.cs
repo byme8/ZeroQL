@@ -1,11 +1,12 @@
 using System.Net;
+
 namespace LinqQL.TestServer;
 
 public class Program
 {
     public const string TEST_SERVER_URL = "http://localhost:10000/graphql";
 
-    private static CancellationTokenSource CancellationTokenSource = new();
+    private static readonly CancellationTokenSource CancellationTokenSource = new();
 
     public static async Task Main(string[] args)
     {
@@ -32,7 +33,7 @@ public class Program
     public static async Task<bool> VerifyServiceIsRunning()
     {
         var httpClient = new HttpClient();
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             try
             {

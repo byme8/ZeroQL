@@ -1,9 +1,8 @@
-﻿namespace LinqQL.Tests.Data
-{
-    public class TestUser
-    {
-        public string FirstName { get; set; }
+﻿namespace LinqQL.Tests.Data;
 
-        public string LastName { get; set; }
-    }
+public class TestUser
+{
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
 }

@@ -7,6 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
+        <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj"/>
     </ItemGroup>
 </Project>

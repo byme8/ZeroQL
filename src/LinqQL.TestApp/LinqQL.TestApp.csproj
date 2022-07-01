@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
-      <ProjectReference Include="..\LinqQL.SourceGenerators\LinqQL.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj"/>
+        <ProjectReference Include="..\LinqQL.SourceGenerators\LinqQL.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 </Project>

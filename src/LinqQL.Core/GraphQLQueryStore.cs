@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace LinqQL.Core
+namespace LinqQL.Core;
+
+public static class GraphQLQueryStore
 {
-    public static class GraphQLQueryStore
-    {
-        public static Dictionary<string, string> Query { get; } = new();
-    }
+    public static Dictionary<string, string> Query { get; } = new();
 }
