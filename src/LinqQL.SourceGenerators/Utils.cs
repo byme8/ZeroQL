@@ -39,7 +39,7 @@ namespace LinqQL.SourceGenerators
         {
             return typeSymbol.NullableAnnotation switch
             {
-                NullableAnnotation.None => Map(typeSymbol.Name),
+                NullableAnnotation.None => Map(typeSymbol.Name) + "!",
                 NullableAnnotation.NotAnnotated => Map(typeSymbol.Name) + "!",
                 NullableAnnotation.Annotated => Map(typeSymbol.Name),
                 _ => throw new ArgumentOutOfRangeException()

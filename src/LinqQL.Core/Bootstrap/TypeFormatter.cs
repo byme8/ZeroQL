@@ -7,6 +7,11 @@ namespace LinqQL.Core.Bootstrap
 {
     public class TypeFormatter
     {
+        public HashSet<string> Enums
+        {
+            get;
+        }
+
         public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
         {
             { "String", "string" },
@@ -21,13 +26,18 @@ namespace LinqQL.Core.Bootstrap
             { "DateTime", "DateTime" },
         };
 
+        public TypeFormatter(HashSet<string> enums)
+        {
+            Enums = enums;
+        }
+
         public TypeDefinition GetTypeDefinition(GraphQLType type)
         {
             switch (type)
             {
                 case GraphQLNonNullType { Type: GraphQLNamedType nonNullType }:
                 {
-                    var fieldKind = GetScalarity(nonNullType);
+                    var fieldKind = GetTypeKind(nonNullType);
                     var typeName = GetTypeName(nonNullType);
 
                     return new TypeDefinition
@@ -39,7 +49,7 @@ namespace LinqQL.Core.Bootstrap
                 case GraphQLNonNullType { Type: GraphQLListType listType }:
                 {
                     var elementType = GetTypeDefinition(listType.Type);
-                    var fieldKind = TypeKind.Object;
+                    var fieldKind = TypeKind.Array;
                     var typeName = elementType.Name + "[]";
 
                     return new TypeDefinition
@@ -51,8 +61,8 @@ namespace LinqQL.Core.Bootstrap
                 case GraphQLListType listType:
                 {
                     var elementType = GetTypeDefinition(listType.Type);
-                    var fieldKind = TypeKind.Object;
-                    var typeName = elementType.Name + "[]";
+                    var fieldKind = TypeKind.Array;
+                    var typeName = elementType.Name + "[]?";
 
                     return new TypeDefinition
                     {
@@ -62,7 +72,7 @@ namespace LinqQL.Core.Bootstrap
                 }
                 case GraphQLNamedType namedType:
                 {
-                    var fieldKind = GetScalarity(namedType);
+                    var fieldKind = GetTypeKind(namedType);
                     var typeName = GetTypeName(namedType);
 
                     return new TypeDefinition
@@ -79,12 +89,18 @@ namespace LinqQL.Core.Bootstrap
 
         private string GetTypeName(GraphQLNamedType nonNullType)
         {
-            var fieldKind = GetScalarity(nonNullType);
+            var fieldKind = GetTypeKind(nonNullType);
             var typeName = nonNullType.Name.StringValue;
-            return fieldKind == TypeKind.Object ? typeName : GraphQLToCsharpScalarTypes[typeName];
+            return fieldKind == TypeKind.Scalar ? GraphQLToCsharpScalarTypes[typeName] : typeName;
         }
 
-        private TypeKind GetScalarity(GraphQLNamedType namedType)
-            => GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Object;
+        private TypeKind GetTypeKind(GraphQLNamedType namedType)
+        {
+            if (Enums.Contains(namedType.Name.StringValue))
+            {
+                return TypeKind.Enum;
+            }
+            return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Object;
+        }
     }
 }

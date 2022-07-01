@@ -18,7 +18,9 @@ public class TypeDefinition
 public enum TypeKind
 {
     Scalar,
-    Object
+    Enum,
+    Object,
+    Array
 }
 
 public class FieldDefinition

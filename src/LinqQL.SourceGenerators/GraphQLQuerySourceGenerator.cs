@@ -156,7 +156,6 @@ namespace {context.Compilation.Assembly.Name}
             if (!(variablesExpression is AnonymousObjectCreationExpressionSyntax anonymousObject))
             {
                 Failed(variablesExpression);
-
                 return Array.Empty<(string Name, string Type)>();
             }
 

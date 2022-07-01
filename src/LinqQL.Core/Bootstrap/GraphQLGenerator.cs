@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -17,20 +18,71 @@ public static class GraphQLGenerator
 
     public static string ToCSharp(string graphql, string clientNamespace)
     {
-        var context = new TypeFormatter();
         var schema = Parser.Parse(graphql);
-        var classes = schema.Definitions
+        var enums = schema.Definitions
+            .OfType<GraphQLEnumTypeDefinition>()
+            .ToArray();
+
+        var enumsNames = new HashSet<string>(enums.Select(o => o.Name.StringValue));
+
+        var context = new TypeFormatter(enumsNames);
+        var inputs = schema.Definitions
+            .OfType<GraphQLInputObjectTypeDefinition>()
+            .Select(o => CreateInputDefinition(context, o))
+            .ToArray();
+
+        var types = schema.Definitions
             .OfType<GraphQLObjectTypeDefinition>()
-            .Select(o => CreateClassDefinition(context, o))
+            .Select(o => CreateTypesDefinition(context, o))
             .ToArray();
 
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
-        var classesDeclaration = classes
+        var typesDeclaration = GenerateTypes(types.Concat(inputs).ToArray());
+        var enumsDeclaration = GenerateEnums(enums);
+
+        namespaceDeclaration = namespaceDeclaration
+            .WithMembers(List<MemberDeclarationSyntax>(typesDeclaration).AddRange(enumsDeclaration));
+
+        var formattedSource = namespaceDeclaration.NormalizeWhitespace().ToFullString();
+        return "using System.Text.Json.Serialization;\n\n" + formattedSource;
+    }
+
+    private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition input)
+    {
+        var typeDefinition = new ClassDefinition
+        {
+            Name = input.Name.StringValue,
+            Properties = CretePropertyDefinition(typeFormatter, input),
+        };
+
+        return typeDefinition;
+    }
+
+    private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
+        => enums.Select(e =>
+            {
+                var members = e.Values.Select(o =>
+                    {
+                        var name = o.Name.StringValue;
+                        return EnumMemberDeclaration(Identifier(name));
+                    })
+                    .ToArray();
+
+                var enumSyntax = EnumDeclaration(Identifier(e.Name.StringValue))
+                    .AddMembers(members)
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword));
+
+                return enumSyntax;
+            })
+            .ToArray();
+
+    private static ClassDeclarationSyntax[] GenerateTypes(ClassDefinition[] classes)
+        => classes
             .Select(o =>
             {
                 var backedFields = o.Properties
-                    .Where(property => property.TypeKind == TypeKind.Object)
+                    .Where(property => property.TypeKind is TypeKind.Object or TypeKind.Array)
                     .Select(property =>
                     {
                         var jsonNameAttributes =
@@ -68,16 +120,9 @@ public static class GraphQLGenerator
             })
             .ToArray();
 
-        namespaceDeclaration = namespaceDeclaration
-            .WithMembers(List<MemberDeclarationSyntax>(classesDeclaration));
-
-        var formattedSource = namespaceDeclaration.NormalizeWhitespace().ToFullString();
-        return "using System.Text.Json.Serialization;\n\n" + formattedSource;
-    }
-
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
     {
-        if (field.TypeKind == TypeKind.Object)
+        if (field.TypeKind is TypeKind.Object or TypeKind.Array)
         {
             var parameters = field.Arguments
                 .Select(o =>
@@ -85,27 +130,49 @@ public static class GraphQLGenerator
                         .WithType(ParseTypeName(o.TypeName)))
                 .ToArray();
 
-            var selectorParameter = Parameter(Identifier("selector"))
-                .WithType(ParseTypeName($"Func<{field.TypeName}, T>"));
+            if (field.TypeKind == TypeKind.Object)
+            {
+                var selectorParameter = Parameter(Identifier("selector"))
+                    .WithType(ParseTypeName($"Func<{field.TypeName}, T>"));
 
+                var genericMethodWithType = MethodDeclaration(
+                        IdentifierName("T"),
+                        Identifier(field.Name + "<T>"))
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                    .WithParameterList(
+                        ParameterList(
+                            SeparatedList(parameters)
+                                .Add(selectorParameter)));
 
+                var body = Block(
+                    ReturnStatement(
+                        InvocationExpression(IdentifierName("selector"))
+                            .AddArgumentListArguments(Argument(IdentifierName("__" + field.Name)))));
 
-            var genericMethodWithType = MethodDeclaration(
-                    IdentifierName("T"),
-                    Identifier(field.Name + "<T>"))
-                .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                .WithParameterList(
-                    ParameterList(
-                        SeparatedList(parameters)
-                            .Add(selectorParameter)));
+                return genericMethodWithType
+                    .WithBody(body);
+            }
 
-            var body = Block(
-                ReturnStatement(
-                    InvocationExpression(IdentifierName("selector"))
-                        .AddArgumentListArguments(Argument(IdentifierName("__" + field.Name)))));
+            if (field.TypeKind == TypeKind.Array)
+            {
+                var selectorParameter = Parameter(Identifier("selector"))
+                    .WithType(ParseTypeName($"Func<{GetElementTypeFromArray(field)}, T>"));
 
-            return genericMethodWithType
-                .WithBody(body);
+                var genericMethodWithType = MethodDeclaration(
+                        IdentifierName("T[]"),
+                        Identifier(field.Name + "<T>"))
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                    .WithParameterList(
+                        ParameterList(
+                            SeparatedList(parameters)
+                                .Add(selectorParameter)));
+
+                var body = Block(
+                    ParseStatement($"return __{field.Name}.Select(selector).ToArray();"));
+
+                return genericMethodWithType
+                    .WithBody(body);
+            }
         }
 
         return PropertyDeclaration(ParseTypeName(field.TypeName), Identifier(field.Name))
@@ -117,7 +184,16 @@ public static class GraphQLGenerator
                     .WithSemicolonToken(ParseToken(";")));
     }
 
-    private static ClassDefinition CreateClassDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
+    private static string GetElementTypeFromArray(FieldDefinition field)
+    {
+        if (field.TypeName.EndsWith("?"))
+        {
+            return field.TypeName[..^3];
+        }
+        return field.TypeName[..^2];
+    }
+
+    private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
     {
         var typeDefinition = new ClassDefinition
         {
@@ -126,6 +202,22 @@ public static class GraphQLGenerator
         };
 
         return typeDefinition;
+    }
+
+    private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition typeQL)
+    {
+        return typeQL.Fields?.Select(field =>
+            {
+                var type = typeFormatter.GetTypeDefinition(field.Type);
+                return new FieldDefinition
+                {
+                    Name = field.Name.StringValue.FirstToUpper(),
+                    TypeName = type.Name,
+                    TypeKind = type.TypeKind,
+                    Arguments = Array.Empty<ArgumentDefinition>()
+                };
+            })
+            .ToArray() ?? Array.Empty<FieldDefinition>();
     }
 
     private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)

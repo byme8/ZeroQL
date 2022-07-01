@@ -9,7 +9,7 @@ type KeyValuePairOfStringAndString {
 
 type Query {
   me: User!
-  users(page: Int! size: Int!): [User!]!
+  users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
   user(id: Int!): User!
   admin(id: Int!): User
   container: TypesContainer!
@@ -58,7 +58,17 @@ type User {
   id: Int!
   firstName: String!
   lastName: String!
+  userKind: UserKind!
   role: Role!
+}
+
+input UserFilterInput {
+  userKind: UserKind!
+}
+
+enum UserKind {
+  GOOD
+  BAD
 }
 
 "The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."

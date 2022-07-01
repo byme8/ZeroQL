@@ -31,9 +31,9 @@ namespace GraphQL.TestServer
             return selector(__Me);
         }
 
-        public T Users<T>(int page, int size, Func<User[], T> selector)
+        public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
-            return selector(__Users);
+            return __Users.Select(selector).ToArray();
         }
 
         public T User<T>(int id, Func<User, T> selector)
@@ -77,25 +77,25 @@ namespace GraphQL.TestServer
         public Guid[] __Value21 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value22")]
-        public Guid[] __Value22 { get; set; }
+        public Guid[]? __Value22 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value23")]
         public Guid[] __Value23 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value24")]
-        public Guid[] __Value24 { get; set; }
+        public Guid[]? __Value24 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value25")]
         public Guid[] __Value25 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value26")]
-        public Guid[] __Value26 { get; set; }
+        public Guid[]? __Value26 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
         public KeyValuePairOfStringAndString[] __Value27 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value28")]
-        public KeyValuePairOfStringAndString[] __Value28 { get; set; }
+        public KeyValuePairOfStringAndString[]? __Value28 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value29")]
         public KeyValuePairOfStringAndString __Value29 { get; set; }
@@ -157,44 +157,44 @@ namespace GraphQL.TestServer
 
         public Guid? Value20 { get; set; }
 
-        public T Value21<T>(Func<Guid[], T> selector)
+        public T[] Value21<T>(Func<Guid, T> selector)
         {
-            return selector(__Value21);
+            return __Value21.Select(selector).ToArray();
         }
 
-        public T Value22<T>(Func<Guid[], T> selector)
+        public T[] Value22<T>(Func<Guid, T> selector)
         {
-            return selector(__Value22);
+            return __Value22.Select(selector).ToArray();
         }
 
-        public T Value23<T>(Func<Guid[], T> selector)
+        public T[] Value23<T>(Func<Guid, T> selector)
         {
-            return selector(__Value23);
+            return __Value23.Select(selector).ToArray();
         }
 
-        public T Value24<T>(Func<Guid[], T> selector)
+        public T[] Value24<T>(Func<Guid, T> selector)
         {
-            return selector(__Value24);
+            return __Value24.Select(selector).ToArray();
         }
 
-        public T Value25<T>(Func<Guid[], T> selector)
+        public T[] Value25<T>(Func<Guid, T> selector)
         {
-            return selector(__Value25);
+            return __Value25.Select(selector).ToArray();
         }
 
-        public T Value26<T>(Func<Guid[], T> selector)
+        public T[] Value26<T>(Func<Guid, T> selector)
         {
-            return selector(__Value26);
+            return __Value26.Select(selector).ToArray();
         }
 
-        public T Value27<T>(Func<KeyValuePairOfStringAndString[], T> selector)
+        public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return selector(__Value27);
+            return __Value27.Select(selector).ToArray();
         }
 
-        public T Value28<T>(Func<KeyValuePairOfStringAndString[], T> selector)
+        public T[] Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return selector(__Value28);
+            return __Value28.Select(selector).ToArray();
         }
 
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
@@ -219,9 +219,22 @@ namespace GraphQL.TestServer
 
         public string LastName { get; set; }
 
+        public UserKind UserKind { get; set; }
+
         public T Role<T>(Func<Role, T> selector)
         {
             return selector(__Role);
         }
+    }
+
+    public class UserFilterInput
+    {
+        public UserKind UserKind { get; set; }
+    }
+
+    public enum UserKind
+    {
+        GOOD,
+        BAD
     }
 }

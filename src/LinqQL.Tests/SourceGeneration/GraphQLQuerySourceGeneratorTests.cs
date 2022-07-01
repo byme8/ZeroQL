@@ -147,24 +147,43 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "new { Id = -431 }, " + csharpQuery));
 
         var assembly = await project.CompileToRealAssembly();
-
         var execute = CreateExecuteDelegate(assembly);
-
         var result = (GraphQLResponse<int>)await execute();
 
         result.Data.Should().Be(-431);
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
 
-    [Fact(Skip = "To Do")]
-    public void SupportForEnums()
+    [Fact]
+    public async Task SupportForEnums()
     {
-        
+        var csharpQuery = "static q => q.Me(o => o.UserKind)";
+        var graphqlQuery = @"query { me { userKind } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+        var execute = CreateExecuteDelegate(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
-    
-    [Fact(Skip = "To Do")]
-    public void SupportForArray()
+
+    [Fact]
+    public async Task SupportForArray()
     {
-        
+        // new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }, static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName));
+
+        var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }";
+        var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
+        var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, $"{arguments}, {csharpQuery}"));
+
+        var assembly = await project.CompileToRealAssembly();
+        var execute = CreateExecuteDelegate(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
 }

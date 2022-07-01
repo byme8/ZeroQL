@@ -40,7 +40,7 @@ public class UserGraphQLExtensions
         };
     }
 
-    public User[] GetUsers(int page, int size)
+    public User[] GetUsers(UserFilterInput filter, int page, int size)
     {
         return Enumerable.Range(0, size)
             .Select(o => new User
@@ -79,6 +79,8 @@ public class User
     public string FirstName { get; set; }
 
     public string LastName { get; set; }
+
+    public UserKind UserKind { get; set; }
 }
 
 public class TypesContainer
@@ -116,4 +118,15 @@ public class TypesContainer
     public KeyValuePair<string, string> Value29 { get; set; }
     public KeyValuePair<string, string>? Value30 { get; set; }
 
+}
+
+public class UserFilterInput
+{
+    public UserKind UserKind { get; set; }
+}
+
+public enum UserKind
+{
+    Good,
+    Bad
 }
