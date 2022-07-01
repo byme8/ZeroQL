@@ -1,6 +1,6 @@
 ﻿<Project>
     <PropertyGroup>
-        <Version>0.1.0</Version>
+        <Version>0.1.0-preview</Version>
         <Authors>Stanislav Silin</Authors>
         <Owners>Stanislav Silin</Owners>
         <PackageProjectUrl>https://github.com/byme8/LinqQL</PackageProjectUrl>

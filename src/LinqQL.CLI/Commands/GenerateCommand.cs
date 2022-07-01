@@ -28,7 +28,6 @@ public class GenerateCommand : ICommand
             return;
         }
 
-
         var graphql = await File.ReadAllTextAsync(Schema);
         var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace);
         var outputFolder = Path.GetDirectoryName(Output);

@@ -49,6 +49,36 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
+    
+    [Fact]
+    public async Task MultipleMemberAccessQuery()
+    {
+        var csharpQuery = "static q => q.Me(o => new { o.FirstName.Length })";
+        var graphqlQuery = @"query { me { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+
+        CreateExecuteDelegate(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
+    
+    [Fact(Skip = "Figure out how to get errors from the source generator")]
+    public async Task UsingVariableFromDifferentScopeNotAllowed()
+    {
+        var csharpQuery = "static q => q.Me(o => q.Me(o => o.FirstName))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        // This should throw an exception
+        var assembly = await project.CompileToRealAssembly();
+
+        CreateExecuteDelegate(assembly);
+    }
 
     [Fact]
     public async Task AnonymousTypeInQueryRoot()
@@ -172,8 +202,6 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     [Fact]
     public async Task SupportForArray()
     {
-        // new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }, static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName));
-
         var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
         var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
