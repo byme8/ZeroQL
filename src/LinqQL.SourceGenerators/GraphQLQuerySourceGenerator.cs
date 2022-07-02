@@ -285,6 +285,20 @@ namespace {context.Compilation.Assembly.Name}
                             return generationContext.AvailableVariables[value];
                         }
 
+                        if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
+                        {
+                            var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression);
+                            if (!(symbol.Symbol is INamedTypeSymbol namedType))
+                            {
+                                return Failed(memberAccess);
+                            }
+
+                            if (namedType.EnumUnderlyingType != null)
+                            {
+                                return memberAccess.ToString();
+                            }
+                        }
+
                         return Failed(argument);
                     }
                     case AnonymousObjectCreationExpressionSyntax anonymous:

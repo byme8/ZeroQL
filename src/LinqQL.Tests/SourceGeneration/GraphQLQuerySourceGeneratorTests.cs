@@ -198,6 +198,21 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
+    
+    [Fact]
+    public async Task SupportForEnumsAsArgument()
+    {
+        var csharpQuery = "static q => q.UsersByKind(UserKind.BAD, 0, 10, o => o.FirstName)";
+        var graphqlQuery = @"query { usersByKind(kind: UserKind.BAD, page: 0, size: 10) { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+        CreateExecuteDelegate(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
 
     [Fact]
     public async Task SupportForArray()

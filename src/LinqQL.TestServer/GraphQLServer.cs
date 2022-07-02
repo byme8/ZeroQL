@@ -47,6 +47,17 @@ public class UserGraphQLExtensions
             })
             .ToArray();
     }
+    
+    public User[] GetUsersByKind(UserKind kind, int page, int size)
+    {
+        return Enumerable.Range(0, size)
+            .Select(o => new User
+            {
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString()
+            })
+            .ToArray();
+    }
 
     public User GetUser(int id)
     {

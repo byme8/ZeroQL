@@ -21,6 +21,9 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
         public User[] __Users { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByKind")]
+        public User[] __UsersByKind { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
         public User __User { get; set; }
 
@@ -38,6 +41,11 @@ namespace GraphQL.TestServer
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
             return __Users.Select(selector).ToArray();
+        }
+
+        public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
+        {
+            return __UsersByKind.Select(selector).ToArray();
         }
 
         public T User<T>(int id, Func<User, T> selector)
