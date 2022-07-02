@@ -26,6 +26,9 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByKind")]
         public User[] __UsersByKind { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersIds")]
+        public int[] __UsersIds { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
         public User __User { get; set; }
 
@@ -48,6 +51,11 @@ namespace GraphQL.TestServer
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
             return __UsersByKind.Select(selector).ToArray();
+        }
+
+        public int[] UsersIds(UserKind kind, int page, int size)
+        {
+            return __UsersIds;
         }
 
         public T User<T>(int id, Func<User, T> selector)
@@ -173,34 +181,34 @@ namespace GraphQL.TestServer
 
         public Guid? Value20 { get; set; }
 
-        public T[] Value21<T>(Func<Guid, T> selector)
+        public Guid[] Value21()
         {
-            return __Value21.Select(selector).ToArray();
+            return __Value21;
         }
 
-        public T[] Value22<T>(Func<Guid, T> selector)
+        public Guid[] Value22()
         {
-            return __Value22.Select(selector).ToArray();
+            return __Value22;
         }
 
-        public T[] Value23<T>(Func<Guid, T> selector)
+        public Guid[] Value23()
         {
-            return __Value23.Select(selector).ToArray();
+            return __Value23;
         }
 
-        public T[] Value24<T>(Func<Guid, T> selector)
+        public Guid[] Value24()
         {
-            return __Value24.Select(selector).ToArray();
+            return __Value24;
         }
 
-        public T[] Value25<T>(Func<Guid, T> selector)
+        public Guid[] Value25()
         {
-            return __Value25.Select(selector).ToArray();
+            return __Value25;
         }
 
-        public T[] Value26<T>(Func<Guid, T> selector)
+        public Guid[] Value26()
         {
-            return __Value26.Select(selector).ToArray();
+            return __Value26;
         }
 
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)

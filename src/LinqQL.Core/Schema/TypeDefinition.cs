@@ -14,14 +14,6 @@ public class TypeDefinition
     public TypeKind TypeKind { get; set; }
 }
 
-public enum TypeKind
-{
-    Scalar,
-    Enum,
-    Object,
-    Array
-}
-
 public class FieldDefinition
 {
     public string Name { get; set; }

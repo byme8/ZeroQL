@@ -228,4 +228,19 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
 
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
+    
+    [Fact]
+    public async Task SupportForArrayWithScalarElementes()
+    {
+        var csharpQuery = "static q => q.UsersIds(UserKind.GOOD, 0, 10)";
+        var graphqlQuery = @"query { usersIds(kind: GOOD, page: 0, size: 10)}";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+        await ExecuteRequest(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
 }

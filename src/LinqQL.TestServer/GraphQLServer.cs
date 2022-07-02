@@ -58,6 +58,11 @@ public class UserGraphQLExtensions
             })
             .ToArray();
     }
+    
+    public int[] GetUsersIds(UserKind kind, int page, int size)
+    {
+        return Enumerable.Range(0, size).ToArray();
+    }
 
     public User GetUser(int id)
     {

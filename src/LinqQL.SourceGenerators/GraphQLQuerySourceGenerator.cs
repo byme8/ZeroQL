@@ -218,8 +218,10 @@ namespace {context.Compilation.Assembly.Name}
                             return Failed(invocation);
                         }
 
+                        var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
+                        var parametersToIgnore = ignoreLastParameter ? 1 : 0;
                         var argumentNames = method.Parameters
-                            .Take(method.Parameters.Length - 1)
+                            .Take(method.Parameters.Length - parametersToIgnore)
                             .Select(o => $"{o.Name.FirstToLower()}: ")
                             .ToArray();
 
@@ -235,7 +237,10 @@ namespace {context.Compilation.Assembly.Name}
 
                             stringBuilder.Append(graphQLArguments);
                         }
-                        stringBuilder.Append($" {{ {GenerateBody(generationContext, invocation.ArgumentList.Arguments.Last().Expression)} }} ");
+                        if (ignoreLastParameter)
+                        {
+                            stringBuilder.Append($" {{ {GenerateBody(generationContext, invocation.ArgumentList.Arguments.Last().Expression)} }} ");
+                        }
 
                         return stringBuilder.ToString();
                     }
@@ -322,7 +327,7 @@ namespace {context.Compilation.Assembly.Name}
                 {
                     return string.Empty;
                 }
-                
+
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         descriptor ?? Descriptors.FailedToConvert,

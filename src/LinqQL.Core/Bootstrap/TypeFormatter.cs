@@ -49,7 +49,7 @@ public class TypeFormatter
             case GraphQLNonNullType { Type: GraphQLListType listType }:
             {
                 var elementType = GetTypeDefinition(listType.Type);
-                var fieldKind = TypeKind.Array;
+                var fieldKind = new List(elementType.TypeKind);
                 var typeName = elementType.Name + "[]";
 
                 return new TypeDefinition
@@ -61,7 +61,7 @@ public class TypeFormatter
             case GraphQLListType listType:
             {
                 var elementType = GetTypeDefinition(listType.Type);
-                var fieldKind = TypeKind.Array;
+                var fieldKind = new List(elementType.TypeKind);
                 var typeName = elementType.Name + "[]?";
 
                 return new TypeDefinition
@@ -100,6 +100,6 @@ public class TypeFormatter
         {
             return TypeKind.Enum;
         }
-        return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Object;
+        return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Complex;
     }
 }
