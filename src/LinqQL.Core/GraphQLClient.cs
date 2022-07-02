@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace LinqQL.Core;
@@ -12,6 +13,10 @@ public class GraphQLClient<TQuery> : IDisposable
     private readonly HttpClient httpClient;
     private readonly JsonSerializerOptions options = new()
     {
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };

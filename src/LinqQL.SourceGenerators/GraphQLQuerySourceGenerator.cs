@@ -74,7 +74,7 @@ namespace {context.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-{queries.Select(o => $@"            GraphQLQueryStore.Query.Add(""{o.Key}"", ""{o.Value}"");").JoinWithNewLine()}
+{queries.Select(o => $@"            GraphQLQueryStore.Query.Add({SyntaxFactory.Literal(o.Key).Text}, {SyntaxFactory.Literal(o.Value).Text});").JoinWithNewLine()}
         }}
     }}
 }}";
@@ -295,7 +295,7 @@ namespace {context.Compilation.Assembly.Name}
 
                             if (namedType.EnumUnderlyingType != null)
                             {
-                                return memberAccess.ToString();
+                                return memberAccess.Name.ToString();
                             }
                         }
 

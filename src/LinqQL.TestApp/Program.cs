@@ -1,4 +1,7 @@
-﻿using GraphQL.TestServer;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using GraphQL.TestServer;
 using LinqQL.Core;
 
 namespace LinqQL.TestApp;
@@ -10,9 +13,9 @@ public class Program
 
     }
 
-    public static void Main()
+    public static async Task Main()
     {
-
+        await Execute();
     }
 
     public static async Task<object> Execute()
