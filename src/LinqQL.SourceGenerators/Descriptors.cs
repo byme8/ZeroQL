@@ -23,10 +23,9 @@ namespace LinqQL.SourceGenerators
         public static DiagnosticDescriptor OpenLambdaIsNotAllowed = new DiagnosticDescriptor(
             nameof(OpenLambdaIsNotAllowed),
             "Open lambda are not allowed",
-            "Open lambda are not allowed",
+            "Open lambda like 'o => o' are not allowed. Use a lambda like 'o => new { o.Id }'.",
             "LinqQL",
             DiagnosticSeverity.Error,
-            description: "Open lambda like 'o => o' are not allowed. Use a lambda like 'o => new { o.Id' }.",
             isEnabledByDefault: true);
         
         public static DiagnosticDescriptor OnlyStaticLambda = new DiagnosticDescriptor(
