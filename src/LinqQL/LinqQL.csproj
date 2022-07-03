@@ -5,8 +5,35 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>LinqQL</PackageId>
+        <Version>1.0.0-preview1</Version>
+        <Authors>Stanislav Silin</Authors>
+        <PackageProjectUrl>https://github.com/byme8/LinqQL</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/byme8/LinqQL</RepositoryUrl>
+        <LicenseUrl>https://licenses.nuget.org/MIT</LicenseUrl>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <description>The GraphQL client with LINQ interface.</description>
+        <PackageTags>graphql, client</PackageTags>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj"/>
+        <ProjectReference Include="..\LinqQL.Core\LinqQL.Core.csproj" />
+        <ProjectReference Include="..\LinqQL.SourceGenerators\LinqQL.SourceGenerators.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <Target Name="_AddAnalyzersToOutput">
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="$(OutputPath)\LinqQL.Core.dll" PackagePath="lib/net6.0" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\LinqQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
+        </ItemGroup>
+    </Target>
 </Project>
