@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LinqQL.SourceGenerators
 {
-    public class GraphQLQueryAnalyzerHelper
+    public class QueryAnalyzerHelper
     {
         public static IMethodSymbol? ExtractQueryMethod(Compilation compilation, InvocationExpressionSyntax invocation)
         {

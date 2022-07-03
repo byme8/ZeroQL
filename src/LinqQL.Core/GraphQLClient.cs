@@ -31,81 +31,136 @@ public class GraphQLClient<TQuery> : IDisposable
         httpClient.Dispose();
     }
 
-    public TResult Query<TArguments, TResult>(string name, TArguments arguments, Func<TArguments, TQuery, TResult> query)
+    public async Task<GraphQLResult<TResult>> Query<TVariables, TResult>(
+        string name,
+        TVariables variables,
+        Func<TVariables, TQuery, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        return query(arguments, default);
-    }
-
-    public TResult Query<TResult>(string name, Func<TQuery, TResult> query)
-    {
-        return query(default);
-    }
-
-    public async Task<GraphQLResponse<TResult>> Query<TVariables, TResult>(TVariables variables, Func<TVariables, TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
-    {
-        var result = await Execute<TQuery>(variables, queryKey);
-        var formatted = query(variables, result.Data);
-
-        return new GraphQLResponse<TResult>
+        var result = await Execute<TQuery>(name, null, queryKey);
+        if (result.Data is not null)
         {
-            Data = formatted
+            var formatted = query(variables, result.Data);
+            return new GraphQLResult<TResult>
+            {
+                Query = result.Query,
+                Data = formatted
+            };
+        }
+
+        return new GraphQLResult<TResult>
+        {
+            Query = result.Query,
+            Errors = result.Errors
         };
     }
 
-    public async Task<GraphQLResponse<TResult>> Query<TResult>(Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
+    public async Task<GraphQLResult<TResult>> Query<TResult>(string name, Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        var result = await Execute<TQuery>(null, queryKey);
-        var formatted = query(result.Data);
-
-        return new GraphQLResponse<TResult>
+        var result = await Execute<TQuery>(name, null, queryKey);
+        if (result.Data is not null)
         {
-            Data = formatted
+            var formatted = query(result.Data);
+            return new GraphQLResult<TResult>
+            {
+                Query = result.Query,
+                Data = formatted
+            };
+        }
+
+        return new GraphQLResult<TResult>
+        {
+            Query = result.Query,
+            Errors = result.Errors
         };
     }
 
-    public async Task<GraphQLResponse<T>> Execute<T>(object? arguments, string queryKey)
+    public async Task<GraphQLResult<TResult>> Query<TVariables, TResult>(
+        TVariables variables,
+        Func<TVariables, TQuery, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        if (!GraphQLQueryStore.Query.TryGetValue(queryKey, out var query))
+        var result = await Execute<TQuery>(null, variables, queryKey);
+        if (result.Data is not null)
+        {
+            var formatted = query(variables, result.Data);
+            return new GraphQLResult<TResult>
+            {
+                Query = result.Query,
+                Data = formatted
+            };
+        }
+
+        return new GraphQLResult<TResult>
+        {
+            Query = result.Query,
+            Errors = result.Errors
+        };
+    }
+
+    public async Task<GraphQLResult<TResult>> Query<TResult>(Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
+    {
+        var result = await Execute<TQuery>(null, null, queryKey);
+        if (result.Data is not null)
+        {
+            var formatted = query(result.Data);
+            return new GraphQLResult<TResult>
+            {
+                Query = result.Query,
+                Data = formatted
+            };
+        }
+
+        return new GraphQLResult<TResult>
+        {
+            Query = result.Query,
+            Errors = result.Errors
+        };
+    }
+
+    public async Task<GraphQLResult<T>> Execute<T>(string? name, object? arguments, string queryKey)
+    {
+        if (!GraphQLQueryStore.Query.TryGetValue(queryKey, out var queryBody))
         {
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
+        var queryBuilder = new StringBuilder();
+        queryBuilder.Append("query ");
+        if (!string.IsNullOrEmpty(name))
+        {
+            queryBuilder.Append(name);
+        }
+        queryBuilder.Append(queryBody);
+
+        var query = queryBuilder.ToString();
         var queryRequest = new GraphQLRequest
         {
             Variables = arguments,
             Query = query
         };
 
-        var json = JsonSerializer.Serialize(queryRequest, options);
-        var response = await httpClient.PostAsync("", new StringContent(json, Encoding.UTF8, "application/json"));
-        var stream = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<GraphQLResponse<T>>(stream, options);
+        var requestJson = JsonSerializer.Serialize(queryRequest, options);
+        var response = await httpClient.PostAsync("", new StringContent(requestJson, Encoding.UTF8, "application/json"));
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(responseJson, options);
+        if (qlResponse is null)
+        {
+            return new GraphQLResult<T>
+            {
+                Query = query,
+                Errors = new[]
+                {
+                    new GraphQueryError { Message = "Failed to deserialize response: " + responseJson },
+                }
+            };
+        }
 
-        return result;
+        return new GraphQLResult<T>
+        {
+            Query = query,
+            Data = qlResponse.Data,
+            Errors = qlResponse.Errors
+        };
     }
-}
-
-public class GraphQLRequest
-{
-    public object? Variables { get; set; }
-    public string Query { get; set; }
-}
-
-public class GraphQLResponse<TData>
-{
-    public TData Data { get; set; }
-
-    public GraphQueryError[] Errors { get; set; }
-}
-
-public class GraphQueryError
-{
-    public string Message { get; set; }
-    public ErrorLocation[] Locations { get; set; }
-}
-
-public class ErrorLocation
-{
-    public int Line { get; set; }
-    public int Column { get; set; }
 }

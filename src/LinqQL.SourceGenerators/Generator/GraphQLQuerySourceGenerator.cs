@@ -32,7 +32,7 @@ namespace LinqQL.SourceGenerators.Generator
                 }
 
                 var semanticModel = context.Compilation.GetSemanticModel(invocation.SyntaxTree);
-                var queryMethod = GraphQLQueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
+                var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
                 if (queryMethod is null)
                 {
                     break;
@@ -67,7 +67,7 @@ namespace {context.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-{queries.Select(o => $@"            GraphQLQueryStore.Query.Add({SyntaxFactory.Literal(o.Key).Text}, {SyntaxFactory.Literal(o.Value).Text});").JoinWithNewLine()}
+{queries.Select(o => $@"            GraphQLQueryStore.Query[{SyntaxFactory.Literal(o.Key).Text}] = {SyntaxFactory.Literal(o.Value).Text};").JoinWithNewLine()}
         }}
     }}
 }}";
@@ -88,24 +88,24 @@ namespace {context.Compilation.Assembly.Name}
                 var queryExpression = invocation.ArgumentList.Arguments.Last().Expression;
                 if (parameterNames.SequenceEqual(new[] { "name", "query", "queryKey" }))
                 {
-                    return GenerateGraphQLQuery(semanticModel, invocation.ArgumentList.Arguments.First().ToString(), null, queryExpression);
+                    return GenerateGraphQLQuery(semanticModel, null, queryExpression);
                 }
 
                 if (parameterNames.SequenceEqual(new[] { "variables", "query", "queryKey" }))
                 {
                     var variablesExpression = invocation.ArgumentList.Arguments.First().Expression;
-                    return GenerateGraphQLQuery(semanticModel, string.Empty, variablesExpression, queryExpression);
+                    return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
                 }
 
                 if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
                 {
-                    return GenerateGraphQLQuery(semanticModel, string.Empty, null, queryExpression);
+                    return GenerateGraphQLQuery(semanticModel, null, queryExpression);
                 }
 
                 return Failed(invocation);
             }
 
-            string GenerateGraphQLQuery(SemanticModel semanticModel, string name, ExpressionSyntax? variablesExpression, ExpressionSyntax query)
+            string GenerateGraphQLQuery(SemanticModel semanticModel, ExpressionSyntax? variablesExpression, ExpressionSyntax query)
             {
                 if (!(query is LambdaExpressionSyntax lambda))
                 {
@@ -129,21 +129,16 @@ namespace {context.Compilation.Assembly.Name}
                 }
 
                 var stringBuilder = new StringBuilder();
-                stringBuilder.Append("query");
-                if (!string.IsNullOrEmpty(name))
-                {
-                    stringBuilder.Append($" {name}");
-                }
                 if (inputs.VariablesName != null)
                 {
                     var variablesBody = variables
                         .Select(o => $"${o.Name.FirstToLower()}: {o.Type}")
                         .Join()
-                        .Wrap(" (", ")");
+                        .Wrap("(", ") ");
 
                     stringBuilder.Append(variablesBody);
                 }
-                stringBuilder.Append(" { ");
+                stringBuilder.Append("{ ");
                 stringBuilder.Append(body);
                 stringBuilder.Append("}");
 
@@ -262,7 +257,7 @@ namespace {context.Compilation.Assembly.Name}
                     }
                     case SimpleLambdaExpressionSyntax simpleLambda:
                     {
-                        if (GraphQLQueryAnalyzerHelper.IsOpenLambda(simpleLambda))
+                        if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
                         {
                             return Failed(simpleLambda); 
                         }

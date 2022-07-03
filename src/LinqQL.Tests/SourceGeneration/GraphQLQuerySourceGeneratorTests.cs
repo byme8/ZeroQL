@@ -23,13 +23,13 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     [Fact]
     public async Task SimpleQuery()
     {
-        var graphqlQuery = @"query { me { firstName } }";
+        var graphqlQuery = @"{ me { firstName } }";
 
         var project = TestProject.Project;
 
         var assembly = await project.CompileToRealAssembly();
 
-        var result = (GraphQLResponse<string>)await ExecuteRequest(assembly);
+        var result = (GraphQLResult<string>)await ExecuteRequest(assembly);
 
         result.Data.Should().Be("Jon");
         GraphQLQueryStore.Query[MeQuery].Should().Be(graphqlQuery);
@@ -39,7 +39,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportForAnonymousType()
     {
         var csharpQuery = "static q => q.Me(o => new { o.FirstName })";
-        var graphqlQuery = @"query { me { firstName } }";
+        var graphqlQuery = @"{ me { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -55,7 +55,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportForMultipleMembers()
     {
         var csharpQuery = "static q => q.Me(o => new { o.FirstName.Length })";
-        var graphqlQuery = @"query { me { firstName } }";
+        var graphqlQuery = @"{ me { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -112,7 +112,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsAnonymousTypeInQueryRoot()
     {
         var csharpQuery = "static q => new { Me = q.Me(o => new { o.FirstName }) }";
-        var graphqlQuery = @"query { me { firstName } }";
+        var graphqlQuery = @"{ me { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -137,7 +137,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsAnonymousTypeWithMultipleFields()
     {
         var csharpQuery = "static q => q.Me(o => new { o.FirstName, o.LastName })";
-        var graphqlQuery = @"query { me { firstName lastName } }";
+        var graphqlQuery = @"{ me { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -153,7 +153,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsAnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
         var csharpQuery = "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";
-        var graphqlQuery = @"query { m1: me { firstName lastName } m2: me { firstName lastName } }";
+        var graphqlQuery = @"{ m1: me { firstName lastName } m2: me { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -169,7 +169,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsAnonymousTypeWithConstantArgumentQuery()
     {
         var csharpQuery = "static q => new { User = q.User(42, o => new { o.FirstName, o.LastName }) }";
-        var graphqlQuery = @"query { user(id: 42) { firstName lastName } }";
+        var graphqlQuery = @"{ user(id: 42) { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -185,7 +185,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsAnonymousTypeWithArgumentQuery()
     {
         var csharpQuery = "static (i, q) => new { User = q.User(i.Id, o => new { o.FirstName, o.LastName }) }";
-        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName } }";
+        var graphqlQuery = @"($id: Int!) { user(id: $id) { firstName lastName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "new { Id = 42 }, " + csharpQuery));
@@ -201,13 +201,13 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportsPassedArgumentInQuery()
     {
         var csharpQuery = "static (i, q) => q.User(i.Id, o => o.Id)";
-        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { id } }";
+        var graphqlQuery = @"($id: Int!) { user(id: $id) { id } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "new { Id = -431 }, " + csharpQuery));
 
         var assembly = await project.CompileToRealAssembly();
-        var result = (GraphQLResponse<int>)await ExecuteRequest(assembly);
+        var result = (GraphQLResult<int>)await ExecuteRequest(assembly);
 
         result.Data.Should().Be(-431);
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
@@ -217,7 +217,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportForEnums()
     {
         var csharpQuery = "static q => q.Me(o => o.UserKind)";
-        var graphqlQuery = @"query { me { userKind } }";
+        var graphqlQuery = @"{ me { userKind } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -232,7 +232,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportForEnumsAsArgument()
     {
         var csharpQuery = "static q => q.UsersByKind(UserKind.BAD, 0, 10, o => o.FirstName)";
-        var graphqlQuery = @"query { usersByKind(kind: BAD, page: 0, size: 10) { firstName } }";
+        var graphqlQuery = @"{ usersByKind(kind: BAD, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
@@ -248,7 +248,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     {
         var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
-        var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
+        var graphqlQuery = @"($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, $"{arguments}, {csharpQuery}"));
@@ -263,10 +263,25 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
     public async Task SupportForArrayWithScalarElements()
     {
         var csharpQuery = "static q => q.UsersIds(UserKind.GOOD, 0, 10)";
-        var graphqlQuery = @"query { usersIds(kind: GOOD, page: 0, size: 10)}";
+        var graphqlQuery = @"{ usersIds(kind: GOOD, page: 0, size: 10)}";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+        await ExecuteRequest(assembly);
+
+        GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
+    }
+    
+    [Fact]
+    public async Task SupportsQueryName()
+    {
+        var csharpQuery = "static q => q.Me(o => o.FirstName)";
+        var graphqlQuery = @"{ me { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, @"""Me"", " + csharpQuery));
 
         var assembly = await project.CompileToRealAssembly();
         await ExecuteRequest(assembly);

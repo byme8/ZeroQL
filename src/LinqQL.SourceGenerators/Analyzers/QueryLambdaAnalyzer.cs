@@ -28,7 +28,7 @@ namespace LinqQL.SourceGenerators.Analyzers
                 return;
             }
 
-            var method = GraphQLQueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
+            var method = QueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
             if (method is null)
             {
                 return;
@@ -54,7 +54,7 @@ namespace LinqQL.SourceGenerators.Analyzers
 
             foreach (var innerLambda in innerLambdas)
             {
-                if (GraphQLQueryAnalyzerHelper.IsOpenLambda(innerLambda))
+                if (QueryAnalyzerHelper.IsOpenLambda(innerLambda))
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
