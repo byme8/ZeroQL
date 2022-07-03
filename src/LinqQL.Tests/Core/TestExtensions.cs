@@ -56,7 +56,7 @@ public static class TestExtensions
         var analyzerResults = await compilation
             .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
             {
-                new OnlyStaticLambdaAnalyzer()
+                new QueryLambdaAnalyzer()
             }))
             .GetAllDiagnosticsAsync();
 

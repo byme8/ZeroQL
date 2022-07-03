@@ -89,7 +89,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyGenerator(new GraphQLQuerySourceGenerator());
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OpenLambdaIsNotAllowed.Id);
     }
@@ -102,7 +102,7 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new OnlyStaticLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);

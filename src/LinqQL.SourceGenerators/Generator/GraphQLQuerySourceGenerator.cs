@@ -264,7 +264,7 @@ namespace {context.Compilation.Assembly.Name}
                     {
                         if (GraphQLQueryAnalyzerHelper.IsOpenLambda(simpleLambda))
                         {
-                            return Failed(simpleLambda, Descriptors.OpenLambdaIsNotAllowed); 
+                            return Failed(simpleLambda); 
                         }
 
                         var parameter = simpleLambda.Parameter.Identifier.ValueText;

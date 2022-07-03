@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,7 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LinqQL.SourceGenerators.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class OnlyStaticLambdaAnalyzer : DiagnosticAnalyzer
+    public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     {
         public override void Initialize(AnalysisContext context)
         {
@@ -45,9 +46,25 @@ namespace LinqQL.SourceGenerators.Analyzers
                     Descriptors.OnlyStaticLambda,
                     lambda.GetLocation()));
             }
+
+            var innerLambdas = lambda
+                .DescendantNodes()
+                .OfType<SimpleLambdaExpressionSyntax>()
+                .ToArray();
+
+            foreach (var innerLambda in innerLambdas)
+            {
+                if (GraphQLQueryAnalyzerHelper.IsOpenLambda(innerLambda))
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.OpenLambdaIsNotAllowed,
+                            innerLambda.GetLocation()));
+                }
+            }
         }
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
-            = ImmutableArray.Create(Descriptors.OnlyStaticLambda);
+            = ImmutableArray.Create(Descriptors.OnlyStaticLambda, Descriptors.OpenLambdaIsNotAllowed);
     }
 }
