@@ -5,6 +5,9 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>LinqQL.Cli</PackageId>
+        <PackAsTool>true</PackAsTool>
+        <Description>The LinqQL CLI to generate C# classes from *.graphql files.</Description>
     </PropertyGroup>
 
     <ItemGroup>

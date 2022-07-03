@@ -4,20 +4,13 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     </PropertyGroup>
     
     <PropertyGroup>
         <PackageId>LinqQL</PackageId>
-        <Version>1.0.0-preview1</Version>
-        <Authors>Stanislav Silin</Authors>
-        <PackageProjectUrl>https://github.com/byme8/LinqQL</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/byme8/LinqQL</RepositoryUrl>
-        <LicenseUrl>https://licenses.nuget.org/MIT</LicenseUrl>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <description>The GraphQL client with LINQ interface.</description>
-        <PackageTags>graphql, client</PackageTags>
-        <NoPackageAnalysis>true</NoPackageAnalysis>
-
+        <Description>The GraphQL client with LINQ like interface.</Description>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
 

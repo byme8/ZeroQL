@@ -4,5 +4,6 @@
 
 bin
 obj
+nugets
 
 *.sln.DotSettings.user
