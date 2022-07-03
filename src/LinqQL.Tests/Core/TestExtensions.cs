@@ -1,5 +1,9 @@
+using System.Collections.Immutable;
 using System.Reflection;
+using LinqQL.SourceGenerators.Analyzers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
 namespace LinqQL.Tests.Core;
@@ -49,15 +53,15 @@ public static class TestExtensions
     public static async Task<Assembly> CompileToRealAssembly(this Project project)
     {
         var compilation = await project.GetCompilationAsync();
-        // var analyzerResults = await compilation
-        //     .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
-        //     {
-        //         // add analyzers
-        //     }))
-        //     .GetAllDiagnosticsAsync();
+        var analyzerResults = await compilation
+            .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
+            {
+                new OnlyStaticLambdaAnalyzer()
+            }))
+            .GetAllDiagnosticsAsync();
 
         var error = compilation.GetDiagnostics()
-            // .Concat(analyzerResults)
+            .Concat(analyzerResults)
             .FirstOrDefault(o => o.Severity == DiagnosticSeverity.Error);
 
         if (error != null)
@@ -73,5 +77,32 @@ public static class TestExtensions
 
             return assembly;
         }
+    }
+
+    public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, ISourceGenerator generator)
+    {
+        var compilation = await project.GetCompilationAsync();
+
+        var driver = CSharpGeneratorDriver.Create(generator)
+            .RunGenerators(compilation!);
+
+        var result = driver.GetRunResult();
+        return result.Diagnostics.ToArray();
+    }
+
+    public static async Task<Diagnostic[]?> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
+    {
+        var compilation = await project.GetCompilationAsync();
+        var analyzerResults = await compilation
+            .WithAnalyzers(ImmutableArray.Create(new[]
+            {
+                analyzer
+            }))
+            .GetAllDiagnosticsAsync();
+
+        var error = compilation.GetDiagnostics()
+            .Concat(analyzerResults);
+
+        return error.ToArray();
     }
 }

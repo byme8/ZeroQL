@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace LinqQL.SourceGenerators
+namespace LinqQL.SourceGenerators.Generator
 {
     public class QueryMethodSelector : ISyntaxReceiver
     {

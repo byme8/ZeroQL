@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace LinqQL.SourceGenerators
+namespace LinqQL.SourceGenerators.Generator
 {
     public class GraphQLQueryGenerationContext
     {

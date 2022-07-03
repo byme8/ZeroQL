@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace LinqQL.SourceGenerators
+namespace LinqQL.SourceGenerators.Generator
 {
     [Generator]
     public class GraphQLQuerySourceGenerator : ISourceGenerator
@@ -31,16 +31,9 @@ namespace LinqQL.SourceGenerators
                     return;
                 }
 
-                if (!(invocation.Expression is MemberAccessExpressionSyntax memberAccess))
-                {
-                    break;
-                }
-
                 var semanticModel = context.Compilation.GetSemanticModel(invocation.SyntaxTree);
-                var possibleMethod = ModelExtensions.GetSymbolInfo(semanticModel, memberAccess.Name);
-                if (!(possibleMethod.Symbol is IMethodSymbol method) ||
-                    !(method.ContainingSymbol is INamedTypeSymbol containingType) ||
-                    containingType.ConstructedFrom.ToString() != "LinqQL.Core.GraphQLClient<TQuery>")
+                var queryMethod = GraphQLQueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
+                if (queryMethod is null)
                 {
                     break;
                 }
@@ -51,7 +44,7 @@ namespace LinqQL.SourceGenerators
                 }
 
                 var key = invocation.ArgumentList.Arguments.Last().ToString();
-                var query = GetQuery(semanticModel, method, invocation);
+                var query = GetQuery(semanticModel, queryMethod, invocation);
 
                 if (context.CancellationToken.IsCancellationRequested)
                 {
@@ -269,6 +262,11 @@ namespace {context.Compilation.Assembly.Name}
                     }
                     case SimpleLambdaExpressionSyntax simpleLambda:
                     {
+                        if (GraphQLQueryAnalyzerHelper.IsOpenLambda(simpleLambda))
+                        {
+                            return Failed(simpleLambda, Descriptors.OpenLambdaIsNotAllowed); 
+                        }
+
                         var parameter = simpleLambda.Parameter.Identifier.ValueText;
                         var childGenerationContext = new GraphQLQueryGenerationContext(
                             parameter,

@@ -19,5 +19,23 @@ namespace LinqQL.SourceGenerators
             "LinqQL",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+        
+        public static DiagnosticDescriptor OpenLambdaIsNotAllowed = new DiagnosticDescriptor(
+            nameof(OpenLambdaIsNotAllowed),
+            "Open lambda are not allowed",
+            "Open lambda are not allowed",
+            "LinqQL",
+            DiagnosticSeverity.Error,
+            description: "Open lambda like 'o => o' are not allowed. Use a lambda like 'o => new { o.Id' }.",
+            isEnabledByDefault: true);
+        
+        public static DiagnosticDescriptor OnlyStaticLambda = new DiagnosticDescriptor(
+            nameof(OnlyStaticLambda),
+            "Only static lambda are allowed",
+            "Only static lambda are allowed",
+            "LinqQL",
+            DiagnosticSeverity.Error,
+            description: "Only static lambda are allowed to avoid variables from different scopes.",
+            isEnabledByDefault: true);
     }
 }
