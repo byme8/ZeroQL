@@ -53,14 +53,14 @@ public static class TestExtensions
     public static async Task<Assembly> CompileToRealAssembly(this Project project)
     {
         var compilation = await project.GetCompilationAsync();
-        var analyzerResults = await compilation
+        var analyzerResults = await compilation!
             .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
             {
                 new QueryLambdaAnalyzer()
             }))
             .GetAllDiagnosticsAsync();
 
-        var error = compilation.GetDiagnostics()
+        var error = compilation!.GetDiagnostics()
             .Concat(analyzerResults)
             .FirstOrDefault(o => o.Severity == DiagnosticSeverity.Error);
 
@@ -93,14 +93,14 @@ public static class TestExtensions
     public static async Task<Diagnostic[]?> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
     {
         var compilation = await project.GetCompilationAsync();
-        var analyzerResults = await compilation
+        var analyzerResults = await compilation!
             .WithAnalyzers(ImmutableArray.Create(new[]
             {
                 analyzer
             }))
             .GetAllDiagnosticsAsync();
 
-        var error = compilation.GetDiagnostics()
+        var error = compilation!.GetDiagnostics()
             .Concat(analyzerResults);
 
         return error.ToArray();

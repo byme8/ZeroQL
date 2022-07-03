@@ -13,7 +13,7 @@ public class ParseSchemaTests
 {
     public ParseSchemaTests()
     {
-        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp");
+        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp", "Query");
         SyntaxTree = CSharpSyntaxTree.ParseText(Csharp);
     }
 
@@ -34,7 +34,8 @@ public class ParseSchemaTests
 
         var query = SyntaxTree.GetClass("Query");
 
-        query.Members.OfType<MethodDeclarationSyntax>()
+        query.Members
+            .OfType<MethodDeclarationSyntax>()
             .Select(o =>
             {
                 var methodName = o.Identifier.ValueText;
@@ -68,7 +69,7 @@ public class ParseSchemaTests
 
         user.ParameterList.Parameters
             .Should()
-            .Contain(o => o.Identifier.ValueText == "id" && o.Type.ToString() == "int");
+            .Contain(o => o.Identifier.ValueText == "id" && o.Type!.ToString() == "int");
 
     }
 
@@ -82,7 +83,7 @@ public class ParseSchemaTests
             .SelectMany(o => o.Attributes)
             .Should()
             .Contain(o => o.Name.ToString() == "JsonPropertyName" &&
-                          o.ArgumentList.Arguments.First().Expression.ToString() == @"""User""");
+                          o.ArgumentList!.Arguments.First().Expression.ToString() == @"""User""");
 
     }
 }

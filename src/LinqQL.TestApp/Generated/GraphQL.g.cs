@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace GraphQL.TestServer
 {
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class KeyValuePairOfStringAndString
     {
         public string Key { get; set; }
@@ -14,8 +14,8 @@ namespace GraphQL.TestServer
         public string Value { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
-    public class Query
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
+    public class TestServerQuery
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
         public User __Me { get; set; }
@@ -74,7 +74,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class Role
     {
         public int Id { get; set; }
@@ -82,7 +82,7 @@ namespace GraphQL.TestServer
         public string Name { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class TypesContainer
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value1")]
@@ -232,7 +232,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class User
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
@@ -252,13 +252,13 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class UserFilterInput
     {
         public UserKind UserKind { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "0.1.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public enum UserKind
     {
         GOOD,
