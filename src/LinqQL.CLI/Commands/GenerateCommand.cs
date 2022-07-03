@@ -5,31 +5,38 @@ using LinqQL.Core.Bootstrap;
 
 namespace LinqQL.CLI.Commands;
 
-[Command]
+[Command("generate", Description = "Generates C# classes from graphql file.")]
 public class GenerateCommand : ICommand
 {
-    [CommandOption("schema", 's', Description = "The schema to generate the query for", IsRequired = true)]
+    [CommandOption("schema", 's', Description = "The schema to generate the query. For example, './schema.graphql'", IsRequired = true)]
     public string Schema { get; set; }
 
-    [CommandOption("namespace", 'n', Description = "The query namespace", IsRequired = true)]
+    [CommandOption("namespace", 'n', Description = "The graphql client namespace", IsRequired = true)]
     public string Namespace { get; set; }
 
-    [CommandOption("query-name", 'q', Description = "The query name", IsRequired = true)]
+    [CommandOption("query-name", 'q', Description = "The graphql client query name. Can be useful if you have multiple clients at the same time.", IsRequired = false)]
     public string? QueryName { get; set; }
 
-    [CommandOption("output", 'o', Description = "The output file", IsRequired = true)]
+    [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'", IsRequired = true)]
     public string Output { get; set; }
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
         if (!File.Exists(Schema))
         {
-            await console.Error.WriteLineAsync("Schema file does not exist");
+            await console.Error.WriteLineAsync("Schema file does not exist. Check that file exist.");
+            return;
+        }
+
+        var fileName = Path.GetFileName(Output);
+        if (string.IsNullOrEmpty(fileName))
+        {
+            await console.Error.WriteLineAsync("The output file name has wrong format. It should be path to file. For example, './Generated/GraphQL.g.cs'");
             return;
         }
 
         var graphql = await File.ReadAllTextAsync(Schema);
-        var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace);
+        var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace, QueryName);
         var outputFolder = Path.GetDirectoryName(Output);
         if (!Directory.Exists(outputFolder))
         {

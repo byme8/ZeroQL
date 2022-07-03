@@ -17,7 +17,7 @@ namespace LinqQL.Core.Bootstrap;
 public static class GraphQLGenerator
 {
 
-    public static string ToCSharp(string graphql, string clientNamespace)
+    public static string ToCSharp(string graphql, string clientNamespace, string? queryName)
     {
         var schema = Parser.Parse(graphql);
         var enums = schema.Definitions
@@ -39,7 +39,7 @@ public static class GraphQLGenerator
 
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
-        var typesDeclaration = GenerateTypes(types.Concat(inputs).ToArray());
+        var typesDeclaration = GenerateTypes(queryName, types.Concat(inputs).ToArray());
         var enumsDeclaration = GenerateEnums(enums);
 
         namespaceDeclaration = namespaceDeclaration
@@ -88,7 +88,7 @@ using System.Text.Json.Serialization;
             .ToArray();
     }
 
-    private static ClassDeclarationSyntax[] GenerateTypes(ClassDefinition[] classes)
+    private static ClassDeclarationSyntax[] GenerateTypes(string? queryName, ClassDefinition[] classes)
     {
         return classes
             .Select(o =>
@@ -125,7 +125,7 @@ using System.Text.Json.Serialization;
                     });
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                return ClassDeclaration(o.Name)
+                return ClassDeclaration(o.Name == "Query" && queryName is not null ? queryName : o.Name)
                     .AddModifiers(Token(SyntaxKind.PublicKeyword))
                     .AddAttributeLists(AttributeList()
                         .AddAttributes(Attribute(ParseName(SourceGeneratorInfo.CodeGenerationAttribute))))
@@ -188,7 +188,7 @@ using System.Text.Json.Serialization;
             return genericMethodWithType
                 .WithBody(body);
         }
-        
+
         if (list.ElementTypeKind is Scalar)
         {
             var elementType = GetElementTypeFromArray(field);
