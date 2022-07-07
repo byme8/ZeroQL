@@ -10,6 +10,8 @@ type KeyValuePairOfStringAndString {
 type Query {
   me: User!
   users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
+  userKinds: [UserKind!]!
+  usersMatrix: [[User!]!]!
   usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
   usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
   user(id: Int!): User!

@@ -39,7 +39,7 @@ public class ParseSchemaTests
             .Select(o =>
             {
                 var methodName = o.Identifier.ValueText;
-                var genericName = o.ParameterList.Parameters.Last().Type as GenericNameSyntax;
+                var genericName = o.ParameterList.Parameters.LastOrDefault()?.Type as GenericNameSyntax;
                 return (methodName, genericName?.TypeArgumentList.Arguments.First().ToString());
             })
             .Should()

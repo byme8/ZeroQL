@@ -9,9 +9,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using Enum = LinqQL.Core.Schema.Enum;
-using List = LinqQL.Core.Schema.List;
-using TypeKind = LinqQL.Core.Schema.TypeKind;
 
 namespace LinqQL.Core.Bootstrap;
 
@@ -95,7 +92,7 @@ using System.Text.Json.Serialization;
             .Select(o =>
             {
                 var backedFields = o.Properties
-                    .Where(property => property.TypeKind is Complex or List)
+                    .Where(property => property.TypeDefinition is ObjectTypeDefinition or ListTypeDefinition)
                     .Select(property =>
                     {
                         var jsonNameAttributes =
@@ -114,7 +111,7 @@ using System.Text.Json.Serialization;
                                 );
 
                         return PropertyDeclaration(
-                                ParseTypeName(property.TypeName),
+                                ParseTypeName(property.TypeDefinition.Name),
                                 Identifier("__" + property.Name))
                             .AddModifiers(Token(SyntaxKind.PublicKeyword))
                             .AddAccessorListAccessors(
@@ -138,7 +135,7 @@ using System.Text.Json.Serialization;
 
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
     {
-        if (field.TypeKind is Complex or List)
+        if (field.TypeDefinition is ObjectTypeDefinition or ListTypeDefinition)
         {
             var parameters = field.Arguments
                 .Select(o =>
@@ -146,18 +143,10 @@ using System.Text.Json.Serialization;
                         .WithType(ParseTypeName(o.TypeName)))
                 .ToArray();
 
-            if (field.TypeKind == TypeKind.Complex)
-            {
-                return GenerateObjectProperty(field, parameters);
-            }
-
-            if (field.TypeKind is List list)
-            {
-                return GenerateListPropertyDeclaration(field, list, parameters);
-            }
+            return GeneratePropertyDeclaration(field, parameters);
         }
 
-        return PropertyDeclaration(ParseTypeName(field.TypeName), Identifier(field.Name))
+        return PropertyDeclaration(ParseTypeName(field.TypeDefinition.Name), Identifier(field.Name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddAccessorListAccessors(
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -166,81 +155,114 @@ using System.Text.Json.Serialization;
                     .WithSemicolonToken(ParseToken(";")));
     }
 
-    private static MemberDeclarationSyntax GenerateListPropertyDeclaration(FieldDefinition field, List list, ParameterSyntax[] parameters)
+    private static MemberDeclarationSyntax GeneratePropertyDeclaration(FieldDefinition field, ParameterSyntax[] parameters)
     {
-        if (list.ElementTypeKind is Complex)
+        var returnType = GetPropertyReturnType(field.TypeDefinition);
+        var name = GetPropertyName(field.Name, field.TypeDefinition);
+        var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
+
+        var funcType = GetPropertyFuncType(field.TypeDefinition);
+        var selectorParameter = Parameter(Identifier("selector")).WithType(ParseTypeName($"Func<{funcType}, T>"));
+
+        var list = SeparatedList(parameters);
+        if (RequireSelector(field.TypeDefinition))
         {
-            var elementType = GetElementTypeFromArray(field);
-            var selectorParameter = Parameter(Identifier("selector"))
-                .WithType(ParseTypeName($"Func<{elementType}, T>"));
-
-            var genericMethodWithType = MethodDeclaration(
-                    IdentifierName("T[]"),
-                    Identifier(field.Name + "<T>"))
-                .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                .WithParameterList(
-                    ParameterList(
-                        SeparatedList(parameters)
-                            .Add(selectorParameter)));
-
-            var body = Block(
-                ParseStatement($"return __{field.Name}.Select(selector).ToArray();"));
-
-            return genericMethodWithType
-                .WithBody(body);
+            list = list.Add(selectorParameter);
         }
-
-        if (list.ElementTypeKind is Scalar or Enum)
-        {
-            var elementType = GetElementTypeFromArray(field);
-            var genericMethodWithType = MethodDeclaration(
-                    IdentifierName($"{elementType}[]"),
-                    Identifier(field.Name))
-                .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                .WithParameterList(
-                    ParameterList(SeparatedList(parameters)));
-
-            var body = Block(
-                ParseStatement($"return __{field.Name};"));
-
-            return genericMethodWithType
-                .WithBody(body);
-        }
-
-        throw new NotSupportedException($"Not supported type: {list.ElementTypeKind}");
-    }
-
-    private static MemberDeclarationSyntax GenerateObjectProperty(FieldDefinition field, ParameterSyntax[] parameters)
-    {
-
-        var selectorParameter = Parameter(Identifier("selector"))
-            .WithType(ParseTypeName($"Func<{field.TypeName}, T>"));
 
         var genericMethodWithType = MethodDeclaration(
-                IdentifierName("T"),
-                Identifier(field.Name + "<T>"))
+                IdentifierName(returnType),
+                Identifier(name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithParameterList(
-                ParameterList(
-                    SeparatedList(parameters)
-                        .Add(selectorParameter)));
+            .WithParameterList(ParameterList(list));
 
         var body = Block(
-            ReturnStatement(
-                InvocationExpression(IdentifierName("selector"))
-                    .AddArgumentListArguments(Argument(IdentifierName("__" + field.Name)))));
+            ParseStatement(methodBody));
 
         return genericMethodWithType
             .WithBody(body);
     }
 
-    private static string GetElementTypeFromArray(FieldDefinition field)
+    private static bool RequireSelector(TypeDefinition typeDefinition)
     {
-        if (field.TypeName.EndsWith("?"))
+        switch (typeDefinition)
         {
-            return field.TypeName[..^3];
+            case ObjectTypeDefinition:
+                return true;
+            case ScalarTypeDefinition:
+            case EnumTypeDefinition:
+                return false;
+            case ListTypeDefinition type:
+                return RequireSelector(type.ElementTypeDefinition);
+            default:
+                throw new NotImplementedException();
         }
-        return field.TypeName[..^2];
+    }
+
+    private static string GetPropertyName(string fieldName, TypeDefinition typeDefinition)
+    {
+        switch (typeDefinition)
+        {
+            case ObjectTypeDefinition:
+                return fieldName + "<T>";
+            case ScalarTypeDefinition:
+            case EnumTypeDefinition:
+                return fieldName;
+            case ListTypeDefinition type:
+                return GetPropertyName(fieldName, type.ElementTypeDefinition);
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private static string GetPropertyFuncType(TypeDefinition typeDefinition)
+    {
+        switch (typeDefinition)
+        {
+            case ObjectTypeDefinition:
+            case ScalarTypeDefinition:
+            case EnumTypeDefinition:
+                return typeDefinition.Name + typeDefinition.NullableAnnotation();
+            case ListTypeDefinition type:
+                return GetPropertyFuncType(type.ElementTypeDefinition);
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition)
+    {
+        switch (typeDefinition)
+        {
+            case ScalarTypeDefinition:
+            case EnumTypeDefinition:
+                return fieldName;
+            case ObjectTypeDefinition:
+                return $"selector({fieldName})";
+            case ListTypeDefinition { ElementTypeDefinition: ScalarTypeDefinition or EnumTypeDefinition }:
+                return fieldName;
+            case ListTypeDefinition type:
+                return $"{fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private static string GetPropertyReturnType(TypeDefinition typeDefinition)
+    {
+        switch (typeDefinition)
+        {
+            case ObjectTypeDefinition type:
+                return "T" + type.NullableAnnotation();
+            case ScalarTypeDefinition type:
+                return type.Name + type.NullableAnnotation();
+            case EnumTypeDefinition type:
+                return type.Name + type.NullableAnnotation();
+            case ListTypeDefinition type:
+                return $"{GetPropertyReturnType(type.ElementTypeDefinition)}[]{type.NullableAnnotation()}";
+            default:
+                throw new NotImplementedException();
+        }
     }
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
@@ -262,8 +284,7 @@ using System.Text.Json.Serialization;
                 return new FieldDefinition
                 {
                     Name = field.Name.StringValue.FirstToUpper(),
-                    TypeName = type.Name,
-                    TypeKind = type.TypeKind,
+                    TypeDefinition = type,
                     Arguments = Array.Empty<ArgumentDefinition>()
                 };
             })
@@ -278,8 +299,7 @@ using System.Text.Json.Serialization;
                 return new FieldDefinition
                 {
                     Name = field.Name.StringValue.FirstToUpper(),
-                    TypeName = type.Name,
-                    TypeKind = type.TypeKind,
+                    TypeDefinition = type,
                     Arguments = field.Arguments?
                         .Select(arg => new ArgumentDefinition { Name = arg.Name.StringValue, TypeName = typeFormatter.GetTypeDefinition(arg.Type).Name })
                         .ToArray() ?? Array.Empty<ArgumentDefinition>()

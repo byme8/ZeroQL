@@ -57,6 +57,20 @@ public class UserGraphQLExtensions
         };
     }
 
+    public User[][] GetUsersMatrix()
+    {
+        return new[]
+        {
+            Enumerable.Range(0, 10)
+                .Select(o => new User
+                {
+                    FirstName = Guid.NewGuid().ToString(),
+                    LastName = Guid.NewGuid().ToString()
+                })
+                .ToArray()
+        };
+    }
+
     public User[] GetUsersByKind(UserKind kind, int page, int size)
     {
         return Enumerable.Range(0, size)

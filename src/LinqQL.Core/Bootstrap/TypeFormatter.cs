@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GraphQLParser.AST;
 using LinqQL.Core.Schema;
 
@@ -31,75 +32,58 @@ public class TypeFormatter
         get;
     }
 
-    public TypeDefinition GetTypeDefinition(GraphQLType type)
+    public TypeDefinition GetTypeDefinition(GraphQLParser.AST.GraphQLType type)
     {
         switch (type)
         {
             case GraphQLNonNullType { Type: GraphQLNamedType nonNullType }:
             {
-                var fieldKind = GetTypeKind(nonNullType);
-                var typeName = GetTypeName(nonNullType);
-
-                return new TypeDefinition
-                {
-                    Name = typeName,
-                    TypeKind = fieldKind
-                };
+                var typeDefinition = GetTypeDefinition(nonNullType);
+                return typeDefinition;
             }
             case GraphQLNonNullType { Type: GraphQLListType listType }:
             {
-                var elementType = GetTypeDefinition(listType.Type);
-                var fieldKind = new List(elementType.TypeKind);
-                var typeName = elementType.Name + "[]";
-
-                return new TypeDefinition
+                var typeDefinition = GetTypeDefinition(listType.Type);
+                return new ListTypeDefinition
                 {
-                    Name = typeName,
-                    TypeKind = fieldKind
+                    Name = typeDefinition.Name + "[]",
+                    CanBeNull = false,
+                    ElementTypeDefinition = typeDefinition
                 };
             }
             case GraphQLListType listType:
             {
-                var elementType = GetTypeDefinition(listType.Type);
-                var fieldKind = new List(elementType.TypeKind);
-                var typeName = elementType.Name + "[]?";
-
-                return new TypeDefinition
+                var typeDefinition = GetTypeDefinition(listType.Type);
+                return new ListTypeDefinition
                 {
-                    Name = typeName,
-                    TypeKind = fieldKind
+                    Name = typeDefinition.Name + "[]",
+                    CanBeNull = true,
+                    ElementTypeDefinition = typeDefinition
                 };
             }
             case GraphQLNamedType namedType:
             {
-                var fieldKind = GetTypeKind(namedType);
-                var typeName = GetTypeName(namedType);
-
-                return new TypeDefinition
+                var typeDefinition = GetTypeDefinition(namedType);
+                return typeDefinition with
                 {
-                    Name = typeName + "?",
-                    TypeKind = fieldKind
+                    CanBeNull = true
                 };
             }
             default:
-                return new TypeDefinition();
+                throw new NotSupportedException($"Type '{type}' is not supported");
         }
     }
 
 
-    private string GetTypeName(GraphQLNamedType nonNullType)
-    {
-        var fieldKind = GetTypeKind(nonNullType);
-        var typeName = nonNullType.Name.StringValue;
-        return fieldKind == TypeKind.Scalar ? GraphQLToCsharpScalarTypes[typeName] : typeName;
-    }
-
-    private TypeKind GetTypeKind(GraphQLNamedType namedType)
+    private TypeDefinition GetTypeDefinition(GraphQLNamedType namedType)
     {
         if (Enums.Contains(namedType.Name.StringValue))
         {
-            return TypeKind.Enum;
+            return new EnumTypeDefinition(namedType.Name.StringValue);
         }
-        return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue) ? TypeKind.Scalar : TypeKind.Complex;
+
+        return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue)
+            ? new ScalarTypeDefinition(GraphQLToCsharpScalarTypes[namedType.Name.StringValue])
+            : new ObjectTypeDefinition(namedType.Name.StringValue);
     }
 }
