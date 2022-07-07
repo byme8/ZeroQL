@@ -47,7 +47,16 @@ public class UserGraphQLExtensions
             })
             .ToArray();
     }
-    
+
+    public UserKind[] GetUserKinds()
+    {
+        return new[]
+        {
+            UserKind.Bad,
+            UserKind.Good
+        };
+    }
+
     public User[] GetUsersByKind(UserKind kind, int page, int size)
     {
         return Enumerable.Range(0, size)
@@ -58,7 +67,7 @@ public class UserGraphQLExtensions
             })
             .ToArray();
     }
-    
+
     public int[] GetUsersIds(UserKind kind, int page, int size)
     {
         return Enumerable.Range(0, size).ToArray();

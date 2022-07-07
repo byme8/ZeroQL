@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Enum = LinqQL.Core.Schema.Enum;
 using List = LinqQL.Core.Schema.List;
 using TypeKind = LinqQL.Core.Schema.TypeKind;
 
@@ -189,7 +190,7 @@ using System.Text.Json.Serialization;
                 .WithBody(body);
         }
 
-        if (list.ElementTypeKind is Scalar)
+        if (list.ElementTypeKind is Scalar or Enum)
         {
             var elementType = GetElementTypeFromArray(field);
             var genericMethodWithType = MethodDeclaration(
