@@ -15,6 +15,7 @@ type Query {
   usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
   usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
   user(id: Int!): User!
+  userKind(id: Int!): UserKind!
   admin(id: Int!): User
   container: TypesContainer!
 }
@@ -73,7 +74,7 @@ input PageInput {
 
 input UserFilterInput {
   userKind: UserKind!
-  page: PageInput!
+  page: PageInput
 }
 
 enum UserKind {
