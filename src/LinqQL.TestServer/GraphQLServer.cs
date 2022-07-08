@@ -96,6 +96,11 @@ public class UserGraphQLExtensions
             LastName = "Smith"
         };
     }
+    
+    public UserKind GetUserKind(int id)
+    {
+        return UserKind.Good;
+    }
 
     public User? GetAdmin(int id)
     {
@@ -159,7 +164,7 @@ public class UserFilterInput
 {
     public UserKind UserKind { get; set; }
 
-    public Page Page { get; set; }
+    public Page? Page { get; set; }
 }
 
 public class Page

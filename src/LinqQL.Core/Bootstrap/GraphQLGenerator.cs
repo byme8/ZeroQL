@@ -62,7 +62,7 @@ using System.Text.Json.Serialization;
             .Select(o =>
             {
                 var fields = o.Properties
-                    .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition.Name));
+                    .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition.Name + property.TypeDefinition.NullableAnnotation()));
 
                 return CSharpHelper.Class(o.Name)
                     .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)

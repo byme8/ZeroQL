@@ -27,9 +27,15 @@ public class ParseSchemaTests
     {
         var properties = new[]
         {
-            (Name: "Admin", Type: "User?"),
-            (Name: "User", Type: "User"),
-            (Name: "Users", Type: "User")
+            "T Me<T>(Func<User, T> selector)",
+            "T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)",
+            "UserKind[] UserKinds()",
+            "T[][] UsersMatrix<T>(Func<User, T> selector)",
+            "T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)",
+            "int[] UsersIds(UserKind kind, int page, int size)",
+            "T User<T>(int id, Func<User, T> selector)",
+            "T? Admin<T>(int id, Func<User?, T> selector)",
+            "T Container<T>(Func<TypesContainer, T> selector)",
         };
 
         var query = SyntaxTree.GetClass("Query");
@@ -38,9 +44,11 @@ public class ParseSchemaTests
             .OfType<MethodDeclarationSyntax>()
             .Select(o =>
             {
-                var methodName = o.Identifier.ValueText;
-                var genericName = o.ParameterList.Parameters.LastOrDefault()?.Type as GenericNameSyntax;
-                return (methodName, genericName?.TypeArgumentList.Arguments.First().ToString());
+                var returnType = o.ReturnType.ToString();
+                var methodName = o.Identifier.ToString();
+                var genericArguments = o.TypeParameterList?.ToString();
+                var genericName = o.ParameterList.ToString();
+                return $@"{returnType} {methodName}{genericArguments}{genericName}";
             })
             .Should()
             .Contain(properties);
@@ -51,8 +59,8 @@ public class ParseSchemaTests
     {
         var properties = new[]
         {
-            "UserKind",
-            "Page"
+            "UserKind UserKind",
+            "PageInput? Page"
         };
 
         var query = SyntaxTree.GetClass("UserFilterInput");
@@ -64,7 +72,7 @@ public class ParseSchemaTests
 
         query.Members
             .OfType<PropertyDeclarationSyntax>()
-            .Select(o => o.Identifier.ValueText)
+            .Select(o => $"{o.Type.ToString()} {o.Identifier.ValueText}")
             .Should()
             .Contain(properties);
     }

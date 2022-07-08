@@ -79,6 +79,8 @@ namespace GraphQL.TestServer
             return selector(__User);
         }
 
+        public UserKind UserKind { get; set; }
+
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
             return selector(__Admin);
@@ -281,7 +283,7 @@ namespace GraphQL.TestServer
     {
         public UserKind UserKind { get; set; }
 
-        public PageInput Page { get; set; }
+        public PageInput? Page { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
