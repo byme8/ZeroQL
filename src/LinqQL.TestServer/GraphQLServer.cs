@@ -158,6 +158,15 @@ public class TypesContainer
 public class UserFilterInput
 {
     public UserKind UserKind { get; set; }
+
+    public Page Page { get; set; }
+}
+
+public class Page
+{
+    public int Count { get; set; }
+
+    public int Size { get; set; }
 }
 
 public enum UserKind

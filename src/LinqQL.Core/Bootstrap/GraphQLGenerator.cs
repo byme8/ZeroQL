@@ -37,11 +37,14 @@ public static class GraphQLGenerator
 
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
-        var typesDeclaration = GenerateTypes(queryName, types.Concat(inputs).ToArray());
+        var typesDeclaration = GenerateTypes(queryName, types);
+        var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
 
         namespaceDeclaration = namespaceDeclaration
-            .WithMembers(List<MemberDeclarationSyntax>(typesDeclaration).AddRange(enumsDeclaration));
+            .WithMembers(List<MemberDeclarationSyntax>(typesDeclaration)
+                .AddRange(inputsDeclaration)
+                .AddRange(enumsDeclaration));
 
         var formattedSource = namespaceDeclaration.NormalizeWhitespace().ToFullString();
         return $@"// This file generated for LinqQL.
@@ -51,6 +54,22 @@ using System.Linq;
 using System.Text.Json.Serialization; 
 
 {formattedSource}";
+    }
+
+    private static ClassDeclarationSyntax[] GenerateInputs(ClassDefinition[] inputs)
+    {
+        return inputs
+            .Select(o =>
+            {
+                var fields = o.Properties
+                    .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition.Name));
+
+                return CSharpHelper.Class(o.Name)
+                    .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)
+                    .WithMembers(List<MemberDeclarationSyntax>(fields));
+
+            })
+            .ToArray();
     }
 
     private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition input)
@@ -95,38 +114,20 @@ using System.Text.Json.Serialization;
                     .Where(property => property.TypeDefinition is ObjectTypeDefinition or ListTypeDefinition)
                     .Select(property =>
                     {
-                        var jsonNameAttributes =
-                            AttributeList()
-                                .AddAttributes(
-                                    Attribute(IdentifierName("global::System.ComponentModel.EditorBrowsable"))
-                                        .AddArgumentListArguments(
-                                            AttributeArgument(
-                                                ParseExpression("global::System.ComponentModel.EditorBrowsableState.Never"))),
-                                    Attribute(IdentifierName("JsonPropertyName"))
-                                        .AddArgumentListArguments(
-                                            AttributeArgument(
-                                                LiteralExpression(
-                                                    SyntaxKind.StringLiteralExpression,
-                                                    Literal(property.Name))))
-                                );
+                        var jsonNameAttributes = new[]
+                        {
+                            ("global::System.ComponentModel.EditorBrowsable" , "global::System.ComponentModel.EditorBrowsableState.Never"),
+                            ("JsonPropertyName", Literal(property.Name).Text)
+                        };
 
-                        return PropertyDeclaration(
-                                ParseTypeName(property.TypeDefinition.Name),
-                                Identifier("__" + property.Name))
-                            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                            .AddAccessorListAccessors(
-                                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                    .WithSemicolonToken(ParseToken(";")),
-                                AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                                    .WithSemicolonToken(ParseToken(";")))
-                            .AddAttributeLists(jsonNameAttributes);
+                        return CSharpHelper
+                            .Property("__" + property.Name, property.TypeDefinition.Name)
+                            .AddAttributes(jsonNameAttributes);
                     });
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                return ClassDeclaration(o.Name == "Query" && queryName is not null ? queryName : o.Name)
-                    .AddModifiers(Token(SyntaxKind.PublicKeyword))
-                    .AddAttributeLists(AttributeList()
-                        .AddAttributes(Attribute(ParseName(SourceGeneratorInfo.CodeGenerationAttribute))))
+                return CSharpHelper.Class(o.Name == "Query" && queryName is not null ? queryName : o.Name)
+                    .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
             })
@@ -143,19 +144,14 @@ using System.Text.Json.Serialization;
                         .WithType(ParseTypeName(o.TypeName)))
                 .ToArray();
 
-            return GeneratePropertyDeclaration(field, parameters);
+            return GenerateQueryPropertyDeclaration(field, parameters);
         }
 
-        return PropertyDeclaration(ParseTypeName(field.TypeDefinition.Name), Identifier(field.Name))
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAccessorListAccessors(
-                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                    .WithSemicolonToken(ParseToken(";")),
-                AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                    .WithSemicolonToken(ParseToken(";")));
+        return CSharpHelper.Property(field.Name, field.TypeDefinition.Name);
     }
 
-    private static MemberDeclarationSyntax GeneratePropertyDeclaration(FieldDefinition field, ParameterSyntax[] parameters)
+
+    private static MemberDeclarationSyntax GenerateQueryPropertyDeclaration(FieldDefinition field, ParameterSyntax[] parameters)
     {
         var returnType = GetPropertyReturnType(field.TypeDefinition);
         var name = GetPropertyName(field.Name, field.TypeDefinition);

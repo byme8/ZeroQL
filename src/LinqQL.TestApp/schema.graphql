@@ -66,8 +66,14 @@ type User {
   role: Role!
 }
 
+input PageInput {
+  count: Int!
+  size: Int!
+}
+
 input UserFilterInput {
   userKind: UserKind!
+  page: PageInput!
 }
 
 enum UserKind {

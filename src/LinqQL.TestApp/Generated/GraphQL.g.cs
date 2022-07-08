@@ -269,9 +269,19 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
+    public class PageInput
+    {
+        public int Count { get; set; }
+
+        public int Size { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class UserFilterInput
     {
         public UserKind UserKind { get; set; }
+
+        public PageInput Page { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]

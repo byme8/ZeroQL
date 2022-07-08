@@ -47,6 +47,29 @@ public class ParseSchemaTests
     }
 
     [Fact]
+    public void InputsDetected()
+    {
+        var properties = new[]
+        {
+            "UserKind",
+            "Page"
+        };
+
+        var query = SyntaxTree.GetClass("UserFilterInput");
+
+        query.Members
+            .OfType<MethodDeclarationSyntax>()
+            .Should()
+            .BeEmpty();
+
+        query.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Select(o => o.Identifier.ValueText)
+            .Should()
+            .Contain(properties);
+    }
+
+    [Fact]
     public void UserDetected()
     {
         var propertiesNames = new[] { "Id", "FirstName", "LastName", "UserKind" };
