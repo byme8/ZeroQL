@@ -1,6 +1,11 @@
 ﻿namespace LinqQL.Core;
 
-public class GraphQLResult<TData>
+public interface IGraphQLQueryProvider
+{
+    string Query { get; }
+}
+
+public class GraphQLResult<TData> : IGraphQLQueryProvider
 {
     public string Query { get; set; }
 

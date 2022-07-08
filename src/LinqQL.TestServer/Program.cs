@@ -1,4 +1,6 @@
 using System.Net;
+using LinqQL.TestServer.Query;
+using LinqQL.TestServer.Query.Models;
 
 namespace LinqQL.TestServer;
 
@@ -19,8 +21,10 @@ public class Program
         builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(10_000));
 
         builder.Services.AddGraphQLServer()
-            .AddQueryType<Query>()
+            .AddQueryType<Query.Query>()
+            .AddMutationType<Mutation>()
             .AddTypeExtension<UserGraphQLExtensions>()
+            .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>();
 
         var app = builder.Build();

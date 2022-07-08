@@ -1,10 +1,15 @@
 schema {
   query: Query
+  mutation: Mutation
 }
 
 type KeyValuePairOfStringAndString {
   key: String!
   value: String!
+}
+
+type Mutation {
+  addUser(firstName: String! lastName: String!): User!
 }
 
 type Query {

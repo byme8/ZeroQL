@@ -15,6 +15,18 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
+    public class Mutation
+    {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
+        public User __AddUser { get; set; }
+
+        public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
+        {
+            return selector(__AddUser);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class TestServerQuery
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
@@ -78,6 +90,8 @@ namespace GraphQL.TestServer
         {
             return selector(__User);
         }
+
+        public UserKind UserKind { get; set; }
 
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
@@ -281,7 +295,7 @@ namespace GraphQL.TestServer
     {
         public UserKind UserKind { get; set; }
 
-        public PageInput Page { get; set; }
+        public PageInput? Page { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]

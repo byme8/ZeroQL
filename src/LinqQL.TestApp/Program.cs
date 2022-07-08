@@ -18,7 +18,7 @@ public class Program
         await Execute();
     }
 
-    public static async Task<object> Execute()
+    public static async Task<IGraphQLQueryProvider> Execute()
     {
         var httpClient = new HttpClient
         {
@@ -26,6 +26,7 @@ public class Program
         };
 
         var qlClient = new GraphQLClient<TestServerQuery>(httpClient);
+        // place to replace
         var response = await qlClient.Query(static q => q.Me(o => o.FirstName));
 
         return response;
