@@ -37,7 +37,7 @@ public class GraphQLClient<TQuery> : IDisposable
         Func<TVariables, TQuery, TResult> query,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        var result = await Execute<TQuery>(name, null, queryKey);
+        var result = await Execute<TQuery>(name, variables, queryKey);
         if (result.Data is not null)
         {
             var formatted = query(variables, result.Data);

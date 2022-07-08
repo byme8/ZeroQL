@@ -96,6 +96,12 @@ namespace {context.Compilation.Assembly.Name}
                     var variablesExpression = invocation.ArgumentList.Arguments.First().Expression;
                     return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
                 }
+                
+                if (parameterNames.SequenceEqual(new[] { "name", "variables", "query", "queryKey" }))
+                {
+                    var variablesExpression = invocation.ArgumentList.Arguments.Skip(1).First().Expression;
+                    return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
+                }
 
                 if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
                 {

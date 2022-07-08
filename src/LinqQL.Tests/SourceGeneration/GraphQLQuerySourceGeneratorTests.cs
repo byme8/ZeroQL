@@ -212,6 +212,22 @@ public class GraphQLQuerySourceGeneratorTests : IntegrationTest
         result.Data.Should().Be(-431);
         GraphQLQueryStore.Query[csharpQuery].Should().Be(graphqlQuery);
     }
+    
+    [Fact]
+    public async Task SupportsPassedArgumentInNamedQuery()
+    {
+        var csharpQuery = "static (i, q) => q.User(i.Id, o => o.Id)";
+        var graphqlQuery = @"query TestQuery($id: Int!) { user(id: $id) { id } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, "\"TestQuery\", new { Id = -431 }, " + csharpQuery));
+
+        var assembly = await project.CompileToRealAssembly();
+        var result = (GraphQLResult<int>)await ExecuteRequest(assembly);
+
+        result.Query.Should().Be(graphqlQuery);
+        result.Data.Should().Be(-431);
+    }
 
     [Fact]
     public async Task SupportForEnums()
