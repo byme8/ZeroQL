@@ -12,7 +12,7 @@ namespace LinqQL.SourceGenerators.Generator
         {
             if (syntaxNode is InvocationExpressionSyntax invocation &&
                 invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                memberAccess.Name.ToString() == "Query")
+                memberAccess.Name.ToString() is "Query" or "Mutation")
             {
                 Invocations.Add(invocation);
             }

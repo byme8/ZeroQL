@@ -126,7 +126,7 @@ using System.Text.Json.Serialization;
                     });
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                return CSharpHelper.Class(o.Name == "Query" && queryName is not null ? queryName : o.Name)
+                return CSharpHelper.Class(o.Name)
                     .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 

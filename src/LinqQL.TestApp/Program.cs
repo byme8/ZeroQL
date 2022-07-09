@@ -25,7 +25,7 @@ public class Program
             BaseAddress = new Uri("http://localhost:10000/graphql")
         };
 
-        var qlClient = new GraphQLClient<TestServerQuery>(httpClient);
+        var qlClient = new GraphQLClient<Query, Mutation>(httpClient);
         // place to replace
         var response = await qlClient.Query(static q => q.Me(o => o.FirstName));
 

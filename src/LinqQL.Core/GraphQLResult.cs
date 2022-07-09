@@ -22,9 +22,9 @@ public class GraphQLRequest
 
 public class GraphQLResponse<TData>
 {
-    public TData Data { get; set; }
+    public TData? Data { get; set; }
 
-    public GraphQueryError[] Errors { get; set; }
+    public GraphQueryError[]? Errors { get; set; }
 }
 
 public class GraphQueryError

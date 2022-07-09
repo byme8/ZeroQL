@@ -11,6 +11,7 @@ namespace LinqQL.Tests.Data;
 public static class TestProject
 {
     public const string MeQuery = @"static q => q.Me(o => o.FirstName)";
+    public const string FullMeQuery = @"Query(static q => q.Me(o => o.FirstName))";
 
     static TestProject()
     {

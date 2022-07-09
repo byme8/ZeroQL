@@ -27,7 +27,7 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
-    public class TestServerQuery
+    public class Query
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
         public User __Me { get; set; }

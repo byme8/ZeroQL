@@ -14,7 +14,7 @@ namespace LinqQL.SourceGenerators
             }
             var possibleMethod = semanticModel.GetSymbolInfo(memberAccess.Name);
             if (possibleMethod.Symbol is not IMethodSymbol { ContainingSymbol: INamedTypeSymbol containingType } method ||
-                containingType.ConstructedFrom.ToString() != "LinqQL.Core.GraphQLClient<TQuery>")
+                containingType.ConstructedFrom.ToString() != "LinqQL.Core.GraphQLClient<TQuery, TMutation>")
             {
                 return null;
             }

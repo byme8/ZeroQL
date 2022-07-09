@@ -8,7 +8,17 @@ using System.Threading.Tasks;
 
 namespace LinqQL.Core;
 
-public class GraphQLClient<TQuery> : IDisposable
+public class Unit
+{
+}
+
+public enum OperationKind
+{
+    Query,
+    Mutation
+}
+
+public class GraphQLClient<TQuery, TMutation> : IDisposable
 {
     private readonly HttpClient httpClient;
     private readonly JsonSerializerOptions options = new()
@@ -37,42 +47,7 @@ public class GraphQLClient<TQuery> : IDisposable
         Func<TVariables, TQuery, TResult> query,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        var result = await Execute<TQuery>(name, variables, queryKey);
-        if (result.Data is not null)
-        {
-            var formatted = query(variables, result.Data);
-            return new GraphQLResult<TResult>
-            {
-                Query = result.Query,
-                Data = formatted
-            };
-        }
-
-        return new GraphQLResult<TResult>
-        {
-            Query = result.Query,
-            Errors = result.Errors
-        };
-    }
-
-    public async Task<GraphQLResult<TResult>> Query<TResult>(string name, Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null!)
-    {
-        var result = await Execute<TQuery>(name, null, queryKey);
-        if (result.Data is not null)
-        {
-            var formatted = query(result.Data);
-            return new GraphQLResult<TResult>
-            {
-                Query = result.Query,
-                Data = formatted
-            };
-        }
-
-        return new GraphQLResult<TResult>
-        {
-            Query = result.Query,
-            Errors = result.Errors
-        };
+        return await Execute(OperationKind.Query, name, variables, query!, queryKey);
     }
 
     public async Task<GraphQLResult<TResult>> Query<TVariables, TResult>(
@@ -80,45 +55,61 @@ public class GraphQLClient<TQuery> : IDisposable
         Func<TVariables, TQuery, TResult> query,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        var result = await Execute<TQuery>(null, variables, queryKey);
-        if (result.Data is not null)
-        {
-            var formatted = query(variables, result.Data);
-            return new GraphQLResult<TResult>
-            {
-                Query = result.Query,
-                Data = formatted
-            };
-        }
-
-        return new GraphQLResult<TResult>
-        {
-            Query = result.Query,
-            Errors = result.Errors
-        };
+        return await Execute(OperationKind.Query, null, variables, query!, queryKey);
     }
 
-    public async Task<GraphQLResult<TResult>> Query<TResult>(Func<TQuery, TResult> query, [CallerArgumentExpression("query")] string queryKey = null)
+    public async Task<GraphQLResult<TResult>> Query<TResult>(
+        string name,
+        Func<TQuery?, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        var result = await Execute<TQuery>(null, null, queryKey);
-        if (result.Data is not null)
-        {
-            var formatted = query(result.Data);
-            return new GraphQLResult<TResult>
-            {
-                Query = result.Query,
-                Data = formatted
-            };
-        }
-
-        return new GraphQLResult<TResult>
-        {
-            Query = result.Query,
-            Errors = result.Errors
-        };
+        return await Execute<Unit, TQuery, TResult>(OperationKind.Query, name, null, (i, q) => query(q), queryKey);
     }
 
-    public async Task<GraphQLResult<T>> Execute<T>(string? name, object? arguments, string queryKey)
+    public async Task<GraphQLResult<TResult>> Query<TResult>(
+        Func<TQuery, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
+    {
+        return await Execute<Unit, TQuery, TResult>(OperationKind.Query, null, null, (i, q) => query(q), queryKey);
+    }
+
+    public async Task<GraphQLResult<TResult>> Mutation<TVariables, TResult>(
+        string name,
+        TVariables variables,
+        Func<TVariables, TMutation, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
+    {
+        return await Execute(OperationKind.Mutation, name, variables, query!, queryKey);
+    }
+
+    public async Task<GraphQLResult<TResult>> Mutation<TVariables, TResult>(
+        TVariables variables,
+        Func<TVariables, TMutation, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
+    {
+        return await Execute(OperationKind.Mutation, null, variables, query!, queryKey);
+    }
+
+    public async Task<GraphQLResult<TResult>> Mutation<TResult>(
+        string name,
+        Func<TMutation?, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
+    {
+        return await Execute<Unit, TMutation, TResult>(OperationKind.Mutation, name, null, (i, q) => query(q), queryKey);
+    }
+    
+    public async Task<GraphQLResult<TResult>> Mutation<TResult>(
+        Func<TMutation, TResult> query,
+        [CallerArgumentExpression("query")] string queryKey = null!)
+    {
+        return await Execute<Unit, TMutation, TResult>(OperationKind.Mutation, null, null, (i, q) => query(q), queryKey);
+    }
+
+    public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationQuery, TResult>(OperationKind operationKind,
+        string? operationName,
+        TVariables? arguments,
+        Func<TVariables?, TOperationQuery?, TResult> queryMapper,
+        string queryKey)
     {
         if (!GraphQLQueryStore.Query.TryGetValue(queryKey, out var queryBody))
         {
@@ -126,10 +117,10 @@ public class GraphQLClient<TQuery> : IDisposable
         }
 
         var queryBuilder = new StringBuilder();
-        queryBuilder.Append("query ");
-        if (!string.IsNullOrEmpty(name))
+        queryBuilder.Append(operationKind == OperationKind.Query ? "query " : "mutation ");
+        if (!string.IsNullOrEmpty(operationName))
         {
-            queryBuilder.Append(name);
+            queryBuilder.Append(operationName);
         }
         queryBuilder.Append(queryBody);
 
@@ -140,15 +131,36 @@ public class GraphQLClient<TQuery> : IDisposable
             Query = query
         };
 
+        var qlResponse = await SendRequest<TOperationQuery>(queryRequest);
+
+        if (qlResponse.Errors is { Length: > 1 })
+        {
+            return new GraphQLResult<TResult>
+            {
+                Query = query,
+                Errors = qlResponse.Errors
+            };
+        }
+
+        var formatted = queryMapper(arguments, qlResponse.Data);
+        return new GraphQLResult<TResult>
+        {
+            Query = query,
+            Data = formatted
+        };
+    }
+
+    private async Task<GraphQLResponse<TOperationQuery>> SendRequest<TOperationQuery>(GraphQLRequest queryRequest)
+    {
         var requestJson = JsonSerializer.Serialize(queryRequest, options);
         var response = await httpClient.PostAsync("", new StringContent(requestJson, Encoding.UTF8, "application/json"));
         var responseJson = await response.Content.ReadAsStringAsync();
-        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<T>>(responseJson, options);
+        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TOperationQuery>>(responseJson, options);
+
         if (qlResponse is null)
         {
-            return new GraphQLResult<T>
+            return new GraphQLResponse<TOperationQuery>
             {
-                Query = query,
                 Errors = new[]
                 {
                     new GraphQueryError { Message = "Failed to deserialize response: " + responseJson },
@@ -156,11 +168,6 @@ public class GraphQLClient<TQuery> : IDisposable
             };
         }
 
-        return new GraphQLResult<T>
-        {
-            Query = query,
-            Data = qlResponse.Data,
-            Errors = qlResponse.Errors
-        };
+        return qlResponse;
     }
 }
