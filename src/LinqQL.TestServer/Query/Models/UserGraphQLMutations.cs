@@ -1,8 +1,5 @@
 ﻿namespace LinqQL.TestServer.Query.Models;
 
-public class Mutation
-{
-}
 
 [ExtendObjectType(typeof(Mutation))]
 public class UserGraphQLMutations

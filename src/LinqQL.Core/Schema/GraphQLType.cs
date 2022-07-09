@@ -2,6 +2,11 @@ namespace LinqQL.Core.Schema;
 
 public static class TypeDefinitionExtension
 {
+    public static string NameWithNullableAnnotation(this TypeDefinition type)
+    {
+        return $"{type.Name}{(type.CanBeNull ? "?" : "")}";
+    }
+    
     public static string NullableAnnotation(this TypeDefinition type)
     {
         return type.CanBeNull ? "?" : "";

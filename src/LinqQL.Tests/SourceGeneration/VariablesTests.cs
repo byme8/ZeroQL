@@ -15,11 +15,11 @@ public class VariablesTests : IntegrationTest
         var graphqlQuery = @"query ($id: Int!) { user(id: $id) { id } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "new { Id = -431 }, " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "new { Id = 2 }, " + csharpQuery));
 
         var response = (GraphQLResult<int>)await project.Validate(graphqlQuery);
 
-        response.Data.Should().Be(-431);
+        response.Data.Should().Be(2);
     }
 
     [Fact]
@@ -41,11 +41,11 @@ public class VariablesTests : IntegrationTest
         var graphqlQuery = @"query TestQuery($id: Int!) { user(id: $id) { id } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "\"TestQuery\", new { Id = -431 }, " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "\"TestQuery\", new { Id = 1 }, " + csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
 
-        result.Data.Should().Be(-431);
+        result.Data.Should().Be(1);
     }
 
     [Fact]

@@ -47,6 +47,20 @@ public class QueryTests : IntegrationTest
     }
 
     [Fact]
+    public async Task NullableQueryHandled()
+    {
+        var csharpQuery = "static q => q.User(10, o => o.FirstName)";
+        var graphqlQuery = @"query { user(id: 10) { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var result = await project.Validate(graphqlQuery);
+
+        result.Query.Should().Be(graphqlQuery);
+    }
+
+    [Fact]
     public async Task SupportForMultipleMembers()
     {
         var csharpQuery = "static q => q.Me(o => new { o.FirstName.Length })";

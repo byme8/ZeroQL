@@ -164,7 +164,7 @@ using System.Text.Json.Serialization;
             return GenerateQueryPropertyDeclaration(field, parameters);
         }
 
-        return CSharpHelper.Property(field.Name, field.TypeDefinition.Name);
+        return CSharpHelper.Property(field.Name, field.TypeDefinition.NameWithNullableAnnotation());
     }
 
 
@@ -251,11 +251,11 @@ using System.Text.Json.Serialization;
             case EnumTypeDefinition:
                 return fieldName;
             case ObjectTypeDefinition:
-                return $"selector({fieldName})";
+                return $"{fieldName} != default ? selector({fieldName}) : default";
             case ListTypeDefinition { ElementTypeDefinition: ScalarTypeDefinition or EnumTypeDefinition }:
                 return fieldName;
             case ListTypeDefinition type:
-                return $"{fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
+                return $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
             default:
                 throw new NotImplementedException();
         }
@@ -268,9 +268,9 @@ using System.Text.Json.Serialization;
             case ObjectTypeDefinition type:
                 return "T" + type.NullableAnnotation();
             case ScalarTypeDefinition type:
-                return type.Name + type.NullableAnnotation();
+                return type.NameWithNullableAnnotation();
             case EnumTypeDefinition type:
-                return type.Name + type.NullableAnnotation();
+                return type.NameWithNullableAnnotation();
             case ListTypeDefinition type:
                 return $"{GetPropertyReturnType(type.ElementTypeDefinition)}[]{type.NullableAnnotation()}";
             default:

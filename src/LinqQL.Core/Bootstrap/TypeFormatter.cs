@@ -12,6 +12,7 @@ public class TypeFormatter
     {
         { "String", "string" },
         { "Short", "short" },
+        { "Byte", "byte" },
         { "Int", "int" },
         { "Long", "long" },
         { "Float", "float" },

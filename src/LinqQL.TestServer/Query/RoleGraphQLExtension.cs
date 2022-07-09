@@ -5,12 +5,17 @@ namespace LinqQL.TestServer.Query;
 [ExtendObjectType(typeof(User))]
 public class RoleGraphQLExtension
 {
-    public Role GetRole([Parent] User user)
+    public Role? GetRole([Parent] User user)
     {
-        return new Role
+        if (user.Id == 1)
         {
-            Id = 42,
-            Name = "Admin"
-        };
+            return new Role
+            {
+                Id = 42,
+                Name = "Admin"
+            };
+        }
+
+        return null;
     }
 }

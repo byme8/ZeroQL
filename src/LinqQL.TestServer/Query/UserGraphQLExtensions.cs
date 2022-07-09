@@ -5,6 +5,12 @@ namespace LinqQL.TestServer.Query;
 [ExtendObjectType(typeof(Query))]
 public class UserGraphQLExtensions
 {
+    public static Dictionary<int, User> Users = new()
+    {
+        { 1, new User() { Id = 1, FirstName = "Jon", LastName = "Smith", UserKind = UserKind.Good } },
+        { 2, new User() { Id = 2, FirstName = "Ben", LastName = "Smith", UserKind = UserKind.Bad } },
+    };
+
     public User Me()
     {
         return new User
@@ -28,11 +34,7 @@ public class UserGraphQLExtensions
 
     public UserKind[] GetUserKinds()
     {
-        return new[]
-        {
-            UserKind.Bad,
-            UserKind.Good
-        };
+        return Users.Select(o => o.Value.UserKind).ToArray();
     }
 
     public User[][] GetUsersMatrix()
@@ -65,16 +67,11 @@ public class UserGraphQLExtensions
         return Enumerable.Range(0, size).ToArray();
     }
 
-    public User GetUser(int id)
+    public User? GetUser(int id)
     {
-        return new User
-        {
-            Id = id,
-            FirstName = "Jon",
-            LastName = "Smith"
-        };
+        return Users.GetValueOrDefault(id);
     }
-    
+
     public UserKind GetUserKind(int id)
     {
         return UserKind.Good;

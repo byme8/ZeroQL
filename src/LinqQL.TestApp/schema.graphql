@@ -19,7 +19,7 @@ type Query {
   usersMatrix: [[User!]!]!
   usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
   usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
-  user(id: Int!): User!
+  user(id: Int!): User
   userKind(id: Int!): UserKind!
   admin(id: Int!): User
   container: TypesContainer!
@@ -69,7 +69,7 @@ type User {
   firstName: String!
   lastName: String!
   userKind: UserKind!
-  role: Role!
+  role: Role
 }
 
 input PageInput {

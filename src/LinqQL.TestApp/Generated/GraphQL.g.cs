@@ -29,7 +29,7 @@ namespace GraphQL.TestServer
 
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
-            return selector(__AddUser);
+            return __AddUser != default ? selector(__AddUser) : default;
         }
     }
 
@@ -65,12 +65,12 @@ namespace GraphQL.TestServer
 
         public T Me<T>(Func<User, T> selector)
         {
-            return selector(__Me);
+            return __Me != default ? selector(__Me) : default;
         }
 
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
-            return __Users.Select(o => selector(o)).ToArray();
+            return __Users?.Select(o => o != default ? selector(o) : default).ToArray();
         }
 
         public UserKind[] UserKinds()
@@ -80,12 +80,12 @@ namespace GraphQL.TestServer
 
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
-            return __UsersMatrix.Select(o => o.Select(o => selector(o)).ToArray()).ToArray();
+            return __UsersMatrix?.Select(o => o?.Select(o => o != default ? selector(o) : default).ToArray()).ToArray();
         }
 
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
-            return __UsersByKind.Select(o => selector(o)).ToArray();
+            return __UsersByKind?.Select(o => o != default ? selector(o) : default).ToArray();
         }
 
         public int[] UsersIds(UserKind kind, int page, int size)
@@ -93,21 +93,21 @@ namespace GraphQL.TestServer
             return __UsersIds;
         }
 
-        public T User<T>(int id, Func<User, T> selector)
+        public T? User<T>(int id, Func<User?, T> selector)
         {
-            return selector(__User);
+            return __User != default ? selector(__User) : default;
         }
 
         public UserKind UserKind { get; set; }
 
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
-            return selector(__Admin);
+            return __Admin != default ? selector(__Admin) : default;
         }
 
         public T Container<T>(Func<TypesContainer, T> selector)
         {
-            return selector(__Container);
+            return __Container != default ? selector(__Container) : default;
         }
     }
 
@@ -122,12 +122,6 @@ namespace GraphQL.TestServer
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class TypesContainer
     {
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value1")]
-        public Byte __Value1 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value2")]
-        public Byte __Value2 { get; set; }
-
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value13")]
         public Decimal __Value13 { get; set; }
 
@@ -166,57 +160,51 @@ namespace GraphQL.TestServer
 
         public string Text { get; set; }
 
-        public T Value1<T>(Func<Byte, T> selector)
-        {
-            return selector(__Value1);
-        }
+        public byte Value1 { get; set; }
 
-        public T? Value2<T>(Func<Byte?, T> selector)
-        {
-            return selector(__Value2);
-        }
+        public byte? Value2 { get; set; }
 
         public short Value3 { get; set; }
 
-        public short Value4 { get; set; }
+        public short? Value4 { get; set; }
 
         public int Value5 { get; set; }
 
-        public int Value6 { get; set; }
+        public int? Value6 { get; set; }
 
         public long Value7 { get; set; }
 
-        public long Value8 { get; set; }
+        public long? Value8 { get; set; }
 
         public float Value9 { get; set; }
 
-        public float Value10 { get; set; }
+        public float? Value10 { get; set; }
 
         public float Value11 { get; set; }
 
-        public float Value12 { get; set; }
+        public float? Value12 { get; set; }
 
         public T Value13<T>(Func<Decimal, T> selector)
         {
-            return selector(__Value13);
+            return __Value13 != default ? selector(__Value13) : default;
         }
 
         public T? Value14<T>(Func<Decimal?, T> selector)
         {
-            return selector(__Value14);
+            return __Value14 != default ? selector(__Value14) : default;
         }
 
         public DateTime Value15 { get; set; }
 
-        public DateTime Value16 { get; set; }
+        public DateTime? Value16 { get; set; }
 
         public DateTime Value17 { get; set; }
 
-        public DateTime Value18 { get; set; }
+        public DateTime? Value18 { get; set; }
 
         public Guid Value19 { get; set; }
 
-        public Guid Value20 { get; set; }
+        public Guid? Value20 { get; set; }
 
         public Guid[] Value21()
         {
@@ -250,22 +238,22 @@ namespace GraphQL.TestServer
 
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return __Value27.Select(o => selector(o)).ToArray();
+            return __Value27?.Select(o => o != default ? selector(o) : default).ToArray();
         }
 
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return __Value28.Select(o => selector(o)).ToArray();
+            return __Value28?.Select(o => o != default ? selector(o) : default).ToArray();
         }
 
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return selector(__Value29);
+            return __Value29 != default ? selector(__Value29) : default;
         }
 
         public T? Value30<T>(Func<KeyValuePairOfStringAndString?, T> selector)
         {
-            return selector(__Value30);
+            return __Value30 != default ? selector(__Value30) : default;
         }
     }
 
@@ -283,9 +271,9 @@ namespace GraphQL.TestServer
 
         public UserKind UserKind { get; set; }
 
-        public T Role<T>(Func<Role, T> selector)
+        public T? Role<T>(Func<Role?, T> selector)
         {
-            return selector(__Role);
+            return __Role != default ? selector(__Role) : default;
         }
     }
 
