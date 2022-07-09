@@ -213,14 +213,14 @@ using System.Text.Json.Serialization;
                 throw new NotImplementedException();
         }
     }
-    
+
     private static bool RequireSelector(FieldDefinition field)
     {
         if (field.Arguments.Any())
         {
             return true;
         }
-        
+
         switch (field.TypeDefinition)
         {
             case ObjectTypeDefinition:
@@ -273,12 +273,16 @@ using System.Text.Json.Serialization;
             case ScalarTypeDefinition:
             case EnumTypeDefinition:
                 return fieldName;
-            case ObjectTypeDefinition:
+            case ObjectTypeDefinition { CanBeNull: true }:
                 return $"{fieldName} != default ? selector({fieldName}) : default";
+            case ObjectTypeDefinition { CanBeNull: false }:
+                return $"selector({fieldName})";
             case ListTypeDefinition { ElementTypeDefinition: ScalarTypeDefinition or EnumTypeDefinition }:
                 return fieldName;
-            case ListTypeDefinition type:
+            case ListTypeDefinition { CanBeNull: true } type:
                 return $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
+            case ListTypeDefinition { CanBeNull: false } type:
+                return $"{fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
             default:
                 throw new NotImplementedException();
         }

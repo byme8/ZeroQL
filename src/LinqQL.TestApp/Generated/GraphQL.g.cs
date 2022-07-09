@@ -4,6 +4,8 @@ using System;
 using System.Linq; 
 using System.Text.Json.Serialization; 
 
+#nullable enable
+
 namespace GraphQL.TestServer
 {
     public class TestServerClient : global::LinqQL.Core.GraphQLClient<Query, Mutation>
@@ -29,7 +31,7 @@ namespace GraphQL.TestServer
 
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
-            return __AddUser != default ? selector(__AddUser) : default;
+            return selector(__AddUser);
         }
     }
 
@@ -65,24 +67,24 @@ namespace GraphQL.TestServer
 
         public T Me<T>(Func<User, T> selector)
         {
-            return __Me != default ? selector(__Me) : default;
+            return selector(__Me);
         }
 
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
-            return __Users?.Select(o => o != default ? selector(o) : default).ToArray();
+            return __Users.Select(o => selector(o)).ToArray();
         }
 
         public UserKind[] UserKinds { get; set; }
 
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
-            return __UsersMatrix?.Select(o => o?.Select(o => o != default ? selector(o) : default).ToArray()).ToArray();
+            return __UsersMatrix.Select(o => o.Select(o => selector(o)).ToArray()).ToArray();
         }
 
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
-            return __UsersByKind?.Select(o => o != default ? selector(o) : default).ToArray();
+            return __UsersByKind.Select(o => selector(o)).ToArray();
         }
 
         public int[] UsersIds(UserKind kind, int page, int size)
@@ -107,7 +109,7 @@ namespace GraphQL.TestServer
 
         public T Container<T>(Func<TypesContainer, T> selector)
         {
-            return __Container != default ? selector(__Container) : default;
+            return selector(__Container);
         }
     }
 
@@ -190,17 +192,17 @@ namespace GraphQL.TestServer
 
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return __Value27?.Select(o => o != default ? selector(o) : default).ToArray();
+            return __Value27.Select(o => selector(o)).ToArray();
         }
 
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return __Value28?.Select(o => o != default ? selector(o) : default).ToArray();
+            return __Value28?.Select(o => selector(o)).ToArray();
         }
 
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
-            return __Value29 != default ? selector(__Value29) : default;
+            return selector(__Value29);
         }
 
         public T? Value30<T>(Func<KeyValuePairOfStringAndString?, T> selector)
