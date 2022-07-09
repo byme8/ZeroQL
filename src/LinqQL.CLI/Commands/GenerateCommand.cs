@@ -14,8 +14,8 @@ public class GenerateCommand : ICommand
     [CommandOption("namespace", 'n', Description = "The graphql client namespace", IsRequired = true)]
     public string Namespace { get; set; }
 
-    [CommandOption("query-name", 'q', Description = "The graphql client query name. Can be useful if you have multiple clients at the same time.", IsRequired = false)]
-    public string? QueryName { get; set; }
+    [CommandOption("client-name", 'q', Description = "The graphql client name. Can be useful if you have multiple clients at the same time.", IsRequired = false)]
+    public string? ClientName { get; set; }
 
     [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'", IsRequired = true)]
     public string Output { get; set; }
@@ -36,7 +36,7 @@ public class GenerateCommand : ICommand
         }
 
         var graphql = await File.ReadAllTextAsync(Schema);
-        var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace, QueryName);
+        var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace, ClientName);
         var outputFolder = Path.GetDirectoryName(Output);
         if (!Directory.Exists(outputFolder))
         {

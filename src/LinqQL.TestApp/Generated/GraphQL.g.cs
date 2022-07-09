@@ -6,6 +6,13 @@ using System.Text.Json.Serialization;
 
 namespace GraphQL.TestServer
 {
+    public class TestServerClient : global::LinqQL.Core.GraphQLClient<Query, Mutation>
+    {
+        public TestServerClient(global::System.Net.Http.HttpClient client) : base(client)
+        {
+        }
+    }
+
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class KeyValuePairOfStringAndString
     {

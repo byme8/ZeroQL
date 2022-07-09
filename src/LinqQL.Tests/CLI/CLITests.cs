@@ -15,7 +15,7 @@ public class CLITests
         var generateCommand = new GenerateCommand();
         generateCommand.Schema = "../../../../LinqQL.TestApp/schema.graphql";
         generateCommand.Namespace = "GraphQL.TestServer";
-        generateCommand.QueryName = "TestServerQuery";
+        generateCommand.ClientName = "TestServerClient";
         generateCommand.Output = "../../../../LinqQL.TestApp/Generated/GraphQL.g.cs";
 
         await generateCommand.ExecuteAsync(console);

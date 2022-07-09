@@ -13,7 +13,7 @@ public class ParseSchemaTests
 {
     public ParseSchemaTests()
     {
-        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp", "Query");
+        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp", "GraphQLClient");
         SyntaxTree = CSharpSyntaxTree.ParseText(Csharp);
     }
 
@@ -50,6 +50,53 @@ public class ParseSchemaTests
                 var genericName = o.ParameterList.ToString();
                 return $@"{returnType} {methodName}{genericArguments}{genericName}";
             })
+            .Should()
+            .Contain(properties);
+    }
+    
+    [Fact]
+    public void MutationDetected()
+    {
+        var properties = new[]
+        {
+            "T AddUser<T>(string firstName, string lastName, Func<User, T> selector)"
+        };
+
+        var query = SyntaxTree.GetClass("Mutation");
+
+        query.Members
+            .OfType<MethodDeclarationSyntax>()
+            .Select(o =>
+            {
+                var returnType = o.ReturnType.ToString();
+                var methodName = o.Identifier.ToString();
+                var genericArguments = o.TypeParameterList?.ToString();
+                var genericName = o.ParameterList.ToString();
+                return $@"{returnType} {methodName}{genericArguments}{genericName}";
+            })
+            .Should()
+            .Contain(properties);
+    }
+    
+    [Fact]
+    public void ClientGenerated()
+    {
+        var properties = new[]
+        {
+            "UserKind UserKind",
+            "PageInput? Page"
+        };
+
+        var query = SyntaxTree.GetClass("UserFilterInput");
+
+        query.Members
+            .OfType<MethodDeclarationSyntax>()
+            .Should()
+            .BeEmpty();
+
+        query.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Select(o => $"{o.Type.ToString()} {o.Identifier.ValueText}")
             .Should()
             .Contain(properties);
     }

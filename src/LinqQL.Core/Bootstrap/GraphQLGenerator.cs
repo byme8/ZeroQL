@@ -15,7 +15,7 @@ namespace LinqQL.Core.Bootstrap;
 public static class GraphQLGenerator
 {
 
-    public static string ToCSharp(string graphql, string clientNamespace, string? queryName)
+    public static string ToCSharp(string graphql, string clientNamespace, string? clientName)
     {
         var schema = Parser.Parse(graphql);
         var enums = schema.Definitions
@@ -37,12 +37,14 @@ public static class GraphQLGenerator
 
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
-        var typesDeclaration = GenerateTypes(queryName, types);
+        var clientDeclaration = new[] { GenerateClient(clientName) };
+        var typesDeclaration = GenerateTypes(types);
         var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
 
         namespaceDeclaration = namespaceDeclaration
-            .WithMembers(List<MemberDeclarationSyntax>(typesDeclaration)
+            .WithMembers(List<MemberDeclarationSyntax>(clientDeclaration)
+                .AddRange(typesDeclaration)
                 .AddRange(inputsDeclaration)
                 .AddRange(enumsDeclaration));
 
@@ -55,6 +57,21 @@ using System.Text.Json.Serialization;
 
 {formattedSource}";
     }
+
+    private static ClassDeclarationSyntax GenerateClient(string? clientName)
+        => CSharpHelper.Class(clientName ?? "GraphQLClient")
+            .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName("global::LinqQL.Core.GraphQLClient<Query, Mutation>")))))
+            .WithMembers(SingletonList<MemberDeclarationSyntax>(
+                ConstructorDeclaration(clientName ?? "GraphQLClient")
+                    .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client)"))
+                    // call base constructor
+                    .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
+                        ArgumentList(SingletonSeparatedList<ArgumentSyntax>(
+                            Argument(IdentifierName("client"))
+                        )))
+                    )
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithBody(Block())));
 
     private static ClassDeclarationSyntax[] GenerateInputs(ClassDefinition[] inputs)
     {
@@ -105,7 +122,7 @@ using System.Text.Json.Serialization;
             .ToArray();
     }
 
-    private static ClassDeclarationSyntax[] GenerateTypes(string? queryName, ClassDefinition[] classes)
+    private static ClassDeclarationSyntax[] GenerateTypes(ClassDefinition[] classes)
     {
         return classes
             .Select(o =>
@@ -116,7 +133,7 @@ using System.Text.Json.Serialization;
                     {
                         var jsonNameAttributes = new[]
                         {
-                            ("global::System.ComponentModel.EditorBrowsable" , "global::System.ComponentModel.EditorBrowsableState.Never"),
+                            ("global::System.ComponentModel.EditorBrowsable", "global::System.ComponentModel.EditorBrowsableState.Never"),
                             ("JsonPropertyName", Literal(property.Name).Text)
                         };
 
