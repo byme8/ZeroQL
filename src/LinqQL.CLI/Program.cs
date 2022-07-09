@@ -1,6 +1,7 @@
 ﻿using CliFx;
+using LinqQL.CLI.Commands;
 
 await new CliApplicationBuilder()
-    .AddCommandsFromThisAssembly()
+    .AddCommand<GenerateCommand>()
     .Build()
     .RunAsync();

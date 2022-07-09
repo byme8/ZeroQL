@@ -8,6 +8,7 @@
         <PackageId>LinqQL.Cli</PackageId>
         <PackAsTool>true</PackAsTool>
         <Description>The LinqQL CLI to generate C# classes from *.graphql files.</Description>
+        <AssemblyName>linqql</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
