@@ -16,12 +16,6 @@ public static class StringExtensions
         return string.Join(separator, values);
     }
 
-    public static IEnumerable<string>? Level(this IEnumerable<string>? values, int spaces)
-    {
-        var lines = values?.SelectMany(o => o.Split(Environment.NewLine));
-        return lines?.Select(o => new string(' ', spaces * 4) + o);
-    }
-
     public static string JoinWithNewLine(this IEnumerable<string>? values, int gap = 0)
     {
         return values.Join(Environment.NewLine);

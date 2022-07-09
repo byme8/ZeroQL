@@ -44,7 +44,7 @@ namespace LinqQL.SourceGenerators.Generator
                 }
 
                 var key = invocation.ArgumentList.Arguments.Last().ToString();
-                var query = GetQuery(semanticModel, queryMethod, invocation);
+                var query = GetQuery(semanticModel, invocation);
 
                 if (context.CancellationToken.IsCancellationRequested)
                 {
@@ -79,47 +79,22 @@ namespace {context.Compilation.Assembly.Name}
 
             context.AddSource("LinqQLModuleInitializer.g.cs", source);
 
-            string GetQuery(SemanticModel semanticModel, IMethodSymbol method, InvocationExpressionSyntax invocation)
+            string GetQuery(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
             {
-                var parameterNames = method.Parameters
-                    .Select(p => p.Name)
-                    .ToArray();
-
                 var queryExpression = invocation.ArgumentList.Arguments.Last().Expression;
-                if (parameterNames.SequenceEqual(new[] { "name", "query", "queryKey" }))
-                {
-                    return GenerateGraphQLQuery(semanticModel, null, queryExpression);
-                }
-
-                if (parameterNames.SequenceEqual(new[] { "variables", "query", "queryKey" }))
-                {
-                    var variablesExpression = invocation.ArgumentList.Arguments.First().Expression;
-                    return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
-                }
-
-                if (parameterNames.SequenceEqual(new[] { "name", "variables", "query", "queryKey" }))
-                {
-                    var variablesExpression = invocation.ArgumentList.Arguments.Skip(1).First().Expression;
-                    return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
-                }
-
-                if (parameterNames.SequenceEqual(new[] { "query", "queryKey" }))
-                {
-                    return GenerateGraphQLQuery(semanticModel, null, queryExpression);
-                }
-
-                return Failed(invocation);
+                return GenerateGraphQLQuery(semanticModel, queryExpression);
             }
 
-            string GenerateGraphQLQuery(SemanticModel semanticModel, ExpressionSyntax? variablesExpression, ExpressionSyntax query)
+            string GenerateGraphQLQuery(SemanticModel semanticModel, ExpressionSyntax query)
             {
-                if (!(query is LambdaExpressionSyntax lambda))
+                if (query is not LambdaExpressionSyntax lambda)
                 {
+                    Failed(query);
                     return "";
                 }
 
                 var inputs = GetQueryInputs(lambda);
-                var variables = GetVariables(semanticModel, variablesExpression);
+                var variables = GetVariables(semanticModel, lambda);
                 var availableVariables = inputs.VariablesName is null ? new Dictionary<string, string>()
                     : variables
                         .ToDictionary(
@@ -167,20 +142,22 @@ namespace {context.Compilation.Assembly.Name}
                 return default;
             }
 
-            (string Name, string Type)[] GetVariables(SemanticModel semanticModel, ExpressionSyntax? variablesExpression)
+            (string Name, string Type)[] GetVariables(SemanticModel semanticModel, LambdaExpressionSyntax lambda)
             {
-                if (variablesExpression is null)
+                var symbol = semanticModel.GetSymbolInfo(lambda);
+                if (symbol.Symbol is not IMethodSymbol method)
+                {
+                    Failed(lambda);
+                    return Array.Empty<(string Name, string Type)>();
+                }
+
+                if (method.Parameters.Length == 1)
                 {
                     return Array.Empty<(string Name, string Type)>();
                 }
 
-                var symbol = semanticModel.GetSymbolInfo(variablesExpression);
-                var type = GetArgumentType(symbol);
-                if (type is null)
-                {
-                    Failed(variablesExpression);
-                    return Array.Empty<(string Name, string Type)>();
-                }
+                var type = method.Parameters.First().Type;
+                
                 return type.GetMembers()
                     .OfType<IPropertySymbol>()
                     .Select(o => (o.Name, o.Type.ToStringWithNullable()))
@@ -333,21 +310,6 @@ namespace {context.Compilation.Assembly.Name}
                         node.ToString()));
 
                 return $"// Failed to generate query for: {node.ToString()}";
-            }
-        }
-
-        private ITypeSymbol? GetArgumentType(SymbolInfo symbol)
-        {
-            switch (symbol.Symbol)
-            {
-                case IMethodSymbol method:
-                    return method.ContainingType;
-                
-                case ILocalSymbol local:
-                    return local.Type;
-                
-                default:
-                    return null;
             }
         }
     }
