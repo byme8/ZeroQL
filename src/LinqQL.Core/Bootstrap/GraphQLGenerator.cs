@@ -55,6 +55,8 @@ using System;
 using System.Linq; 
 using System.Text.Json.Serialization; 
 
+#nullable enable
+
 {formattedSource}";
     }
 
