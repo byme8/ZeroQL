@@ -12,6 +12,22 @@ namespace LinqQL.SourceGenerators
             { "string", "String" }
         };
 
+        public static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
+        {
+            if (symbol.BaseType != null)
+            {
+                foreach (var member in symbol.BaseType.GetAllMembers())
+                {
+                    yield return member;
+                }
+            }
+
+            foreach (var member in symbol.GetMembers())
+            {
+                yield return member;
+            }
+        }
+        
         public static string FirstToLower(this string text)
         {
             var first = text.Substring(0, 1);

@@ -60,6 +60,19 @@ public class VariablesTests : IntegrationTest
         await project.Validate(graphqlQuery);
     }
     
+    [Fact]
+    public async Task VariablesCanBeSeparate()
+    {
+        var csharpQuery = "variables, static (i, q) => q.User(i.Id, o => o.FirstName)";
+        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                ("// place to replace", "var variables = new { Id = 1 };"),
+                (TestProject.MeQuery, csharpQuery));
+
+        await project.Validate(graphqlQuery);
+    }
     
     // var variables = new { Id = 1 };
     // var response = await qlClient.Query(variables, static (i, q) => q.User(i.Id, o => o.FirstName));

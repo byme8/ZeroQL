@@ -96,7 +96,7 @@ namespace {context.Compilation.Assembly.Name}
                     var variablesExpression = invocation.ArgumentList.Arguments.First().Expression;
                     return GenerateGraphQLQuery(semanticModel, variablesExpression, queryExpression);
                 }
-                
+
                 if (parameterNames.SequenceEqual(new[] { "name", "variables", "query", "queryKey" }))
                 {
                     var variablesExpression = invocation.ArgumentList.Arguments.Skip(1).First().Expression;
@@ -174,14 +174,13 @@ namespace {context.Compilation.Assembly.Name}
                     return Array.Empty<(string Name, string Type)>();
                 }
 
-                if (!(variablesExpression is AnonymousObjectCreationExpressionSyntax anonymousObject))
+                var symbol = semanticModel.GetSymbolInfo(variablesExpression);
+                var type = GetArgumentType(symbol);
+                if (type is null)
                 {
                     Failed(variablesExpression);
                     return Array.Empty<(string Name, string Type)>();
                 }
-
-                var ctor = semanticModel.GetSymbolInfo(anonymousObject).Symbol as IMethodSymbol;
-                var type = ctor!.ContainingType;
                 return type.GetMembers()
                     .OfType<IPropertySymbol>()
                     .Select(o => (o.Name, o.Type.ToStringWithNullable()))
@@ -265,7 +264,7 @@ namespace {context.Compilation.Assembly.Name}
                     {
                         if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
                         {
-                            return Failed(simpleLambda); 
+                            return Failed(simpleLambda);
                         }
 
                         var parameter = simpleLambda.Parameter.Identifier.ValueText;
@@ -334,6 +333,21 @@ namespace {context.Compilation.Assembly.Name}
                         node.ToString()));
 
                 return $"// Failed to generate query for: {node.ToString()}";
+            }
+        }
+
+        private ITypeSymbol? GetArgumentType(SymbolInfo symbol)
+        {
+            switch (symbol.Symbol)
+            {
+                case IMethodSymbol method:
+                    return method.ContainingType;
+                
+                case ILocalSymbol local:
+                    return local.Type;
+                
+                default:
+                    return null;
             }
         }
     }
