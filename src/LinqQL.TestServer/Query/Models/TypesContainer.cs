@@ -3,7 +3,6 @@
 public class TypesContainer
 {
     public string Text { get; set; }
-
     public byte Value1 { get; set; }
     public byte? Value2 { get; set; }
     public short Value3 { get; set; }

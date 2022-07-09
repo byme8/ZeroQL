@@ -15,12 +15,12 @@ public class TypeFormatter
         { "Byte", "byte" },
         { "Int", "int" },
         { "Long", "long" },
-        { "Float", "float" },
-        { "Double", "double" },
-        { "Date", "DateTime" },
+        { "Float", "double" },
+        { "Decimal", "decimal" },
+        { "DateTime", "DateTime" },
+        { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "Boolean", "bool" },
-        { "DateTime", "DateTime" }
     };
 
     public TypeFormatter(HashSet<string> enums)

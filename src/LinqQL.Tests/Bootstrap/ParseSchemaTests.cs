@@ -25,17 +25,21 @@ public class ParseSchemaTests
     [Fact]
     public void QueryDetected()
     {
-        var properties = new[]
+        var methods = new[]
         {
             "T Me<T>(Func<User, T> selector)",
             "T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)",
-            "UserKind[] UserKinds()",
             "T[][] UsersMatrix<T>(Func<User, T> selector)",
             "T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)",
             "int[] UsersIds(UserKind kind, int page, int size)",
             "T? User<T>(int id, Func<User?, T> selector)",
             "T? Admin<T>(int id, Func<User?, T> selector)",
             "T Container<T>(Func<TypesContainer, T> selector)",
+        };
+        
+        var properties = new[]
+        {
+            "UserKind[] UserKinds",
         };
 
         var query = SyntaxTree.GetClass("Query");
@@ -51,9 +55,69 @@ public class ParseSchemaTests
                 return $@"{returnType} {methodName}{genericArguments}{genericName}";
             })
             .Should()
+            .Contain(methods);
+        
+        query.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Where(o => !o.Identifier.ValueText.StartsWith("__"))
+            .Select(o =>
+            {
+                var returnType = o.Type.ToString();
+                var name = o.Identifier.Text;
+                return $@"{returnType} {name}";
+            })
+            .Should()
             .Contain(properties);
     }
-    
+
+    [Fact]
+    public void TypeContainerDetected()
+    {
+        var properties = new[]
+        {
+            "string Text",
+            "byte Value1",
+            "byte? Value2",
+            "short Value3",
+            "short? Value4",
+            "int Value5",
+            "int? Value6",
+            "long Value7",
+            "long? Value8",
+            "double Value9",
+            "double? Value10",
+            "double Value11",
+            "double? Value12",
+            "decimal Value13",
+            "decimal? Value14",
+            "DateTime Value15",
+            "DateTime? Value16",
+            "DateOnly Value17",
+            "DateOnly? Value18",
+            "Guid Value19",
+            "Guid? Value20",
+            "Guid[] Value21",
+            "Guid[]? Value22",
+            "Guid[] Value23",
+            "Guid[]? Value24",
+            "Guid[] Value25",
+            "Guid[]? Value26"
+        };
+
+        var query = SyntaxTree.GetClass("TypesContainer");
+
+        query.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Select(o =>
+            {
+                var returnType = o.Type.ToString();
+                var name = o.Identifier.Text.ToString();
+                return $@"{returnType} {name}";
+            })
+            .Should()
+            .Contain(properties);
+    }
+
     [Fact]
     public void MutationDetected()
     {
@@ -77,7 +141,7 @@ public class ParseSchemaTests
             .Should()
             .Contain(properties);
     }
-    
+
     [Fact]
     public void ClientGenerated()
     {

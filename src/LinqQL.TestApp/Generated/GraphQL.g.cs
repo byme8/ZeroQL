@@ -42,9 +42,6 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
         public User[] __Users { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKinds")]
-        public UserKind[] __UserKinds { get; set; }
-
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
         public User[][] __UsersMatrix { get; set; }
 
@@ -56,6 +53,9 @@ namespace GraphQL.TestServer
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
         public User __User { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKind")]
+        public UserKind __UserKind { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Admin")]
         public User __Admin { get; set; }
@@ -73,10 +73,7 @@ namespace GraphQL.TestServer
             return __Users?.Select(o => o != default ? selector(o) : default).ToArray();
         }
 
-        public UserKind[] UserKinds()
-        {
-            return __UserKinds;
-        }
+        public UserKind[] UserKinds { get; set; }
 
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
@@ -98,7 +95,10 @@ namespace GraphQL.TestServer
             return __User != default ? selector(__User) : default;
         }
 
-        public UserKind UserKind { get; set; }
+        public UserKind UserKind(int id)
+        {
+            return __UserKind;
+        }
 
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
@@ -122,30 +122,6 @@ namespace GraphQL.TestServer
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]
     public class TypesContainer
     {
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value13")]
-        public Decimal __Value13 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value14")]
-        public Decimal __Value14 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value21")]
-        public Guid[] __Value21 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value22")]
-        public Guid[] __Value22 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value23")]
-        public Guid[] __Value23 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value24")]
-        public Guid[] __Value24 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value25")]
-        public Guid[] __Value25 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value26")]
-        public Guid[] __Value26 { get; set; }
-
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
         public KeyValuePairOfStringAndString[] __Value27 { get; set; }
 
@@ -176,65 +152,41 @@ namespace GraphQL.TestServer
 
         public long? Value8 { get; set; }
 
-        public float Value9 { get; set; }
+        public double Value9 { get; set; }
 
-        public float? Value10 { get; set; }
+        public double? Value10 { get; set; }
 
-        public float Value11 { get; set; }
+        public double Value11 { get; set; }
 
-        public float? Value12 { get; set; }
+        public double? Value12 { get; set; }
 
-        public T Value13<T>(Func<Decimal, T> selector)
-        {
-            return __Value13 != default ? selector(__Value13) : default;
-        }
+        public decimal Value13 { get; set; }
 
-        public T? Value14<T>(Func<Decimal?, T> selector)
-        {
-            return __Value14 != default ? selector(__Value14) : default;
-        }
+        public decimal? Value14 { get; set; }
 
         public DateTime Value15 { get; set; }
 
         public DateTime? Value16 { get; set; }
 
-        public DateTime Value17 { get; set; }
+        public DateOnly Value17 { get; set; }
 
-        public DateTime? Value18 { get; set; }
+        public DateOnly? Value18 { get; set; }
 
         public Guid Value19 { get; set; }
 
         public Guid? Value20 { get; set; }
 
-        public Guid[] Value21()
-        {
-            return __Value21;
-        }
+        public Guid[] Value21 { get; set; }
 
-        public Guid[]? Value22()
-        {
-            return __Value22;
-        }
+        public Guid[]? Value22 { get; set; }
 
-        public Guid[] Value23()
-        {
-            return __Value23;
-        }
+        public Guid[] Value23 { get; set; }
 
-        public Guid[]? Value24()
-        {
-            return __Value24;
-        }
+        public Guid[]? Value24 { get; set; }
 
-        public Guid[] Value25()
-        {
-            return __Value25;
-        }
+        public Guid[] Value25 { get; set; }
 
-        public Guid[]? Value26()
-        {
-            return __Value26;
-        }
+        public Guid[]? Value26 { get; set; }
 
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {

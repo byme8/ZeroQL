@@ -128,7 +128,7 @@ using System.Text.Json.Serialization;
             .Select(o =>
             {
                 var backedFields = o.Properties
-                    .Where(property => property.TypeDefinition is ObjectTypeDefinition or ListTypeDefinition)
+                    .Where(RequireSelector)
                     .Select(property =>
                     {
                         var jsonNameAttributes = new[]
@@ -153,7 +153,7 @@ using System.Text.Json.Serialization;
 
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
     {
-        if (field.TypeDefinition is ObjectTypeDefinition or ListTypeDefinition)
+        if (RequireSelector(field))
         {
             var parameters = field.Arguments
                 .Select(o =>
@@ -199,6 +199,27 @@ using System.Text.Json.Serialization;
     private static bool RequireSelector(TypeDefinition typeDefinition)
     {
         switch (typeDefinition)
+        {
+            case ObjectTypeDefinition:
+                return true;
+            case ScalarTypeDefinition:
+            case EnumTypeDefinition:
+                return false;
+            case ListTypeDefinition type:
+                return RequireSelector(type.ElementTypeDefinition);
+            default:
+                throw new NotImplementedException();
+        }
+    }
+    
+    private static bool RequireSelector(FieldDefinition field)
+    {
+        if (field.Arguments.Any())
+        {
+            return true;
+        }
+        
+        switch (field.TypeDefinition)
         {
             case ObjectTypeDefinition:
                 return true;
