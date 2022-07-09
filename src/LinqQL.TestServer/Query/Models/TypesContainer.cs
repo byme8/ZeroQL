@@ -33,4 +33,6 @@ public class TypesContainer
     public Dictionary<string, string>? Value28 { get; set; }
     public KeyValuePair<string, string> Value29 { get; set; }
     public KeyValuePair<string, string>? Value30 { get; set; }
+    public DateTimeOffset Value31 { get; set; }
+    public DateTimeOffset? Value32 { get; set; }
 }

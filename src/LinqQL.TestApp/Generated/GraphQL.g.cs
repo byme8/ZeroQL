@@ -164,9 +164,9 @@ namespace GraphQL.TestServer
 
         public decimal? Value14 { get; set; }
 
-        public DateTime Value15 { get; set; }
+        public DateTimeOffset Value15 { get; set; }
 
-        public DateTime? Value16 { get; set; }
+        public DateTimeOffset? Value16 { get; set; }
 
         public DateOnly Value17 { get; set; }
 
@@ -207,6 +207,10 @@ namespace GraphQL.TestServer
         {
             return __Value30 != default ? selector(__Value30) : default;
         }
+
+        public DateTimeOffset Value31 { get; set; }
+
+        public DateTimeOffset? Value32 { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "LinqQL" ,  "1.0.0.0" )]

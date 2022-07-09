@@ -17,7 +17,7 @@ public class TypeFormatter
         { "Long", "long" },
         { "Float", "double" },
         { "Decimal", "decimal" },
-        { "DateTime", "DateTime" },
+        { "DateTime", "DateTimeOffset" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "Boolean", "bool" },

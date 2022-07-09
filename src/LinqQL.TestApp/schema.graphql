@@ -62,6 +62,8 @@ type TypesContainer {
   value28: [KeyValuePairOfStringAndString!]
   value29: KeyValuePairOfStringAndString!
   value30: KeyValuePairOfStringAndString
+  value31: DateTime!
+  value32: DateTime
 }
 
 type User {
