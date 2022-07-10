@@ -1,0 +1,30 @@
+name: .NET
+
+on:
+  push:
+    tags:        
+     - v*   
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Test
+      run: dotnet test -c Release --no-build --verbosity normal
+    - name: Push
+      run: |
+        cd ./src/ZeroQL
+        dotnet pack -c Release --no-build --verbosity normal -o ./nugets
+        cd ./nugets
+        dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 
