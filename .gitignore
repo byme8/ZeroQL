@@ -6,4 +6,5 @@ bin
 obj
 nugets
 
+.DS_Store
 *.sln.DotSettings.user

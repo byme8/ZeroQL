@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>ZeroQL</PackageId>
+        <Description>The GraphQL client with LINQ like interface.</Description>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
+        <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <Target Name="_AddAnalyzersToOutput">
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Core.dll" PackagePath="lib/net6.0" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
+        </ItemGroup>
+    </Target>
+</Project>
