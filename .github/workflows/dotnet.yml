@@ -22,9 +22,6 @@ jobs:
       run: dotnet build -c Release --no-restore
     - name: Push
       run: |
-        cd ./src/ZeroQL
-        dotnet pack -c Release --no-build --verbosity normal -o ./nugets
-         cd ./../src/ZeroQL.CLI
         dotnet pack -c Release --no-build --verbosity normal -o ./nugets
         cd ./nugets
         dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 
