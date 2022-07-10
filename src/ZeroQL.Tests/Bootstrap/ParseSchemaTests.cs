@@ -36,7 +36,7 @@ public class ParseSchemaTests
             "T? Admin<T>(int id, Func<User?, T> selector)",
             "T Container<T>(Func<TypesContainer, T> selector)",
         };
-        
+
         var properties = new[]
         {
             "UserKind[] UserKinds",
@@ -56,7 +56,7 @@ public class ParseSchemaTests
             })
             .Should()
             .Contain(methods);
-        
+
         query.Members
             .OfType<PropertyDeclarationSyntax>()
             .Where(o => !o.Identifier.ValueText.StartsWith("__"))
@@ -227,5 +227,31 @@ public class ParseSchemaTests
             .Contain(o => o.Name.ToString() == "JsonPropertyName" &&
                           o.ArgumentList!.Arguments.First().Expression.ToString() == @"""User""");
 
+    }
+
+    [Fact]
+    public void SchemaWithoutMutationHandledProperly()
+    {
+        var rawSchema = TestSchema.RawSchema
+            .Replace("mutation: Mutation", "")
+            .Replace("type Mutation", "type FakeMutation");
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        syntaxTree.GetClass("Mutation").Should().NotBeNull();
+    }
+    
+    [Fact]
+    public void SchemaWithoutQueryHandledProperly()
+    {
+        var rawSchema = TestSchema.RawSchema
+            .Replace("query: Query", "")
+            .Replace("type Query", "type FakeQuery");
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        syntaxTree.GetClass("Query").Should().NotBeNull();
     }
 }

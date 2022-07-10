@@ -21,8 +21,4 @@
         <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Data\Models" />
-    </ItemGroup>
-
 </Project>

@@ -124,9 +124,9 @@ using System.Text.Json.Serialization;
             .ToArray();
     }
 
-    private static ClassDeclarationSyntax[] GenerateTypes(ClassDefinition[] classes)
+    private static IReadOnlyList<ClassDeclarationSyntax> GenerateTypes(ClassDefinition[] definitions)
     {
-        return classes
+        var csharpDefinitions = definitions
             .Select(o =>
             {
                 var backedFields = o.Properties
@@ -150,7 +150,21 @@ using System.Text.Json.Serialization;
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
             })
-            .ToArray();
+            .ToList();
+
+        if (definitions.All(o => o.Name != "Mutation"))
+        {
+            csharpDefinitions.Add(CSharpHelper.Class("Mutation")
+                .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute));
+        }
+        
+        if (definitions.All(o => o.Name != "Query"))
+        {
+            csharpDefinitions.Add(CSharpHelper.Class("Query")
+                .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute));
+        }
+
+        return csharpDefinitions;
     }
 
     private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
