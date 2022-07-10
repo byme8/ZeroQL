@@ -5,6 +5,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <LangVersion>Latest</LangVersion>
         <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
