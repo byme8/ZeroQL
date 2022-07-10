@@ -11,9 +11,6 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 
 # How to setup
 
-The library setup may look a bit complicated at first, but you must do it only once.
-But in the end, it is required to make the usage of the library as smooth as possible.
-
 The initial setup:
 ``` bash
 dotnet new console -o QLClient # create console app
