@@ -2,7 +2,12 @@
 
 The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-like syntax and provides performance close to a simple HTTP call.
 
-# How to use
+- [x] Bootstrap client from schema.graphql file
+- [x] Support for queries
+- [x] Support for mutations
+- [ ] Support for subscriptions
+
+# How to setup
 
 Library setup may look a bit complicated at first, but you need to do only once.
 But in the end, it is required to make the usage of the library as smooth as possible.
@@ -27,6 +32,8 @@ And the last thing. Add the next target to your project.
 The graphql client will be generated on every build.
 It allows us to keep track of what we have in the schema.graphql file.
 
+# How to use
+
 Let's suppose that schema.graphql file contains the following:
 ``` graphql
 schema {
@@ -44,12 +51,12 @@ type User {
 }
 ```
 
-and we want to execute the following query:
+and we want to execute the query like that:
 ``` graphql
 query { me { id firstName lastName } }
 ```
 
-We can do it like that:
+Here how we can achive it with ZeroQL:
 ``` csharp
 var httpClient = new HttpClient();
 httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
@@ -65,6 +72,6 @@ Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data
 The console output will be:
 ```
 GraphQL: query { me { id firstName lastName } }
--1: Jon Smith
+1: Jon Smith
 ```
 
