@@ -2,6 +2,7 @@
 
 The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-like syntax. It does't not require Reflection.Emit or expressions. As a result, in runtime provides performance very close to a raw HTTP call.
 
+There is a more detailed list of what the ZeroQL can do at the moment:
 - [ ] Bootstrap schema.graphql file from graphql endpoint
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries
