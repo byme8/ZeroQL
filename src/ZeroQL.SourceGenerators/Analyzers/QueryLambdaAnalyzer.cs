@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using ZeroQL.SourceGenerators.Generator;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -46,7 +47,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
                 Descriptors.OnlyStaticLambda,
                 lambda.GetLocation()));
         }
-
+            
         var innerLambdas = lambda
             .DescendantNodes()
             .OfType<SimpleLambdaExpressionSyntax>()
@@ -62,8 +63,20 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
                         innerLambda.GetLocation()));
             }
         }
+        
+        var semanticModel = context.SemanticModel;
+        var argumentSyntax = invocation.ArgumentList.Arguments.Last();
+        var query = GraphQLQueryGenerator.Generate(semanticModel, argumentSyntax.Expression, context.CancellationToken);
+        if (query.Error is ErrorWithData<Diagnostic> error)
+        {
+            context.ReportDiagnostic(error.Data);
+        }
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
-        = ImmutableArray.Create(Descriptors.OnlyStaticLambda, Descriptors.OpenLambdaIsNotAllowed);
+        = ImmutableArray.Create(
+            Descriptors.OnlyStaticLambda, 
+            Descriptors.OpenLambdaIsNotAllowed,
+            Descriptors.DontUserOutScopeValues,
+            Descriptors.FailedToConvert);
 }

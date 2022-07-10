@@ -76,7 +76,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyGenerator(new GraphQLQuerySourceGenerator());
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.DontUserOutScopeValues.Id);

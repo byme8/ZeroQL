@@ -1,92 +1,92 @@
 schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 
 type KeyValuePairOfStringAndString {
-    key: String!
-    value: String!
+  key: String!
+  value: String!
 }
 
 type Mutation {
-    addUser(firstName: String! lastName: String!): User!
+  addUser(firstName: String! lastName: String!): User!
 }
 
 type Query {
-    me: User!
-    users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
-    userKinds: [UserKind!]!
-    usersMatrix: [[User!]!]!
-    usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
-    usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
-    user(id: Int!): User
-    userKind(id: Int!): UserKind!
-    admin(id: Int!): User
-    container: TypesContainer!
+  me: User!
+  users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
+  userKinds: [UserKind!]!
+  usersMatrix: [[User!]!]!
+  usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
+  usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
+  user(id: Int!): User
+  userKind(id: Int!): UserKind!
+  admin(id: Int!): User
+  container: TypesContainer!
 }
 
 type Role {
-    id: Int!
-    name: String!
+  id: Int!
+  name: String!
 }
 
 type TypesContainer {
-    text: String!
-    value1: Byte!
-    value2: Byte
-    value3: Short!
-    value4: Short
-    value5: Int!
-    value6: Int
-    value7: Long!
-    value8: Long
-    value9: Float!
-    value10: Float
-    value11: Float!
-    value12: Float
-    value13: Decimal!
-    value14: Decimal
-    value15: DateTime!
-    value16: DateTime
-    value17: Date!
-    value18: Date
-    value19: UUID!
-    value20: UUID
-    value21: [UUID!]!
-    value22: [UUID!]
-    value23: [UUID!]!
-    value24: [UUID!]
-    value25: [UUID!]!
-    value26: [UUID!]
-    value27: [KeyValuePairOfStringAndString!]!
-    value28: [KeyValuePairOfStringAndString!]
-    value29: KeyValuePairOfStringAndString!
-    value30: KeyValuePairOfStringAndString
-    value31: DateTime!
-    value32: DateTime
+  text: String!
+  value1: Byte!
+  value2: Byte
+  value3: Short!
+  value4: Short
+  value5: Int!
+  value6: Int
+  value7: Long!
+  value8: Long
+  value9: Float!
+  value10: Float
+  value11: Float!
+  value12: Float
+  value13: Decimal!
+  value14: Decimal
+  value15: DateTime!
+  value16: DateTime
+  value17: Date!
+  value18: Date
+  value19: UUID!
+  value20: UUID
+  value21: [UUID!]!
+  value22: [UUID!]
+  value23: [UUID!]!
+  value24: [UUID!]
+  value25: [UUID!]!
+  value26: [UUID!]
+  value27: [KeyValuePairOfStringAndString!]!
+  value28: [KeyValuePairOfStringAndString!]
+  value29: KeyValuePairOfStringAndString!
+  value30: KeyValuePairOfStringAndString
+  value31: DateTime!
+  value32: DateTime
 }
 
 type User {
-    id: Int!
-    firstName: String!
-    lastName: String!
-    userKind: UserKind!
-    role: Role
+  id: Int!
+  firstName: String!
+  lastName: String!
+  userKind: UserKind!
+  role: Role
 }
 
 input PageInput {
-    count: Int!
-    size: Int!
+  count: Int!
+  size: Int!
 }
 
 input UserFilterInput {
-    userKind: UserKind!
-    page: PageInput
+  userKind: UserKind!
+  page: PageInput
 }
 
 enum UserKind {
-    GOOD
-    BAD
+  GOOD
+  BAD
 }
 
 "The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."
