@@ -1,12 +1,12 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using GraphQL.TestServer;
 using Microsoft.Extensions.DependencyInjection;
 using StrawberryShake.TestServerClient;
-using ZeroQL.Core;
 
 _ = ZeroQL.TestServer.Program.StartServer(args);
 await ZeroQL.TestServer.Program.VerifyServiceIsRunning();
@@ -15,6 +15,12 @@ var benchmark = new RawVSZeroQL();
 var raw = await benchmark.Raw();
 var strawberry = await benchmark.StrawberryShake();
 var zeroQL = await benchmark.ZeroQL();
+
+if (!(raw == strawberry && strawberry == zeroQL))
+{
+    Console.WriteLine("Raw, StrawberryShake and ZeroQL are not equal");
+    return;
+}
 
 BenchmarkRunner.Run<RawVSZeroQL>();
 
@@ -49,20 +55,12 @@ public class RawVSZeroQL
     [Benchmark]
     public async Task<string> Raw()
     {
-        var rawQuery = "query { me { firstName }}";
+        var rawQuery = @"{ ""query"": ""query { me { firstName }}"" }";
+        var response = await httpClient.PostAsync("", new StringContent(rawQuery, Encoding.UTF8, "application/json"));
+        var responseJson = await response.Content.ReadAsStreamAsync();
+        var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-        var queryRequest = new GraphQLRequest
-        {
-            Variables = null,
-            Query = rawQuery
-        };
-
-        var requestJson = JsonSerializer.Serialize(queryRequest, options);
-        var response = await httpClient.PostAsync("", new StringContent(requestJson, Encoding.UTF8, "application/json"));
-        var responseJson = await response.Content.ReadAsStringAsync();
-        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<Query>>(responseJson, options);
-
-        return qlResponse.Data.__Me.FirstName;
+        return qlResponse["data"]["me"]["firstName"].GetValue<string>();
     }
 
     [Benchmark]
