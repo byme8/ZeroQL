@@ -8,7 +8,7 @@ The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-li
 ``` bash
 dotnet new classlib -o QLClient # create class library
 cd QLClient 
-curl http:/localhost:10000/graphql?sdl > schema.graphql # fetch graphql schema from server(this step can vary depending on your web server)
+curl http:/localhost:10000/graphql?sdl > schema.graphql # fetch graphql schema from server(depends on your web server)
 dotnet new tool-manifest
 dotnet tool install ZeroQL.CLI
 dotnet add package ZeroQL --prerelease
