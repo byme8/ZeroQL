@@ -32,7 +32,7 @@ public static class CSharpHelper
                 AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                     .WithSemicolonToken(ParseToken(";")));
     }
-    
+
     public static PropertyDeclarationSyntax AddAttributes(this PropertyDeclarationSyntax classDeclarationSyntax, params (string Name, string Arguments)[] attributes)
     {
         return classDeclarationSyntax

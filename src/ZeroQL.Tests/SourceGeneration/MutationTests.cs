@@ -20,7 +20,7 @@ public class MutationTests : IntegrationTest
         var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
         result.Data.Should().Be("Jon");
     }
-    
+
     [Fact]
     public async Task MutationWithVariables()
     {

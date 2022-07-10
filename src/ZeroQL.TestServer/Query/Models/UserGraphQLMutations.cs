@@ -1,6 +1,5 @@
 ﻿namespace ZeroQL.TestServer.Query.Models;
 
-
 [ExtendObjectType(typeof(Mutation))]
 public class UserGraphQLMutations
 {

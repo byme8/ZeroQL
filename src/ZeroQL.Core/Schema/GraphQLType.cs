@@ -6,7 +6,7 @@ public static class TypeDefinitionExtension
     {
         return $"{type.Name}{(type.CanBeNull ? "?" : "")}";
     }
-    
+
     public static string NullableAnnotation(this TypeDefinition type)
     {
         return type.CanBeNull ? "?" : "";

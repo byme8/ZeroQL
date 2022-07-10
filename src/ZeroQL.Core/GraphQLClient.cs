@@ -97,7 +97,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
     {
         return await Execute<Unit, TMutation, TResult>(OperationKind.Mutation, name, null, (i, q) => query(q), queryKey);
     }
-    
+
     public async Task<GraphQLResult<TResult>> Mutation<TResult>(
         Func<TMutation, TResult> query,
         [CallerArgumentExpression("query")] string queryKey = null!)
@@ -163,7 +163,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
             {
                 Errors = new[]
                 {
-                    new GraphQueryError { Message = "Failed to deserialize response: " + responseJson },
+                    new GraphQueryError { Message = "Failed to deserialize response: " + responseJson }
                 }
             };
         }

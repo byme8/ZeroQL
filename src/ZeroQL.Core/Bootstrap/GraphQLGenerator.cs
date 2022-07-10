@@ -61,7 +61,8 @@ using System.Text.Json.Serialization;
     }
 
     private static ClassDeclarationSyntax GenerateClient(string? clientName)
-        => CSharpHelper.Class(clientName ?? "GraphQLClient")
+    {
+        return CSharpHelper.Class(clientName ?? "GraphQLClient")
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName("global::ZeroQL.Core.GraphQLClient<Query, Mutation>")))))
             .WithMembers(SingletonList<MemberDeclarationSyntax>(
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
@@ -74,6 +75,7 @@ using System.Text.Json.Serialization;
                     )
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                     .WithBody(Block())));
+    }
 
     private static ClassDeclarationSyntax[] GenerateInputs(ClassDefinition[] inputs)
     {
@@ -157,7 +159,7 @@ using System.Text.Json.Serialization;
             csharpDefinitions.Add(CSharpHelper.Class("Mutation")
                 .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute));
         }
-        
+
         if (definitions.All(o => o.Name != "Query"))
         {
             csharpDefinitions.Add(CSharpHelper.Class("Query")

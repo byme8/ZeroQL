@@ -20,7 +20,7 @@ public class TypeFormatter
         { "DateTime", "DateTimeOffset" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
-        { "Boolean", "bool" },
+        { "Boolean", "bool" }
     };
 
     public TypeFormatter(HashSet<string> enums)
@@ -33,7 +33,7 @@ public class TypeFormatter
         get;
     }
 
-    public TypeDefinition GetTypeDefinition(GraphQLParser.AST.GraphQLType type)
+    public TypeDefinition GetTypeDefinition(GraphQLType type)
     {
         switch (type)
         {

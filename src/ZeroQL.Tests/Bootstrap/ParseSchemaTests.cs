@@ -34,12 +34,12 @@ public class ParseSchemaTests
             "int[] UsersIds(UserKind kind, int page, int size)",
             "T? User<T>(int id, Func<User?, T> selector)",
             "T? Admin<T>(int id, Func<User?, T> selector)",
-            "T Container<T>(Func<TypesContainer, T> selector)",
+            "T Container<T>(Func<TypesContainer, T> selector)"
         };
 
         var properties = new[]
         {
-            "UserKind[] UserKinds",
+            "UserKind[] UserKinds"
         };
 
         var query = SyntaxTree.GetClass("Query");
@@ -241,7 +241,7 @@ public class ParseSchemaTests
 
         syntaxTree.GetClass("Mutation").Should().NotBeNull();
     }
-    
+
     [Fact]
     public void SchemaWithoutQueryHandledProperly()
     {

@@ -59,7 +59,7 @@ public class VariablesTests : IntegrationTest
 
         await project.Validate(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task VariablesCanBeSeparate()
     {
@@ -73,7 +73,7 @@ public class VariablesTests : IntegrationTest
 
         await project.Validate(graphqlQuery);
     }
-    
+
     // var variables = new { Id = 1 };
     // var response = await qlClient.Query(variables, static (i, q) => q.User(i.Id, o => o.FirstName));
 
