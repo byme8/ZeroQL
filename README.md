@@ -4,9 +4,10 @@ The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-li
 
 # How to use
 
-Library setup may look a bit complicated a first, but you need to do only once.
+Library setup may look a bit complicated at first, but you need to do only once.
 Then you will be able to use the library without any issues.
 
+The initial setup:
 ``` bash
 dotnet new console -o QLClient # create console app
 cd QLClient # go to project folder
@@ -17,7 +18,6 @@ dotnet add package ZeroQL # add ZeroQL nuget package
 ```
 
 And the last thing. Add the next target to your project.
-
 ``` xml
  <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile">
     <Exec Command="dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs" />
