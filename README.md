@@ -24,15 +24,15 @@ dotnet tool install ZeroQL.CLI # add ZeroQL.CLI nuget tool
 dotnet add package ZeroQL # add ZeroQL nuget package
 ```
 
-And the last thing. Add the next target to your project.
+Add the next target to the QLClient.csproj.
 ``` xml
- <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile">
+<Target Name="GenerateQLClient" BeforeTargets="BeforeCompile">
     <Exec Command="dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs" />
 </Target>
 ```
 
 The graphql client will be generated on every build.
-It allows us to keep track of what we have in the schema.graphql file.
+It allows to keep track of what is defined in the schema.graphql file.
 
 # How to use
 
@@ -44,12 +44,19 @@ schema {
 
 type Query {
   me: User!
+  user(id: Int!): User
 }
 
 type User {
   id: Int!
   firstName: String!
   lastName: String!
+  role: Role!
+}
+
+type Role {
+  id: Int!
+  name: String!
 }
 ```
 
@@ -67,13 +74,66 @@ var client = new TestServerGraphQLClient(httpClient);
 
 var response = await client.Query(static o => o.Me(o => new { o.Id, o.FirstName, o.LastName }));
 
-Console.WriteLine($"GraphQL: {response.Query}");
-Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}");
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query { me { id firstName lastName } }
+Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
 ```
 
-The console output will be:
-```
-GraphQL: query { me { id firstName lastName } }
-1: Jon Smith
+You can pass arguments if needed:
+``` csharp
+var variables = new { Id = 1 };
+var response = await client.Query(variables, static (i, o) => o.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query ($id: Int!) { user(id: $id) { id firstName lastName } }
+Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
 ```
 
+You can give name to the query:
+``` csharp
+var variables = new { Id = 1 };
+var response = await client.Query("GetUser", variables, static (i, o) => o.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUser($id: Int!) { user(id: $id) { id firstName lastName } }
+Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
+```
+
+You can fetch attached fields:
+``` csharp
+var variables = new { Id = 1 };
+var response = await client.Query(
+    "GetUserWithRole",
+    variables,
+    static (i, o) => o
+        .User(i.Id,
+            o => new
+            {
+                o.Id,
+                o.FirstName,
+                o.LastName,
+                Role = o.Role(role => role.Name)
+            }));
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUserWithRole($id: Int!) { user(id: $id) { id firstName lastName role { name }  } }
+Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}, Role: {response.Data.Role}"); // 1: Jon Smith, Role: Admin
+```
+
+You can do multiple queries at the same time:
+``` csharp
+var variables = new { Id = 1 };
+var response = await client.Query(
+    "GetMeAndUser",
+    variables,
+    static (i, o) => new
+    {
+        MyFirstName = o.Me(o => o.FirstName),
+        User = o.User(i.Id,
+            o => new
+            {
+                o.FirstName,
+                o.LastName,
+                Role = o.Role(role => role.Name)
+            })
+    });
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUserWithRole($id: Int!) { me { firstName }  user(id: $id) { firstName lastName role { name }  } }
+Console.WriteLine($"Me: {response.Data.MyFirstName}, User: {response.Data.User.FirstName} {response.Data.User.LastName}, Role: {response.Data.User.Role}"); // Me: Jon, User: Jon Smith, Role: Admin
+```
