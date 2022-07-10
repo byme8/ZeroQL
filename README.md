@@ -5,7 +5,7 @@ The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-li
 # How to use
 
 Library setup may look a bit complicated at first, but you need to do only once.
-Then you will be able to use the library without any issues.
+But in the end, it is required to make the usage of the library as smooth as possible.
 
 The initial setup:
 ``` bash
