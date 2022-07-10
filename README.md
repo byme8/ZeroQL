@@ -1,6 +1,6 @@
 # ZeroQL | ![GitHub](https://img.shields.io/github/license/byme8/ZeroQL?color=blue&style=flat-square) ![Nuget](https://img.shields.io/nuget/v/zeroql?color=blue&style=flat-square)
 
-The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-like syntax and provides performance close to a simple HTTP call.
+The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-like syntax. It does't not require Reflection.Emit or expressions. As a result, in runtime provides performance very close to a raw HTTP call.
 
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries
