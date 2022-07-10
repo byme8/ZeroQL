@@ -7,4 +7,8 @@ obj
 nugets
 
 .DS_Store
+*.log
 *.sln.DotSettings.user
+src/Benchmarks/ZeroQL.Benchmark/BenchmarkDotNet.Artifacts/results/RawVSZeroQL-report.csv
+src/Benchmarks/ZeroQL.Benchmark/BenchmarkDotNet.Artifacts/results/RawVSZeroQL-report.html
+src/Benchmarks/StrawberryShake.Client/Generated/StrawberryShakeTestServerClient.StrawberryShake.cs

@@ -9,6 +9,7 @@
         <PackAsTool>true</PackAsTool>
         <Description>The ZeroQL CLI to generate C# classes from *.graphql files.</Description>
         <AssemblyName>zeroql</AssemblyName>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
