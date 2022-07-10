@@ -1,7 +1,7 @@
 ﻿<Project>
     <PropertyGroup>
         <IsPackable>false</IsPackable>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <Authors>Stanislav Silin</Authors>
         <PackageProjectUrl>https://github.com/byme8/ZeroQL</PackageProjectUrl>
         <RepositoryUrl>https://github.com/byme8/ZeroQL</RepositoryUrl>
