@@ -108,6 +108,20 @@ public class QueryTests : IntegrationTest
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
     }
+    
+    [Fact]
+    public async Task FailsWhenLambdaIsNotStaticWithArgument()
+    {
+        var csharpQuery = "new { Id = 1}, (i, q) => q.Me(o => o.FirstName)";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+
+        diagnostics.Should()
+            .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
+    }
 
     [Fact]
     public async Task SupportsAnonymousTypeInQueryRoot()

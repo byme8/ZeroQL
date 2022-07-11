@@ -22,8 +22,8 @@ public class QueryAnalyzerHelper
         return method;
     }
 
-    public static bool IsOpenLambda(SimpleLambdaExpressionSyntax lambda)
+    public static bool IsOpenLambda(LambdaExpressionSyntax lambda)
     {
-        return lambda.Parameter.Identifier.ValueText == lambda.Body.ToString();
+        return lambda.Body is IdentifierNameSyntax;
     }
 }

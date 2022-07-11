@@ -24,7 +24,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     {
         if (context.Node is not InvocationExpressionSyntax invocation ||
             invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.ValueText != "Query")
+            memberAccess.Name.Identifier.ValueText is not "Query" or "Mutation")
         {
             return;
         }
@@ -35,8 +35,13 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         var possibleLambdaQuery = invocation.ArgumentList.Arguments.Last().Expression;
-        if (possibleLambdaQuery is not SimpleLambdaExpressionSyntax lambda)
+        if (possibleLambdaQuery is not LambdaExpressionSyntax lambda)
         {
             return;
         }
@@ -47,14 +52,24 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
                 Descriptors.OnlyStaticLambda,
                 lambda.GetLocation()));
         }
-            
+
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         var innerLambdas = lambda
             .DescendantNodes()
-            .OfType<SimpleLambdaExpressionSyntax>()
+            .OfType<LambdaExpressionSyntax>()
             .ToArray();
 
         foreach (var innerLambda in innerLambdas)
         {
+            if (context.CancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
             if (QueryAnalyzerHelper.IsOpenLambda(innerLambda))
             {
                 context.ReportDiagnostic(
@@ -63,7 +78,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
                         innerLambda.GetLocation()));
             }
         }
-        
+
         var semanticModel = context.SemanticModel;
         var argumentSyntax = invocation.ArgumentList.Arguments.Last();
         var query = GraphQLQueryGenerator.Generate(semanticModel, argumentSyntax.Expression, context.CancellationToken);
@@ -75,7 +90,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
         = ImmutableArray.Create(
-            Descriptors.OnlyStaticLambda, 
+            Descriptors.OnlyStaticLambda,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUserOutScopeValues,
             Descriptors.FailedToConvert);
