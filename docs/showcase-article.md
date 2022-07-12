@@ -91,14 +91,14 @@ public async Task<GraphQLResult<TResult>> Query<TResult>(
 ```
 The `` CallerArgumentExpression `` is a new feature of C# 10. It allows us to get a stringified representation of the expression that was passed inside—that exact representation we need to get the corresponding graphql from the "special" dictionary. As a result, we always know what graphql we need for each call. The crucial thing here is that the graphql is generated at **compile-time**. So, there is nothing to do at runtime except executing the HTTP call. As a result, we have our GraphQL from C# code at compile-time and zero overhead at runtime. 
 Another important thing is that the "graphql" lambda must be a static one. There are two reasons for that. First, analyzing it via the source generator is much easier because there are no outside-scope variables that can make things complicated. Second, if you plan to have graphql variables like that: 
-``` graphql
+``` c# 
 var variables = new { Id = 1 };
 var response = await client.Query(variables, static (i, q) => q.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
 ```
 It is the single way to ensure that all inputs are analyzed. With such an approach, we have them as parameters and can serialize them at runtime before the HTTP call.
 
 We can get deep nested fields too:
-``` graphql
+``` c# 
 var variables = new { Id = 1 };
 var response = await client.Query(
     "GetUserWithRole",
@@ -118,7 +118,7 @@ Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data
 ```
 
 Also, touch multiple fields at the same time:
-``` 
+``` c# 
 var variables = new { Id = 1 };
 var response = await client.Query(
     "GetMeAndUser",
