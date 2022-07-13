@@ -7,22 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0"/>
-        <PackageReference Include="xunit" Version="2.4.1"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+        <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.2.0"/>
-        <PackageReference Include="Buildalyzer" Version="4.1.4"/>
-        <PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4"/>
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.2.0" />
+        <PackageReference Include="Buildalyzer" Version="4.1.4" />
+        <PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj"/>
-        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj"/>
-        <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj"/>
-        <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj"/>
+        <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
+        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
+        <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
+        <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
 
 </Project>

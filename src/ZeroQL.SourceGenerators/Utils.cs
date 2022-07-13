@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 namespace ZeroQL.SourceGenerators;
@@ -34,6 +35,25 @@ public static class Utils
         var tail = text.Substring(1);
 
         return first.ToLower() + tail;
+    }
+
+    public static string ToAllUpperCase(this string name)
+    {
+        var upperCaseString = new List<char>(name.Length);
+        for (var i = 0; i < name.Length; i++)
+        {
+            var ch = name[i];
+            if (i != 0 && char.IsUpper(ch))
+            {
+                upperCaseString.Add('_');
+                upperCaseString.Add(ch);
+                continue;
+            }
+
+            upperCaseString.Add(char.ToUpper(name[i]));
+        }
+
+        return new string(upperCaseString.ToArray());
     }
 
     public static string Join(this IEnumerable<string> values, string separator = ", ")
