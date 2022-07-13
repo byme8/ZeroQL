@@ -1,11 +1,13 @@
 ﻿namespace ZeroQL.Core;
 
-public interface IGraphQLQueryProvider
+public interface IGraphQLResult
 {
     string Query { get; }
+
+    public GraphQueryError[] Errors { get; set; }
 }
 
-public class GraphQLResult<TData> : IGraphQLQueryProvider
+public class GraphQLResult<TData> : IGraphQLResult
 {
     public string Query { get; set; }
 

@@ -26,21 +26,26 @@ public static class TestProject
 
     public static AdhocWorkspace Workspace { get; }
 
-    public static async Task<IGraphQLQueryProvider> ExecuteRequest(this Assembly assembly)
+    public static async Task<IGraphQLResult> ExecuteRequest(this Assembly assembly)
     {
         var method = (assembly.GetType("ZeroQL.TestApp.Program")!
             .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<IGraphQLQueryProvider>>)) as Func<Task<IGraphQLQueryProvider>>)!;
+            .CreateDelegate(typeof(Func<Task<IGraphQLResult>>)) as Func<Task<IGraphQLResult>>)!;
 
         return await method.Invoke();
     }
 
-    public static async Task<IGraphQLQueryProvider> Validate(this Project project, string graphqlQuery)
+    public static async Task<IGraphQLResult> Validate(this Project project, string graphqlQuery, bool checkError = true)
     {
         var assembly = await project.CompileToRealAssembly();
         var response = await assembly.ExecuteRequest();
 
         response.Query.Should().Be(graphqlQuery);
+
+        if (checkError)
+        {
+            response.Errors.Should().BeNull();
+        }
 
         return response;
     }

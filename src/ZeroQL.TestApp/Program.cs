@@ -18,7 +18,7 @@ public class Program
         await Execute();
     }
 
-    public static async Task<IGraphQLQueryProvider> Execute()
+    public static async Task<IGraphQLResult> Execute()
     {
         var httpClient = new HttpClient
         {

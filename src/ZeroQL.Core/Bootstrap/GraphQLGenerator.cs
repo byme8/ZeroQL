@@ -110,7 +110,7 @@ using System.Text.Json.Serialization;
             {
                 var members = e.Values.Select(o =>
                     {
-                        var name = o.Name.StringValue;
+                        var name = o.Name.StringValue.ToPascalCase();
                         return EnumMemberDeclaration(Identifier(name));
                     })
                     .ToArray();

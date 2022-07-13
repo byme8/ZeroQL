@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using ZeroQL.Core.Extensions;
 
 namespace ZeroQL.Core;
 
@@ -18,6 +19,14 @@ public enum OperationKind
     Mutation
 }
 
+public class GraphQLEnumNamingPolicy : JsonNamingPolicy
+{
+    public override string ConvertName(string name)
+    {
+        return name.ToUpperCase();
+    }
+}
+
 public class GraphQLClient<TQuery, TMutation> : IDisposable
 {
     private readonly HttpClient httpClient;
@@ -25,7 +34,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
     {
         Converters =
         {
-            new JsonStringEnumConverter()
+            new JsonStringEnumConverter(new GraphQLEnumNamingPolicy())
         },
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -133,7 +142,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
 
         var qlResponse = await SendRequest<TOperationQuery>(queryRequest);
 
-        if (qlResponse.Errors is { Length: > 1 })
+        if (qlResponse.Errors is { Length: > 0 })
         {
             return new GraphQLResult<TResult>
             {

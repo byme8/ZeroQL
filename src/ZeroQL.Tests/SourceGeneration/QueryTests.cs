@@ -186,7 +186,7 @@ public class QueryTests : IntegrationTest
     [Fact]
     public async Task SupportForArray()
     {
-        var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.GOOD} }";
+        var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good} }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
         var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
@@ -199,7 +199,7 @@ public class QueryTests : IntegrationTest
     [Fact]
     public async Task SupportForArrayWithScalarElements()
     {
-        var csharpQuery = "static q => q.UsersIds(UserKind.GOOD, 0, 10)";
+        var csharpQuery = "static q => q.UsersIds(UserKind.Good, 0, 10)";
         var graphqlQuery = @"query { usersIds(kind: GOOD, page: 0, size: 10)}";
 
         var project = await TestProject.Project

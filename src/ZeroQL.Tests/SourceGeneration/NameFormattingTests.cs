@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Xunit;
-using ZeroQL.SourceGenerators;
+using ZeroQL.Core.Extensions;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
@@ -12,6 +12,15 @@ public class NameFormattingTests
     [InlineData("GoodBoyBadGirl", "GOOD_BOY_BAD_GIRL")]
     public void UpperCase(string name, string upperCaseName)
     {
-        name.ToAllUpperCase().Should().Be(upperCaseName);
+        name.ToUpperCase().Should().Be(upperCaseName);
+    }
+    
+    [Theory]
+    [InlineData("GOOD", "Good")]
+    [InlineData("GOOD_BOY", "GoodBoy")]
+    [InlineData("GOOD_BOY_BAD_GIRL", "GoodBoyBadGirl")]
+    public void PascalCase(string name, string upperCaseName)
+    {
+        name.ToPascalCase().Should().Be(upperCaseName);
     }
 }

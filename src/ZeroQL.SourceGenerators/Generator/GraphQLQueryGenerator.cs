@@ -211,14 +211,14 @@ public class GraphQLQueryGenerator
                 if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
                 {
                     var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression);
-                    if (!(symbol.Symbol is INamedTypeSymbol namedType))
+                    if (symbol.Symbol is not INamedTypeSymbol namedType)
                     {
                         return Failed(memberAccess);
                     }
 
                     if (namedType.EnumUnderlyingType != null)
                     {
-                        return memberAccess.Name.ToString();
+                        return memberAccess.Name.Identifier.Text.ToUpperCase();
                     }
                 }
 

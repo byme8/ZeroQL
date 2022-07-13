@@ -51,7 +51,7 @@ public class VariablesTests : IntegrationTest
     [Fact]
     public async Task SupportForEnumsAsArgument()
     {
-        var csharpQuery = "static q => q.UsersByKind(UserKind.BAD, 0, 10, o => o.FirstName)";
+        var csharpQuery = "static q => q.UsersByKind(UserKind.Bad, 0, 10, o => o.FirstName)";
         var graphqlQuery = @"query { usersByKind(kind: BAD, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project

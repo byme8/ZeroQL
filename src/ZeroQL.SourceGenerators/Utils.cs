@@ -37,7 +37,7 @@ public static class Utils
         return first.ToLower() + tail;
     }
 
-    public static string ToAllUpperCase(this string name)
+    internal static string ToUpperCase(this string name)
     {
         var upperCaseString = new List<char>(name.Length);
         for (var i = 0; i < name.Length; i++)
