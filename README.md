@@ -7,7 +7,10 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries
 - [x] Support for mutations
+- [ ] Support for fragments(in progress)
 - [ ] Support for subscriptions
+- [ ] Support for @defer
+- [ ] Support for @stream
 
 # How to setup
 
