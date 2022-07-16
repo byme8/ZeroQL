@@ -12,6 +12,8 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [ ] Support for @defer
 - [ ] Support for @stream
 
+The full article you can find [here](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
+
 # How to setup
 
 The initial setup:
