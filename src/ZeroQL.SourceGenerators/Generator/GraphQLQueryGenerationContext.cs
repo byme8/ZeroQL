@@ -1,27 +1,29 @@
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace ZeroQL.SourceGenerators.Generator;
 
-public class GraphQLQueryGenerationContext
+public record GraphQLQueryGenerationContext(
+    string QueryVariableName,
+    CSharpSyntaxNode Parent,
+    Dictionary<string, string> AvailableVariables,
+    SemanticModel SemanticModel,
+    CancellationToken CancellationToken)
 {
-    public GraphQLQueryGenerationContext(string queryVariableName, Dictionary<string, string> availableVariables, SemanticModel semanticModel, CancellationToken cancellationToken)
+    public string QueryVariableName { get; set; } = QueryVariableName;
+
+    public CSharpSyntaxNode Parent { get; set; } = Parent;
+    
+    public Dictionary<string, string> AvailableVariables { get; set; } = AvailableVariables;
+
+    public SemanticModel SemanticModel { get; set; } = SemanticModel;
+
+    public CancellationToken CancellationToken { get; set; } = CancellationToken;
+    
+    public GraphQLQueryGenerationContext WithParent(CSharpSyntaxNode parent)
     {
-        QueryVariableName = queryVariableName;
-        AvailableVariables = availableVariables;
-        SemanticModel = semanticModel;
-        CancellationToken = cancellationToken;
-    }
-
-    public string QueryVariableName { get; }
-
-    public Dictionary<string, string> AvailableVariables { get; }
-
-    public SemanticModel SemanticModel { get; }
-
-    public CancellationToken CancellationToken
-    {
-        get;
+        return this with { Parent = parent };
     }
 }

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GraphQL.TestServer;
 using ZeroQL.Core;
+using ZeroQL.TestApp.Models;
 
 namespace ZeroQL.TestApp;
 
@@ -10,7 +11,7 @@ public class Program
 {
     public static void Stub()
     {
-
+        UserModal user;
     }
 
     public static async Task Main()
@@ -32,5 +33,3 @@ public class Program
         return response;
     }
 }
-
-public record User(string FirstName, string LastName, string Role);
