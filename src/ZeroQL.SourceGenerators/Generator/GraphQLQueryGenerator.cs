@@ -21,18 +21,23 @@ public class GraphQLQueryGenerator
         }
 
         var inputs = GetQueryInputs(lambda);
-        var variables = GetVariables(semanticModel, lambda);
+        var variables = GetVariables(semanticModel, lambda, cancellationToken);
         var availableVariables = inputs.VariablesName is null ? new Dictionary<string, string>()
             : variables
                 .ToDictionary(
                     o => $"{inputs.VariablesName}.{o.Name}",
                     o => "$" + o.Name.FirstToLower());
 
+        var fieldSelectorAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
+        var fragmentAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
+
         var generationContext = new GraphQLQueryGenerationContext(
             inputs.QueryName,
             lambda,
             availableVariables,
             semanticModel,
+            fieldSelectorAttribute,
+            fragmentAttribute,
             cancellationToken);
 
         var body = GenerateQuery(generationContext, lambda.Body);
@@ -79,9 +84,9 @@ public class GraphQLQueryGenerator
         return default;
     }
 
-    private static (string Name, string Type)[] GetVariables(SemanticModel semanticModel, LambdaExpressionSyntax lambda)
+    private static (string Name, string Type)[] GetVariables(SemanticModel semanticModel, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
     {
-        var symbol = semanticModel.GetSymbolInfo(lambda);
+        var symbol = semanticModel.GetSymbolInfo(lambda, cancellationToken);
         if (symbol.Symbol is not IMethodSymbol method)
         {
             Failed(lambda);
@@ -208,7 +213,7 @@ public class GraphQLQueryGenerator
 
         if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
         {
-            var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression);
+            var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression, generationContext.CancellationToken);
             if (symbol.Symbol is not INamedTypeSymbol namedType)
             {
                 return Failed(memberAccess);
@@ -269,7 +274,7 @@ public class GraphQLQueryGenerator
             return Failed(identifierName, Descriptors.DontUserOutScopeValues);
         }
 
-        var symbol = generationContext.SemanticModel.GetSymbolInfo(invocation);
+        var symbol = generationContext.SemanticModel.GetSymbolInfo(invocation, generationContext.CancellationToken);
         if (symbol.Symbol is not IMethodSymbol method)
         {
             return Failed(invocation);
@@ -280,13 +285,14 @@ public class GraphQLQueryGenerator
             return new Error(Cancelled);
         }
 
-        var hasFieldSelector = method
-            .GetAttributes()
-            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFieldSelectorAttribute);
+        var attributes = method
+            .GetAttributes();
 
-        var hasFragment = method
-            .GetAttributes()
-            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFragmentAttribute);
+        var hasFieldSelector = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, generationContext.FieldSelectorAttribute));
+
+        var hasFragment = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, generationContext.FragmentAttribute));
 
         if (!hasFieldSelector && !hasFragment)
         {
