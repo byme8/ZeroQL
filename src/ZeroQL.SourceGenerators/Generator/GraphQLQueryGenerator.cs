@@ -33,7 +33,7 @@ public class GraphQLQueryGenerator
             semanticModel,
             cancellationToken);
 
-        var body = GenerateBody(generationContext, lambda.Body);
+        var body = GenerateQuery(generationContext, lambda.Body);
         if (body.Error)
         {
             return body;
@@ -99,7 +99,7 @@ public class GraphQLQueryGenerator
             .ToArray();
     }
 
-    private static Result<string> GenerateBody(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node)
+    private static Result<string> GenerateQuery(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node)
     {
         if (generationContext.CancellationToken.IsCancellationRequested)
         {
@@ -138,7 +138,7 @@ public class GraphQLQueryGenerator
             }
             case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
             {
-                return GenerateBody(generationContext.WithParent(anonymousMember), anonymousMember.Expression);
+                return GenerateQuery(generationContext.WithParent(anonymousMember), anonymousMember.Expression);
             }
             case ObjectCreationExpressionSyntax objectCreation:
             {
@@ -158,7 +158,7 @@ public class GraphQLQueryGenerator
         }
 
         var results = arguments
-            .Select(o => GenerateBody(generationContext.WithParent(objectCreation), o))
+            .Select(o => GenerateQuery(generationContext.WithParent(objectCreation), o))
             .ToArray();
 
         if (results.Any(o => o.Error))
@@ -171,7 +171,7 @@ public class GraphQLQueryGenerator
 
     private static Result<string> HandleArgumentAsObjectCreation(GraphQLQueryGenerationContext generationContext, ArgumentSyntax argument)
     {
-        return GenerateBody(generationContext.WithParent(argument), argument.Expression);
+        return GenerateQuery(generationContext.WithParent(argument), argument.Expression);
     }
 
     private static Result<string> HandleAnonymousObjectCreation(GraphQLQueryGenerationContext generationContext, AnonymousObjectCreationExpressionSyntax anonymous)
@@ -179,7 +179,7 @@ public class GraphQLQueryGenerator
         var initializers = new List<string>(anonymous.Initializers.Count);
         foreach (var initializer in anonymous.Initializers)
         {
-            var result = GenerateBody(generationContext, initializer);
+            var result = GenerateQuery(generationContext, initializer);
             if (result.Error)
             {
                 return result.Error;
@@ -231,7 +231,7 @@ public class GraphQLQueryGenerator
         var parameter = simpleLambda.Parameter.Identifier.ValueText;
         var childGenerationContext = generationContext with { QueryVariableName = parameter };
 
-        return GenerateBody(childGenerationContext.WithParent(simpleLambda), simpleLambda.Body);
+        return GenerateQuery(childGenerationContext.WithParent(simpleLambda), simpleLambda.Body);
     }
 
     private static Result<string> HanleIndentifier(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
@@ -248,7 +248,7 @@ public class GraphQLQueryGenerator
     {
         if (member.Expression is MemberAccessExpressionSyntax left)
         {
-            return GenerateBody(generationContext.WithParent(member), left);
+            return GenerateQuery(generationContext.WithParent(member), left);
         }
 
         if (member.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == generationContext.QueryVariableName)
@@ -273,6 +273,15 @@ public class GraphQLQueryGenerator
             return Failed(invocation);
         }
 
+        var haveFieldSelector = method
+            .GetAttributes()
+            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFieldSelectorAttribute);
+        
+        if (!haveFieldSelector)
+        {
+            return Failed(invocation, Descriptors.OnlyFieldSelectorsAreAllowed);
+        }
+
         var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
         var argumentNames = method.Parameters
@@ -286,7 +295,7 @@ public class GraphQLQueryGenerator
         {
             var graphQLArguments = invocation.ArgumentList.Arguments
                 .Take(argumentNames.Length)
-                .Select(o => GenerateBody(generationContext.WithParent(o), o))
+                .Select(o => GenerateQuery(generationContext.WithParent(o), o))
                 .ToArray();
 
             if (graphQLArguments.Any(o => o.Error))
@@ -303,7 +312,7 @@ public class GraphQLQueryGenerator
         }
         if (ignoreLastParameter)
         {
-            var generateBody = GenerateBody(generationContext.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
+            var generateBody = GenerateQuery(generationContext.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
             if (generateBody.Error)
             {
                 return generateBody;

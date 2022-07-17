@@ -29,6 +29,7 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
         public User __AddUser { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
             return selector(__AddUser);
@@ -65,11 +66,13 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Me<T>(Func<User, T> selector)
         {
             return selector(__Me);
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
             return __Users.Select(o => selector(o)).ToArray();
@@ -77,36 +80,43 @@ namespace GraphQL.TestServer
 
         public UserKind[] UserKinds { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
             return __UsersMatrix.Select(o => o.Select(o => selector(o)).ToArray()).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
             return __UsersByKind.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public int[] UsersIds(UserKind kind, int page, int size)
         {
             return __UsersIds;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? User<T>(int id, Func<User?, T> selector)
         {
             return __User != default ? selector(__User) : default;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public UserKind UserKind(int id)
         {
             return __UserKind;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
             return __Admin != default ? selector(__Admin) : default;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Container<T>(Func<TypesContainer, T> selector)
         {
             return selector(__Container);
@@ -190,21 +200,25 @@ namespace GraphQL.TestServer
 
         public Guid[]? Value26 { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value27.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value28?.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return selector(__Value29);
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Value30<T>(Func<KeyValuePairOfStringAndString?, T> selector)
         {
             return __Value30 != default ? selector(__Value30) : default;
@@ -229,6 +243,7 @@ namespace GraphQL.TestServer
 
         public UserKind UserKind { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Role<T>(Func<Role?, T> selector)
         {
             return __Role != default ? selector(__Role) : default;

@@ -33,3 +33,11 @@ public class Program
         return response;
     }
 }
+
+public static class QueryFragments
+{
+    public static UserModal AsUserWithRoleName(this User user)
+    {
+        return new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
+    }
+}
