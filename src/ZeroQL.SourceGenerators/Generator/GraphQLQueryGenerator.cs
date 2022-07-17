@@ -12,7 +12,7 @@ namespace ZeroQL.SourceGenerators.Generator;
 public class GraphQLQueryGenerator
 {
     public const string Cancelled = nameof(Cancelled);
-    
+
     public static Result<string> Generate(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
     {
         if (query is not LambdaExpressionSyntax lambda)
@@ -315,18 +315,43 @@ public class GraphQLQueryGenerator
             return Failed(invocation);
         }
 
-        var name = methodDeclaration.ParameterList.Parameters.FirstOrDefault()?.Identifier.Text;
+        var parameters = methodDeclaration.ParameterList.Parameters;
+        var name = parameters.FirstOrDefault()?.Identifier.Text;
         if (name is null)
         {
             return Failed(invocation);
+        }
+
+        var variablesToMap = parameters
+            .Skip(1)
+            .Select(o => o.Identifier.Text)
+            .ToArray();
+
+        var inputVariables = invocation.ArgumentList.Arguments;
+
+        var variables = inputVariables
+            .Select((o, i) => (Key: variablesToMap[i], Value: HandleArgumentAsVariable(generationContext, o)))
+            .ToArray();
+
+        for (int i = 0; i < variables.Length; i++)
+        {
+            var variable = variables[i];
+            if (variable.Value.Error)
+            {
+                return Failed(invocation.ArgumentList.Arguments[i]);
+            }
         }
 
         if (generationContext.CancellationToken.IsCancellationRequested)
         {
             return new Error(Cancelled);
         }
-        
-        var newContext = generationContext.WithVariableName(name);
+
+        var newContext = generationContext.WithVariableName(name) with
+        {
+            AvailableVariables = variables.ToDictionary(o => o.Key, o => o.Value.Value)
+        };
+
         if (methodDeclaration.Body is not null)
         {
             if (methodDeclaration.Body.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
@@ -341,7 +366,7 @@ public class GraphQLQueryGenerator
         {
             return new Error(Cancelled);
         }
-        
+
         if (methodDeclaration.ExpressionBody is not null)
         {
             return GenerateQuery(newContext.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
