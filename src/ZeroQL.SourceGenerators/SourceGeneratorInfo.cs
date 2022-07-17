@@ -7,4 +7,6 @@ public class SourceGeneratorInfo
     public static string CodeGenerationAttribute { get; } = $@"[System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")]";
     
     public static string GraphQLFieldSelectorAttribute { get; } = "global::ZeroQL.Core.GraphQLFieldSelector";
+
+    public static string GraphQLFragmentAttribute { get; } = "global::ZeroQL.Core.GraphQLFragment";
 }

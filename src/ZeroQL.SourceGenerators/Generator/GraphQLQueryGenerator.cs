@@ -11,6 +11,8 @@ namespace ZeroQL.SourceGenerators.Generator;
 
 public class GraphQLQueryGenerator
 {
+    public const string Cancelled = nameof(Cancelled);
+    
     public static Result<string> Generate(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
     {
         if (query is not LambdaExpressionSyntax lambda)
@@ -103,7 +105,7 @@ public class GraphQLQueryGenerator
     {
         if (generationContext.CancellationToken.IsCancellationRequested)
         {
-            return new Error("Cancelled");
+            return new Error(Cancelled);
         }
 
         switch (node)
@@ -273,15 +275,83 @@ public class GraphQLQueryGenerator
             return Failed(invocation);
         }
 
-        var haveFieldSelector = method
-            .GetAttributes()
-            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFieldSelectorAttribute);
-        
-        if (!haveFieldSelector)
+        if (generationContext.CancellationToken.IsCancellationRequested)
         {
-            return Failed(invocation, Descriptors.OnlyFieldSelectorsAreAllowed);
+            return new Error(Cancelled);
         }
 
+        var hasFieldSelector = method
+            .GetAttributes()
+            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFieldSelectorAttribute);
+
+        var hasFragment = method
+            .GetAttributes()
+            .Any(o => o.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == SourceGeneratorInfo.GraphQLFragmentAttribute);
+
+        if (!hasFieldSelector && !hasFragment)
+        {
+            return Failed(invocation, Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
+        }
+
+        if (hasFieldSelector)
+        {
+            return HandleFieldSelector(generationContext, invocation, method);
+        }
+
+        return HandleFragment(generationContext, invocation, method);
+
+    }
+
+    private static Result<string> HandleFragment(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    {
+        if (method.DeclaringSyntaxReferences.IsEmpty)
+        {
+            return Failed(invocation);
+        }
+
+        var fragment = method.DeclaringSyntaxReferences.First().GetSyntax();
+        if (fragment is not MethodDeclarationSyntax methodDeclaration)
+        {
+            return Failed(invocation);
+        }
+
+        var name = methodDeclaration.ParameterList.Parameters.FirstOrDefault()?.Identifier.Text;
+        if (name is null)
+        {
+            return Failed(invocation);
+        }
+
+        if (generationContext.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+        
+        var newContext = generationContext.WithVariableName(name);
+        if (methodDeclaration.Body is not null)
+        {
+            if (methodDeclaration.Body.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
+            {
+                return GenerateQuery(newContext.WithParent(returnStatement), returnStatement.Expression);
+            }
+
+            return Failed(methodDeclaration.Body.Statements.First());
+        }
+
+        if (generationContext.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+        
+        if (methodDeclaration.ExpressionBody is not null)
+        {
+            return GenerateQuery(newContext.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
+        }
+
+        return Failed(invocation);
+    }
+
+    private static Result<string> HandleFieldSelector(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    {
         var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
         var argumentNames = method.Parameters

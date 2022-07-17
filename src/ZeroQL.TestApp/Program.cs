@@ -36,8 +36,13 @@ public class Program
 
 public static class QueryFragments
 {
-    public static UserModal AsUserWithRoleName(this User user)
+    [GraphQLFragment]
+    public static UserModal AsUserWithRoleNameBody(this User user)
     {
         return new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
     }
+
+    [GraphQLFragment]
+    public static UserModal AsUserWithRoleNameExpression(this User user)
+        => new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
 }

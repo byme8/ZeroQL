@@ -103,7 +103,7 @@ public class QueryTests : IntegrationTest
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         diagnostics.Should()
-            .Contain(o => o.Id == Descriptors.OnlyFieldSelectorsAreAllowed.Id);
+            .Contain(o => o.Id == Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed.Id);
     }
 
     [Fact]

@@ -7,7 +7,7 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
-public class FragmentTests: IntegrationTest
+public class FragmentTests : IntegrationTest
 {
     [Fact]
     public async Task CanCreateClassInstance()
@@ -19,26 +19,48 @@ public class FragmentTests: IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
-        
+
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
         response.Data.Role.Should().Be("Admin");
     }
-    
+
     [Fact]
-    public async Task CanApplyFragment()
+    public async Task CanApplyFragmentWithBody()
     {
-        var csharpQuery = "static q => q.Me(o => o.AsUserWithRoleName())";
+        var csharpQuery = "static q => q.Me(o => o.AsUserWithRoleNameBody())";
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
-        
+
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
         response.Data.Role.Should().Be("Admin");
+    }
+
+    [Fact]
+    public async Task CanApplyFragmentWithExpression()
+    {
+        var csharpQuery = "static q => q.Me(o => o.AsUserWithRoleNameExpression())";
+        var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+
+        response.Data.FirstName.Should().Be("Jon");
+        response.Data.LastName.Should().Be("Smith");
+        response.Data.Role.Should().Be("Admin");
+    }
+
+    [Fact(Skip = "Not implemented")]
+    public void CanLoadFragmentWithoutSyntaxTree()
+    {
+
     }
 
 }

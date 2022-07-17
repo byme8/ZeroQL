@@ -37,10 +37,10 @@ public class Descriptors
         description: "Only static lambda are allowed to avoid variables from different scopes.",
         isEnabledByDefault: true);
     
-    public static DiagnosticDescriptor OnlyFieldSelectorsAreAllowed = new(
-        nameof(OnlyFieldSelectorsAreAllowed),
-        "Only field selectors are allowed",
-        "The method {0} doesn't have field selector attribute and can't be used in the query",
+    public static DiagnosticDescriptor OnlyFieldSelectorsAndFragmentsAreAllowed = new(
+        nameof(OnlyFieldSelectorsAndFragmentsAreAllowed),
+        "Only field selectors and fragments are allowed",
+        "The method doesn't have field selector or fragment attribute and can't be used in the query",
         "ZeroQL",
         DiagnosticSeverity.Error,
         description: "Only field selectors and fragments are allowed inside the query.",
