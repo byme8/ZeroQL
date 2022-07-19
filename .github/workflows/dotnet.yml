@@ -16,15 +16,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.301
-    - name: Set env
-      run: |
-        echo ${GITHUB_REF_NAME:1}
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release /p:Version=$RELEASE_VERSION --no-restore
+      run: dotnet build -c Release /p:Version=${GITHUB_REF_NAME:1} --no-restore
     - name: Push
       run: |
-        dotnet pack -c Release --no-build --verbosity normal /p:Version=$RELEASE_VERSION -o ./nugets
+        dotnet pack -c Release --no-build --verbosity normal /p:Version=${GITHUB_REF_NAME:1} -o ./nugets
         cd ./nugets
         dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 
