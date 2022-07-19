@@ -45,4 +45,12 @@ public class Descriptors
         DiagnosticSeverity.Error,
         description: "Only field selectors and fragments are allowed inside the query.",
         isEnabledByDefault: true);
+    
+    public static DiagnosticDescriptor GraphQLQueryPreview = new(
+        nameof(GraphQLQueryPreview),
+        string.Empty,
+        "{0}",
+        "ZeroQL",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true);
 }
