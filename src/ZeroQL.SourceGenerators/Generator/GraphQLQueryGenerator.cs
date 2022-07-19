@@ -11,6 +11,8 @@ namespace ZeroQL.SourceGenerators.Generator;
 
 public class GraphQLQueryGenerator
 {
+    public const string Cancelled = nameof(Cancelled);
+
     public static Result<string> Generate(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
     {
         if (query is not LambdaExpressionSyntax lambda)
@@ -19,15 +21,26 @@ public class GraphQLQueryGenerator
         }
 
         var inputs = GetQueryInputs(lambda);
-        var variables = GetVariables(semanticModel, lambda);
+        var variables = GetVariables(semanticModel, lambda, cancellationToken);
         var availableVariables = inputs.VariablesName is null ? new Dictionary<string, string>()
             : variables
                 .ToDictionary(
                     o => $"{inputs.VariablesName}.{o.Name}",
                     o => "$" + o.Name.FirstToLower());
 
-        var generationContext = new GraphQLQueryGenerationContext(inputs.QueryName, availableVariables, semanticModel, cancellationToken);
-        var body = GenerateBody(generationContext, lambda.Body);
+        var fieldSelectorAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
+        var fragmentAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
+
+        var generationContext = new GraphQLQueryGenerationContext(
+            inputs.QueryName,
+            lambda,
+            availableVariables,
+            semanticModel,
+            fieldSelectorAttribute,
+            fragmentAttribute,
+            cancellationToken);
+
+        var body = GenerateQuery(generationContext, lambda.Body);
         if (body.Error)
         {
             return body;
@@ -71,9 +84,9 @@ public class GraphQLQueryGenerator
         return default;
     }
 
-    private static (string Name, string Type)[] GetVariables(SemanticModel semanticModel, LambdaExpressionSyntax lambda)
+    private static (string Name, string Type)[] GetVariables(SemanticModel semanticModel, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
     {
-        var symbol = semanticModel.GetSymbolInfo(lambda);
+        var symbol = semanticModel.GetSymbolInfo(lambda, cancellationToken);
         if (symbol.Symbol is not IMethodSymbol method)
         {
             Failed(lambda);
@@ -93,160 +106,322 @@ public class GraphQLQueryGenerator
             .ToArray();
     }
 
-    private static Result<string> GenerateBody(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node)
+    private static Result<string> GenerateQuery(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node)
     {
         if (generationContext.CancellationToken.IsCancellationRequested)
         {
-            return new Error("Cancelled");
+            return new Error(Cancelled);
         }
 
         switch (node)
         {
             case InvocationExpressionSyntax invocation:
             {
-                if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName } &&
-                    identifierName.Identifier.ValueText != generationContext.QueryVariableName)
-                {
-                    return Failed(identifierName, Descriptors.DontUserOutScopeValues);
-                }
-
-                var symbol = generationContext.SemanticModel.GetSymbolInfo(invocation);
-                if (symbol.Symbol is not IMethodSymbol method)
-                {
-                    return Failed(invocation);
-                }
-
-                var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
-                var parametersToIgnore = ignoreLastParameter ? 1 : 0;
-                var argumentNames = method.Parameters
-                    .Take(method.Parameters.Length - parametersToIgnore)
-                    .Select(o => $"{o.Name.FirstToLower()}: ")
-                    .ToArray();
-
-                var stringBuilder = new StringBuilder();
-                stringBuilder.Append(method.Name.FirstToLower());
-                if (argumentNames.Any())
-                {
-                    var graphQLArguments = invocation.ArgumentList.Arguments
-                        .Take(argumentNames.Length)
-                        .Select(o => GenerateBody(generationContext, o))
-                        .ToArray();
-
-                    if (graphQLArguments.Any(o => o.Error))
-                    {
-                        return graphQLArguments.First(o => o.Error);
-                    }
-
-                    var formattedArguments = graphQLArguments
-                        .Select((o, i) => $"{argumentNames[i]}{o.Value}")
-                        .Join()
-                        .Wrap("(", ")");
-
-                    stringBuilder.Append(formattedArguments);
-                }
-                if (ignoreLastParameter)
-                {
-                    var generateBody = GenerateBody(generationContext, invocation.ArgumentList.Arguments.Last().Expression);
-                    if (generateBody.Error)
-                    {
-                        return generateBody;
-                    }
-                    stringBuilder.Append($" {{ {generateBody.Value} }} ");
-                }
-
-                return stringBuilder.ToString();
+                return HandleInvocation(generationContext, invocation);
             }
             case MemberAccessExpressionSyntax member:
             {
-                if (member.Expression is MemberAccessExpressionSyntax left)
-                {
-                    return GenerateBody(generationContext, left);
-                }
-
-                if (member.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == generationContext.QueryVariableName)
-                {
-                    return member.Name.Identifier.ValueText.FirstToLower();
-                }
-
-                return Failed(member.Expression);
+                return HandleMemberAccess(generationContext, member);
             }
             case IdentifierNameSyntax identifierNameSyntax:
             {
-                if (identifierNameSyntax.Identifier.ValueText == generationContext.QueryVariableName)
-                {
-                    return string.Empty;
-                }
-
-                return Failed(node);
+                return HanleIndentifier(generationContext, node, identifierNameSyntax);
             }
             case SimpleLambdaExpressionSyntax simpleLambda:
             {
-                if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
-                {
-                    return Failed(simpleLambda);
-                }
-
-                var parameter = simpleLambda.Parameter.Identifier.ValueText;
-                var childGenerationContext = new GraphQLQueryGenerationContext(
-                    parameter,
-                    generationContext.AvailableVariables,
-                    generationContext.SemanticModel,
-                    generationContext.CancellationToken);
-
-                return GenerateBody(childGenerationContext, simpleLambda.Body);
+                return HandlerSimpleLambda(generationContext, simpleLambda);
+            }
+            case ArgumentSyntax argument when generationContext.Parent is ObjectCreationExpressionSyntax:
+            {
+                return HandleArgumentAsObjectCreation(generationContext, argument);
             }
             case ArgumentSyntax argument:
             {
-                if (argument.Expression is LiteralExpressionSyntax literal)
-                {
-                    return literal.ToString();
-                }
-
-                var value = argument.Expression.ToString();
-                if (generationContext.AvailableVariables.ContainsKey(value))
-                {
-                    return generationContext.AvailableVariables[value];
-                }
-
-                if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
-                {
-                    var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression);
-                    if (symbol.Symbol is not INamedTypeSymbol namedType)
-                    {
-                        return Failed(memberAccess);
-                    }
-
-                    if (namedType.EnumUnderlyingType != null)
-                    {
-                        return memberAccess.Name.Identifier.Text.ToUpperCase();
-                    }
-                }
-
-                return Failed(argument);
+                return HandleArgumentAsVariable(generationContext, argument);
             }
             case AnonymousObjectCreationExpressionSyntax anonymous:
             {
-                var initializers = new List<string>(anonymous.Initializers.Count);
-                foreach (var initializer in anonymous.Initializers)
-                {
-                    var result = GenerateBody(generationContext, initializer);
-                    if (result.Error)
-                    {
-                        return result.Error;
-                    }
-
-                    initializers.Add(result.Value);
-                }
-
-                return initializers.Join(" ");
+                return HandleAnonymousObjectCreation(generationContext, anonymous);
             }
             case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
             {
-                return GenerateBody(generationContext, anonymousMember.Expression);
+                return GenerateQuery(generationContext.WithParent(anonymousMember), anonymousMember.Expression);
+            }
+            case ObjectCreationExpressionSyntax objectCreation:
+            {
+                return HandleObjectCreation(generationContext, objectCreation);
             }
         }
 
         return Failed(node);
+    }
+
+    private static Result<string> HandleObjectCreation(GraphQLQueryGenerationContext generationContext, ObjectCreationExpressionSyntax objectCreation)
+    {
+        var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
+        if (arguments is null)
+        {
+            return string.Empty;
+        }
+
+        var results = arguments
+            .Select(o => GenerateQuery(generationContext.WithParent(objectCreation), o))
+            .ToArray();
+
+        if (results.Any(o => o.Error))
+        {
+            return results.First().Error;
+        }
+
+        return results.Select(o => o.Value).Join(" ");
+    }
+
+    private static Result<string> HandleArgumentAsObjectCreation(GraphQLQueryGenerationContext generationContext, ArgumentSyntax argument)
+    {
+        return GenerateQuery(generationContext.WithParent(argument), argument.Expression);
+    }
+
+    private static Result<string> HandleAnonymousObjectCreation(GraphQLQueryGenerationContext generationContext, AnonymousObjectCreationExpressionSyntax anonymous)
+    {
+        var initializers = new List<string>(anonymous.Initializers.Count);
+        foreach (var initializer in anonymous.Initializers)
+        {
+            var result = GenerateQuery(generationContext, initializer);
+            if (result.Error)
+            {
+                return result.Error;
+            }
+
+            initializers.Add(result.Value);
+        }
+
+        return initializers.Join(" ");
+    }
+
+    private static Result<string> HandleArgumentAsVariable(GraphQLQueryGenerationContext generationContext, ArgumentSyntax argument)
+    {
+        if (argument.Expression is LiteralExpressionSyntax literal)
+        {
+            return literal.ToString();
+        }
+
+        var value = argument.Expression.ToString();
+        if (generationContext.AvailableVariables.ContainsKey(value))
+        {
+            return generationContext.AvailableVariables[value];
+        }
+
+        if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            var symbol = generationContext.SemanticModel.GetSymbolInfo(memberAccess.Expression, generationContext.CancellationToken);
+            if (symbol.Symbol is not INamedTypeSymbol namedType)
+            {
+                return Failed(memberAccess);
+            }
+
+            if (namedType.EnumUnderlyingType != null)
+            {
+                return memberAccess.Name.Identifier.Text.ToUpperCase();
+            }
+        }
+
+        return Failed(argument);
+    }
+
+    private static Result<string> HandlerSimpleLambda(GraphQLQueryGenerationContext generationContext, SimpleLambdaExpressionSyntax simpleLambda)
+    {
+        if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
+        {
+            return Failed(simpleLambda);
+        }
+
+        var parameter = simpleLambda.Parameter.Identifier.ValueText;
+        var childGenerationContext = generationContext with { QueryVariableName = parameter };
+
+        return GenerateQuery(childGenerationContext.WithParent(simpleLambda), simpleLambda.Body);
+    }
+
+    private static Result<string> HanleIndentifier(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
+    {
+        if (identifierNameSyntax.Identifier.ValueText == generationContext.QueryVariableName)
+        {
+            return string.Empty;
+        }
+
+        return Failed(node);
+    }
+
+    private static Result<string> HandleMemberAccess(GraphQLQueryGenerationContext generationContext, MemberAccessExpressionSyntax member)
+    {
+        if (member.Expression is MemberAccessExpressionSyntax left)
+        {
+            return GenerateQuery(generationContext.WithParent(member), left);
+        }
+
+        if (member.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == generationContext.QueryVariableName)
+        {
+            return member.Name.Identifier.ValueText.FirstToLower();
+        }
+
+        return Failed(member.Expression);
+    }
+
+    private static Result<string> HandleInvocation(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation)
+    {
+        if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName } &&
+            identifierName.Identifier.ValueText != generationContext.QueryVariableName)
+        {
+            return Failed(identifierName, Descriptors.DontUserOutScopeValues);
+        }
+
+        var symbol = generationContext.SemanticModel.GetSymbolInfo(invocation, generationContext.CancellationToken);
+        if (symbol.Symbol is not IMethodSymbol method)
+        {
+            return Failed(invocation);
+        }
+
+        if (generationContext.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+
+        var attributes = method
+            .GetAttributes();
+
+        var hasFieldSelector = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, generationContext.FieldSelectorAttribute));
+
+        var hasFragment = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, generationContext.FragmentAttribute));
+
+        if (!hasFieldSelector && !hasFragment)
+        {
+            return Failed(invocation, Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
+        }
+
+        if (hasFieldSelector)
+        {
+            return HandleFieldSelector(generationContext, invocation, method);
+        }
+
+        return HandleFragment(generationContext, invocation, method);
+
+    }
+
+    private static Result<string> HandleFragment(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    {
+        if (method.DeclaringSyntaxReferences.IsEmpty)
+        {
+            return Failed(invocation);
+        }
+
+        var fragment = method.DeclaringSyntaxReferences.First().GetSyntax();
+        if (fragment is not MethodDeclarationSyntax methodDeclaration)
+        {
+            return Failed(invocation);
+        }
+
+        var parameters = methodDeclaration.ParameterList.Parameters;
+        var name = parameters.FirstOrDefault()?.Identifier.Text;
+        if (name is null)
+        {
+            return Failed(invocation);
+        }
+
+        var variablesToMap = parameters
+            .Skip(1)
+            .Select(o => o.Identifier.Text)
+            .ToArray();
+
+        var inputVariables = invocation.ArgumentList.Arguments;
+
+        var variables = inputVariables
+            .Select((o, i) => (Key: variablesToMap[i], Value: HandleArgumentAsVariable(generationContext, o)))
+            .ToArray();
+
+        for (int i = 0; i < variables.Length; i++)
+        {
+            var variable = variables[i];
+            if (variable.Value.Error)
+            {
+                return Failed(invocation.ArgumentList.Arguments[i]);
+            }
+        }
+
+        if (generationContext.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+
+        var newContext = generationContext.WithVariableName(name) with
+        {
+            AvailableVariables = variables.ToDictionary(o => o.Key, o => o.Value.Value)
+        };
+
+        if (methodDeclaration.Body is not null)
+        {
+            if (methodDeclaration.Body.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
+            {
+                return GenerateQuery(newContext.WithParent(returnStatement), returnStatement.Expression);
+            }
+
+            return Failed(methodDeclaration.Body.Statements.First());
+        }
+
+        if (generationContext.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+
+        if (methodDeclaration.ExpressionBody is not null)
+        {
+            return GenerateQuery(newContext.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
+        }
+
+        return Failed(invocation);
+    }
+
+    private static Result<string> HandleFieldSelector(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    {
+        var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
+        var parametersToIgnore = ignoreLastParameter ? 1 : 0;
+        var argumentNames = method.Parameters
+            .Take(method.Parameters.Length - parametersToIgnore)
+            .Select(o => $"{o.Name.FirstToLower()}: ")
+            .ToArray();
+
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(method.Name.FirstToLower());
+        if (argumentNames.Any())
+        {
+            var graphQLArguments = invocation.ArgumentList.Arguments
+                .Take(argumentNames.Length)
+                .Select(o => GenerateQuery(generationContext.WithParent(o), o))
+                .ToArray();
+
+            if (graphQLArguments.Any(o => o.Error))
+            {
+                return graphQLArguments.First(o => o.Error);
+            }
+
+            var formattedArguments = graphQLArguments
+                .Select((o, i) => $"{argumentNames[i]}{o.Value}")
+                .Join()
+                .Wrap("(", ")");
+
+            stringBuilder.Append(formattedArguments);
+        }
+        if (ignoreLastParameter)
+        {
+            var generateBody = GenerateQuery(generationContext.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
+            if (generateBody.Error)
+            {
+                return generateBody;
+            }
+            stringBuilder.Append($" {{ {generateBody.Value} }} ");
+        }
+
+        return stringBuilder.ToString();
     }
 
     private static Error Failed(CSharpSyntaxNode node, DiagnosticDescriptor? descriptor = null)

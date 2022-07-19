@@ -15,7 +15,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class KeyValuePairOfStringAndString
     {
         public string Key { get; set; }
@@ -23,19 +23,20 @@ namespace GraphQL.TestServer
         public string Value { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class Mutation
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
         public User __AddUser { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
             return selector(__AddUser);
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class Query
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
@@ -65,11 +66,13 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Me<T>(Func<User, T> selector)
         {
             return selector(__Me);
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
             return __Users.Select(o => selector(o)).ToArray();
@@ -77,43 +80,50 @@ namespace GraphQL.TestServer
 
         public UserKind[] UserKinds { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
             return __UsersMatrix.Select(o => o.Select(o => selector(o)).ToArray()).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
             return __UsersByKind.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public int[] UsersIds(UserKind kind, int page, int size)
         {
             return __UsersIds;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? User<T>(int id, Func<User?, T> selector)
         {
             return __User != default ? selector(__User) : default;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public UserKind UserKind(int id)
         {
             return __UserKind;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
             return __Admin != default ? selector(__Admin) : default;
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Container<T>(Func<TypesContainer, T> selector)
         {
             return selector(__Container);
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class Role
     {
         public int Id { get; set; }
@@ -121,7 +131,7 @@ namespace GraphQL.TestServer
         public string Name { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class TypesContainer
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
@@ -190,21 +200,25 @@ namespace GraphQL.TestServer
 
         public Guid[]? Value26 { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value27.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value28?.Select(o => selector(o)).ToArray();
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return selector(__Value29);
         }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Value30<T>(Func<KeyValuePairOfStringAndString?, T> selector)
         {
             return __Value30 != default ? selector(__Value30) : default;
@@ -215,7 +229,7 @@ namespace GraphQL.TestServer
         public DateTimeOffset? Value32 { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class User
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
@@ -229,13 +243,14 @@ namespace GraphQL.TestServer
 
         public UserKind UserKind { get; set; }
 
+        [ZeroQL.Core.GraphQLFieldSelector]
         public T? Role<T>(Func<Role?, T> selector)
         {
             return __Role != default ? selector(__Role) : default;
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class PageInput
     {
         public int Count { get; set; }
@@ -243,7 +258,7 @@ namespace GraphQL.TestServer
         public int Size { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public class UserFilterInput
     {
         public UserKind UserKind { get; set; }
@@ -251,7 +266,7 @@ namespace GraphQL.TestServer
         public PageInput? Page { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.2.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
     public enum UserKind
     {
         Good,

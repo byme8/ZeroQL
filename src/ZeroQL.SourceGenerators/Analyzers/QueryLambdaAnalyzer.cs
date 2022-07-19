@@ -93,5 +93,6 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.OnlyStaticLambda,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUserOutScopeValues,
-            Descriptors.FailedToConvert);
+            Descriptors.FailedToConvert,
+            Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
 }

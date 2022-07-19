@@ -15,7 +15,7 @@ public class UserGraphQLExtensions
     {
         return new User
         {
-            Id = -1,
+            Id = 1,
             FirstName = "Jon",
             LastName = "Smith"
         };

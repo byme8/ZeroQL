@@ -31,10 +31,10 @@ public static class Utils
 
     public static string FirstToLower(this string text)
     {
-        var first = text.Substring(0, 1);
-        var tail = text.Substring(1);
+        var chars = text.ToCharArray();
+        chars[0] = char.ToLower(chars[0]);
 
-        return first.ToLower() + tail;
+        return new string(chars);
     }
 
     internal static string ToUpperCase(this string name)

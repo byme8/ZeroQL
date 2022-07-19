@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GraphQL.TestServer;
 using ZeroQL.Core;
+using ZeroQL.TestApp.Models;
 
 namespace ZeroQL.TestApp;
 
@@ -10,7 +11,7 @@ public class Program
 {
     public static void Stub()
     {
-
+        UserModal user;
     }
 
     public static async Task Main()
@@ -33,4 +34,19 @@ public class Program
     }
 }
 
-public record User(string FirstName, string LastName, string Role);
+public static class QueryFragments
+{
+    [GraphQLFragment]
+    public static UserModal AsUserWithRoleNameBody(this User user)
+    {
+        return new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
+    }
+
+    [GraphQLFragment]
+    public static UserModal AsUserWithRoleNameExpression(this User user)
+        => new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
+
+    [GraphQLFragment]
+    public static UserModal? GetUserById(this Query query, int id)
+        => query.User(id, o => o!.AsUserWithRoleNameBody());
+}

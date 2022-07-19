@@ -63,8 +63,6 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var assembly = await project.CompileToRealAssembly();
-
         await project.Validate(graphqlQuery);
     }
 
@@ -93,6 +91,19 @@ public class QueryTests : IntegrationTest
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OpenLambdaIsNotAllowed.Id);
+    }
+    
+    [Fact]
+    public async Task FailsWhenMethodCalled()
+    {
+        var csharpQuery = "static q => q.Me(o => o.ToString())";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        diagnostics.Should()
+            .Contain(o => o.Id == Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed.Id);
     }
 
     [Fact]

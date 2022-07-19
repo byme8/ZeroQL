@@ -205,6 +205,10 @@ using System.Text.Json.Serialization;
                 IdentifierName(returnType),
                 Identifier(name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
+            .AddAttributeLists(AttributeList()
+                .AddAttributes(
+                    Attribute(
+                        ParseName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute))))
             .WithParameterList(ParameterList(list));
 
         var body = Block(

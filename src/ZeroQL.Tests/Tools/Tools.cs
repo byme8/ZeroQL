@@ -1,7 +1,7 @@
 using Xunit;
 using ZeroQL.Tests.Core;
 
-namespace ZeroQL.Tests;
+namespace ZeroQL.Tests.Tools;
 
 public class Tools : IntegrationTest
 {

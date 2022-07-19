@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Xunit;
+using ZeroQL.Core;
 using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.Bootstrap;
@@ -46,6 +47,9 @@ public class ParseSchemaTests
 
         query.Members
             .OfType<MethodDeclarationSyntax>()
+            .Where(o => o.AttributeLists
+                .SelectMany(list => list.Attributes)
+                .Any(attribute => attribute.Name.ToString() == SourceGeneratorInfo.GraphQLFieldSelectorAttribute))
             .Select(o =>
             {
                 var returnType = o.ReturnType.ToString();
