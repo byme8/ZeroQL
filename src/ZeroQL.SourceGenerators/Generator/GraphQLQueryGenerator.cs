@@ -159,12 +159,28 @@ public class GraphQLQueryGenerator
     private static Result<string> HandleObjectCreation(GraphQLQueryGenerationContext generationContext, ObjectCreationExpressionSyntax objectCreation)
     {
         var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
-        if (arguments is null)
+        var initializers = objectCreation.Initializer?.Expressions
+            .OfType<AssignmentExpressionSyntax>()
+            .Select(o => o.Right)
+            .ToArray();
+        
+        if (arguments is null && initializers is null)
         {
             return string.Empty;
         }
+        
+        var expressions = new List<CSharpSyntaxNode>();
+        if (arguments is not null)
+        {
+            expressions.AddRange(arguments);
+        }
 
-        var results = arguments
+        if (initializers is not null)
+        {
+            expressions.AddRange(initializers);
+        }
+
+        var results = expressions
             .Select(o => GenerateQuery(generationContext.WithParent(objectCreation), o))
             .ToArray();
 
