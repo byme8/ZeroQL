@@ -19,9 +19,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release /p:Version=$GITHUB_REF_NAME --no-restore
     - name: Push
       run: |
-        dotnet pack -c Release --no-build --verbosity normal -o ./nugets
+        dotnet pack -c Release --no-build --verbosity normal /p:Version=$GITHUB_REF_NAME -o ./nugets
         cd ./nugets
         dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 
