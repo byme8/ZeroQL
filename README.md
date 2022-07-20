@@ -7,34 +7,41 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries
 - [x] Support for mutations
-- [ ] Support for fragments(in progress)
+- [x] Support for fragments
 - [ ] Support for subscriptions
 - [ ] Support for @defer
 - [ ] Support for @stream
 
-The full article you can find [here](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
+The articles:
+- [ZeroQL - C# friendly graphql client](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
 
 # How to setup
 
 The initial setup:
 ``` bash
-dotnet new console -o QLClient # create console app
-cd QLClient # go to project folder
-curl http://localhost:10000/graphql?sdl > schema.graphql # fetch graphql schema from server(depends on your web server)
-dotnet new tool-manifest # create manifest file to track nuget tools
-dotnet tool install ZeroQL.CLI # add ZeroQL.CLI nuget tool
-dotnet add package ZeroQL # add ZeroQL nuget package
+# create console app
+dotnet new console -o QLClient
+# go to project folder 
+cd QLClient
+# fetch graphql schema from server(depends on your web server)
+curl http://localhost:10000/graphql?sdl > schema.graphql 
+# create manifest file to track nuget tools
+dotnet new tool-manifest 
+# add ZeroQL.CLI nuget tool
+dotnet tool install ZeroQL.CLI
+# add ZeroQL nuget package
+dotnet add package ZeroQL 
+# to bootstrap schema.graphql file from graphql schema
+dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
 
-Add the next target to the QLClient.csproj.
+It is possible to add next target to csproj to keep generated client in sync with schema.graphql:
 ``` xml
 <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile">
     <Exec Command="dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs" />
 </Target>
 ```
-
-The graphql client will be generated on every build.
-It allows to keep track of what is defined in the schema.graphql file.
+As a result, the graphql client will be generated on every build.
 
 # How to use
 
@@ -67,7 +74,7 @@ and we want to execute the query like that:
 query { me { id firstName lastName } }
 ```
 
-Here how we can achive it with ZeroQL:
+Here how we can achieve it with ZeroQL:
 ``` csharp
 var httpClient = new HttpClient();
 httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
@@ -89,20 +96,10 @@ Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query ($id: Int!) {
 Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
 ```
 
-You can give name to the query:
-``` csharp
-var variables = new { Id = 1 };
-var response = await client.Query("GetUser", variables, static (i, o) => o.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
-
-Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUser($id: Int!) { user(id: $id) { id firstName lastName } }
-Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
-```
-
 You can fetch attached fields:
 ``` csharp
 var variables = new { Id = 1 };
 var response = await client.Query(
-    "GetUserWithRole",
     variables,
     static (i, o) => o
         .User(i.Id,
@@ -118,24 +115,97 @@ Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUserWithRo
 Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}, Role: {response.Data.Role}"); // 1: Jon Smith, Role: Admin
 ```
 
-You can do multiple queries at the same time:
+# Fragments
+It is possible to define and reuse fragments:
 ``` csharp
+public static class UserFragments
+{
+    [GraphQLFragment]
+    public static UserDetails ToUserDetails(this User user)
+    {
+        return new UserDetails
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName
+        };
+    }
+}
+
 var variables = new { Id = 1 };
 var response = await client.Query(
-    "GetMeAndUser",
     variables,
-    static (i, o) => new
-    {
-        MyFirstName = o.Me(o => o.FirstName),
-        User = o.User(i.Id,
-            o => new
-            {
-                o.FirstName,
-                o.LastName,
-                Role = o.Role(role => role.Name)
-            })
-    });
+    static (i, q) => 
+        new 
+        { 
+            Me = q.Me(o => o.ToUserDetails()),
+            User = q.User(i.Id, o => o.ToUserDetails())
+        });
 
-Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUserWithRole($id: Int!) { me { firstName }  user(id: $id) { firstName lastName role { name }  } }
-Console.WriteLine($"Me: {response.Data.MyFirstName}, User: {response.Data.User.FirstName} {response.Data.User.LastName}, Role: {response.Data.User.Role}"); // Me: Jon, User: Jon Smith, Role: Admin
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query ($id: Int!) { me { id firstName lastName } user(id: $id) { id firstName lastName } }
+Console.WriteLine($"{response.Data.Me.Id}: {response.Data.Me.FirstName} {response.Data.Me.LastName}"); // 1: Jon Smith
+Console.WriteLine($"{response.Data.User.Id}: {response.Data.User.FirstName} {response.Data.User.LastName}"); // 1: Jon Smith
 ```
+
+The fragment has a bunch of limitations.
+It should be marked wit the `` [GraphQLFragment] `` attribute.
+It should be an extension method.
+And it has to be defined in the same assembly where the method ``Query`` is called.
+The last limitation is dictated by the fact that source generators can analyze only one assembly once.
+So, if you define a fragment in a different assembly, it will not be available for the source generator.
+
+
+# Benchmarks
+
+The full benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs)
+The short version looks like this:
+``` csharp
+[Benchmark]
+public async Task<string> Raw()
+{
+    var rawQuery = @"{ ""query"": ""query { me { firstName }}"" }";
+    var response = await httpClient.PostAsync("", new StringContent(rawQuery, Encoding.UTF8, "application/json"));
+    var responseJson = await response.Content.ReadAsStreamAsync();
+    var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
+
+    return qlResponse["data"]["me"]["firstName"].GetValue<string>();
+}
+
+[Benchmark]
+public async Task<string> StrawberryShake()
+{
+    var firstname = await strawberryShake.Me.ExecuteAsync();
+    return firstname.Data.Me.FirstName;
+}
+
+[Benchmark]
+public async Task<string> ZeroQL()
+{
+    var firstname = await zeroQLClient.Query(static q => q.Me(o => o.FirstName));
+
+    return firstname.Data;
+}
+```
+
+Here results:
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.4 (21F79) [Darwin 21.5.0]
+Apple M1, 1 CPU, 8 logical and 8 physical cores
+.NET SDK=6.0.302
+  [Host]     : .NET 6.0.7 (6.0.722.32202), Arm64 RyuJIT
+  DefaultJob : .NET 6.0.7 (6.0.722.32202), Arm64 RyuJIT
+
+
+```
+|          Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+|---------------- |---------:|--------:|--------:|-------:|----------:|
+|             Raw | 182.5 μs | 1.07 μs | 1.00 μs | 2.4414 |      5 KB |
+| StrawberryShake | 190.9 μs | 0.74 μs | 0.69 μs | 3.1738 |      6 KB |
+|          ZeroQL | 185.9 μs | 1.39 μs | 1.30 μs | 2.9297 |      6 KB |
+
+As you can see, the ``Raw`` method is the fastest.
+The ``ZeroQL`` method is a bit faster then the ``StrawberryShake`` method. 
+But in absolute terms, all of them are pretty much the same.
+At the same time, with the `` ZeroQL `` you can forget about the graphql and just use Linq-like interface.
