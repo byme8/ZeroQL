@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ZeroQL.TestApp\ZeroQL.TestApp.csproj" />
+      <ProjectReference Include="..\..\TestApp\ZeroQL.TestApp.Client\ZeroQL.TestApp.Client.csproj" />
       <ProjectReference Include="..\..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
       <ProjectReference Include="..\StrawberryShake.Client\StrawberryShake.Client.csproj" />
     </ItemGroup>

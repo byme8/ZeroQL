@@ -163,12 +163,12 @@ public class GraphQLQueryGenerator
             .OfType<AssignmentExpressionSyntax>()
             .Select(o => o.Right)
             .ToArray();
-        
+
         if (arguments is null && initializers is null)
         {
             return string.Empty;
         }
-        
+
         var expressions = new List<CSharpSyntaxNode>();
         if (arguments is not null)
         {
@@ -336,6 +336,11 @@ public class GraphQLQueryGenerator
         {
             return Failed(invocation);
         }
+
+        var newSemanticModel = generationContext.SemanticModel.Compilation
+            .GetSemanticModel(fragment.SyntaxTree);
+
+        generationContext = generationContext with { SemanticModel = newSemanticModel };
 
         var parameters = methodDeclaration.ParameterList.Parameters;
         var name = parameters.FirstOrDefault()?.Identifier.Text;

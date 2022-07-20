@@ -173,7 +173,7 @@ public class QueryTests : IntegrationTest
         await project.Validate(graphqlQuery);
     }
 
-    [Fact(Skip = "Think how to fix after release")]
+    [Fact(Skip = "Figure out how to support this")]
     public async Task SupportsAnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
         var csharpQuery = "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";

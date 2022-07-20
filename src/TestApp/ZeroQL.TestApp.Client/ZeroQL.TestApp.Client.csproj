@@ -6,4 +6,7 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\ZeroQL.Core\ZeroQL.Core.csproj" />
+    </ItemGroup>
 </Project>
