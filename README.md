@@ -148,8 +148,7 @@ Console.WriteLine($"{response.Data.Me.Id}: {response.Data.Me.FirstName} {respons
 Console.WriteLine($"{response.Data.User.Id}: {response.Data.User.FirstName} {response.Data.User.LastName}"); // 1: Jon Smith
 ```
 
-The fragment has a bunch of limitations.
-It should be marked wit the `` [GraphQLFragment] `` attribute.
+The fragment should be marked with the `` [GraphQLFragment] `` attribute. and it has a bunch of limitations.
 It should be an extension method.
 And it has to be defined in the same assembly where the method ``Query`` is called.
 The last limitation is dictated by the fact that source generators can analyze only one assembly once.
@@ -158,7 +157,7 @@ So, if you define a fragment in a different assembly, it will not be available f
 
 # Benchmarks
 
-The full benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs)
+The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs)
 The short version looks like this:
 ``` csharp
 [Benchmark]
@@ -206,6 +205,6 @@ Apple M1, 1 CPU, 8 logical and 8 physical cores
 |          ZeroQL | 185.9 μs | 1.39 μs | 1.30 μs | 2.9297 |      6 KB |
 
 As you can see, the ``Raw`` method is the fastest.
-The ``ZeroQL`` method is a bit faster then the ``StrawberryShake`` method. 
+The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 
 But in absolute terms, all of them are pretty much the same.
-At the same time, with the `` ZeroQL `` you can forget about the graphql and just use Linq-like interface.
+At the same time, with the `` ZeroQL `` you can forget about the graphql and just use the Linq-like interface.
