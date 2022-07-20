@@ -158,6 +158,7 @@ So, if you define a fragment in a different assembly, it will not be available f
 # Benchmarks
 
 The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs)
+
 The short version looks like this:
 ``` csharp
 [Benchmark]
