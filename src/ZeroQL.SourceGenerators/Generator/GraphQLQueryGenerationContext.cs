@@ -10,10 +10,33 @@ public record struct GraphQLQueryGenerationContext(
     CSharpSyntaxNode Parent,
     Dictionary<string, string> AvailableVariables,
     SemanticModel SemanticModel,
-    INamedTypeSymbol FieldSelectorAttribute,
-    INamedTypeSymbol FragmentAttribute,
     CancellationToken CancellationToken)
 {
+    private INamedTypeSymbol? fragmentAttribute = null;
+    private INamedTypeSymbol? fieldSelectorAttribute = null;
+    private SemanticModel semanticModel = SemanticModel;
+
+    public INamedTypeSymbol FragmentAttribute
+    {
+        get => fragmentAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
+    }
+
+    public INamedTypeSymbol FieldSelectorAttribute
+    {
+        get => fieldSelectorAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
+    }
+
+    public SemanticModel SemanticModel
+    {
+        readonly get => semanticModel;
+        set
+        {
+            semanticModel = value;
+            fieldSelectorAttribute = null;
+            fragmentAttribute = null;
+        }
+    }
+
     public GraphQLQueryGenerationContext WithParent(CSharpSyntaxNode parent)
     {
         return this with { Parent = parent };

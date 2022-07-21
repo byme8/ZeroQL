@@ -28,16 +28,11 @@ public class GraphQLQueryGenerator
                     o => $"{inputs.VariablesName}.{o.Name}",
                     o => "$" + o.Name.FirstToLower());
 
-        var fieldSelectorAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
-        var fragmentAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
-
         var generationContext = new GraphQLQueryGenerationContext(
             inputs.QueryName,
             lambda,
             availableVariables,
             semanticModel,
-            fieldSelectorAttribute,
-            fragmentAttribute,
             cancellationToken);
 
         var body = GenerateQuery(generationContext, lambda.Body);
@@ -328,18 +323,22 @@ public class GraphQLQueryGenerator
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
         {
-            return Failed(invocation);
+            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
         }
 
-        var fragment = method.DeclaringSyntaxReferences.First().GetSyntax();
+        var fragment = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         if (fragment is not MethodDeclarationSyntax methodDeclaration)
         {
             return Failed(invocation);
         }
 
-        var newSemanticModel = generationContext.SemanticModel.Compilation
-            .GetSemanticModel(fragment.SyntaxTree);
-
+        var compilation = GetCompilation(fragment.SyntaxTree, generationContext.SemanticModel.Compilation);
+        if (compilation.Error)
+        {
+            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+        }
+        
+        var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
         generationContext = generationContext with { SemanticModel = newSemanticModel };
 
         var parameters = methodDeclaration.ParameterList.Parameters;
@@ -443,6 +442,26 @@ public class GraphQLQueryGenerator
         }
 
         return stringBuilder.ToString();
+    }
+
+    private static Result<Compilation> GetCompilation(SyntaxTree syntaxTree, Compilation compilation)
+    {
+        if (!compilation.ContainsSyntaxTree(syntaxTree))
+        {
+            var newCompilation = compilation.References
+                .OfType<CompilationReference>()
+                .FirstOrDefault(o => o.Compilation.ContainsSyntaxTree(syntaxTree))
+                ?.Compilation;
+
+            if (newCompilation is null)
+            {
+                return new Error("Failed to find compilation");
+            }
+
+            return newCompilation;
+        }
+
+        return compilation;
     }
 
     private static Error Failed(CSharpSyntaxNode node, DiagnosticDescriptor? descriptor = null)

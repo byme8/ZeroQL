@@ -46,6 +46,14 @@ public class Descriptors
         description: "Only field selectors and fragments are allowed inside the query.",
         isEnabledByDefault: true);
     
+    public static DiagnosticDescriptor FragmentsWithoutSyntaxTree = new(
+        nameof(FragmentsWithoutSyntaxTree),
+        "Looks like, this fragment is defined in pre-compiled assembly. Such fragment can't be used in the query.",
+        "Looks like, this fragment is defined in pre-compiled assembly. Such fragment can't be used in the query.",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+    
     public static DiagnosticDescriptor GraphQLQueryPreview = new(
         nameof(GraphQLQueryPreview),
         string.Empty,

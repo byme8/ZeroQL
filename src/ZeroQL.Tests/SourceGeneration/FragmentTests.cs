@@ -105,8 +105,8 @@ public class FragmentTests : IntegrationTest
         response.Data.Role.Should().Be("Admin");
     }
 
-    [Fact(Skip = "Figure out how to support this")]
-    public async Task CanLoadFragmentWithoutSyntaxTree()
+    [Fact]
+    public async Task CanLoadFragmentFromDifferentProject()
     {
         var csharpQuery = "static q => q.Me(o => o.AsUserFromDifferentAssembly())";
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
