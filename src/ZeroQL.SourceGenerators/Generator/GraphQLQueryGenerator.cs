@@ -332,8 +332,9 @@ public class GraphQLQueryGenerator
             return Failed(invocation);
         }
 
-        var compilation = GetCompilation(fragment.SyntaxTree, generationContext.SemanticModel.Compilation);
-        if (compilation.Error)
+        var currentCompilation = generationContext.SemanticModel.Compilation;
+        var compilation = GetCompilation(fragment.SyntaxTree, currentCompilation);
+        if (compilation.Error || compilation.Value != currentCompilation)
         {
             return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
         }

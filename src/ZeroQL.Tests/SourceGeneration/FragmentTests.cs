@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Xunit;
 using ZeroQL.Core;
+using ZeroQL.SourceGenerators;
+using ZeroQL.SourceGenerators.Generator;
 using ZeroQL.TestApp.Models;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
@@ -106,7 +108,7 @@ public class FragmentTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CanLoadFragmentFromDifferentProject()
+    public async Task FailsToLoadFragmentFromDifferentProject()
     {
         var csharpQuery = "static q => q.Me(o => o.AsUserFromDifferentAssembly())";
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
@@ -114,11 +116,10 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var diagnostics = await project.ApplyGenerator(new GraphQLQuerySourceGenerator());
 
-        response.Data.FirstName.Should().Be("Jon");
-        response.Data.LastName.Should().Be("Smith");
-        response.Data.Role.Should().Be("Admin");
+        diagnostics.Should()
+            .Contain(o => o.Descriptor.Id == Descriptors.FragmentsWithoutSyntaxTree.Id);
     }
 
 }
