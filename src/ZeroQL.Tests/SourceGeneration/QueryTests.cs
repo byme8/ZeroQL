@@ -133,6 +133,21 @@ public class QueryTests : IntegrationTest
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
     }
+    
+    [Fact]
+    public async Task QueryPreviewGenerated()
+    {
+        var csharpQuery = "static q => new { Me = q.Me(o => new { o.FirstName }) }";
+        var graphqlQuery = @"{ me { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var queryPreview = diagnostics!.First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
+        
+        queryPreview.GetMessage().Should().Be(graphqlQuery);
+    }
 
     [Fact]
     public async Task SupportsAnonymousTypeInQueryRoot()
@@ -158,7 +173,7 @@ public class QueryTests : IntegrationTest
         await project.Validate(graphqlQuery);
     }
 
-    [Fact(Skip = "Think how to fix after release")]
+    [Fact(Skip = "Figure out how to support this")]
     public async Task SupportsAnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
         var csharpQuery = "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";

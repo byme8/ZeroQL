@@ -86,6 +86,13 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
         {
             context.ReportDiagnostic(error.Data);
         }
+        else
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                    Descriptors.GraphQLQueryPreview,
+                    memberAccess.Name.GetLocation(),
+                    query.Value));
+        }
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -94,5 +101,6 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUserOutScopeValues,
             Descriptors.FailedToConvert,
-            Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
+            Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
+            Descriptors.GraphQLQueryPreview);
 }

@@ -33,20 +33,3 @@ public class Program
         return response;
     }
 }
-
-public static class QueryFragments
-{
-    [GraphQLFragment]
-    public static UserModal AsUserWithRoleNameBody(this User user)
-    {
-        return new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
-    }
-
-    [GraphQLFragment]
-    public static UserModal AsUserWithRoleNameExpression(this User user)
-        => new UserModal(user.FirstName, user.LastName, user.Role(o => o.Name));
-
-    [GraphQLFragment]
-    public static UserModal? GetUserById(this Query query, int id)
-        => query.User(id, o => o!.AsUserWithRoleNameBody());
-}

@@ -28,16 +28,11 @@ public class GraphQLQueryGenerator
                     o => $"{inputs.VariablesName}.{o.Name}",
                     o => "$" + o.Name.FirstToLower());
 
-        var fieldSelectorAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
-        var fragmentAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
-
         var generationContext = new GraphQLQueryGenerationContext(
             inputs.QueryName,
             lambda,
             availableVariables,
             semanticModel,
-            fieldSelectorAttribute,
-            fragmentAttribute,
             cancellationToken);
 
         var body = GenerateQuery(generationContext, lambda.Body);
@@ -159,12 +154,28 @@ public class GraphQLQueryGenerator
     private static Result<string> HandleObjectCreation(GraphQLQueryGenerationContext generationContext, ObjectCreationExpressionSyntax objectCreation)
     {
         var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
-        if (arguments is null)
+        var initializers = objectCreation.Initializer?.Expressions
+            .OfType<AssignmentExpressionSyntax>()
+            .Select(o => o.Right)
+            .ToArray();
+
+        if (arguments is null && initializers is null)
         {
             return string.Empty;
         }
 
-        var results = arguments
+        var expressions = new List<CSharpSyntaxNode>();
+        if (arguments is not null)
+        {
+            expressions.AddRange(arguments);
+        }
+
+        if (initializers is not null)
+        {
+            expressions.AddRange(initializers);
+        }
+
+        var results = expressions
             .Select(o => GenerateQuery(generationContext.WithParent(objectCreation), o))
             .ToArray();
 
@@ -312,14 +323,24 @@ public class GraphQLQueryGenerator
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
         {
-            return Failed(invocation);
+            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
         }
 
-        var fragment = method.DeclaringSyntaxReferences.First().GetSyntax();
+        var fragment = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         if (fragment is not MethodDeclarationSyntax methodDeclaration)
         {
             return Failed(invocation);
         }
+
+        var currentCompilation = generationContext.SemanticModel.Compilation;
+        var compilation = GetCompilation(fragment.SyntaxTree, currentCompilation);
+        if (compilation.Error || compilation.Value != currentCompilation)
+        {
+            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+        }
+        
+        var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
+        generationContext = generationContext with { SemanticModel = newSemanticModel };
 
         var parameters = methodDeclaration.ParameterList.Parameters;
         var name = parameters.FirstOrDefault()?.Identifier.Text;
@@ -422,6 +443,26 @@ public class GraphQLQueryGenerator
         }
 
         return stringBuilder.ToString();
+    }
+
+    private static Result<Compilation> GetCompilation(SyntaxTree syntaxTree, Compilation compilation)
+    {
+        if (!compilation.ContainsSyntaxTree(syntaxTree))
+        {
+            var newCompilation = compilation.References
+                .OfType<CompilationReference>()
+                .FirstOrDefault(o => o.Compilation.ContainsSyntaxTree(syntaxTree))
+                ?.Compilation;
+
+            if (newCompilation is null)
+            {
+                return new Error("Failed to find compilation");
+            }
+
+            return newCompilation;
+        }
+
+        return compilation;
     }
 
     private static Error Failed(CSharpSyntaxNode node, DiagnosticDescriptor? descriptor = null)

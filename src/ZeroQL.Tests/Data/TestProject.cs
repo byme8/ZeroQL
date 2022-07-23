@@ -16,7 +16,9 @@ public static class TestProject
     static TestProject()
     {
         var manager = new AnalyzerManager();
-        manager.GetProject(@"../../../../ZeroQL.TestApp/ZeroQL.TestApp.csproj");
+        manager.GetProject(@"../../../../TestApp/ZeroQL.TestApp/ZeroQL.TestApp.csproj");
+        manager.GetProject(@"../../../../TestApp/ZeroQL.TestApp.Client/ZeroQL.TestApp.Client.csproj");
+        manager.GetProject(@"../../../../TestApp/ZeroQL.TestApp.Models/ZeroQL.TestApp.Models.csproj");
         Workspace = manager.GetWorkspace();
 
         Project = Workspace.CurrentSolution.Projects.First(o => o.Name == "ZeroQL.TestApp");

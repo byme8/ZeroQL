@@ -15,7 +15,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class KeyValuePairOfStringAndString
     {
         public string Key { get; set; }
@@ -23,7 +23,7 @@ namespace GraphQL.TestServer
         public string Value { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Mutation
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
@@ -36,7 +36,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Query
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
@@ -123,7 +123,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Role
     {
         public int Id { get; set; }
@@ -131,7 +131,7 @@ namespace GraphQL.TestServer
         public string Name { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TypesContainer
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
@@ -229,7 +229,7 @@ namespace GraphQL.TestServer
         public DateTimeOffset? Value32 { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class User
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
@@ -250,7 +250,7 @@ namespace GraphQL.TestServer
         }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class PageInput
     {
         public int Count { get; set; }
@@ -258,7 +258,7 @@ namespace GraphQL.TestServer
         public int Size { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class UserFilterInput
     {
         public UserKind UserKind { get; set; }
@@ -266,7 +266,7 @@ namespace GraphQL.TestServer
         public PageInput? Page { get; set; }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.3.0" )]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public enum UserKind
     {
         Good,

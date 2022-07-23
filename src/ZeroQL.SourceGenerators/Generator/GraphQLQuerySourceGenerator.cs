@@ -45,6 +45,7 @@ public class GraphQLQuerySourceGenerator : ISourceGenerator
             var query = GraphQLQueryGenerator.Generate(semanticModel, argumentSyntax.Expression, context.CancellationToken);
             if (query.Error is ErrorWithData<Diagnostic> error)
             {
+                context.ReportDiagnostic(error.Data);
                 return;
             }
 
