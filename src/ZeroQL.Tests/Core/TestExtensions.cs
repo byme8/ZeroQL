@@ -89,6 +89,17 @@ public static class TestExtensions
         var result = driver.GetRunResult();
         return result.Diagnostics.ToArray();
     }
+    
+    public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, IIncrementalGenerator generator)
+    {
+        var compilation = await project.GetCompilationAsync();
+
+        var driver = CSharpGeneratorDriver.Create(generator)
+            .RunGenerators(compilation!);
+
+        var result = driver.GetRunResult();
+        return result.Diagnostics.ToArray();
+    }
 
     public static async Task<Diagnostic[]?> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
     {

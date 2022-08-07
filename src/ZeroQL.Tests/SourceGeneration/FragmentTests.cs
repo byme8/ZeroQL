@@ -116,7 +116,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyGenerator(new GraphQLQuerySourceGenerator());
+        var diagnostics = await project.ApplyGenerator(new GraphQLQueryIncrementalSourceGenerator());
 
         diagnostics.Should()
             .Contain(o => o.Descriptor.Id == Descriptors.FragmentsWithoutSyntaxTree.Id);
