@@ -13,3 +13,14 @@ public class GraphQLFragment : Attribute
 {
     
 }
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public class GraphQLQueryTemplate : Attribute
+{
+    public GraphQLQueryTemplate(string query)
+    {
+        Query = query;
+    }
+
+    public string Query { get; }
+}

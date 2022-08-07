@@ -14,11 +14,17 @@ public record struct GraphQLQueryGenerationContext(
 {
     private INamedTypeSymbol? fragmentAttribute = null;
     private INamedTypeSymbol? fieldSelectorAttribute = null;
+    private INamedTypeSymbol? fragmentQueryAttribute = null;
     private SemanticModel semanticModel = SemanticModel;
 
     public INamedTypeSymbol FragmentAttribute
     {
         get => fragmentAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
+    }
+    
+    public INamedTypeSymbol FragmentQueryAttribute
+    {
+        get => fragmentQueryAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLQueryTemplateAttribute)!;
     }
 
     public INamedTypeSymbol FieldSelectorAttribute

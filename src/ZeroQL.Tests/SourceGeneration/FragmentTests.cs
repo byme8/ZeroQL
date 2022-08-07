@@ -108,18 +108,35 @@ public class FragmentTests : IntegrationTest
     }
 
     [Fact]
-    public async Task FailsToLoadFragmentFromDifferentProject()
+    public async Task CanLoadFragmentFromDifferentProject()
     {
         var csharpQuery = "static q => q.Me(o => o.AsUserFromDifferentAssembly())";
-        var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
+        var graphqlQuery = @"query { me { firstName lastName role { name } } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyGenerator(new GraphQLQueryIncrementalSourceGenerator());
+        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
 
-        diagnostics.Should()
-            .Contain(o => o.Descriptor.Id == Descriptors.FragmentsWithoutSyntaxTree.Id);
+        response.Data.FirstName.Should().Be("Jon");
+        response.Data.LastName.Should().Be("Smith");
+        response.Data.Role.Should().Be("Admin");
+    }
+    
+    [Fact]
+    public async Task CanLoadFragmentFromDifferentProjectWitharguments()
+    {
+        var csharpQuery = "new { Id = 1 }, static (i, q) => q.AsUserFromDifferentAssembly(i.Id)";
+        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name } }}";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+
+        response.Data.FirstName.Should().Be("Jon");
+        response.Data.LastName.Should().Be("Smith");
+        response.Data.Role.Should().Be("Admin");
     }
 
 }

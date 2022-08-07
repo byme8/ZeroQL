@@ -334,11 +334,26 @@ public class GraphQLQueryGenerator
 
         var currentCompilation = generationContext.SemanticModel.Compilation;
         var compilation = GetCompilation(fragment.SyntaxTree, currentCompilation);
-        if (compilation.Error || compilation.Value != currentCompilation)
+        if (compilation.Error || currentCompilation != compilation.Value)
         {
-            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+            var methodHasTemplate = method
+                .GetAttributes()
+                .Any(o => o.AttributeClass == generationContext.FragmentQueryAttribute);
+
+            if (!methodHasTemplate)
+            {
+                return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+            }
+
+            var result = HandleFragmentWithoutSyntaxTree(generationContext, invocation, method);
+            if (result.Error)
+            {
+                return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+            }
+
+            return result;
         }
-        
+
         var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
         generationContext = generationContext with { SemanticModel = newSemanticModel };
 
@@ -400,6 +415,53 @@ public class GraphQLQueryGenerator
         }
 
         return Failed(invocation);
+    }
+
+    private static Result<string> HandleFragmentWithoutSyntaxTree(GraphQLQueryGenerationContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    {
+        var graphQLQueryTemplate = method
+            .GetAttributes()
+            .FirstOrDefault(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FragmentQueryAttribute))?
+            .ConstructorArguments
+            .FirstOrDefault()
+            .Value?
+            .ToString();
+
+        if (graphQLQueryTemplate is null)
+        {
+            return new Error("Fragment query is not found");
+        }
+
+        var parameters = method.Parameters;
+        var variablesToMap = parameters
+            .Select(o => o.Name)
+            .ToArray();
+
+        var inputVariables = invocation.ArgumentList.Arguments;
+        var variables = inputVariables
+            .Select((o, i) => (Key: variablesToMap[i], Value: HandleArgumentAsVariable(context, o)))
+            .ToArray();
+
+        for (int i = 0; i < variables.Length; i++)
+        {
+            var variable = variables[i];
+            if (variable.Value.Error)
+            {
+                return Failed(invocation.ArgumentList.Arguments[i]);
+            }
+        }
+
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return new Error(Cancelled);
+        }
+
+        var finalGraphQLQuery = variables
+            .Aggregate(
+                graphQLQueryTemplate,
+                (current, variable) => current.Replace($"{{{{{variable.Key}}}}}", variable.Value.Value));
+
+        return finalGraphQLQuery;
     }
 
     private static Result<string> HandleFieldSelector(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
