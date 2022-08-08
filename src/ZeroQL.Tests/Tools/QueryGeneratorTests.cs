@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Xunit;
-using ZeroQL.SourceGenerators.Generator;
+using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
@@ -43,7 +43,7 @@ public class QueryGeneratorTests : IAsyncLifetime
     {
         for (int i = 0; i < 100000; i++)
         {
-            var query = GraphQLQueryGenerator.Generate(semanticModel, expression, CancellationToken.None);
+            var query = GraphQLQueryResolver.Resolve(semanticModel, expression, CancellationToken.None);
         }
     }
 }

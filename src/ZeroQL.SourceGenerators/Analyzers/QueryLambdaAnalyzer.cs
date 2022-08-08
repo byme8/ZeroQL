@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using ZeroQL.SourceGenerators.Generator;
+using ZeroQL.SourceGenerators.Resolver;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -81,7 +81,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
         var semanticModel = context.SemanticModel;
         var argumentSyntax = invocation.ArgumentList.Arguments.Last();
-        var query = GraphQLQueryGenerator.Generate(semanticModel, argumentSyntax.Expression, context.CancellationToken);
+        var query = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken);
         if (query.Error is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);
@@ -98,6 +98,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
         = ImmutableArray.Create(
             Descriptors.OnlyStaticLambda,
+            Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUserOutScopeValues,
             Descriptors.FailedToConvert,

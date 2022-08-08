@@ -89,16 +89,45 @@ public static class TestExtensions
         var result = driver.GetRunResult();
         return result.Diagnostics.ToArray();
     }
-    
+
     public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, IIncrementalGenerator generator)
     {
-        var compilation = await project.GetCompilationAsync();
+        project = await project.RemoveSyntaxTreesFromReferences();
 
+        var projectCompilation = await project.GetCompilationAsync();
         var driver = CSharpGeneratorDriver.Create(generator)
-            .RunGenerators(compilation!);
+            .RunGenerators(projectCompilation!);
 
         var result = driver.GetRunResult();
-        return result.Diagnostics.ToArray();
+        return result.Diagnostics.Where(o => o.Severity == DiagnosticSeverity.Error).ToArray();
+    }
+
+    public static async Task<Project> RemoveSyntaxTreesFromReferences(this Project project)
+    {
+        var solution = project.Solution;
+        var projectReferencesCompilationTasks = project.ProjectReferences
+            .Select(o => solution.GetProject(o.ProjectId)!.GetCompilationAsync())
+            .ToArray();
+
+        var compilations = await Task.WhenAll(projectReferencesCompilationTasks);
+        var assembliesAsBytes = compilations
+            .Select(o =>
+            {
+                var memoryStream = new MemoryStream();
+                o.Emit(memoryStream);
+                return memoryStream.ToArray();
+            })
+            .ToArray();
+
+        var metadataReferences = assembliesAsBytes
+            .Select(o => MetadataReference.CreateFromImage(o))
+            .ToArray();
+
+        project = project
+            .WithProjectReferences(Enumerable.Empty<ProjectReference>())
+            .AddMetadataReferences(metadataReferences);
+
+        return project;
     }
 
     public static async Task<Diagnostic[]?> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)

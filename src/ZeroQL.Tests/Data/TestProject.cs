@@ -39,6 +39,7 @@ public static class TestProject
 
     public static async Task<IGraphQLResult> Validate(this Project project, string graphqlQuery, bool checkError = true)
     {
+        project = await project.RemoveSyntaxTreesFromReferences();
         var assembly = await project.CompileToRealAssembly();
         var response = await assembly.ExecuteRequest();
 

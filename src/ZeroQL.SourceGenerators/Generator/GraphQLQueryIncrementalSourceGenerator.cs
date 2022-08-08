@@ -3,6 +3,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ZeroQL.SourceGenerators.Resolver;
 
 namespace ZeroQL.SourceGenerators.Generator;
 
@@ -41,7 +42,7 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
 
         var argumentSyntax = invocation.Invocation.ArgumentList.Arguments.Last();
         var key = argumentSyntax.ToString();
-        var query = GraphQLQueryGenerator.Generate(semanticModel, argumentSyntax.Expression, context.CancellationToken);
+        var query = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken);
         if (query.Error is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);

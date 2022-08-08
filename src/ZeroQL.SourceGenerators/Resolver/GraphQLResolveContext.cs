@@ -3,9 +3,9 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace ZeroQL.SourceGenerators.Generator;
+namespace ZeroQL.SourceGenerators.Resolver;
 
-public record struct GraphQLQueryGenerationContext(
+public record struct GraphQLResolveContext(
     string QueryVariableName,
     CSharpSyntaxNode Parent,
     Dictionary<string, string> AvailableVariables,
@@ -43,12 +43,12 @@ public record struct GraphQLQueryGenerationContext(
         }
     }
 
-    public GraphQLQueryGenerationContext WithParent(CSharpSyntaxNode parent)
+    public GraphQLResolveContext WithParent(CSharpSyntaxNode parent)
     {
         return this with { Parent = parent };
     }
 
-    public GraphQLQueryGenerationContext WithVariableName(string name)
+    public GraphQLResolveContext WithVariableName(string name)
     {
         return this with { QueryVariableName = name };
     }

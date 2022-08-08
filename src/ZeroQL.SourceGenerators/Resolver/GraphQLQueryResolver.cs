@@ -7,13 +7,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace ZeroQL.SourceGenerators.Generator;
+namespace ZeroQL.SourceGenerators.Resolver;
 
-public class GraphQLQueryGenerator
+public class GraphQLQueryResolver
 {
     public const string Cancelled = nameof(Cancelled);
 
-    public static Result<string> Generate(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
+    public static Result<string> Resolve(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
     {
         if (query is not LambdaExpressionSyntax lambda)
         {
@@ -28,14 +28,14 @@ public class GraphQLQueryGenerator
                     o => $"{inputs.VariablesName}.{o.Name}",
                     o => "$" + o.Name.FirstToLower());
 
-        var generationContext = new GraphQLQueryGenerationContext(
+        var generationContext = new GraphQLResolveContext(
             inputs.QueryName,
             lambda,
             availableVariables,
             semanticModel,
             cancellationToken);
 
-        var body = GenerateQuery(generationContext, lambda.Body);
+        var body = ResolveQuery(generationContext, lambda.Body);
         if (body.Error)
         {
             return body;
@@ -101,7 +101,7 @@ public class GraphQLQueryGenerator
             .ToArray();
     }
 
-    private static Result<string> GenerateQuery(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node)
+    private static Result<string> ResolveQuery(GraphQLResolveContext generationContext, CSharpSyntaxNode node)
     {
         if (generationContext.CancellationToken.IsCancellationRequested)
         {
@@ -140,7 +140,7 @@ public class GraphQLQueryGenerator
             }
             case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
             {
-                return GenerateQuery(generationContext.WithParent(anonymousMember), anonymousMember.Expression);
+                return ResolveQuery(generationContext.WithParent(anonymousMember), anonymousMember.Expression);
             }
             case ObjectCreationExpressionSyntax objectCreation:
             {
@@ -151,7 +151,7 @@ public class GraphQLQueryGenerator
         return Failed(node);
     }
 
-    private static Result<string> HandleObjectCreation(GraphQLQueryGenerationContext generationContext, ObjectCreationExpressionSyntax objectCreation)
+    private static Result<string> HandleObjectCreation(GraphQLResolveContext generationContext, ObjectCreationExpressionSyntax objectCreation)
     {
         var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
         var initializers = objectCreation.Initializer?.Expressions
@@ -176,7 +176,7 @@ public class GraphQLQueryGenerator
         }
 
         var results = expressions
-            .Select(o => GenerateQuery(generationContext.WithParent(objectCreation), o))
+            .Select(o => ResolveQuery(generationContext.WithParent(objectCreation), o))
             .ToArray();
 
         if (results.Any(o => o.Error))
@@ -187,17 +187,17 @@ public class GraphQLQueryGenerator
         return results.Select(o => o.Value).Join(" ");
     }
 
-    private static Result<string> HandleArgumentAsObjectCreation(GraphQLQueryGenerationContext generationContext, ArgumentSyntax argument)
+    private static Result<string> HandleArgumentAsObjectCreation(GraphQLResolveContext generationContext, ArgumentSyntax argument)
     {
-        return GenerateQuery(generationContext.WithParent(argument), argument.Expression);
+        return ResolveQuery(generationContext.WithParent(argument), argument.Expression);
     }
 
-    private static Result<string> HandleAnonymousObjectCreation(GraphQLQueryGenerationContext generationContext, AnonymousObjectCreationExpressionSyntax anonymous)
+    private static Result<string> HandleAnonymousObjectCreation(GraphQLResolveContext generationContext, AnonymousObjectCreationExpressionSyntax anonymous)
     {
         var initializers = new List<string>(anonymous.Initializers.Count);
         foreach (var initializer in anonymous.Initializers)
         {
-            var result = GenerateQuery(generationContext, initializer);
+            var result = ResolveQuery(generationContext, initializer);
             if (result.Error)
             {
                 return result.Error;
@@ -209,7 +209,7 @@ public class GraphQLQueryGenerator
         return initializers.Join(" ");
     }
 
-    private static Result<string> HandleArgumentAsVariable(GraphQLQueryGenerationContext generationContext, ArgumentSyntax argument)
+    private static Result<string> HandleArgumentAsVariable(GraphQLResolveContext generationContext, ArgumentSyntax argument)
     {
         if (argument.Expression is LiteralExpressionSyntax literal)
         {
@@ -239,7 +239,7 @@ public class GraphQLQueryGenerator
         return Failed(argument);
     }
 
-    private static Result<string> HandlerSimpleLambda(GraphQLQueryGenerationContext generationContext, SimpleLambdaExpressionSyntax simpleLambda)
+    private static Result<string> HandlerSimpleLambda(GraphQLResolveContext generationContext, SimpleLambdaExpressionSyntax simpleLambda)
     {
         if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
         {
@@ -249,10 +249,10 @@ public class GraphQLQueryGenerator
         var parameter = simpleLambda.Parameter.Identifier.ValueText;
         var childGenerationContext = generationContext with { QueryVariableName = parameter };
 
-        return GenerateQuery(childGenerationContext.WithParent(simpleLambda), simpleLambda.Body);
+        return ResolveQuery(childGenerationContext.WithParent(simpleLambda), simpleLambda.Body);
     }
 
-    private static Result<string> HanleIndentifier(GraphQLQueryGenerationContext generationContext, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
+    private static Result<string> HanleIndentifier(GraphQLResolveContext generationContext, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
     {
         if (identifierNameSyntax.Identifier.ValueText == generationContext.QueryVariableName)
         {
@@ -262,11 +262,11 @@ public class GraphQLQueryGenerator
         return Failed(node);
     }
 
-    private static Result<string> HandleMemberAccess(GraphQLQueryGenerationContext generationContext, MemberAccessExpressionSyntax member)
+    private static Result<string> HandleMemberAccess(GraphQLResolveContext generationContext, MemberAccessExpressionSyntax member)
     {
         if (member.Expression is MemberAccessExpressionSyntax left)
         {
-            return GenerateQuery(generationContext.WithParent(member), left);
+            return ResolveQuery(generationContext.WithParent(member), left);
         }
 
         if (member.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == generationContext.QueryVariableName)
@@ -277,7 +277,7 @@ public class GraphQLQueryGenerator
         return Failed(member.Expression);
     }
 
-    private static Result<string> HandleInvocation(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation)
+    private static Result<string> HandleInvocation(GraphQLResolveContext generationContext, InvocationExpressionSyntax invocation)
     {
         if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName } &&
             identifierName.Identifier.ValueText != generationContext.QueryVariableName)
@@ -319,11 +319,26 @@ public class GraphQLQueryGenerator
 
     }
 
-    private static Result<string> HandleFragment(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFragment(GraphQLResolveContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
         {
-            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
+            var methodHasTemplate = method
+                .GetAttributes()
+                .Any(o => o.AttributeClass == generationContext.FragmentQueryAttribute);
+
+            if (!methodHasTemplate)
+            {
+                return new Error("Method without template");
+            }
+
+            var result = HandleFragmentWithoutSyntaxTree(generationContext, invocation, method);
+            if (result.Error)
+            {
+                return new Error("Failed Fragment with out Syntax Tree");
+            }
+
+            return result;
         }
 
         var fragment = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
@@ -336,22 +351,7 @@ public class GraphQLQueryGenerator
         var compilation = GetCompilation(fragment.SyntaxTree, currentCompilation);
         if (compilation.Error || currentCompilation != compilation.Value)
         {
-            var methodHasTemplate = method
-                .GetAttributes()
-                .Any(o => o.AttributeClass == generationContext.FragmentQueryAttribute);
-
-            if (!methodHasTemplate)
-            {
-                return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
-            }
-
-            var result = HandleFragmentWithoutSyntaxTree(generationContext, invocation, method);
-            if (result.Error)
-            {
-                return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
-            }
-
-            return result;
+            return Failed(invocation, Descriptors.FragmentsWithoutSyntaxTree);
         }
 
         var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
@@ -398,7 +398,7 @@ public class GraphQLQueryGenerator
         {
             if (methodDeclaration.Body.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
             {
-                return GenerateQuery(newContext.WithParent(returnStatement), returnStatement.Expression);
+                return ResolveQuery(newContext.WithParent(returnStatement), returnStatement.Expression);
             }
 
             return Failed(methodDeclaration.Body.Statements.First());
@@ -411,13 +411,13 @@ public class GraphQLQueryGenerator
 
         if (methodDeclaration.ExpressionBody is not null)
         {
-            return GenerateQuery(newContext.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
+            return ResolveQuery(newContext.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
         }
 
         return Failed(invocation);
     }
 
-    private static Result<string> HandleFragmentWithoutSyntaxTree(GraphQLQueryGenerationContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFragmentWithoutSyntaxTree(GraphQLResolveContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
     {
         var graphQLQueryTemplate = method
             .GetAttributes()
@@ -464,7 +464,7 @@ public class GraphQLQueryGenerator
         return finalGraphQLQuery;
     }
 
-    private static Result<string> HandleFieldSelector(GraphQLQueryGenerationContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFieldSelector(GraphQLResolveContext generationContext, InvocationExpressionSyntax invocation, IMethodSymbol method)
     {
         var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
@@ -479,7 +479,7 @@ public class GraphQLQueryGenerator
         {
             var graphQLArguments = invocation.ArgumentList.Arguments
                 .Take(argumentNames.Length)
-                .Select(o => GenerateQuery(generationContext.WithParent(o), o))
+                .Select(o => ResolveQuery(generationContext.WithParent(o), o))
                 .ToArray();
 
             if (graphQLArguments.Any(o => o.Error))
@@ -496,7 +496,7 @@ public class GraphQLQueryGenerator
         }
         if (ignoreLastParameter)
         {
-            var generateBody = GenerateQuery(generationContext.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
+            var generateBody = ResolveQuery(generationContext.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
             if (generateBody.Error)
             {
                 return generateBody;
