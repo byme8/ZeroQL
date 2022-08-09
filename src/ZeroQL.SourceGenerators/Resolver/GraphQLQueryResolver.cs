@@ -11,7 +11,7 @@ namespace ZeroQL.SourceGenerators.Resolver;
 
 public class GraphQLQueryResolver
 {
-    public const string Cancelled = nameof(Cancelled);
+    public const string CANCELLED = nameof(CANCELLED);
 
     public static Result<string> Resolve(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
     {
@@ -141,7 +141,7 @@ public class GraphQLQueryResolver
     {
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(Cancelled);
+            return new Error(CANCELLED);
         }
 
         switch (node)
@@ -283,9 +283,9 @@ public class GraphQLQueryResolver
         }
 
         var parameter = simpleLambda.Parameter.Identifier.ValueText;
-        var childcontext = context with { QueryVariableName = parameter };
+        var childContext = context with { QueryVariableName = parameter };
 
-        return ResolveQuery(childcontext.WithParent(simpleLambda), simpleLambda.Body);
+        return ResolveQuery(childContext.WithParent(simpleLambda), simpleLambda.Body);
     }
 
     private static Result<string> HanleIndentifier(GraphQLResolveContext context, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
@@ -318,7 +318,7 @@ public class GraphQLQueryResolver
         if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName } &&
             identifierName.Identifier.ValueText != context.QueryVariableName)
         {
-            return Failed(identifierName, Descriptors.DontUserOutScopeValues);
+            return Failed(identifierName, Descriptors.DontUseOutScopeValues);
         }
 
         var symbol = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken);
@@ -329,7 +329,7 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(Cancelled);
+            return new Error(CANCELLED);
         }
 
         var attributes = method
@@ -351,7 +351,7 @@ public class GraphQLQueryResolver
 
         if (hasFragmentTemplate)
         {
-            return HandleFragmentTemplate(context, invocation, method);
+            return HandleFragmentWithoutSyntaxTree(context, invocation, method);
         }
 
         if (hasFieldSelector)
@@ -367,7 +367,7 @@ public class GraphQLQueryResolver
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
         {
-            return HandleFragmentTemplate(context, invocation, method);
+            return HandleFragmentWithoutSyntaxTree(context, invocation, method);
         }
 
         var fragment = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
@@ -413,7 +413,7 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(Cancelled);
+            return new Error(CANCELLED);
         }
 
         var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
@@ -424,26 +424,6 @@ public class GraphQLQueryResolver
         };
 
         return HandleFragmentBody(context, invocation, methodDeclaration);
-    }
-
-    private static Result<string> HandleFragmentTemplate(GraphQLResolveContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
-    {
-        var methodHasTemplate = method
-            .GetAttributes()
-            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.TemplateAttribute));
-
-        if (!methodHasTemplate)
-        {
-            return new Error("Method without template");
-        }
-
-        var result = HandleFragmentWithoutSyntaxTree(context, invocation, method);
-        if (result.Error)
-        {
-            return new Error("Failed Fragment with out Syntax Tree");
-        }
-
-        return result;
     }
 
     private static Result<string> HandleFragmentBody(GraphQLResolveContext context, CSharpSyntaxNode node, MethodDeclarationSyntax methodDeclaration)
@@ -460,7 +440,7 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(Cancelled);
+            return new Error(CANCELLED);
         }
 
         if (methodDeclaration.ExpressionBody is not null)
@@ -483,7 +463,7 @@ public class GraphQLQueryResolver
 
         if (graphQLQueryTemplate is null)
         {
-            return new Error("Fragment query is not found");
+            return Failed(invocation);
         }
 
         var parameters = method.Parameters;
@@ -492,13 +472,13 @@ public class GraphQLQueryResolver
             .ToArray();
 
         var inputVariables = invocation.ArgumentList.Arguments;
-        var variables = inputVariables
+        var fragmentVariablesToInputVariables = inputVariables
             .Select((o, i) => (Key: variablesToMap[i], Value: HandleArgumentAsVariable(context, o)))
             .ToArray();
 
-        for (int i = 0; i < variables.Length; i++)
+        for (int i = 0; i < fragmentVariablesToInputVariables.Length; i++)
         {
-            var variable = variables[i];
+            var variable = fragmentVariablesToInputVariables[i];
             if (variable.Value.Error)
             {
                 return Failed(invocation.ArgumentList.Arguments[i]);
@@ -507,10 +487,10 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(Cancelled);
+            return new Error(CANCELLED);
         }
 
-        var finalGraphQLQuery = variables
+        var finalGraphQLQuery = fragmentVariablesToInputVariables
             .Aggregate(
                 graphQLQueryTemplate,
                 (current, variable) => current.Replace($"{{{{{variable.Key}}}}}", variable.Value.Value));

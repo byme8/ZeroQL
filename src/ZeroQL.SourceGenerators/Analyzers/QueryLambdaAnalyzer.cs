@@ -102,7 +102,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.OnlyStaticLambda,
             Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
-            Descriptors.DontUserOutScopeValues,
+            Descriptors.DontUseOutScopeValues,
             Descriptors.FailedToConvert,
             Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
             Descriptors.GraphQLQueryPreview);
