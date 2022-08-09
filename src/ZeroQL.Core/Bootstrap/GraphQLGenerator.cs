@@ -94,15 +94,7 @@ using System.Text.Json.Serialization;
     }
 
     private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition input)
-    {
-        var typeDefinition = new ClassDefinition
-        {
-            Name = input.Name.StringValue,
-            Properties = CretePropertyDefinition(typeFormatter, input)
-        };
-
-        return typeDefinition;
-    }
+        => new(input.Name.StringValue, CretePropertyDefinition(typeFormatter, input));
 
     private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
     {
@@ -326,27 +318,15 @@ using System.Text.Json.Serialization;
     }
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
-    {
-        var typeDefinition = new ClassDefinition
-        {
-            Name = type.Name.StringValue,
-            Properties = CretePropertyDefinition(typeFormatter, type)
-        };
-
-        return typeDefinition;
-    }
+        => new(type.Name.StringValue, CretePropertyDefinition(typeFormatter, type));
 
     private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition typeQL)
     {
-        return typeQL.Fields?.Select(field =>
+        return typeQL.Fields?
+            .Select(field =>
             {
                 var type = typeFormatter.GetTypeDefinition(field.Type);
-                return new FieldDefinition
-                {
-                    Name = field.Name.StringValue.FirstToUpper(),
-                    TypeDefinition = type,
-                    Arguments = Array.Empty<ArgumentDefinition>()
-                };
+                return new FieldDefinition(field.Name.StringValue.FirstToUpper(), type, Array.Empty<ArgumentDefinition>());
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
@@ -356,14 +336,12 @@ using System.Text.Json.Serialization;
         return typeQL.Fields?.Select(field =>
             {
                 var type = typeFormatter.GetTypeDefinition(field.Type);
-                return new FieldDefinition
-                {
-                    Name = field.Name.StringValue.FirstToUpper(),
-                    TypeDefinition = type,
-                    Arguments = field.Arguments?
-                        .Select(arg => new ArgumentDefinition { Name = arg.Name.StringValue, TypeName = typeFormatter.GetTypeDefinition(arg.Type).Name })
-                        .ToArray() ?? Array.Empty<ArgumentDefinition>()
-                };
+                return new FieldDefinition(
+                    field.Name.StringValue.FirstToUpper(),
+                    type,
+                    field.Arguments?
+                        .Select(arg => new ArgumentDefinition(arg.Name.StringValue, typeFormatter.GetTypeDefinition(arg.Type).Name))
+                        .ToArray() ?? Array.Empty<ArgumentDefinition>());
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }

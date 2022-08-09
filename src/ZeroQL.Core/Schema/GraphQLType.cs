@@ -15,36 +15,46 @@ public static class TypeDefinitionExtension
 
 public abstract record TypeDefinition
 {
-    public string Name { get; set; }
+    protected TypeDefinition(string name, bool canBeNull)
+    {
+        Name = name;
+        CanBeNull = canBeNull;
+    }
 
-    public bool CanBeNull { get; set; }
+    public string Name { get; init; }
+
+    public bool CanBeNull { get; init; }
 }
 
 public record ScalarTypeDefinition : TypeDefinition
 {
-    public ScalarTypeDefinition(string name)
+    public ScalarTypeDefinition(string name) 
+        : base(name, false)
     {
-        Name = name;
     }
 }
 
 public record EnumTypeDefinition : TypeDefinition
 {
-    public EnumTypeDefinition(string name)
+    public EnumTypeDefinition(string name) 
+        : base(name, false)
     {
-        Name = name;
     }
 }
 
 public record ObjectTypeDefinition : TypeDefinition
 {
-    public ObjectTypeDefinition(string name)
+    public ObjectTypeDefinition(string name) : base(name, false)
     {
-        Name = name;
     }
 }
 
 public record ListTypeDefinition : TypeDefinition
 {
-    public TypeDefinition ElementTypeDefinition { get; set; }
+    public ListTypeDefinition(string name, bool canBeNull, TypeDefinition elementTypeDefinition) : base(name, canBeNull)
+    {
+        ElementTypeDefinition = elementTypeDefinition;
+    }
+
+    public TypeDefinition ElementTypeDefinition { get; init; }
 }

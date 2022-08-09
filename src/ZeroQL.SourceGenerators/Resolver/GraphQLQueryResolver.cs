@@ -217,10 +217,10 @@ public class GraphQLQueryResolver
 
         if (results.Any(o => o.Error))
         {
-            return results.First().Error;
+            return results.First().Error!;
         }
 
-        return results.Select(o => o.Value).Join(" ");
+        return results.Select(o => o.Value!).Join(" ");
     }
 
     private static Result<string> HandleArgumentAsObjectCreation(GraphQLResolveContext context, ArgumentSyntax argument)
@@ -233,13 +233,13 @@ public class GraphQLQueryResolver
         var initializers = new List<string>(anonymous.Initializers.Count);
         foreach (var initializer in anonymous.Initializers)
         {
-            var result = ResolveQuery(context, initializer);
-            if (result.Error)
+            var (result, error) = ResolveQuery(context, initializer).Unwrap();
+            if (error)
             {
-                return result.Error;
+                return error;
             }
 
-            initializers.Add(result.Value);
+            initializers.Add(result);
         }
 
         return initializers.Join(" ");
@@ -420,7 +420,7 @@ public class GraphQLQueryResolver
         context = context.WithVariableName(name) with
         {
             SemanticModel = newSemanticModel,
-            AvailableVariables = variables.ToDictionary(o => o.Key, o => o.Value.Value)
+            AvailableVariables = variables.ToDictionary(o => o.Key, o => o.Value.Value!)
         };
 
         return HandleFragmentBody(context, invocation, methodDeclaration);

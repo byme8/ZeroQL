@@ -2,7 +2,13 @@
 
 public class ClassDefinition
 {
-    public string Name { get; set; }
+    public ClassDefinition(string name, FieldDefinition[] properties)
+    {
+        Name = name;
+        Properties = properties;
+    }
 
-    public FieldDefinition[] Properties { get; set; }
+    public string Name { get; init; }
+
+    public FieldDefinition[] Properties { get; init; }
 }

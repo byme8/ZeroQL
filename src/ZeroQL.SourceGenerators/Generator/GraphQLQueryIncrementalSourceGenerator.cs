@@ -42,17 +42,19 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
 
         var argumentSyntax = invocation.Invocation.ArgumentList.Arguments.Last();
         var key = argumentSyntax.ToString();
-        var query = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken);
-        if (query.Error is ErrorWithData<Diagnostic> error)
+        var (query, error) = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken).Unwrap();
+        if (error)
         {
-            context.ReportDiagnostic(error.Data);
+            if (error is ErrorWithData<Diagnostic> errorWithData)
+            {
+                context.ReportDiagnostic(errorWithData.Data);
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(Descriptors.FailedToConvert, argumentSyntax.Expression.GetLocation()));
             return;
         }
 
-        if (query.Error)
-        {
-            return;
-        }
 
         if (context.CancellationToken.IsCancellationRequested)
         {
@@ -72,7 +74,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-            GraphQLQueryStore.Query[{SyntaxFactory.Literal(key).Text}] = {SyntaxFactory.Literal(query.Value).Text};
+            GraphQLQueryStore.Query[{SyntaxFactory.Literal(key).Text}] = {SyntaxFactory.Literal(query).Text};
         }}
     }}
 }}";

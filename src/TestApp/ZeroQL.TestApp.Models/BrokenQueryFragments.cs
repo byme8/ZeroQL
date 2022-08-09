@@ -12,7 +12,7 @@ public static partial class BrokenQueryFragments
     }
 
     [GraphQLFragment]
-    public static partial UserModel AsUserFromDifferentAssembly(this Query query, int userId)
+    public static partial UserModel? AsUserFromDifferentAssembly(this Query query, int userId)
     {
         return query.User(userId, o => o.AsUserFromDifferentAssembly());
     }

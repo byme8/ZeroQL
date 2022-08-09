@@ -2,7 +2,13 @@
 
 public class ArgumentDefinition
 {
-    public string Name { get; set; }
+    public ArgumentDefinition(string name, string typeName)
+    {
+        Name = name;
+        TypeName = typeName;
+    }
 
-    public string TypeName { get; set; }
+    public string Name { get; init; }
+
+    public string TypeName { get; init; }
 }

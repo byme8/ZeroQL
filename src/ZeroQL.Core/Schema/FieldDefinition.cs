@@ -2,9 +2,16 @@
 
 public class FieldDefinition
 {
-    public string Name { get; set; }
+    public FieldDefinition(string name, TypeDefinition typeDefinition, ArgumentDefinition[] arguments)
+    {
+        Name = name;
+        Arguments = arguments;
+        TypeDefinition = typeDefinition;
+    }
 
-    public ArgumentDefinition[] Arguments { get; set; }
+    public string Name { get; init; }
 
-    public TypeDefinition TypeDefinition { get; set; }
+    public ArgumentDefinition[] Arguments { get; init; }
+
+    public TypeDefinition TypeDefinition { get; init; }
 }

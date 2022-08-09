@@ -37,7 +37,7 @@ public class GenerateCommand : ICommand
 
         var graphql = await File.ReadAllTextAsync(Schema);
         var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace, ClientName);
-        var outputFolder = Path.GetDirectoryName(Output);
+        var outputFolder = Path.GetDirectoryName(Output)!;
         if (!Directory.Exists(outputFolder))
         {
             Directory.CreateDirectory(outputFolder);

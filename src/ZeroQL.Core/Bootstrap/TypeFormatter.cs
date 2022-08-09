@@ -45,22 +45,12 @@ public class TypeFormatter
             case GraphQLNonNullType { Type: GraphQLListType listType }:
             {
                 var typeDefinition = GetTypeDefinition(listType.Type);
-                return new ListTypeDefinition
-                {
-                    Name = typeDefinition.Name + "[]",
-                    CanBeNull = false,
-                    ElementTypeDefinition = typeDefinition
-                };
+                return new ListTypeDefinition(typeDefinition.Name + "[]", false, typeDefinition);
             }
             case GraphQLListType listType:
             {
                 var typeDefinition = GetTypeDefinition(listType.Type);
-                return new ListTypeDefinition
-                {
-                    Name = typeDefinition.Name + "[]",
-                    CanBeNull = true,
-                    ElementTypeDefinition = typeDefinition
-                };
+                return new ListTypeDefinition(typeDefinition.Name + "[]", true, typeDefinition);
             }
             case GraphQLNamedType namedType:
             {

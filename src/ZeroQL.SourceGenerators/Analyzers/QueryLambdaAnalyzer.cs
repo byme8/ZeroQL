@@ -11,7 +11,9 @@ namespace ZeroQL.SourceGenerators.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 {
+ #pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
+ #pragma warning restore RS1026
     {
 #if !DEBUG
             context.EnableConcurrentExecution();
