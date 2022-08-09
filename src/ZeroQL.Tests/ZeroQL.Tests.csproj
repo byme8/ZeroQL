@@ -19,11 +19,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TestApp\ZeroQL.TestApp.Client\ZeroQL.TestApp.Client.csproj" />
+        <ProjectReference Include="..\TestApp\ZeroQL.TestApp.Models\ZeroQL.TestApp.Models.csproj" />
         <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
         <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
-        <ProjectReference Include="..\TestApp\ZeroQL.TestApp.Models\ZeroQL.TestApp.Models.csproj" />
         <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
 

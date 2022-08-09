@@ -1,8 +1,6 @@
 using FluentAssertions;
 using Xunit;
 using ZeroQL.Core;
-using ZeroQL.SourceGenerators;
-using ZeroQL.SourceGenerators.Generator;
 using ZeroQL.TestApp.Models;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
@@ -14,13 +12,13 @@ public class FragmentTests : IntegrationTest
     [Fact]
     public async Task CanCreateClassInstance()
     {
-        var csharpQuery = "static q => q.Me(o => new UserModal(o.FirstName, o.LastName, o.Role(o => o.Name)))";
+        var csharpQuery = "static q => q.Me(o => new UserModel(o.FirstName, o.LastName, o.Role(o => o.Name)))";
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -36,7 +34,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -52,7 +50,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -68,7 +66,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -84,7 +82,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "new { Id = 1 }, " + csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -100,7 +98,7 @@ public class FragmentTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -111,12 +109,12 @@ public class FragmentTests : IntegrationTest
     public async Task CanLoadFragmentFromDifferentProject()
     {
         var csharpQuery = "static q => q.Me(o => o.AsUserFromDifferentAssembly())";
-        var graphqlQuery = @"query { me { firstName lastName role { name } } }";
+        var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");
@@ -127,12 +125,28 @@ public class FragmentTests : IntegrationTest
     public async Task CanLoadFragmentFromDifferentProjectWitharguments()
     {
         var csharpQuery = "new { Id = 1 }, static (i, q) => q.AsUserFromDifferentAssembly(i.Id)";
-        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name } }}";
+        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var response = (GraphQLResult<UserModal>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
+
+        response.Data.FirstName.Should().Be("Jon");
+        response.Data.LastName.Should().Be("Smith");
+        response.Data.Role.Should().Be("Admin");
+    }    
+    
+    [Fact]
+    public async Task FragmentsWithPartialKeywordIsExtended()
+    {
+        var csharpQuery = "static q => q.Me(o => o.ExposedFragmentUserWithRole())";
+        var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
         response.Data.FirstName.Should().Be("Jon");
         response.Data.LastName.Should().Be("Smith");

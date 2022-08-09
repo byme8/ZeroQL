@@ -49,6 +49,11 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
+        if (query.Error)
+        {
+            return;
+        }
+
         if (context.CancellationToken.IsCancellationRequested)
         {
             return;

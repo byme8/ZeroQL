@@ -11,7 +11,7 @@ public class Program
 {
     public static void Stub()
     {
-        UserModal user;
+        UserModel user;
     }
 
     public static async Task Main()

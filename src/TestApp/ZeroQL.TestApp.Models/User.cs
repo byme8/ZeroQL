@@ -1,13 +1,13 @@
 namespace ZeroQL.TestApp.Models;
 
-public record UserModal
+public record UserModel
 {
-    public UserModal()
+    public UserModel()
     {
         
     }
     
-    public UserModal(string firstName, string lastName, string role)
+    public UserModel(string firstName, string lastName, string role)
     {
         FirstName = firstName;
         LastName = lastName;

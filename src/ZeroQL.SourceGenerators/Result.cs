@@ -9,12 +9,12 @@ public class Result<TValue>
 
     private Result(Error error)
     {
-        Error = error;   
+        Error = error;
     }
-    
-    public TValue Value { get; }
 
-    public Error Error { get; }
+    public TValue? Value { get; }
+
+    public Error? Error { get; }
 
     public static implicit operator Result<TValue>(TValue value) => new(value);
 
@@ -29,17 +29,30 @@ public class Error
     }
 
     public string Code { get; }
-    
+
     public static implicit operator bool(Error? error) => error is not null;
 }
 
 public class ErrorWithData<TData> : Error
 {
-    public ErrorWithData(string code, TData data) 
+    public ErrorWithData(string code, TData data)
         : base(code)
     {
         Data = data;
     }
-    
+
     public TData Data { get; }
+}
+
+public static class ResultExtensions
+{
+    public static (TValue Value, Error error) Unwrap<TValue>(this Result<TValue> result)
+    {
+        if (result.Value is not null)
+        {
+            return (result.Value, null!);
+        }
+        
+        return (default, result.Error)!;
+    }
 }

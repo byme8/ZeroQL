@@ -8,7 +8,9 @@ public class SourceGeneratorInfo
 
     public static string GraphQLFieldSelectorAttribute { get; } = "ZeroQL.Core.GraphQLFieldSelector";
 
-    public static string GraphQLFragmentAttribute { get; } = "ZeroQL.Core.GraphQLFragment";
+    public static string GraphQLFragmentAttributeFullName { get; } = "ZeroQL.Core.GraphQLFragment";
+    
+    public static string GraphQLFragmentAttributeTypeName { get; } = "GraphQLFragment";
 
     public static string GraphQLQueryTemplateAttribute { get; } = "ZeroQL.Core.GraphQLQueryTemplate";
 }

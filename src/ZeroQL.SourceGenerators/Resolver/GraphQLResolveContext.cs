@@ -19,10 +19,10 @@ public record struct GraphQLResolveContext(
 
     public INamedTypeSymbol FragmentAttribute
     {
-        get => fragmentAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttribute)!;
+        get => fragmentAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFragmentAttributeFullName)!;
     }
     
-    public INamedTypeSymbol FragmentQueryAttribute
+    public INamedTypeSymbol TemplateAttribute
     {
         get => fragmentQueryAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLQueryTemplateAttribute)!;
     }
