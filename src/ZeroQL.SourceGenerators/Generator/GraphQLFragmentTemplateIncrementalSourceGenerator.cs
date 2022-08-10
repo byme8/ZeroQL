@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -17,7 +16,7 @@ public class GraphQLFragmentTemplateIncrementalSourceGenerator : IIncrementalGen
     {
         var fragments = context.SyntaxProvider.CreateSyntaxProvider(
             FindFragmentThatRequiresSourceGeneration,
-            (c, ct) =>
+            (c, _) =>
             {
                 var attribute = (AttributeSyntax)c.Node;
                 var method = (MethodDeclarationSyntax)attribute.Parent!.Parent!;
@@ -38,16 +37,15 @@ public class GraphQLFragmentTemplateIncrementalSourceGenerator : IIncrementalGen
             return;
         }
 
-        if (classDeclaration.Parent is not BaseNamespaceDeclarationSyntax namespaceDeclaration)
-        {
-            return;
-        }
+        var namespaceDeclaration = classDeclaration
+            .AncestorsAndSelf()
+            .OfType<BaseNamespaceDeclarationSyntax>()
+            .FirstOrDefault();
 
-
-        if (namespaceDeclaration.Parent is not CompilationUnitSyntax compilationUnit)
-        {
-            return;
-        }
+        var compilationUnit = classDeclaration
+            .AncestorsAndSelf()
+            .OfType<CompilationUnitSyntax>()
+            .First();
 
         var (graphQLTemplate, error) = GraphQLQueryResolver.ResolveFragmentTemplate(semanticModel, methodDeclaration, context.CancellationToken).Unwrap();
         if (error)
@@ -62,26 +60,34 @@ public class GraphQLFragmentTemplateIncrementalSourceGenerator : IIncrementalGen
             return;
         }
 
-        var usings = namespaceDeclaration.Usings.Concat(compilationUnit.Usings).ToArray();
+        var usings = compilationUnit.Usings
+            .Concat(namespaceDeclaration?.Usings ?? Enumerable.Empty<UsingDirectiveSyntax>())
+            .ToArray();
 
         var literal = LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(graphQLTemplate));
         var newMethod = MethodDeclaration(methodDeclaration.ReturnType, methodDeclaration.Identifier)
-                .WithParameterList(methodDeclaration.ParameterList)
-                .AddAttributeLists(AttributeList()
-                        .AddAttributes(Attribute(ParseName(SourceGeneratorInfo.GraphQLQueryTemplateAttribute))
-                            .WithArgumentList(ParseAttributeArgumentList($"({literal})"))))
-                .WithModifiers(methodDeclaration.Modifiers)
+            .WithParameterList(methodDeclaration.ParameterList)
+            .AddAttributeLists(AttributeList()
+                .AddAttributes(Attribute(ParseName(SourceGeneratorInfo.GraphQLQueryTemplateAttribute))
+                    .WithArgumentList(ParseAttributeArgumentList($"({literal})"))))
+            .WithModifiers(methodDeclaration.Modifiers)
             .WithBody(null)
             .WithSemicolonToken(ParseToken(";"));
 
-        var syntaxTree = compilationUnit
+        var newClassDeclaration = classDeclaration
+            .WithMembers(List<MemberDeclarationSyntax>()
+                .Add(newMethod));
+
+        MemberDeclarationSyntax members = namespaceDeclaration is null
+            ? newClassDeclaration
+            : NamespaceDeclaration(namespaceDeclaration.Name)
+                .WithMembers(List<MemberDeclarationSyntax>()
+                    .Add(newClassDeclaration));
+
+        var syntaxTree = CompilationUnit()
             .WithUsings(List(usings))
             .WithMembers(List<MemberDeclarationSyntax>()
-                .Add(NamespaceDeclaration(namespaceDeclaration.Name)
-                    .WithMembers(List<MemberDeclarationSyntax>()
-                        .Add(classDeclaration
-                            .WithMembers(List<MemberDeclarationSyntax>()
-                                .Add(newMethod))))));
+                .Add(members));
 
         var source = syntaxTree
             .NormalizeWhitespace()
