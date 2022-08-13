@@ -15,7 +15,7 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
         var invocations = context.SyntaxProvider
             .CreateSyntaxProvider(FindMethods, (c, ct) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
-        context.RegisterSourceOutput(invocations, GenerateSource);
+        context.RegisterImplementationSourceOutput(invocations, GenerateSource);
     }
 
     private void GenerateSource(
