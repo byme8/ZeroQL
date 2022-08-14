@@ -149,12 +149,7 @@ Console.WriteLine($"{response.Data.Me.Id}: {response.Data.Me.FirstName} {respons
 Console.WriteLine($"{response.Data.User.Id}: {response.Data.User.FirstName} {response.Data.User.LastName}"); // 1: Jon Smith
 ```
 
-The fragment should be marked with the `` [GraphQLFragment] `` attribute. and it has a bunch of limitations.
-It should be an extension method.
-And it has to be defined in the same assembly where the method ``Query`` is called.
-The last limitation is dictated by the fact that source generators can analyze only one assembly once.
-So, if you define a fragment in a different assembly, it will not be available for the source generator.
-
+The fragment should be marked with the `` [GraphQLFragment] `` attribute, and it should be an extension method. If the fragment is defined in another assembly, it should be a partial method. The last requirement is necessary because source generators don't have access to source code from another assembly. So, a workaround will be to define fragments as a partial method and generate additional metadata.
 
 # Benchmarks
 
