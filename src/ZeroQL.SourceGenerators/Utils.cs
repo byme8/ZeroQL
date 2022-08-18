@@ -90,4 +90,50 @@ public static class Utils
             return name;
         }
     }
+    
+    public static INamedTypeSymbol GetNamedTypeSymbol(this ISymbol info)
+    {
+        switch (info)
+        {
+            case INamedTypeSymbol type:
+                return type;
+            case ILocalSymbol local:
+                return local.Type.GetNamedTypeSymbol();
+            case IParameterSymbol parameterSymbol:
+                return parameterSymbol.Type.GetNamedTypeSymbol();
+            default:
+                return null;
+        }
+    }
+    
+    public static INamedTypeSymbol? GetTypeSymbol(this SymbolInfo info)
+    {
+        switch (info.Symbol)
+        {
+            case INamedTypeSymbol type:
+                return type;
+            case ILocalSymbol local:
+                return local.Type.GetNamedTypeSymbol();
+            case IParameterSymbol parameterSymbol:
+                return parameterSymbol.Type.GetNamedTypeSymbol();
+            default:
+                return null;
+        }
+    }
+
+    public static string ToGlobalName(this ISymbol symbol)
+    {
+        if (symbol is INamedTypeSymbol { IsTupleType: true } anonymousType)
+        {
+            return anonymousType.ToDisplayString();
+        }
+
+        if (symbol is INamedTypeSymbol { SpecialType: SpecialType.System_Object } namedTypeSymbol)
+        {
+            return "object?";
+        }
+        
+        
+        return $"global::{symbol.ToDisplayString()}";
+    }
 }

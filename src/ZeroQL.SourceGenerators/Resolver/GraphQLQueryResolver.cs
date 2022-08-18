@@ -130,6 +130,11 @@ public class GraphQLQueryResolver
         }
 
         var type = method.Parameters.First().Type;
+        
+        if (type is INamedTypeSymbol { IsTupleType: true } namedType)
+        {
+            return namedType.TupleElements.Select(o => (o.Name, o.Type.ToStringWithNullable())).ToArray();
+        }
 
         return type.GetMembers()
             .OfType<IPropertySymbol>()
@@ -261,7 +266,8 @@ public class GraphQLQueryResolver
         if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
         {
             var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Expression, context.CancellationToken);
-            if (symbol.Symbol is not INamedTypeSymbol namedType)
+            var namedType = symbol.GetTypeSymbol();
+            if (namedType is null)
             {
                 return Failed(memberAccess);
             }

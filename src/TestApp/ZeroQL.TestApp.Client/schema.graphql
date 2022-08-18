@@ -10,6 +10,7 @@ type KeyValuePairOfStringAndString {
 
 type Mutation {
   addUser(firstName: String! lastName: String!): User!
+  addUserProfileImage(userId: Int! file: Upload!): Int!
 }
 
 type Query {
@@ -117,3 +118,6 @@ scalar Long
 scalar Short
 
 scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
+
+"The `Upload` scalar type represents a file upload."
+scalar Upload

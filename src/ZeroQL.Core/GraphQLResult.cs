@@ -9,6 +9,18 @@ public interface IGraphQLResult
 
 public class GraphQLResult<TData> : IGraphQLResult
 {
+    public GraphQLResult()
+    {
+        
+    }
+    
+    public GraphQLResult(string query, TData data, GraphQueryError[] errors)
+    {
+        Query = query;
+        Data = data;
+        Errors = errors;
+    }
+
     public string Query { get; set; }
 
     public TData Data { get; set; }

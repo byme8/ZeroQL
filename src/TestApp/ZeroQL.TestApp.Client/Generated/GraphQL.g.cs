@@ -29,10 +29,19 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
         public User __AddUser { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
+        public int __AddUserProfileImage { get; set; }
+
         [ZeroQL.Core.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
             return selector(__AddUser);
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddUserProfileImage(int userId, System.IO.Stream file)
+        {
+            return __AddUserProfileImage;
         }
     }
 

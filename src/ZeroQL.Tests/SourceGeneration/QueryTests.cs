@@ -92,7 +92,7 @@ public class QueryTests : IntegrationTest
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OpenLambdaIsNotAllowed.Id);
     }
-    
+
     [Fact]
     public async Task FailsWhenMethodCalled()
     {
@@ -119,7 +119,7 @@ public class QueryTests : IntegrationTest
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
     }
-    
+
     [Fact]
     public async Task FailsWhenLambdaIsNotStaticWithArgument()
     {
@@ -133,7 +133,7 @@ public class QueryTests : IntegrationTest
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
     }
-    
+
     [Fact]
     public async Task QueryPreviewGenerated()
     {
@@ -145,7 +145,7 @@ public class QueryTests : IntegrationTest
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         var queryPreview = diagnostics!.First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
-        
+
         queryPreview.GetMessage().Should().Be(graphqlQuery);
     }
 
@@ -212,9 +212,9 @@ public class QueryTests : IntegrationTest
     [Fact]
     public async Task SupportForArray()
     {
-        var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good} }";
+        var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good } }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
-        var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
+        var graphqlQuery = @"query ($filter: UserFilterInput!, $page: Int!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, $"{arguments}, {csharpQuery}"));
