@@ -11,6 +11,7 @@ type KeyValuePairOfStringAndString {
 type Mutation {
   addUser(firstName: String! lastName: String!): User!
   addUserProfileImage(userId: Int! file: Upload!): Int!
+  addMyProfileImage(file: Upload!): Int!
 }
 
 type Query {

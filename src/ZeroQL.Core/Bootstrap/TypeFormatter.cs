@@ -21,7 +21,7 @@ public class TypeFormatter
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "Boolean", "bool" },
-        { "Upload", "System.IO.Stream" },
+        { "Upload", "global::ZeroQL.Core.Upload" },
     };
 
     public TypeFormatter(HashSet<string> enums)

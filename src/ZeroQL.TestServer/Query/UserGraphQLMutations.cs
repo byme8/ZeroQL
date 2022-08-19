@@ -24,4 +24,13 @@ public class UserGraphQLMutations
 
         return data.Length;
     }
+    
+    public async Task<int> AddMyProfileImage(IFile file)
+    {
+        var stream = file.OpenReadStream();
+        var streamReader = new StreamReader(stream);
+        var data = await streamReader.ReadToEndAsync();
+
+        return data.Length;
+    }
 }

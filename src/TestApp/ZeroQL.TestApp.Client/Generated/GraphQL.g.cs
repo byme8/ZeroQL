@@ -32,6 +32,9 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
         public int __AddUserProfileImage { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddMyProfileImage")]
+        public int __AddMyProfileImage { get; set; }
+
         [ZeroQL.Core.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
@@ -39,9 +42,15 @@ namespace GraphQL.TestServer
         }
 
         [ZeroQL.Core.GraphQLFieldSelector]
-        public int AddUserProfileImage(int userId, System.IO.Stream file)
+        public int AddUserProfileImage(int userId, global::ZeroQL.Core.Upload file)
         {
             return __AddUserProfileImage;
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddMyProfileImage(global::ZeroQL.Core.Upload file)
+        {
+            return __AddMyProfileImage;
         }
     }
 

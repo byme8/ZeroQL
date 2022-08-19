@@ -33,3 +33,16 @@ public class Program
         return response;
     }
 }
+
+public class AddProfileImage
+{
+    public AddProfileImage(int userId, Upload file)
+    {
+        UserId = userId;
+        File = file;
+    }
+
+    public int UserId { get; set; }
+
+    public Upload File { get; set; }
+}

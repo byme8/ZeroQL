@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace ZeroQL.SourceGenerators;
@@ -26,6 +27,32 @@ public static class Utils
         {
             yield return member;
         }
+    }
+
+    public static IEnumerable<(string Name, ITypeSymbol Type)> GetRealProperties(this ITypeSymbol symbol)
+    {
+        var members = symbol
+            .GetAllMembers()
+            .Where(o => !o.IsImplicitlyDeclared && !o.IsStatic && o.DeclaredAccessibility == Accessibility.Public)
+            .ToArray();
+
+        foreach (var member in members.OfType<IPropertySymbol>())
+        {
+            yield return (member.Name, member.Type);
+        }
+    }
+
+    public static IEnumerable<ITypeSymbol> GetAllBaseTypes(this ITypeSymbol symbol)
+    {
+        if (symbol.BaseType != null)
+        {
+            foreach (var baseType in symbol.BaseType.GetAllBaseTypes())
+            {
+                yield return baseType;
+            }
+        }
+
+        yield return symbol;
     }
 
     public static string FirstToLower(this string text)
@@ -90,7 +117,7 @@ public static class Utils
             return name;
         }
     }
-    
+
     public static INamedTypeSymbol GetNamedTypeSymbol(this ISymbol info)
     {
         switch (info)
@@ -105,7 +132,7 @@ public static class Utils
                 return null;
         }
     }
-    
+
     public static INamedTypeSymbol? GetTypeSymbol(this SymbolInfo info)
     {
         switch (info.Symbol)
@@ -132,8 +159,8 @@ public static class Utils
         {
             return "object?";
         }
-        
-        
+
+
         return $"global::{symbol.ToDisplayString()}";
     }
 }

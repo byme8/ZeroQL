@@ -55,13 +55,17 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
         }
 
         var requestKind = memberAccess.Name.Identifier.Text.ToLower();
-        
-        var variablesTypeName = lambdaSymbol.Parameters.Length > 1 
-            ? lambdaSymbol.Parameters.First().GetNamedTypeSymbol().ToGlobalName() 
-            : "global::ZeroQL.Core.Unit";
-        
+        var variablesTypeName = GetVariableTypename(lambdaSymbol);
         var queryTypeName = lambdaSymbol.Parameters.Last().ToGlobalName();
-        
+
+
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var executeRequest = GetPrepareRequest(lambdaSymbol, semanticModel);
+
         var (query, error) = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken).Unwrap();
         if (error)
         {
@@ -99,12 +103,14 @@ namespace {semanticModel.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-            GraphQLQueryStore<object?, {queryTypeName}>.Query[{SyntaxFactory.Literal(key).Text}] = Execute;
+            GraphQLQueryStore<{queryTypeName}>.Query[{SyntaxFactory.Literal(key).Text}] = Execute;
         }}
 
-        public static async Task<GraphQLResult<{queryTypeName}>> Execute(HttpClient httpClient, string? operationName, object? variables)
+        public static async Task<GraphQLResult<{queryTypeName}>> Execute(HttpClient httpClient, string? operationName, object variablesObject)
         {{
             var queryBody = {SyntaxFactory.Literal(query).Text};
+            var variables = ({variablesTypeName})variablesObject;
+            
             var stringBuilder = new System.Text.StringBuilder();
             stringBuilder.Append(""{requestKind} "");
             if (!string.IsNullOrEmpty(operationName))
@@ -120,8 +126,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
                 Query = query
             }};
 
-            var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-            var response = await httpClient.PostAsync("""", new StringContent(requestJson, Encoding.UTF8, ""application/json""));
+            {executeRequest}
             var responseJson = await response.Content.ReadAsStringAsync();
             var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<{queryTypeName}>>(responseJson, ZeroQLJsonOptions.Options);
 
@@ -160,6 +165,93 @@ namespace {semanticModel.Compilation.Assembly.Name}
         }
 
         context.AddSource($"ZeroQLModuleInitializer.{uniqId}.g.cs", source);
+    }
+
+    private string GetPrepareRequest(IMethodSymbol lambdaSymbol, SemanticModel semanticModel)
+    {
+        if (lambdaSymbol.Parameters.Length == 1)
+        {
+            return RequestWithoutVariables();
+        }
+
+        var inputType = lambdaSymbol.Parameters
+            .First()
+            .GetNamedTypeSymbol();
+
+        var upload = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Core.Upload");
+        {
+            var isFile = SymbolEqualityComparer.Default.Equals(inputType, upload);
+            if (isFile)
+            {
+                return RequestWithSingleStream();
+            }
+        }
+
+        var streamProperties = inputType
+            .GetRealProperties()
+            .Select(o =>
+            {
+                var isFile = SymbolEqualityComparer.Default.Equals(o.Type, upload);
+                return (File: isFile, o.Name, o.Type);
+            })
+            .Where(o => o.File)
+            .ToArray();
+
+        if (!streamProperties.Any())
+        {
+            return RequestWithoutVariables();
+        }
+
+        return RequestWithMultipleStreams(streamProperties);
+    }
+
+    private static string RequestWithMultipleStreams(
+        (bool Stream, string Name, ITypeSymbol Type)[] streamProperties)
+    {
+        var executeRequest = $@"
+            var form = new MultipartFormDataContent();
+
+            var queryJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
+            form.Add(new StringContent(queryJson), ""operations"");
+
+            var map = @""{{ {streamProperties.Select((o, i) => $@"""""{i}"""": [""""variables.{o.Name.FirstToLower()}""""]").Join()} }}"";
+            form.Add(new StringContent(map), ""map"");
+{streamProperties
+    .Select((o, i) =>
+        $@"form.Add(new StreamContent(variables.{o.Name}.Stream), ""{i}"", variables.{o.Name}.FileName);").JoinWithNewLine()}
+
+            var response = await httpClient.PostAsync("""", form);";
+
+        return executeRequest;
+    }
+
+    private static string RequestWithSingleStream()
+    {
+        return "";
+    }
+
+    private static string RequestWithoutVariables()
+    {
+        var executeRequest = @"
+            var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
+            var response = await httpClient.PostAsync("""", new StringContent(requestJson, Encoding.UTF8, ""application/json""));";
+
+        return executeRequest;
+    }
+
+    private static string GetVariableTypename(IMethodSymbol lambdaSymbol)
+    {
+        if (lambdaSymbol.Parameters.Length == 1)
+        {
+            return "global::ZeroQL.Core.Unit";
+        }
+
+        var namedSymbol = lambdaSymbol.Parameters.First().GetNamedTypeSymbol();
+        return namedSymbol switch
+        {
+            { IsAnonymousType: true } anonymous => anonymous.BaseType!.ToGlobalName(),
+            _ => namedSymbol.ToGlobalName()
+        };
     }
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
