@@ -214,7 +214,7 @@ public class QueryTests : IntegrationTest
     {
         var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good } }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
-        var graphqlQuery = @"query ($filter: UserFilterInput!, $page: Int!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
+        var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, $"{arguments}, {csharpQuery}"));

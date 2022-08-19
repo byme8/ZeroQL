@@ -125,7 +125,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
         Func<TVariables?, TOperationQuery?, TResult> queryMapper,
         string queryKey)
     {
-        if (!GraphQLQueryStore<TVariables, TOperationQuery>.Query.TryGetValue(queryKey, out var queryRunner))
+        if (!GraphQLQueryStore<object?, TOperationQuery>.Query.TryGetValue(queryKey, out var queryRunner))
         {
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
@@ -137,53 +137,5 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
             typedResult.Query,
             queryMapper(variables, typedResult.Data),
             typedResult.Errors);
-    }
-
-    // public async Task<GraphQLResult<TResult>> ExecuteQL<TVariables, TOperationQuery, TResult>(TVariables? variables, Func<TVariables?, TOperationQuery?, TResult> mapper, string query)
-    // {
-    //     var queryRequest = new GraphQLRequest
-    //     {
-    //         Variables = variables,
-    //         Query = query
-    //     };
-    //
-    //     var qlResponse = await SendRequest<TOperationQuery>(queryRequest);
-    //
-    //     if (qlResponse.Errors is { Length: > 0 })
-    //     {
-    //         return new GraphQLResult<TResult>
-    //         {
-    //             Query = query,
-    //             Errors = qlResponse.Errors
-    //         };
-    //     }
-    //
-    //     var formatted = mapper(variables, qlResponse.Data);
-    //     return new GraphQLResult<TResult>
-    //     {
-    //         Query = query,
-    //         Data = formatted
-    //     };
-    // }
-
-    private async Task<GraphQLResponse<TOperationQuery>> SendRequest<TOperationQuery>(GraphQLRequest queryRequest)
-    {
-        var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-        var response = await httpClient.PostAsync("", new StringContent(requestJson, Encoding.UTF8, "application/json"));
-        var responseJson = await response.Content.ReadAsStringAsync();
-        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TOperationQuery>>(responseJson, ZeroQLJsonOptions.Options);
-
-        if (qlResponse is null)
-        {
-            return new GraphQLResponse<TOperationQuery>
-            {
-                Errors = new[]
-                {
-                    new GraphQueryError { Message = "Failed to deserialize response: " + responseJson }
-                }
-            };
-        }
-
-        return qlResponse;
     }
 }

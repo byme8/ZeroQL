@@ -21,16 +21,16 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
 
     private void GenerateSource(
         SourceProductionContext context,
-        (InvocationExpressionSyntax Invocation, SemanticModel SemanticModel) invocation)
+        (InvocationExpressionSyntax Invocation, SemanticModel SemanticModel) input)
     {
+        var (invocation, semanticModel) = input;
         var uniqId = Guid.NewGuid().ToString("N");
         if (context.CancellationToken.IsCancellationRequested)
         {
             return;
         }
 
-        var semanticModel = invocation.SemanticModel;
-        var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation.Invocation);
+        var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, input.Invocation);
         if (queryMethod is null)
         {
             return;
@@ -41,7 +41,7 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var argumentSyntax = invocation.Invocation.ArgumentList.Arguments.Last();
+        var argumentSyntax = invocation.ArgumentList.Arguments.Last();
         var key = argumentSyntax.ToString();
         var symbol = semanticModel.GetSymbolInfo(argumentSyntax.Expression);
         if (symbol.Symbol is not IMethodSymbol lambdaSymbol)
@@ -49,6 +49,13 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        {
+            return;
+        }
+
+        var requestKind = memberAccess.Name.Identifier.Text.ToLower();
+        
         var variablesTypeName = lambdaSymbol.Parameters.Length > 1 
             ? lambdaSymbol.Parameters.First().GetNamedTypeSymbol().ToGlobalName() 
             : "global::ZeroQL.Core.Unit";
@@ -92,14 +99,14 @@ namespace {semanticModel.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-            GraphQLQueryStore<{variablesTypeName}, {queryTypeName}>.Query[{SyntaxFactory.Literal(key).Text}] = Execute;
+            GraphQLQueryStore<object?, {queryTypeName}>.Query[{SyntaxFactory.Literal(key).Text}] = Execute;
         }}
 
-        public static async Task<GraphQLResult<{queryTypeName}>> Execute(HttpClient httpClient, string? operationName, {variablesTypeName} variables)
+        public static async Task<GraphQLResult<{queryTypeName}>> Execute(HttpClient httpClient, string? operationName, object? variables)
         {{
             var queryBody = {SyntaxFactory.Literal(query).Text};
             var stringBuilder = new System.Text.StringBuilder();
-            stringBuilder.Append(""query "");
+            stringBuilder.Append(""{requestKind} "");
             if (!string.IsNullOrEmpty(operationName))
             {{
                 stringBuilder.Append(operationName);
