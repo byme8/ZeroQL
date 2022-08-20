@@ -340,7 +340,7 @@ using System.Text.Json.Serialization;
                     field.Name.StringValue.FirstToUpper(),
                     type,
                     field.Arguments?
-                        .Select(arg => new ArgumentDefinition(arg.Name.StringValue, typeFormatter.GetTypeDefinition(arg.Type).Name))
+                        .Select(arg => new ArgumentDefinition(arg.Name.StringValue, typeFormatter.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
                         .ToArray() ?? Array.Empty<ArgumentDefinition>());
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();

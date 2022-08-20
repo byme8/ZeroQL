@@ -130,15 +130,10 @@ public class GraphQLQueryResolver
         }
 
         var type = method.Parameters.First().Type;
-        
-        if (type is INamedTypeSymbol { IsTupleType: true } namedType)
-        {
-            return namedType.TupleElements.Select(o => (o.Name, o.Type.ToStringWithNullable())).ToArray();
-        }
 
         return type.GetMembers()
             .OfType<IPropertySymbol>()
-            .Select(o => (o.Name, o.Type.ToStringWithNullable()))
+            .Select(o => (o.Name, o.Type.ToGraphQLType()))
             .ToArray();
     }
 

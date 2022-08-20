@@ -16,7 +16,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -32,7 +32,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -48,7 +48,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -64,7 +64,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -80,7 +80,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "new { Id = 1 }, " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, "new { Id = 1 }, " + csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -96,7 +96,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { user(id: 1) { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -112,7 +112,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -128,7 +128,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -144,7 +144,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 
@@ -160,7 +160,7 @@ public class FragmentTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
 
         var response = (GraphQLResult<UserModel>)await project.Validate(graphqlQuery);
 

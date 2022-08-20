@@ -9,8 +9,19 @@ public static class Utils
 {
     private static readonly Dictionary<string, string> CSharpToGraphQL = new()
     {
+        { "string", "String" },
+        { "byte", "Byte" },
+        { "Int16", "Short" },
         { "Int32", "Int" },
-        { "string", "String" }
+        { "Int64", "Long" },
+        { "Single", "Float" },
+        { "Double", "Float" },
+        { "Decimal", "Decimal" },
+        { "DateTimeOffset", "DateTime" },
+        { "DateOnly", "Date" },
+        { "Guid", "UUID" },
+        { "bool", "Boolean" },
+        { "global::ZeroQL.Upload", "Upload" },
     };
 
     public static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
@@ -91,7 +102,7 @@ public static class Utils
     {
         return $"{left}{text}{right}";
     }
-    
+
     public static string SpaceLeft(this string text, int lenght, int mult = 4)
     {
         var spaces = new string(' ', lenght * mult);
@@ -103,25 +114,30 @@ public static class Utils
         return string.Join($"{separator}{Environment.NewLine}", values);
     }
 
-    public static string ToStringWithNullable(this ITypeSymbol typeSymbol)
+    public static string ToGraphQLType(this ITypeSymbol typeSymbol)
+    {
+        return typeSymbol switch
+        {
+            IArrayTypeSymbol arrayTypeSymbol => $"[{arrayTypeSymbol.ElementType.ToGraphQLType()}]{typeSymbol.Nullable()}",
+            INamedTypeSymbol {Name: "Nullable" } namedType => namedType.TypeArguments[0].ToGraphQLType(),
+            _ => Map(typeSymbol) + typeSymbol.Nullable(),
+        };
+    }
+
+    private static string Map(ITypeSymbol typeSymbol)
+    {
+        return CSharpToGraphQL.ContainsKey(typeSymbol.Name) ? CSharpToGraphQL[typeSymbol.Name] : typeSymbol.Name;
+    }
+
+    public static string Nullable(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.NullableAnnotation switch
         {
-            NullableAnnotation.None => Map(typeSymbol.Name) + "!",
-            NullableAnnotation.NotAnnotated => Map(typeSymbol.Name) + "!",
-            NullableAnnotation.Annotated => Map(typeSymbol.Name),
+            NullableAnnotation.None => "!",
+            NullableAnnotation.NotAnnotated => "!",
+            NullableAnnotation.Annotated => "",
             _ => throw new ArgumentOutOfRangeException()
         };
-
-        string Map(string name)
-        {
-            if (CSharpToGraphQL.ContainsKey(name))
-            {
-                return CSharpToGraphQL[name];
-            }
-
-            return name;
-        }
     }
 
     public static INamedTypeSymbol GetNamedTypeSymbol(this ISymbol info)

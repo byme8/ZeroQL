@@ -12,11 +12,12 @@ public static class ZeroQLJsonOptions
         Converters =
         {
             new JsonStringEnumConverter(new GraphQLEnumNamingPolicy()),
-            new UploadJsonConverter()
+            new UploadJsonConverter(),
+            new DateOnlyConverter()
         },
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
     };
 
 
@@ -40,5 +41,26 @@ public static class ZeroQLJsonOptions
             Upload dateTimeValue,
             JsonSerializerOptions options) =>
             writer.WriteNullValue();
+    }
+
+    public class DateOnlyConverter : JsonConverter<DateOnly>
+    {
+        private readonly string serializationFormat = "yyyy-MM-dd";
+
+        public override DateOnly Read(ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            var value = reader.GetString();
+            return DateOnly.Parse(value!);
+        }
+
+        public override void Write(Utf8JsonWriter writer,
+            DateOnly value,
+            JsonSerializerOptions options)
+        {
+            var text = value.ToString(serializationFormat);
+            writer.WriteStringValue(text);
+        }
     }
 }

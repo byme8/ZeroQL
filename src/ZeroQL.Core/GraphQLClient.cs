@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -91,7 +92,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationQuery, TResult>(
         string? operationName,
         TVariables? variables,
-        Func<TVariables?, TOperationQuery?, TResult> queryMapper,
+        Func<TVariables?, TOperationQuery?, TResult?> queryMapper,
         string queryKey)
     {
         if (!GraphQLQueryStore<TOperationQuery>.Query.TryGetValue(queryKey, out var queryRunner))
@@ -100,11 +101,14 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
         }
 
         var result = await queryRunner.Invoke(httpClient, operationName, variables);
-        var typedResult = result;
+        if (result.Errors?.Any() ?? false)
+        {
+            return new GraphQLResult<TResult>(result.Query, default, result.Errors);
+        }
 
         return new GraphQLResult<TResult>(
-            typedResult.Query,
-            queryMapper(variables, typedResult.Data),
-            typedResult.Errors);
+            result.Query,
+            queryMapper(variables, result.Data),
+            result.Errors);
     }
 }

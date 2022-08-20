@@ -71,6 +71,14 @@ public class UserGraphQLExtensions
     {
         return Users.GetValueOrDefault(id);
     }
+    
+    public User[] GetUsersByIds(int[] ids)
+    {
+        return Users
+            .Where(o => ids.Contains(o.Key))
+            .Select(o => o.Value)
+            .ToArray();
+    }
 
     public UserKind GetUserKind(int id)
     {

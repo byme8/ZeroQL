@@ -15,7 +15,7 @@ public class MutationTests : IntegrationTest
         var graphqlQuery = @"mutation { addUser(firstName: ""Jon"", lastName: ""Smith"") { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
 
         var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
         result.Data.Should().Be("Jon");
@@ -28,7 +28,7 @@ public class MutationTests : IntegrationTest
         var graphqlQuery = @"mutation ($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
 
         var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
         result.Data.Should().Be("Jon");
