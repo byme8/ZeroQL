@@ -42,13 +42,13 @@ namespace GraphQL.TestServer
         }
 
         [ZeroQL.Core.GraphQLFieldSelector]
-        public int AddUserProfileImage(int userId, global::ZeroQL.Core.Upload file)
+        public int AddUserProfileImage(int userId, global::ZeroQL.Upload file)
         {
             return __AddUserProfileImage;
         }
 
         [ZeroQL.Core.GraphQLFieldSelector]
-        public int AddMyProfileImage(global::ZeroQL.Core.Upload file)
+        public int AddMyProfileImage(global::ZeroQL.Upload file)
         {
             return __AddMyProfileImage;
         }

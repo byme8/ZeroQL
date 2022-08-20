@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ZeroQL.Core;
+namespace ZeroQL;
 
 public class Upload
 {

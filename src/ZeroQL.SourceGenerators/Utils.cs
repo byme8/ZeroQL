@@ -29,7 +29,7 @@ public static class Utils
         }
     }
 
-    public static IEnumerable<(string Name, ITypeSymbol Type)> GetRealProperties(this ITypeSymbol symbol)
+    public static IEnumerable<IPropertySymbol> GetRealProperties(this ITypeSymbol symbol)
     {
         var members = symbol
             .GetAllMembers()
@@ -38,7 +38,7 @@ public static class Utils
 
         foreach (var member in members.OfType<IPropertySymbol>())
         {
-            yield return (member.Name, member.Type);
+            yield return member;
         }
     }
 
@@ -90,6 +90,12 @@ public static class Utils
     public static string Wrap(this string text, string left = "", string right = "")
     {
         return $"{left}{text}{right}";
+    }
+    
+    public static string SpaceLeft(this string text, int lenght, int mult = 4)
+    {
+        var spaces = new string(' ', lenght * mult);
+        return $"{spaces}{text}";
     }
 
     public static string JoinWithNewLine(this IEnumerable<string> values, string separator = "")

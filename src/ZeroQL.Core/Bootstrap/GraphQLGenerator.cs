@@ -86,7 +86,7 @@ using System.Text.Json.Serialization;
                     .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition.Name + property.TypeDefinition.NullableAnnotation()));
 
                 return CSharpHelper.Class(o.Name)
-                    .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)
+                    .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(fields));
 
             })
@@ -109,7 +109,7 @@ using System.Text.Json.Serialization;
 
                 var enumSyntax = EnumDeclaration(Identifier(e.Name.StringValue))
                     .AddAttributeLists(AttributeList()
-                        .AddAttributes(Attribute(ParseName(SourceGeneratorInfo.CodeGenerationAttribute))))
+                        .AddAttributes(Attribute(ParseName(ZeroQLGenerationInfo.CodeGenerationAttribute))))
                     .AddMembers(members)
                     .AddModifiers(Token(SyntaxKind.PublicKeyword));
 
@@ -140,7 +140,7 @@ using System.Text.Json.Serialization;
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
                 return CSharpHelper.Class(o.Name)
-                    .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute)
+                    .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
             })
@@ -149,13 +149,13 @@ using System.Text.Json.Serialization;
         if (definitions.All(o => o.Name != "Mutation"))
         {
             csharpDefinitions.Add(CSharpHelper.Class("Mutation")
-                .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute));
+                .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute));
         }
 
         if (definitions.All(o => o.Name != "Query"))
         {
             csharpDefinitions.Add(CSharpHelper.Class("Query")
-                .AddAttributes(SourceGeneratorInfo.CodeGenerationAttribute));
+                .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute));
         }
 
         return csharpDefinitions;
@@ -200,7 +200,7 @@ using System.Text.Json.Serialization;
             .AddAttributeLists(AttributeList()
                 .AddAttributes(
                     Attribute(
-                        ParseName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute))))
+                        ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))))
             .WithParameterList(ParameterList(list));
 
         var body = Block(

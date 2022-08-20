@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -178,23 +179,17 @@ namespace {semanticModel.Compilation.Assembly.Name}
             .First()
             .GetNamedTypeSymbol();
 
-        var upload = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Core.Upload");
-        {
-            var isFile = SymbolEqualityComparer.Default.Equals(inputType, upload);
-            if (isFile)
-            {
-                return RequestWithSingleStream();
-            }
-        }
+        var upload = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload");
 
         var streamProperties = inputType
             .GetRealProperties()
             .Select(o =>
             {
                 var isFile = SymbolEqualityComparer.Default.Equals(o.Type, upload);
-                return (File: isFile, o.Name, o.Type);
+                return (File: isFile, Property: o);
             })
             .Where(o => o.File)
+            .Select(o => o.Property)
             .ToArray();
 
         if (!streamProperties.Any())
@@ -205,8 +200,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
         return RequestWithMultipleStreams(streamProperties);
     }
 
-    private static string RequestWithMultipleStreams(
-        (bool Stream, string Name, ITypeSymbol Type)[] streamProperties)
+    private static string RequestWithMultipleStreams(IPropertySymbol[] streamProperties)
     {
         var executeRequest = $@"
             var form = new MultipartFormDataContent();
@@ -216,18 +210,25 @@ namespace {semanticModel.Compilation.Assembly.Name}
 
             var map = @""{{ {streamProperties.Select((o, i) => $@"""""{i}"""": [""""variables.{o.Name.FirstToLower()}""""]").Join()} }}"";
             form.Add(new StringContent(map), ""map"");
-{streamProperties
-    .Select((o, i) =>
-        $@"form.Add(new StreamContent(variables.{o.Name}.Stream), ""{i}"", variables.{o.Name}.FileName);").JoinWithNewLine()}
+{streamProperties.Select(GetVariable).JoinWithNewLine()}
 
             var response = await httpClient.PostAsync("""", form);";
 
         return executeRequest;
     }
 
-    private static string RequestWithSingleStream()
+    public static string GetVariable(IPropertySymbol propertySymbol, int index)
     {
-        return "";
+        if (propertySymbol.ContainingType.IsAnonymousType)
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($@"var upload{index} = (global::ZeroQL.Upload)ZeroQLReflectionCache.Get(variables, ""{propertySymbol.Name}"");".SpaceLeft(3));
+            stringBuilder.AppendLine($@"form.Add(new StreamContent(upload{index}.Stream), ""{index}"", upload{index}.FileName);".SpaceLeft(3));
+
+            return stringBuilder.ToString();
+        }
+
+        return $@"form.Add(new StreamContent(variables.{propertySymbol.Name}.Stream), ""{index}"", variables.{propertySymbol.Name}.FileName);".SpaceLeft(3);
     }
 
     private static string RequestWithoutVariables()

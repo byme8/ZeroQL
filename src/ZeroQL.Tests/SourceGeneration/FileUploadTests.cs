@@ -9,7 +9,7 @@ namespace ZeroQL.Tests.SourceGeneration;
 public class FileUploadTests : IntegrationTest
 {
     [Fact]
-    public async Task UploadFileWithOtherArgument()
+    public async Task UploadFileAsClassInstance()
     {
         var csharpQuery = "Mutation(new AddProfileImage(1, new Upload(\"image.png\", new MemoryStream(new byte[42]))), static (i, m) => m.AddUserProfileImage(i.UserId, i.File))";
         var graphqlQuery = @"mutation ($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
@@ -22,7 +22,7 @@ public class FileUploadTests : IntegrationTest
     }
     
     [Fact]
-    public async Task UploadSingleFile()
+    public async Task UploadFileAsAnonymousType()
     {
         var csharpQuery = "Mutation(new { File = new Upload(\"image.png\", new MemoryStream(new byte[42])) }, static (i, m) => m.AddMyProfileImage(i.File))";
         var graphqlQuery = @"mutation ($file: Upload!) { addMyProfileImage(file: $file)}";

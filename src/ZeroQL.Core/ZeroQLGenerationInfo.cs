@@ -1,8 +1,8 @@
 namespace ZeroQL.Core;
 
-public class SourceGeneratorInfo
+public class ZeroQLGenerationInfo
 {
-    public static string Version { get; } = typeof(SourceGeneratorInfo).Assembly.GetName().Version!.ToString();
+    public static string Version { get; } = typeof(ZeroQLGenerationInfo).Assembly.GetName().Version!.ToString();
     
     public static string CodeGenerationAttribute { get; } = $@"System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")";
     
