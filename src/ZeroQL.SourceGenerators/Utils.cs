@@ -7,7 +7,7 @@ namespace ZeroQL.SourceGenerators;
 
 public static class Utils
 {
-    private static readonly Dictionary<string, string> CSharpToGraphQL = new()
+    public static readonly Dictionary<string, string> CSharpToGraphQL = new()
     {
         { "string", "String" },
         { "byte", "Byte" },
@@ -182,7 +182,27 @@ public static class Utils
             return "object?";
         }
 
+        var name = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        if (string.IsNullOrEmpty(name))
+        {
+            return symbol.ToDisplayString();
+        }
 
-        return $"global::{symbol.ToDisplayString()}";
+        return name;
+    }
+    
+    public static string ToSafeGlobalName(this ISymbol symbol)
+    {
+        var name = symbol.ToGlobalName();
+
+        return name
+            .Replace("::", "")
+            .Replace("<", "GenerticOf")
+            .Replace(">", "")
+            .Replace("[", "ArrayOf")
+            .Replace("]", "")
+            .Replace(" ", "")
+            .Replace(":", "")
+            .Replace(".", "");
     }
 }

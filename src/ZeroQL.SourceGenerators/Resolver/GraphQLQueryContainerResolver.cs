@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -6,9 +7,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ZeroQL.SourceGenerators.Resolver;
 
+public class UploadInfoByType
+{
+    public ITypeSymbol Type { get; set; }
+
+    public IPropertySymbol[] UploadProperties { get; set; }
+}
+
 public class GraphQLQueryContainerResolver
 {
     public string Key { get; private set; }
+
+    public INamedTypeSymbol UploadType { get; private set; }
 
     public string OperationKind { get; private set; }
 
@@ -22,7 +32,7 @@ public class GraphQLQueryContainerResolver
 
     public INamedTypeSymbol RequestExecutorInputArgumentSymbol { get; private set; }
 
-    public (INamedTypeSymbol Type, IPropertySymbol[] UploadProperties)[] UploadPropeties { get; private set; }
+    public UploadInfoByType[] UploadPropeties { get; private set; }
 
     public Error? Resolve(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
     {
@@ -56,7 +66,7 @@ public class GraphQLQueryContainerResolver
 
         OperationKind = memberAccess.Name.Identifier.Text.ToLower();
 
-        GraphQLInputSymbol = GetVariableTypeName(lambdaSymbol, semanticModel.Compilation);
+        GraphQLInputSymbol = GetInputSymbol(lambdaSymbol, semanticModel.Compilation);
         RequestExecutorInputArgumentSymbol = GraphQLInputSymbol.IsAnonymousType ? GraphQLInputSymbol.BaseType! : GraphQLInputSymbol;
         RequestExecutorQueryType = lambdaSymbol.Parameters.Last().ToGlobalName();
 
@@ -90,12 +100,13 @@ public class GraphQLQueryContainerResolver
             .First()
             .GetNamedTypeSymbol();
 
-        var upload = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload");
-        UploadPropeties = FindUploadPropertiesForType(inputType, upload, new HashSet<string>())
+        UploadType = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload")!;
+        UploadPropeties = FindUploadPropertiesForType(inputType, UploadType, new HashSet<string>())
             .ToArray();
     }
 
-    private static INamedTypeSymbol GetVariableTypeName(IMethodSymbol lambdaSymbol, Compilation compilation)
+
+    private static INamedTypeSymbol GetInputSymbol(IMethodSymbol lambdaSymbol, Compilation compilation)
     {
         if (lambdaSymbol.Parameters.Length == 1)
         {
@@ -105,18 +116,45 @@ public class GraphQLQueryContainerResolver
         return lambdaSymbol.Parameters.First().GetNamedTypeSymbol();
     }
 
-    public static IEnumerable<(INamedTypeSymbol Type, IPropertySymbol[] UploadProperties)> FindUploadPropertiesForType(
-        INamedTypeSymbol inputType,
-        INamedTypeSymbol? upload,
+    public static UploadInfoByType[] FindUploadPropertiesForType(
+        ITypeSymbol inputType,
+        INamedTypeSymbol upload,
         HashSet<string> processedTypes)
     {
-        if (processedTypes.Contains(inputType.ToGlobalName()))
+        var inputTypeGlobalName = inputType.ToDisplayString();
+        if (processedTypes.Contains(inputTypeGlobalName) || Utils.CSharpToGraphQL.ContainsKey(inputTypeGlobalName))
         {
-            yield break;
+            return Array.Empty<UploadInfoByType>();
         }
 
-        processedTypes.Add(inputType.ToGlobalName());
+        processedTypes.Add(inputTypeGlobalName);
 
+        switch (inputType)
+        {
+            case INamedTypeSymbol namedTypeSymbol:
+            {
+                return HandleNamedType(namedTypeSymbol, upload, processedTypes);
+            }
+            case IArrayTypeSymbol arrayTypeSymbol:
+            {
+                return new[]
+                    {
+                        new UploadInfoByType()
+                        {
+                            Type = arrayTypeSymbol,
+                            UploadProperties = Array.Empty<IPropertySymbol>()
+                        }
+                    }
+                    .Concat(FindUploadPropertiesForType(arrayTypeSymbol.ElementType, upload, processedTypes))
+                    .ToArray();
+            }
+        }
+
+        return Array.Empty<UploadInfoByType>();
+    }
+
+    private static UploadInfoByType[] HandleNamedType(INamedTypeSymbol inputType, INamedTypeSymbol upload, HashSet<string> processedTypes)
+    {
         var properties = inputType
             .GetRealProperties()
             .Select(o =>
@@ -136,19 +174,51 @@ public class GraphQLQueryContainerResolver
             .Select(o => o.Property)
             .ToArray();
 
-        yield return (inputType, uploadProperties);
+        var results = nonUploadProperties
+            .Select(o => FindUploadPropertiesForType(o.Type, upload, processedTypes))
+            .ToArray();
 
-        foreach (var nonUploadProperty in nonUploadProperties)
+        var nodesToUpload = new List<int>();
+        for (int i = 0; i < results.Length; i++)
         {
-            if (nonUploadProperty.Type is not INamedTypeSymbol namedType)
+            var result = results[i];
+            if (result.Any())
             {
-                continue;
-            }
-
-            foreach (var item in FindUploadPropertiesForType(namedType, upload, processedTypes))
-            {
-                yield return (item.Type, item.UploadProperties);
+                nodesToUpload.Add(i);
             }
         }
+
+        if (nodesToUpload.Any())
+        {
+            return new[]
+                {
+                    new UploadInfoByType()
+                    {
+                        Type = inputType,
+                        UploadProperties = nodesToUpload
+                            .Select(o => nonUploadProperties[o])
+                            .Concat(uploadProperties)
+                            .ToArray()
+                    }
+                }
+                .Concat(nodesToUpload
+                    .SelectMany(o => results[o])
+                    .ToArray())
+                .ToArray();
+        }
+
+        if (uploadProperties.Any())
+        {
+            return new[]
+            {
+                new UploadInfoByType
+                {
+                    Type = inputType,
+                    UploadProperties = uploadProperties
+                }
+            };
+        }
+
+        return Array.Empty<UploadInfoByType>();
     }
 }
