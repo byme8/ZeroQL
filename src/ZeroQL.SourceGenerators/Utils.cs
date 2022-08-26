@@ -202,6 +202,7 @@ public static class Utils
             .Replace("[", "ArrayOf")
             .Replace("]", "")
             .Replace(" ", "")
+            .Replace(",", "")
             .Replace(":", "")
             .Replace(".", "");
     }

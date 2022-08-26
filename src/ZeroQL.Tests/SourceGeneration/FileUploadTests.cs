@@ -20,6 +20,19 @@ public class FileUploadTests : IntegrationTest
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
         result.Data.Should().Be(42);
     }
+    
+    [Fact]
+    public async Task UploadFileAsAnonymousTypeWithMultipleProperties()
+    {
+        var csharpQuery = "Mutation(new { UserId = 1, File = new Upload(\"image.png\", new MemoryStream(new byte[42])) }, static (i, m) => m.AddUserProfileImage(i.UserId, i.File))";
+        var graphqlQuery = @"mutation ($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+
+        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        result.Data.Should().Be(42);
+    }
 
     [Fact]
     public async Task UploadFileAsAnonymousType()
