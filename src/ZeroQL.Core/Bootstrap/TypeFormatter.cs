@@ -20,7 +20,8 @@ public class TypeFormatter
         { "DateTime", "DateTimeOffset" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
-        { "Boolean", "bool" }
+        { "Boolean", "bool" },
+        { "Upload", "global::ZeroQL.Upload" },
     };
 
     public TypeFormatter(HashSet<string> enums)

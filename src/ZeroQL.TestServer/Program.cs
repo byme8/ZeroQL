@@ -23,6 +23,7 @@ public class Program
         builder.Services.AddGraphQLServer()
             .AddQueryType<Query.Query>()
             .AddMutationType<Mutation>()
+            .AddType<UploadType>()
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>();

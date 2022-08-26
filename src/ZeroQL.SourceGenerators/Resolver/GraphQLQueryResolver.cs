@@ -133,7 +133,7 @@ public class GraphQLQueryResolver
 
         return type.GetMembers()
             .OfType<IPropertySymbol>()
-            .Select(o => (o.Name, o.Type.ToStringWithNullable()))
+            .Select(o => (o.Name, o.Type.ToGraphQLType()))
             .ToArray();
     }
 
@@ -261,7 +261,8 @@ public class GraphQLQueryResolver
         if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
         {
             var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Expression, context.CancellationToken);
-            if (symbol.Symbol is not INamedTypeSymbol namedType)
+            var namedType = symbol.GetTypeSymbol();
+            if (namedType is null)
             {
                 return Failed(memberAccess);
             }

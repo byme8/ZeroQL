@@ -1,4 +1,6 @@
-﻿namespace ZeroQL.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ZeroQL.Core;
 
 public interface IGraphQLResult
 {
@@ -9,11 +11,23 @@ public interface IGraphQLResult
 
 public class GraphQLResult<TData> : IGraphQLResult
 {
+    public GraphQLResult()
+    {
+        
+    }
+    
+    public GraphQLResult(string query, TData? data, GraphQueryError[] errors)
+    {
+        Query = query;
+        Data = data;
+        Errors = errors;
+    }
+
     public string Query { get; set; }
 
-    public TData Data { get; set; }
+    public TData? Data { get; set; }
 
-    public GraphQueryError[] Errors { get; set; }
+    public GraphQueryError[]? Errors { get; set; }
 }
 
 public class GraphQLRequest
@@ -33,11 +47,13 @@ public class GraphQueryError
 {
     public string Message { get; set; }
 
-    public ErrorLocation[] Locations { get; set; }
+    public object[] Path { get; set; }
+    
+    public QLExtenstion Extensions { get; set; }
 }
 
-public class ErrorLocation
+public class QLExtenstion
 {
-    public int Line { get; set; }
-    public int Column { get; set; }
+    public string Code { get; set; }
+    public string Field { get; set; }
 }

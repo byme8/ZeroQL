@@ -1,0 +1,97 @@
+﻿using ZeroQL.TestServer.Query.Models;
+
+namespace ZeroQL.TestServer.Query;
+
+[ExtendObjectType(typeof(Mutation))]
+public class UserGraphQLMutations
+{
+    public User AddUser(string firstName, string lastName)
+    {
+        var user = new User
+        {
+            FirstName = firstName,
+            LastName = lastName
+        };
+
+        return user;
+    }
+
+    public async Task<int> AddUserProfileImage(int userId, IFile file)
+    {
+        var stream = file.OpenReadStream();
+        var streamReader = new StreamReader(stream);
+        var data = await streamReader.ReadToEndAsync();
+
+        return data.Length;
+    }
+
+    public async Task<int> AddMyProfileImage(IFile file)
+    {
+        var stream = file.OpenReadStream();
+        var streamReader = new StreamReader(stream);
+        var data = await streamReader.ReadToEndAsync();
+
+        return data.Length;
+    }
+
+    public class UserInfo
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public IFile Avatar { get; set; }
+    }
+
+    public async Task<int> AddUsersInfo(UserInfo[] users)
+    {
+        var sum = 0;
+        foreach (var user in users)
+        {
+            var stream = user.Avatar.OpenReadStream();
+            var streamReader = new StreamReader(stream);
+            var data = await streamReader.ReadToEndAsync();
+            sum += data.Length;
+        }
+
+        return sum;
+    }
+
+    public async Task<int> AddValues(
+        string text,
+        byte value1,
+        byte? value2,
+        short value3,
+        short? value4,
+        int value5,
+        int? value6,
+        long value7,
+        long? value8,
+        float value9,
+        float? value10,
+        double value11,
+        double? value12,
+        decimal value13,
+        decimal? value14,
+        DateTime value15,
+        DateTime? value16,
+        DateOnly value17,
+        DateOnly? value18,
+        Guid value19,
+        Guid? value20,
+        Guid[] value21,
+        Guid[]? value22,
+        List<Guid> value23,
+        List<Guid>? value24,
+        IEnumerable<Guid> value25,
+        IEnumerable<Guid>? value26,
+        Dictionary<string, string> value27,
+        Dictionary<string, string>? value28,
+        KeyValuePair<string, string> value29,
+        KeyValuePair<string, string>? value30,
+        DateTimeOffset value31,
+        DateTimeOffset? value32
+    )
+    {
+        return 1;
+    }
+}

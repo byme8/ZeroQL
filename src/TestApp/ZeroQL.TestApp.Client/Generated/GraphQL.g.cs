@@ -29,10 +29,46 @@ namespace GraphQL.TestServer
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
         public User __AddUser { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
+        public int __AddUserProfileImage { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddMyProfileImage")]
+        public int __AddMyProfileImage { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUsersInfo")]
+        public int __AddUsersInfo { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddValues")]
+        public int __AddValues { get; set; }
+
         [ZeroQL.Core.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
             return selector(__AddUser);
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddUserProfileImage(int userId, global::ZeroQL.Upload file)
+        {
+            return __AddUserProfileImage;
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddMyProfileImage(global::ZeroQL.Upload file)
+        {
+            return __AddMyProfileImage;
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddUsersInfo(UserInfoInput[] users)
+        {
+            return __AddUsersInfo;
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public int AddValues(string text, byte value1, byte? value2, short value3, short? value4, int value5, int? value6, long value7, long? value8, double value9, double? value10, double value11, double? value12, decimal value13, decimal? value14, DateTimeOffset value15, DateTimeOffset? value16, DateOnly value17, DateOnly? value18, Guid value19, Guid? value20, Guid[] value21, Guid[]? value22, Guid[] value23, Guid[]? value24, Guid[] value25, Guid[]? value26, KeyValuePairOfStringAndStringInput[] value27, KeyValuePairOfStringAndStringInput[]? value28, KeyValuePairOfStringAndStringInput value29, KeyValuePairOfStringAndStringInput? value30, DateTimeOffset value31, DateTimeOffset? value32)
+        {
+            return __AddValues;
         }
     }
 
@@ -56,6 +92,9 @@ namespace GraphQL.TestServer
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
         public User __User { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByIds")]
+        public User[] __UsersByIds { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKind")]
         public UserKind __UserKind { get; set; }
@@ -102,6 +141,12 @@ namespace GraphQL.TestServer
         public T? User<T>(int id, Func<User?, T> selector)
         {
             return __User != default ? selector(__User) : default;
+        }
+
+        [ZeroQL.Core.GraphQLFieldSelector]
+        public T[] UsersByIds<T>(int[] ids, Func<User, T> selector)
+        {
+            return __UsersByIds.Select(o => selector(o)).ToArray();
         }
 
         [ZeroQL.Core.GraphQLFieldSelector]
@@ -251,6 +296,14 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class KeyValuePairOfStringAndStringInput
+    {
+        public string Key { get; set; }
+
+        public string Value { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class PageInput
     {
         public int Count { get; set; }
@@ -264,6 +317,16 @@ namespace GraphQL.TestServer
         public UserKind UserKind { get; set; }
 
         public PageInput? Page { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class UserInfoInput
+    {
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public global::ZeroQL.Upload Avatar { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

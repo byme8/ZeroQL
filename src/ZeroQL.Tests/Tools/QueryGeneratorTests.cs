@@ -17,7 +17,7 @@ public class QueryGeneratorTests : IAsyncLifetime
         var csharpQuery = "static q => q.Me(o => o.AsUserWithRoleNameBody())";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
         var compilation = await project.GetCompilationAsync();
         var document = project.Documents.First(o => o.Name == "Program.cs");
         var tree = await document.GetSyntaxTreeAsync();

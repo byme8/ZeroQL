@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net.Http;
+using System.IO; // do not remove this
+using System.Collections.Generic; // do not remove this
 using System.Threading.Tasks;
 using GraphQL.TestServer;
 using ZeroQL.Core;
@@ -32,4 +34,17 @@ public class Program
 
         return response;
     }
+}
+
+public class AddProfileImage
+{
+    public AddProfileImage(int userId, Upload file)
+    {
+        UserId = userId;
+        File = file;
+    }
+
+    public int UserId { get; set; }
+
+    public Upload File { get; set; }
 }
