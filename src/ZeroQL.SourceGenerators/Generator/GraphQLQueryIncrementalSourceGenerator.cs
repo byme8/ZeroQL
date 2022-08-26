@@ -157,10 +157,12 @@ namespace {semanticModel.Compilation.Assembly.Name}
         
         var sb = new StringBuilder();
 
-        foreach (var type in types)
+        foreach (var type in types.Where(o => o.Type is not IArrayTypeSymbol))
         {
+            var name  = GenerateTypeName(type.Type);
+            
             sb.Append($@"
-        private static void Process_{type.Type.ToSafeGlobalName()}(MultipartFormDataContentContext context, {type.Type.ToGlobalName()} value, string path)
+        private static void Process_{type.Type.ToSafeGlobalName()}(MultipartFormDataContentContext context, {name} value, string path)
         {{
 {type.UploadProperties.Select(o => GenerateAccessor(type, o, uploadType)).JoinWithNewLine()}
         }}");
@@ -170,34 +172,57 @@ namespace {semanticModel.Compilation.Assembly.Name}
         return sb.ToString();
     }
 
+    private string GenerateTypeName(ITypeSymbol type)
+    {
+        return type.IsAnonymousType
+            ? type.BaseType!.ToGlobalName()
+            : type.ToGlobalName();
+    }
+
     private string GenerateAccessor(UploadInfoByType type, IPropertySymbol propertySymbol, INamedTypeSymbol uploadType)
     {
         return propertySymbol.Type switch
         {
             INamedTypeSymbol namedType when SymbolEqualityComparer.Default.Equals(namedType, uploadType) =>
 $@"         
-            if (value.{propertySymbol.Name} is not null)
             {{
-                var index = context.Uploads.Count;
-                var uploadEntry = new UploadEntry
+                var propertyValue = {GenerateGetter(propertySymbol)};
+                if (propertyValue is not null)
                 {{
-                    Index = index,
-                    Path = {GeneratePath(propertySymbol)},
-                    Getter = () => (ZeroQL.Upload){GenerateGetter(propertySymbol)},
-                }};
-                context.Uploads.Add(uploadEntry);
+                    var index = context.Uploads.Count;
+                    var uploadEntry = new UploadEntry
+                    {{
+                        Index = index,
+                        Path = {GeneratePath(propertySymbol)},
+                        Getter = () => (ZeroQL.Upload)propertyValue,
+                    }};
+                    context.Uploads.Add(uploadEntry);
+                }}
             }}
 ",
             INamedTypeSymbol namedType => @$"Process_{namedType.ToSafeGlobalName()}(context, {GenerateGetter(propertySymbol)}, {GeneratePath(propertySymbol)});",
+            IArrayTypeSymbol arrayType =>
+@$"
+            {{
+                var propertyValue = ({GenerateTypeName(propertySymbol.Type)}){GenerateGetter(propertySymbol)};
+                if (propertyValue is not null)
+                {{
+                    for(var i = 0; i < propertyValue.Length; i++)
+                    {{
+                        Process_{arrayType.ElementType.ToSafeGlobalName()}(context, propertyValue[i], path + $"".{propertySymbol.Name.FirstToLower()}.{{i}}"");
+                    }}
+                }};
+            }}
+",
             _ => $@""
         };
     }
 
     private string GenerateGetter(IPropertySymbol propertySymbol)
     {
-        return propertySymbol.Type switch
+        return propertySymbol.ContainingType switch
         {
-            INamedTypeSymbol { IsAnonymousType: true } => $@"ZeroQLReflectionCache.Get(value, ""{propertySymbol.Name}"")",
+            { IsAnonymousType: true } => $@"ZeroQLReflectionCache.Get(value, ""{propertySymbol.Name}"")",
             _ => $@"value.{propertySymbol.Name}",
         };
     }
