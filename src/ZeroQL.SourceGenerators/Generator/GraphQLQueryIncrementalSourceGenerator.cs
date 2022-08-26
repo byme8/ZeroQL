@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -26,7 +24,6 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
         (InvocationExpressionSyntax Invocation, SemanticModel SemanticModel) input)
     {
         var (invocation, semanticModel) = input;
-        var uniqId = Guid.NewGuid().ToString("N");
         if (context.CancellationToken.IsCancellationRequested)
         {
             return;
@@ -59,6 +56,7 @@ public class GraphQLQueryIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
+        var uniqId = Guid.NewGuid().ToString("N");
         var graphQLInputTypeSafeName = resolver.GraphQLInputSymbol.ToSafeGlobalName();
         var typeInfo = resolver.UploadPropeties.ToDictionary(o => o.Type.ToSafeGlobalName());
         var source = $@"// This file generated for ZeroQL.
@@ -104,7 +102,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
                 Query = query
             }};
 
-            {GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
+            {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
 
             var responseJson = await response.Content.ReadAsStringAsync();
             var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<{resolver.RequestExecutorQueryType}>>(responseJson, ZeroQLJsonOptions.Options);
@@ -136,7 +134,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
             }};
         }}
 
-        {GenerateUploadsSelectors(resolver.UploadPropeties, resolver.UploadType)}
+        {GraphQLUploadResolver.GenerateUploadsSelectors(resolver.UploadPropeties, resolver.UploadType)}
     }}
 }}";
 
@@ -146,128 +144,6 @@ namespace {semanticModel.Compilation.Assembly.Name}
         }
 
         context.AddSource($"ZeroQLModuleInitializer.{uniqId}.g.cs", source);
-    }
-
-    private string GenerateUploadsSelectors(UploadInfoByType[] types, INamedTypeSymbol uploadType)
-    {
-        if (!types.Any())
-        {
-            return string.Empty;
-        }
-        
-        var sb = new StringBuilder();
-
-        foreach (var type in types.Where(o => o.Type is not IArrayTypeSymbol))
-        {
-            var name  = GenerateTypeName(type.Type);
-            
-            sb.Append($@"
-        private static void Process_{type.Type.ToSafeGlobalName()}(MultipartFormDataContentContext context, {name} value, string path)
-        {{
-{type.UploadProperties.Select(o => GenerateAccessor(type, o, uploadType)).JoinWithNewLine()}
-        }}");
-
-        }
-        
-        return sb.ToString();
-    }
-
-    private string GenerateTypeName(ITypeSymbol type)
-    {
-        return type.IsAnonymousType
-            ? type.BaseType!.ToGlobalName()
-            : type.ToGlobalName();
-    }
-
-    private string GenerateAccessor(UploadInfoByType type, IPropertySymbol propertySymbol, INamedTypeSymbol uploadType)
-    {
-        return propertySymbol.Type switch
-        {
-            INamedTypeSymbol namedType when SymbolEqualityComparer.Default.Equals(namedType, uploadType) =>
-$@"         
-            {{
-                var propertyValue = {GenerateGetter(propertySymbol)};
-                if (propertyValue is not null)
-                {{
-                    var index = context.Uploads.Count;
-                    var uploadEntry = new UploadEntry
-                    {{
-                        Index = index,
-                        Path = {GeneratePath(propertySymbol)},
-                        Getter = () => (ZeroQL.Upload)propertyValue,
-                    }};
-                    context.Uploads.Add(uploadEntry);
-                }}
-            }}
-",
-            INamedTypeSymbol namedType => @$"Process_{namedType.ToSafeGlobalName()}(context, {GenerateGetter(propertySymbol)}, {GeneratePath(propertySymbol)});",
-            IArrayTypeSymbol arrayType =>
-@$"
-            {{
-                var propertyValue = ({GenerateTypeName(propertySymbol.Type)}){GenerateGetter(propertySymbol)};
-                if (propertyValue is not null)
-                {{
-                    for(var i = 0; i < propertyValue.Length; i++)
-                    {{
-                        Process_{arrayType.ElementType.ToSafeGlobalName()}(context, propertyValue[i], path + $"".{propertySymbol.Name.FirstToLower()}.{{i}}"");
-                    }}
-                }};
-            }}
-",
-            _ => $@""
-        };
-    }
-
-    private string GenerateGetter(IPropertySymbol propertySymbol)
-    {
-        return propertySymbol.ContainingType switch
-        {
-            { IsAnonymousType: true } => $@"ZeroQLReflectionCache.Get(value, ""{propertySymbol.Name}"")",
-            _ => $@"value.{propertySymbol.Name}",
-        };
-    }
-
-    private string GeneratePath(IPropertySymbol propertySymbol)
-    {
-        return propertySymbol.Type switch
-        {
-            _ => $@"$""{{path}}.{propertySymbol.Name.FirstToLower()}""",
-        };
-    }
-
-    private string GenerateRequestPreparations(string graphQLInputTypeName, Dictionary<string, UploadInfoByType> infoForTypes)
-    {
-        if (!infoForTypes.TryGetValue(graphQLInputTypeName, out var root))
-        {
-            return RequestWithoutUpload();
-        }
-
-        return $@"
-            var context = new MultipartFormDataContentContext();
-            Process_{root.Type.ToSafeGlobalName()}(context, variables, ""variables"");
-
-            var form = new MultipartFormDataContent();
-
-            var queryJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-            form.Add(new StringContent(queryJson), ""operations"");
-
-            var map = context.Uploads.ToDictionary(o => o.Index,  o => new [] {{ o.Path }});
-            var mapJson = JsonSerializer.Serialize(map, ZeroQLJsonOptions.Options);
-            form.Add(new StringContent(mapJson), ""map"");
-            foreach(var uploadInfo in context.Uploads)
-            {{
-                var upload = uploadInfo.Getter();
-                form.Add(new StreamContent(upload.Stream), uploadInfo.Index.ToString(), upload.FileName);
-            }};
-
-            var response = await httpClient.PostAsync("""", form);";
-    }
-
-    private static string RequestWithoutUpload()
-    {
-        return @"
-            var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-            var response = await httpClient.PostAsync("""", new StringContent(requestJson, Encoding.UTF8, ""application/json""));";
     }
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
