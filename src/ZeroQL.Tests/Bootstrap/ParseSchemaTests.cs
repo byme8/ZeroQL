@@ -43,7 +43,7 @@ public class ParseSchemaTests
             "UserKind[] UserKinds"
         };
 
-        var query = SyntaxTree.GetClass("Query");
+        var query = SyntaxTree.GetClass("Query")!;
 
         query.Members
             .OfType<MethodDeclarationSyntax>()
@@ -108,7 +108,7 @@ public class ParseSchemaTests
             "Guid[]? Value26"
         };
 
-        var query = SyntaxTree.GetClass("TypesContainer");
+        var query = SyntaxTree.GetClass("TypesContainer")!;
 
         query.Members
             .OfType<PropertyDeclarationSyntax>()
@@ -130,7 +130,7 @@ public class ParseSchemaTests
             "T AddUser<T>(string firstName, string lastName, Func<User, T> selector)"
         };
 
-        var query = SyntaxTree.GetClass("Mutation");
+        var query = SyntaxTree.GetClass("Mutation")!;
 
         query.Members
             .OfType<MethodDeclarationSyntax>()
@@ -155,7 +155,7 @@ public class ParseSchemaTests
             "PageInput? Page"
         };
 
-        var query = SyntaxTree.GetClass("UserFilterInput");
+        var query = SyntaxTree.GetClass("UserFilterInput")!;
 
         query.Members
             .OfType<MethodDeclarationSyntax>()
@@ -178,7 +178,7 @@ public class ParseSchemaTests
             "PageInput? Page"
         };
 
-        var query = SyntaxTree.GetClass("UserFilterInput");
+        var query = SyntaxTree.GetClass("UserFilterInput")!;
 
         query.Members
             .OfType<MethodDeclarationSyntax>()
@@ -197,7 +197,7 @@ public class ParseSchemaTests
     {
         var propertiesNames = new[] { "Id", "FirstName", "LastName", "UserKind" };
 
-        var query = SyntaxTree.GetClass("User");
+        var query = SyntaxTree.GetClass("User")!;
 
         query.Should().NotBeNull();
         query.Members
@@ -210,7 +210,7 @@ public class ParseSchemaTests
     [Fact]
     public void FieldsHasArguments()
     {
-        var query = SyntaxTree.GetClass("Query");
+        var query = SyntaxTree.GetClass("Query")!;
         var user = query.GetMethod("User");
 
         user.ParameterList.Parameters
@@ -222,7 +222,7 @@ public class ParseSchemaTests
     [Fact]
     public void BackedFieldsHasJsonPropertyNames()
     {
-        var query = SyntaxTree.GetClass("Query");
+        var query = SyntaxTree.GetClass("Query")!;
         var user = query.GetProperty("__User");
 
         user.AttributeLists
@@ -243,7 +243,12 @@ public class ParseSchemaTests
         var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
         var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
 
-        syntaxTree.GetClass("Mutation").Should().NotBeNull();
+        var clientClass = syntaxTree.GetClass("GraphQLClient")!;
+        clientClass.Should().NotBeNull();
+
+        var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
+        var genericName = (GenericNameSyntax)name.Right;
+        genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("ZeroQL.Core.Unit");
     }
 
     [Fact]
@@ -256,6 +261,52 @@ public class ParseSchemaTests
         var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
         var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
 
-        syntaxTree.GetClass("Query").Should().NotBeNull();
+        var clientClass = syntaxTree.GetClass("GraphQLClient")!;
+        clientClass.Should().NotBeNull();
+
+        var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
+        var genericName = (GenericNameSyntax)name.Right;
+        genericName.TypeArgumentList.Arguments[0].ToString().Should().Be("ZeroQL.Core.Unit");
+    }
+
+    [Fact]
+    public void SchemaWithRenamedQueryHandledProperly()
+    {
+        var rawSchema = TestSchema.RawSchema
+            .Replace("query: Query", "query: Queries")
+            .Replace("type Query", "type Queries");
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        syntaxTree.GetClass("Query").Should().BeNull();
+        syntaxTree.GetClass("Queries").Should().NotBeNull();
+        
+        var clientClass = syntaxTree.GetClass("GraphQLClient")!;
+        clientClass.Should().NotBeNull();
+
+        var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
+        var genericName = (GenericNameSyntax)name.Right;
+        genericName.TypeArgumentList.Arguments[0].ToString().Should().Be("Queries");
+    }
+    
+    [Fact]
+    public void SchemaWithRenamedMutationHandledProperly()
+    {
+        var rawSchema = TestSchema.RawSchema
+            .Replace("mutation: Mutation", "mutation: Mutations")
+            .Replace("type Mutation", "type Mutations");
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        syntaxTree.GetClass("Mutation").Should().BeNull();
+        syntaxTree.GetClass("Mutations").Should().NotBeNull();
+        var clientClass = syntaxTree.GetClass("GraphQLClient")!;
+        clientClass.Should().NotBeNull();
+
+        var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
+        var genericName = (GenericNameSyntax)name.Right;
+        genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("Mutations");
     }
 }

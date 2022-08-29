@@ -6,12 +6,12 @@ namespace ZeroQL.Core.Extensions;
 
 public static class NodeExtensions
 {
-    public static ClassDeclarationSyntax GetClass(this SyntaxTree syntaxTree, string name)
+    public static ClassDeclarationSyntax? GetClass(this SyntaxTree syntaxTree, string name)
     {
         var type = syntaxTree.GetRoot()
             .DescendantNodes()
             .OfType<ClassDeclarationSyntax>()
-            .First(o => o.Identifier.ValueText == name);
+            .FirstOrDefault(o => o.Identifier.ValueText == name);
 
         return type;
     }

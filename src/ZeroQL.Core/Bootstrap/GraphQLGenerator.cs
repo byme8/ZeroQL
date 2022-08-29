@@ -22,6 +22,23 @@ public static class GraphQLGenerator
             .OfType<GraphQLEnumTypeDefinition>()
             .ToArray();
 
+        var schemaDefinition = schema.Definitions
+            .OfType<GraphQLSchemaDefinition>()
+            .FirstOrDefault();
+
+        if (schemaDefinition is null)
+        {
+            return "// Schema definition not found";
+        }
+
+        var queryType = schemaDefinition.OperationTypes
+            .FirstOrDefault(x => x.Operation == OperationType.Query)?
+            .Type;
+
+        var mutationType = schemaDefinition.OperationTypes
+            .FirstOrDefault(x => x.Operation == OperationType.Mutation)?
+            .Type;
+
         var enumsNames = new HashSet<string>(enums.Select(o => o.Name.StringValue));
 
         var context = new TypeFormatter(enumsNames);
@@ -37,7 +54,7 @@ public static class GraphQLGenerator
 
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
-        var clientDeclaration = new[] { GenerateClient(clientName) };
+        var clientDeclaration = new[] { GenerateClient(clientName, queryType, mutationType) };
         var typesDeclaration = GenerateTypes(types);
         var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
@@ -60,10 +77,13 @@ using System.Text.Json.Serialization;
 {formattedSource}";
     }
 
-    private static ClassDeclarationSyntax GenerateClient(string? clientName)
+    private static ClassDeclarationSyntax GenerateClient(string? clientName, GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
     {
+        var queryTypeName = queryType?.Name.StringValue ?? "ZeroQL.Core.Unit";
+        var mutationTypeName = mutationType?.Name.StringValue ?? "ZeroQL.Core.Unit";
+
         return CSharpHelper.Class(clientName ?? "GraphQLClient")
-            .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName("global::ZeroQL.Core.GraphQLClient<Query, Mutation>")))))
+            .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName($"global::ZeroQL.Core.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
             .WithMembers(SingletonList<MemberDeclarationSyntax>(
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
                     .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client)"))
@@ -145,18 +165,6 @@ using System.Text.Json.Serialization;
 
             })
             .ToList();
-
-        if (definitions.All(o => o.Name != "Mutation"))
-        {
-            csharpDefinitions.Add(CSharpHelper.Class("Mutation")
-                .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute));
-        }
-
-        if (definitions.All(o => o.Name != "Query"))
-        {
-            csharpDefinitions.Add(CSharpHelper.Class("Query")
-                .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute));
-        }
 
         return csharpDefinitions;
     }
