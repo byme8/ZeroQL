@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TestApp\ZeroQL.TestApp.Models\ZeroQL.TestApp.Models.csproj" />
         <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
         <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />

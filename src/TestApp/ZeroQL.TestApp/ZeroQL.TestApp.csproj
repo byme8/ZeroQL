@@ -7,8 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZeroQL.TestApp.Client\ZeroQL.TestApp.Client.csproj" />
-        <ProjectReference Include="..\ZeroQL.TestApp.Models\ZeroQL.TestApp.Models.csproj" />
+        <ProjectReference Include="..\..\ZeroQL.Core\ZeroQL.Core.csproj" />
         <ProjectReference Include="..\..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>

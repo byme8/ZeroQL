@@ -13,10 +13,10 @@ public class CLITests
     {
         using var console = new FakeInMemoryConsole();
         var generateCommand = new GenerateCommand();
-        generateCommand.Schema = "../../../../TestApp/ZeroQL.TestApp.Client/schema.graphql";
+        generateCommand.Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql";
         generateCommand.Namespace = "GraphQL.TestServer";
         generateCommand.ClientName = "TestServerClient";
-        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp.Client/Generated/GraphQL.g.cs";
+        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/Generated/GraphQL.g.cs";
 
         await generateCommand.ExecuteAsync(console);
 
