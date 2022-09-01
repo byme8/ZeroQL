@@ -111,7 +111,7 @@ public class GraphQLQueryContainerResolver
     {
         if (lambdaSymbol.Parameters.Length == 1)
         {
-            return compilation.GetTypeByMetadataName("ZeroQL.Core.Unit")!;
+            return compilation.GetTypeByMetadataName("ZeroQL.Unit")!;
         }
 
         return lambdaSymbol.Parameters.First().GetNamedTypeSymbol();

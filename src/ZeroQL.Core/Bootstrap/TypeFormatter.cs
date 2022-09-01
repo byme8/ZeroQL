@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraphQLParser.AST;
-using ZeroQL.Core.Schema;
+using ZeroQL.Schema;
 
-namespace ZeroQL.Core.Bootstrap;
+namespace ZeroQL.Bootstrap;
 
 public class TypeFormatter
 {

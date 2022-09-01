@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace ZeroQL.Core.Stores;
+namespace ZeroQL.Stores;
 
 public static class GraphQLQueryStore<TQuery>
 {

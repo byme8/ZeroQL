@@ -1,6 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace ZeroQL.Core;
+namespace ZeroQL;
+
+public class Unit
+{
+}
 
 public interface IGraphQLResult
 {

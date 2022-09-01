@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Xunit;
-using ZeroQL.Core;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 

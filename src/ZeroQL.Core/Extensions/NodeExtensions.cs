@@ -2,7 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace ZeroQL.Core.Extensions;
+namespace ZeroQL.Extensions;
 
 public static class NodeExtensions
 {

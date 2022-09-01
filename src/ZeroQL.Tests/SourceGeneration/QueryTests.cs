@@ -1,6 +1,5 @@
 using System.Reflection;
 using FluentAssertions;
-using ZeroQL.Core;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.SourceGenerators.Generator;

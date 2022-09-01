@@ -1,4 +1,4 @@
-﻿namespace ZeroQL.Core.Schema;
+﻿namespace ZeroQL.Schema;
 
 public class FieldDefinition
 {

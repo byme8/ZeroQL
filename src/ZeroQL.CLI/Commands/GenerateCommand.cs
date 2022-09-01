@@ -1,7 +1,7 @@
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
-using ZeroQL.Core.Bootstrap;
+using ZeroQL.Bootstrap;
 
 namespace ZeroQL.CLI.Commands;
 

@@ -1,4 +1,4 @@
-namespace ZeroQL.Core;
+namespace ZeroQL;
 
 public class ZeroQLGenerationInfo
 {
@@ -6,5 +6,5 @@ public class ZeroQLGenerationInfo
     
     public static string CodeGenerationAttribute { get; } = $@"System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")";
     
-    public static string GraphQLFieldSelectorAttribute { get; } = $@"ZeroQL.Core.GraphQLFieldSelector";
+    public static string GraphQLFieldSelectorAttribute { get; } = $@"ZeroQL.GraphQLFieldSelector";
 }

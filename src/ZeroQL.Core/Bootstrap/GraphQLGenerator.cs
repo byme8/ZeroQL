@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQLParser;
 using GraphQLParser.AST;
-using ZeroQL.Core.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using ZeroQL.Core.Schema;
+using ZeroQL.Extensions;
+using ZeroQL.Schema;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace ZeroQL.Core.Bootstrap;
+namespace ZeroQL.Bootstrap;
 
 public static class GraphQLGenerator
 {
@@ -79,11 +79,11 @@ using System.Text.Json.Serialization;
 
     private static ClassDeclarationSyntax GenerateClient(string? clientName, GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
     {
-        var queryTypeName = queryType?.Name.StringValue ?? "ZeroQL.Core.Unit";
-        var mutationTypeName = mutationType?.Name.StringValue ?? "ZeroQL.Core.Unit";
+        var queryTypeName = queryType?.Name.StringValue ?? "ZeroQL.Unit";
+        var mutationTypeName = mutationType?.Name.StringValue ?? "ZeroQL.Unit";
 
         return CSharpHelper.Class(clientName ?? "GraphQLClient")
-            .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName($"global::ZeroQL.Core.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
+            .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName($"global::ZeroQL.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
             .WithMembers(SingletonList<MemberDeclarationSyntax>(
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
                     .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client)"))

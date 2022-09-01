@@ -1,5 +1,5 @@
 using GraphQL.TestServer;
-using ZeroQL.Core;
+using ZeroQL;
 using ZeroQL.TestApp.Models;
 
 public static partial class QueryFragmentsWithoutNamespace

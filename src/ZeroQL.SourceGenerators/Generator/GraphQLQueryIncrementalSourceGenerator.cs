@@ -67,9 +67,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Net.Http;
-using ZeroQL.Core;
-using ZeroQL.Core.Stores;
-using ZeroQL.Core.Internal;
+using ZeroQL;
+using ZeroQL.Stores;
+using ZeroQL.Internal;
 
 namespace {semanticModel.Compilation.Assembly.Name}
 {{

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.TestServer;
-using ZeroQL.Core;
 using ZeroQL.TestApp.Models;
 
 namespace ZeroQL.TestApp;

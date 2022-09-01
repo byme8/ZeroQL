@@ -2,7 +2,6 @@ using System.Reflection;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
 using FluentAssertions;
-using ZeroQL.Core;
 using ZeroQL.Tests.Core;
 using Microsoft.CodeAnalysis;
 

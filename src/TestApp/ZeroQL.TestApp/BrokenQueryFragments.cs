@@ -1,5 +1,4 @@
 using GraphQL.TestServer;
-using ZeroQL.Core;
 
 namespace ZeroQL.TestApp.Models;
 

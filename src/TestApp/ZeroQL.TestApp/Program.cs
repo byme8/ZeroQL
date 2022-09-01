@@ -4,7 +4,7 @@ using System.IO; // do not remove this
 using System.Collections.Generic; // do not remove this
 using System.Threading.Tasks;
 using GraphQL.TestServer;
-using ZeroQL.Core;
+using ZeroQL.Schema;
 using ZeroQL.TestApp.Models;
 
 namespace ZeroQL.TestApp;

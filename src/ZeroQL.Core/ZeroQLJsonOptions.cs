@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ZeroQL.Core.Extensions;
+using ZeroQL.Extensions;
 
-namespace ZeroQL.Core;
+namespace ZeroQL;
 
 public static class ZeroQLJsonOptions
 {

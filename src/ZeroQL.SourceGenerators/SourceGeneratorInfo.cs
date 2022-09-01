@@ -6,11 +6,11 @@ public class SourceGeneratorInfo
 
     public static string CodeGenerationAttribute { get; } = $@"[System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")]";
 
-    public static string GraphQLFieldSelectorAttribute { get; } = "ZeroQL.Core.GraphQLFieldSelector";
+    public static string GraphQLFieldSelectorAttribute { get; } = "ZeroQL.GraphQLFieldSelector";
 
-    public static string GraphQLFragmentAttributeFullName { get; } = "ZeroQL.Core.GraphQLFragment";
+    public static string GraphQLFragmentAttributeFullName { get; } = "ZeroQL.GraphQLFragment";
     
     public static string GraphQLFragmentAttributeTypeName { get; } = "GraphQLFragment";
 
-    public static string GraphQLQueryTemplateAttribute { get; } = "ZeroQL.Core.GraphQLQueryTemplate";
+    public static string GraphQLQueryTemplateAttribute { get; } = "ZeroQL.GraphQLQueryTemplate";
 }

@@ -1,11 +1,10 @@
 ﻿using FluentAssertions;
-using ZeroQL.Core.Bootstrap;
-using ZeroQL.Core.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Xunit;
-using ZeroQL.Core;
+using ZeroQL.Bootstrap;
+using ZeroQL.Extensions;
 using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.Bootstrap;
@@ -248,7 +247,7 @@ public class ParseSchemaTests
 
         var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
         var genericName = (GenericNameSyntax)name.Right;
-        genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("ZeroQL.Core.Unit");
+        genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("ZeroQL.Unit");
     }
 
     [Fact]
@@ -266,7 +265,7 @@ public class ParseSchemaTests
 
         var name = (QualifiedNameSyntax)clientClass.BaseList!.Types[0].Type;
         var genericName = (GenericNameSyntax)name.Right;
-        genericName.TypeArgumentList.Arguments[0].ToString().Should().Be("ZeroQL.Core.Unit");
+        genericName.TypeArgumentList.Arguments[0].ToString().Should().Be("ZeroQL.Unit");
     }
 
     [Fact]

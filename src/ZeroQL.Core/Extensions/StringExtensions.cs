@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ZeroQL.Core.Extensions;
+namespace ZeroQL.Extensions;
 
 public static class StringExtensions
 {

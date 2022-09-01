@@ -1,6 +1,6 @@
 using System;
 
-namespace ZeroQL.Core;
+namespace ZeroQL;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class GraphQLFieldSelector : Attribute

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Xunit;
-using ZeroQL.Core.Extensions;
+using ZeroQL.Extensions;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
