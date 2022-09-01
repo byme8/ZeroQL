@@ -7,6 +7,7 @@ using BenchmarkDotNet.Running;
 using GraphQL.TestServer;
 using Microsoft.Extensions.DependencyInjection;
 using StrawberryShake.TestServerClient;
+using ZeroQL;
 
 _ = ZeroQL.TestServer.Program.StartServer(args);
 await ZeroQL.TestServer.Program.VerifyServiceIsRunning();
