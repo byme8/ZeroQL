@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
+using ZeroQL.Internal;
 using ZeroQL.Schema;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 

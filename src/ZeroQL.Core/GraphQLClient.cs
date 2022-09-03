@@ -21,7 +21,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
         Func<TVariables?, TOperationType?, TResult?> queryMapper,
         string queryKey)
     {
-        if (!GraphQLQueryStore<TOperationType>.Query.TryGetValue(queryKey, out var queryRunner))
+        if (!GraphQLQueryStore<TOperationType>.Executor.TryGetValue(queryKey, out var queryRunner))
         {
             throw new InvalidOperationException("Query is not bootstrapped.");
         }

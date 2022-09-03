@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace ZeroQL;
+namespace ZeroQL.Internal;
 
-public static class CSharpHelper
+internal static class CSharpHelper
 {
     public static ClassDeclarationSyntax Class(string name)
     {

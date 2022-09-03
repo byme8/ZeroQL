@@ -79,7 +79,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {{
-            GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Query[{SyntaxFactory.Literal(resolver.Key).Text}] = Execute;
+            GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Executor[{SyntaxFactory.Literal(resolver.Key).Text}] = Execute;
         }}
 
         public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(HttpClient httpClient, string? operationName, object variablesObject)

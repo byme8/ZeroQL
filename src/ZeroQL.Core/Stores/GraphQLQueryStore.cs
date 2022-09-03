@@ -7,5 +7,5 @@ namespace ZeroQL.Stores;
 
 public static class GraphQLQueryStore<TQuery>
 {
-    public static Dictionary<string, Func<HttpClient, string?, object, Task<GraphQLResult<TQuery>>>> Query { get; } = new();
+    public static Dictionary<string, Func<HttpClient, string?, object, Task<GraphQLResult<TQuery>>>> Executor { get; } = new();
 }

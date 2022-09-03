@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using GraphQLParser.AST;
 using ZeroQL.Schema;
 
-namespace ZeroQL.Bootstrap;
+namespace ZeroQL.Internal;
 
-public class TypeFormatter
+internal class TypeFormatter
 {
 
     public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
