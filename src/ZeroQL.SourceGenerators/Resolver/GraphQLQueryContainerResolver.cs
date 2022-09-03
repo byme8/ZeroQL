@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,6 +26,8 @@ public class GraphQLQueryContainerResolver
     public string OperationKind { get; private set; }
 
     public string QueryBody { get; private set; }
+
+    public string Hash { get; private set; }
 
     public IMethodSymbol GraphQLLambdaSymbol { get; private set; }
 
@@ -85,6 +89,7 @@ public class GraphQLQueryContainerResolver
         }
 
         QueryBody = query;
+        Hash = ComputeHash(QueryBody);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -93,7 +98,13 @@ public class GraphQLQueryContainerResolver
 
         return null;
     }
-
+    
+    private string ComputeHash(string queryBody)
+    {
+        using var sha256 = SHA256.Create();
+        var saltedPasswordAsBytes = Encoding.UTF8.GetBytes(queryBody);
+        return Convert.ToBase64String(sha256.ComputeHash(saltedPasswordAsBytes));
+    }
 
     private void FindAllUploadProperties(IMethodSymbol lambdaSymbol, SemanticModel semanticModel)
     {

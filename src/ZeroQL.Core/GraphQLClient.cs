@@ -6,14 +6,25 @@ using ZeroQL.Stores;
 
 namespace ZeroQL;
 
-public class GraphQLClient<TQuery, TMutation> : IDisposable
+public interface IGraphQLClient
 {
-    private readonly HttpClient httpClient;
+    HttpClient HttpClient { get; }
 
-    public GraphQLClient(HttpClient httpClient)
+    IGraphQLQueryStrategy QueryStrategy { get; }
+}
+
+public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
+{
+
+    public GraphQLClient(HttpClient httpClient, IGraphQLQueryStrategy? queryStrategy = null)
     {
-        this.httpClient = httpClient;
+        HttpClient = httpClient;
+        QueryStrategy = queryStrategy ?? new FullQueryStrategy();
     }
+
+    public HttpClient HttpClient { get; }
+
+    public IGraphQLQueryStrategy QueryStrategy { get; }
 
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         string? operationName,
@@ -26,7 +37,7 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
-        var result = await queryRunner.Invoke(httpClient, operationName, variables);
+        var result = await queryRunner.Invoke(this, queryKey, operationName, variables);
         if (result.Errors?.Any() ?? false)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors);
@@ -40,6 +51,6 @@ public class GraphQLClient<TQuery, TMutation> : IDisposable
 
     public void Dispose()
     {
-        httpClient.Dispose();
+        HttpClient.Dispose();
     }
 }

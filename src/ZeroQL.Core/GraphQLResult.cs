@@ -20,7 +20,7 @@ public class GraphQLResult<TData> : IGraphQLResult
         
     }
     
-    public GraphQLResult(string query, TData? data, GraphQueryError[] errors)
+    public GraphQLResult(string query, TData? data, GraphQueryError[]? errors)
     {
         Query = query;
         Data = data;
@@ -32,12 +32,6 @@ public class GraphQLResult<TData> : IGraphQLResult
     public TData? Data { get; set; }
 
     public GraphQueryError[]? Errors { get; set; }
-}
-
-public class GraphQLRequest
-{
-    public object? Variables { get; set; }
-    public string Query { get; set; }
 }
 
 public class GraphQLResponse<TData>

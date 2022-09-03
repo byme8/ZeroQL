@@ -100,32 +100,31 @@ public class GraphQLUploadResolver
         {
             return RequestWithoutUpload();
         }
-        
+
         return $@"
             var context = new MultipartFormDataContentContext();
             Process_{root.Type.ToSafeGlobalName()}(context, variables, ""variables"");
 
-            var form = new MultipartFormDataContent();
+            var content = new MultipartFormDataContent();
 
             var queryJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-            form.Add(new StringContent(queryJson), ""operations"");
+            content.Add(new StringContent(queryJson), ""operations"");
 
             var map = context.Uploads.ToDictionary(o => o.Index,  o => new [] {{ o.Path }});
             var mapJson = JsonSerializer.Serialize(map, ZeroQLJsonOptions.Options);
-            form.Add(new StringContent(mapJson), ""map"");
+            content.Add(new StringContent(mapJson), ""map"");
             foreach(var uploadInfo in context.Uploads)
             {{
                 var upload = uploadInfo.Getter();
-                form.Add(new StreamContent(upload.Stream), uploadInfo.Index.ToString(), upload.FileName);
+                content.Add(new StreamContent(upload.Stream), uploadInfo.Index.ToString(), upload.FileName);
             }};
-
-            var response = await httpClient.PostAsync("""", form);";
+";
     }
 
     private static string RequestWithoutUpload()
     {
         return @"
-            var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
-            var response = await httpClient.PostAsync("""", new StringContent(requestJson, Encoding.UTF8, ""application/json""));";
+            var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options); 
+            var content = new StringContent(requestJson, Encoding.UTF8, ""application/json"");";
     }
 }

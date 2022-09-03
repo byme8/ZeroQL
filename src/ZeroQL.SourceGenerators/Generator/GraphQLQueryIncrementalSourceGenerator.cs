@@ -80,40 +80,28 @@ namespace {semanticModel.Compilation.Assembly.Name}
         public static void Init()
         {{
             GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Executor[{SyntaxFactory.Literal(resolver.Key).Text}] = Execute;
+            GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Query[{SyntaxFactory.Literal(resolver.Key).Text}] = new QueryInfo 
+            {{
+                QueryBody = {SyntaxFactory.Literal(resolver.QueryBody).Text},
+                OperationType = {SyntaxFactory.Literal(resolver.OperationKind).Text},
+                Hash = {SyntaxFactory.Literal(resolver.Hash).Text},
+            }};
         }}
 
-        public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(HttpClient httpClient, string? operationName, object variablesObject)
+        public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(IGraphQLClient qlClient, string queryKey, string? operationName, object variablesObject)
         {{
-            var queryBody = {SyntaxFactory.Literal(resolver.QueryBody).Text};
             var variables = ({resolver.RequestExecutorInputArgumentSymbol.ToGlobalName()})variablesObject;
             
-            var stringBuilder = new System.Text.StringBuilder();
-            stringBuilder.Append(""{resolver.OperationKind} "");
-            if (!string.IsNullOrEmpty(operationName))
-            {{
-                stringBuilder.Append(operationName);
-            }}
-            stringBuilder.Append(queryBody);
-
-            var query = stringBuilder.ToString();
-            var queryRequest = new GraphQLRequest
-            {{
-                Variables = variables,
-                Query = query
-            }};
-
+            var queryRequest = qlClient.QueryStrategy.CreateRequest<{resolver.RequestExecutorQueryType}>(queryKey, operationName, variablesObject);
             {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
-
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<{resolver.RequestExecutorQueryType}>>(responseJson, ZeroQLJsonOptions.Options);
-
+            var qlResponse = await qlClient.QueryStrategy.ExecuteAsync<{resolver.RequestExecutorQueryType}>(qlClient.HttpClient, content);
             if (qlResponse is null)
             {{
                 return new GraphQLResult<{resolver.RequestExecutorQueryType}>
                 {{
                     Errors = new[]
                     {{
-                        new GraphQueryError {{ Message = ""Failed to deserialize response: "" + responseJson }}
+                        new GraphQueryError {{ Message = ""Failed to deserialize response"" }}
                     }}
                 }};
             }}
@@ -122,14 +110,14 @@ namespace {semanticModel.Compilation.Assembly.Name}
             {{
                 return new GraphQLResult<{resolver.RequestExecutorQueryType}>
                 {{
-                    Query = query,
+                    Query = queryRequest.Query,
                     Errors = qlResponse.Errors
                 }};
             }}
 
             return new GraphQLResult<{resolver.RequestExecutorQueryType}>
             {{
-                Query = query,
+                Query = queryRequest.Query,
                 Data = qlResponse.Data
             }};
         }}
