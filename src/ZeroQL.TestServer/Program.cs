@@ -1,4 +1,5 @@
 using System.Net;
+using HotChocolate.Language;
 using ZeroQL.TestServer.Query;
 using ZeroQL.TestServer.Query.Models;
 
@@ -20,13 +21,18 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(10_000));
 
+        builder.Services.AddMemoryCache()
+            .AddSha256DocumentHashProvider(HashFormat.Hex);
+
         builder.Services.AddGraphQLServer()
             .AddQueryType<Query.Query>()
             .AddMutationType<Mutation>()
             .AddType<UploadType>()
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLMutations>()
-            .AddTypeExtension<RoleGraphQLExtension>();
+            .AddTypeExtension<RoleGraphQLExtension>()
+            .UseAutomaticPersistedQueryPipeline()
+            .AddInMemoryQueryStorage();
 
         var app = builder.Build();
 

@@ -23,9 +23,11 @@ public class GraphQLQueryContainerResolver
 
     public INamedTypeSymbol UploadType { get; private set; }
 
+    public string? Name { get; private set; }
+
     public string OperationKind { get; private set; }
 
-    public string QueryBody { get; private set; }
+    public string Query { get; private set; }
 
     public string Hash { get; private set; }
 
@@ -53,15 +55,13 @@ public class GraphQLQueryContainerResolver
         }
 
         var graphqlLambda = invocation.ArgumentList.Arguments.Last();
-        var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
-
         Key = graphqlLambda.ToString();
 
+        var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
         if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol lambdaSymbol)
         {
             return new Error("Could not find lambda symbol");
         }
-
         GraphQLLambdaSymbol = lambdaSymbol;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
@@ -70,6 +70,30 @@ public class GraphQLQueryContainerResolver
         }
 
         OperationKind = memberAccess.Name.Identifier.Text.ToLower();
+
+        var possibleMethodSymbol = semanticModel.GetSymbolInfo(invocation);
+        if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
+        {
+            return new Error("Could not find method symbol");
+        }
+
+        var hasName = methodSymbol.Parameters.First().Name == "name";
+        if (hasName)
+        {
+            var expression = invocation.ArgumentList.Arguments.First().Expression;
+            if (expression is not LiteralExpressionSyntax literal)
+            {
+                var diagnostic = Diagnostic.Create(
+                    Descriptors.GraphQLQueryNameShouldBeLiteral,
+                    expression.GetLocation());
+
+                return new ErrorWithData<Diagnostic>(
+                    "GraphQLQueryNameShouldBeLiteral",
+                    diagnostic);
+            }
+
+            Name = literal.Token.ValueText;
+        }
 
         GraphQLInputSymbol = GetInputSymbol(lambdaSymbol, semanticModel.Compilation);
         RequestExecutorInputArgumentSymbol = GraphQLInputSymbol.IsAnonymousType ? GraphQLInputSymbol.BaseType! : GraphQLInputSymbol;
@@ -82,14 +106,14 @@ public class GraphQLQueryContainerResolver
 
         FindAllUploadProperties(lambdaSymbol, semanticModel);
 
-        var (query, error) = GraphQLQueryResolver.Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
+        var (queryBody, error) = GraphQLQueryResolver.Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
         if (error)
         {
             return error;
         }
 
-        QueryBody = query;
-        Hash = ComputeHash(QueryBody);
+        Query = $"{OperationKind} {Name ?? string.Empty}{queryBody}";
+        Hash = ComputeHash(Query);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -98,12 +122,20 @@ public class GraphQLQueryContainerResolver
 
         return null;
     }
-    
+
     private string ComputeHash(string queryBody)
     {
         using var sha256 = SHA256.Create();
-        var saltedPasswordAsBytes = Encoding.UTF8.GetBytes(queryBody);
-        return Convert.ToBase64String(sha256.ComputeHash(saltedPasswordAsBytes));
+        var body = Encoding.UTF8.GetBytes(queryBody);
+        var bytes = sha256.ComputeHash(body);
+
+        var builder = new StringBuilder();
+        foreach (var t in bytes)
+        {
+            builder.Append(t.ToString("x2"));
+        }
+
+        return builder.ToString();
     }
 
     private void FindAllUploadProperties(IMethodSymbol lambdaSymbol, SemanticModel semanticModel)

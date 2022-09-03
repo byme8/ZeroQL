@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ZeroQL.Internal;
@@ -8,39 +10,90 @@ namespace ZeroQL;
 
 public interface IGraphQLQueryStrategy
 {
-    GraphQLRequest CreateRequest<T>(string queryKey, string? name, object? variables);
-
-    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, HttpContent content);
+    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator);
 }
 
 public class FullQueryStrategy : IGraphQLQueryStrategy
 {
-    public GraphQLRequest CreateRequest<TQuery>(string queryKey, string? name, object? variables)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
-        var stringBuilder = new System.Text.StringBuilder();
-        stringBuilder.Append(queryInfo.OperationType);
-        stringBuilder.Append(' ');
-        if (!string.IsNullOrEmpty(name))
-        {
-            stringBuilder.Append(name);
-        }
-        stringBuilder.Append(queryInfo.QueryBody);
-
-        var query = stringBuilder.ToString();
-        return new GraphQLRequest
+        var query = queryInfo.Query;
+        var qlRequest = new GraphQLRequest
         {
             Query = query,
             Variables = variables
         };
-    }
 
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, HttpContent content)
-    {
+        var content = contentCreator(qlRequest);
         var response = await httpClient.PostAsync("", content);
         var responseJson = await response.Content.ReadAsStreamAsync();
         var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
 
+        if (qlResponse is not null)
+        {
+            qlResponse.Query = query;
+        }
+
+        return qlResponse!;
+    }
+}
+
+public class PersistentQueryStrategy : IGraphQLQueryStrategy
+{
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
+    {
+        var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
+        var qlRequest = new GraphQLRequest
+        {
+            Variables = variables,
+            Extensions = new GraphQLRequestExtensions
+            {
+                PersistedQuery = new GraphQLPersistedQueryExtension
+                {
+                    Version = 1,
+                    SHA256Hash = queryInfo.Hash
+                }
+            }
+        };
+
+        var content = contentCreator(qlRequest);
+        var response = await httpClient.PostAsync("", content);
+        var qlResponse = await ReadResponse<TQuery>(response);
+
+        if (qlResponse.Errors is null)
+        {
+            return qlResponse with { Query = FormatPersistedQuery(queryInfo)  };
+        }
+
+        if (qlResponse.Errors.All(o => o.Message != "PersistedQueryNotFound"))
+        {
+            return qlResponse with { Query = FormatPersistedQuery(queryInfo)  };
+        }
+
+        qlRequest.Query = queryInfo.Query;
+        content = contentCreator(qlRequest);
+        response = await httpClient.PostAsync("", content);
+        qlResponse = await ReadResponse<TQuery>(response);
+
+        return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
+    }
+
+    private static string FormatPersistedQuery(QueryInfo queryInfo)
+    {
+        return $"{queryInfo.Hash}:{queryInfo.Query}";
+    }
+
+    private static async Task<GraphQLResponse<TQuery>> ReadResponse<TQuery>(HttpResponseMessage response)
+    {
+#if DEBUG
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+#endif
+#if !DEBUG
+        var responseJson = await response.Content.ReadAsStreamAsync();
+        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+#endif
         return qlResponse!;
     }
 }

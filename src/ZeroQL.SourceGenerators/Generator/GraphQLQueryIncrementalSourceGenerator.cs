@@ -82,19 +82,21 @@ namespace {semanticModel.Compilation.Assembly.Name}
             GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Executor[{SyntaxFactory.Literal(resolver.Key).Text}] = Execute;
             GraphQLQueryStore<{resolver.RequestExecutorQueryType}>.Query[{SyntaxFactory.Literal(resolver.Key).Text}] = new QueryInfo 
             {{
-                QueryBody = {SyntaxFactory.Literal(resolver.QueryBody).Text},
+                Query = {SyntaxFactory.Literal(resolver.Query).Text},
                 OperationType = {SyntaxFactory.Literal(resolver.OperationKind).Text},
                 Hash = {SyntaxFactory.Literal(resolver.Hash).Text},
             }};
         }}
 
-        public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(IGraphQLClient qlClient, string queryKey, string? operationName, object variablesObject)
+        public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(IGraphQLClient qlClient, string queryKey, object variablesObject)
         {{
             var variables = ({resolver.RequestExecutorInputArgumentSymbol.ToGlobalName()})variablesObject;
-            
-            var queryRequest = qlClient.QueryStrategy.CreateRequest<{resolver.RequestExecutorQueryType}>(queryKey, operationName, variablesObject);
-            {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
-            var qlResponse = await qlClient.QueryStrategy.ExecuteAsync<{resolver.RequestExecutorQueryType}>(qlClient.HttpClient, content);
+            var qlResponse = await qlClient.QueryStrategy.ExecuteAsync<{resolver.RequestExecutorQueryType}>(qlClient.HttpClient, queryKey, variablesObject, queryRequest => 
+            {{
+                {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
+                return content;
+            }});
+
             if (qlResponse is null)
             {{
                 return new GraphQLResult<{resolver.RequestExecutorQueryType}>
@@ -110,14 +112,14 @@ namespace {semanticModel.Compilation.Assembly.Name}
             {{
                 return new GraphQLResult<{resolver.RequestExecutorQueryType}>
                 {{
-                    Query = queryRequest.Query,
+                    Query = qlResponse.Query,
                     Errors = qlResponse.Errors
                 }};
             }}
 
             return new GraphQLResult<{resolver.RequestExecutorQueryType}>
             {{
-                Query = queryRequest.Query,
+                Query = qlResponse.Query,
                 Data = qlResponse.Data
             }};
         }}

@@ -34,8 +34,10 @@ public class GraphQLResult<TData> : IGraphQLResult
     public GraphQueryError[]? Errors { get; set; }
 }
 
-public class GraphQLResponse<TData>
+public record GraphQLResponse<TData>
 {
+    public string Query { get; set; }
+    
     public TData? Data { get; set; }
 
     public GraphQueryError[]? Errors { get; set; }
@@ -47,10 +49,10 @@ public class GraphQueryError
 
     public object[] Path { get; set; }
     
-    public QLExtenstion Extensions { get; set; }
+    public QLResponseExtenstion Extensions { get; set; }
 }
 
-public class QLExtenstion
+public class QLResponseExtenstion
 {
     public string Code { get; set; }
     public string Field { get; set; }

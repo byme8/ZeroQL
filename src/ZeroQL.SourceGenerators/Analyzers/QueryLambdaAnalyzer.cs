@@ -82,18 +82,18 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
         }
 
         var semanticModel = context.SemanticModel;
-        var argumentSyntax = invocation.ArgumentList.Arguments.Last();
-        var query = GraphQLQueryResolver.Resolve(semanticModel, argumentSyntax.Expression, context.CancellationToken);
-        if (query.Error is ErrorWithData<Diagnostic> error)
+        var resolver = new GraphQLQueryContainerResolver();
+        var query = resolver.Resolve(invocation, semanticModel, context.CancellationToken);
+        if (query is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);
         }
         else
         {
             context.ReportDiagnostic(Diagnostic.Create(
-                    Descriptors.GraphQLQueryPreview,
-                    memberAccess.Name.GetLocation(),
-                    query.Value));
+                Descriptors.GraphQLQueryPreview,
+                memberAccess.Name.GetLocation(),
+                resolver.Query));
         }
     }
 
@@ -105,5 +105,6 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.DontUseOutScopeValues,
             Descriptors.FailedToConvert,
             Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
+            Descriptors.GraphQLQueryNameShouldBeLiteral,
             Descriptors.GraphQLQueryPreview);
 }

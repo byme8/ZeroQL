@@ -59,4 +59,12 @@ public class Descriptors
         "ZeroQL",
         DiagnosticSeverity.Info,
         isEnabledByDefault: true);
+    
+    public static DiagnosticDescriptor GraphQLQueryNameShouldBeLiteral = new(
+        nameof(GraphQLQueryNameShouldBeLiteral),
+        "GraphQL query name should be literal.",
+        "GraphQL query name should be literal.",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

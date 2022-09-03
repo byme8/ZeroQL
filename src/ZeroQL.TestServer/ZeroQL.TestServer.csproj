@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.7.0" />
         <PackageReference Include="HotChocolate.AspNetCore" Version="12.12.0" />
+        <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="12.12.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
     </ItemGroup>
 

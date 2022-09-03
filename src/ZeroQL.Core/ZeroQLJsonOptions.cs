@@ -17,7 +17,7 @@ public static class ZeroQLJsonOptions
         },
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
 

@@ -17,11 +17,8 @@ public class GraphQLRequestExtensions
 
 public class GraphQLPersistedQueryExtension
 {
-    public int Version { get; set; }
-}
-
-public class SHA256HashQueryExtension : GraphQLPersistedQueryExtension
-{
     [JsonPropertyName("sha256Hash")]
     public string? SHA256Hash { get; set; }
+    
+    public int Version { get; set; }
 }

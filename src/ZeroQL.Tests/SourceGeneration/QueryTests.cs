@@ -137,7 +137,7 @@ public class QueryTests : IntegrationTest
     public async Task QueryPreviewGenerated()
     {
         var csharpQuery = "static q => new { Me = q.Me(o => new { o.FirstName }) }";
-        var graphqlQuery = @"{ me { firstName } }";
+        var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
@@ -243,5 +243,18 @@ public class QueryTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, @"""Me"", " + csharpQuery));
 
         await project.Validate(graphqlQuery);
+    }
+
+    [Fact]
+    public async Task SupportsOnlyLiteralQueryName()
+    {
+        var csharpQuery = "static q => q.Me(o => o.FirstName)";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, @"nameof(Execute), " + csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+
+        diagnostics.Should().Contain(o => o.Id == Descriptors.GraphQLQueryNameShouldBeLiteral.Id);
     }
 }

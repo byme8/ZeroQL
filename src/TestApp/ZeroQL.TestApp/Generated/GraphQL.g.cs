@@ -10,7 +10,7 @@ namespace GraphQL.TestServer
 {
     public class TestServerClient : global::ZeroQL.GraphQLClient<Query, Mutation>
     {
-        public TestServerClient(global::System.Net.Http.HttpClient client) : base(client)
+        public TestServerClient(global::System.Net.Http.HttpClient client, global::ZeroQL.IGraphQLQueryStrategy? queryStrategy = null) : base(client, queryStrategy)
         {
         }
     }

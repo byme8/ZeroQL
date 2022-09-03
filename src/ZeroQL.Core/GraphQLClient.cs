@@ -27,7 +27,6 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
     public IGraphQLQueryStrategy QueryStrategy { get; }
 
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
-        string? operationName,
         TVariables? variables,
         Func<TVariables?, TOperationType?, TResult?> queryMapper,
         string queryKey)
@@ -37,7 +36,7 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
-        var result = await queryRunner.Invoke(this, queryKey, operationName, variables);
+        var result = await queryRunner.Invoke(this, queryKey, variables);
         if (result.Errors?.Any() ?? false)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors);
