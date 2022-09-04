@@ -52,6 +52,15 @@ public static class TestExtensions
 
     public static async Task<Assembly> CompileToRealAssembly(this Project project)
     {
+        var bytes = await project.CompileToRealAssemblyAsBytes();
+        var assembly = Assembly.Load(bytes);
+
+        return assembly;
+    }
+
+    public static async Task<byte[]> CompileToRealAssemblyAsBytes(this Project project)
+    {
+
         var compilation = await project.GetCompilationAsync();
         var analyzerResults = await compilation!
             .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
@@ -69,14 +78,10 @@ public static class TestExtensions
             throw new Exception(error.GetMessage());
         }
 
-        using (var memoryStream = new MemoryStream())
-        {
-            compilation.Emit(memoryStream);
-            var bytes = memoryStream.ToArray();
-            var assembly = Assembly.Load(bytes);
-
-            return assembly;
-        }
+        using var memoryStream = new MemoryStream();
+        compilation.Emit(memoryStream);
+        var bytes = memoryStream.ToArray();
+        return bytes;
     }
 
     public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, ISourceGenerator generator)

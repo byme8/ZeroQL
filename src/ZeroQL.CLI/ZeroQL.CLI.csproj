@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CliFx" Version="2.2.6"/>
+        <PackageReference Include="CliFx" Version="2.2.6" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj"/>
+        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
     </ItemGroup>
 
 </Project>
