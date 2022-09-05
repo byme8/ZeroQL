@@ -84,9 +84,9 @@ public class Program
 
     public class ServerContext
     {
-        public int Port { get; set; }
+        public int Port { get; set; } = 10_000;
 
-        public string[] Arguments { get; set; }
+        public string[] Arguments { get; set; } = Array.Empty<string>();
 
         public CancellationTokenSource CancellationTokenSource { get; set; } = new();
 

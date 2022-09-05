@@ -9,8 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using StrawberryShake.TestServerClient;
 using ZeroQL;
 
-_ = ZeroQL.TestServer.Program.StartServer(args);
-await ZeroQL.TestServer.Program.VerifyServiceIsRunning();
+var serverContext = new ZeroQL.TestServer.Program.ServerContext();
+
+_ = ZeroQL.TestServer.Program.StartServer(serverContext);
+await ZeroQL.TestServer.Program.VerifyServiceIsRunning(serverContext);
 
 var benchmark = new RawVSZeroQL();
 var raw = await benchmark.Raw();
@@ -25,7 +27,7 @@ if (!(raw == strawberry && strawberry == zeroQL))
 
 BenchmarkRunner.Run<RawVSZeroQL>();
 
-ZeroQL.TestServer.Program.StopServer();
+ZeroQL.TestServer.Program.StopServer(serverContext);
 
 [MemoryDiagnoser]
 public class RawVSZeroQL
