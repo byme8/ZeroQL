@@ -87,12 +87,12 @@ using System.Text.Json.Serialization;
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName($"global::ZeroQL.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
             .WithMembers(SingletonList<MemberDeclarationSyntax>(
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
-                    .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client, global::ZeroQL.IGraphQLQueryStrategy? queryStrategy = null)"))
+                    .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
                     // call base constructor
                     .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
                         ArgumentList(SeparatedList<ArgumentSyntax>()
                             .Add(Argument(IdentifierName("client")))
-                            .Add(Argument(IdentifierName("queryStrategy")))
+                            .Add(Argument(IdentifierName("queryPipeline")))
                         )))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                     .WithBody(Block())));

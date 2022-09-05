@@ -6,41 +6,17 @@ using System.Threading.Tasks;
 using ZeroQL.Internal;
 using ZeroQL.Stores;
 
-namespace ZeroQL;
+namespace ZeroQL.Pipelines;
 
-public interface IGraphQLQueryStrategy
+public class PersistedQueryPipeline : IGraphQLQueryPipeline
 {
-    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator);
-}
-
-public class FullQueryStrategy : IGraphQLQueryStrategy
-{
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
+    public PersistedQueryPipeline(bool tryToAddPersistedQueryOnFail = true)
     {
-        var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
-        var query = queryInfo.Query;
-        var qlRequest = new GraphQLRequest
-        {
-            Query = query,
-            Variables = variables
-        };
-
-        var content = contentCreator(qlRequest);
-        var response = await httpClient.PostAsync("", content);
-        var responseJson = await response.Content.ReadAsStreamAsync();
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
-
-        if (qlResponse is not null)
-        {
-            qlResponse.Query = query;
-        }
-
-        return qlResponse!;
+        TryToAddPersistedQueryOnFail = tryToAddPersistedQueryOnFail;
     }
-}
 
-public class PersistentQueryStrategy : IGraphQLQueryStrategy
-{
+    public bool TryToAddPersistedQueryOnFail { get; }
+
     public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
@@ -63,12 +39,17 @@ public class PersistentQueryStrategy : IGraphQLQueryStrategy
 
         if (qlResponse.Errors is null)
         {
-            return qlResponse with { Query = FormatPersistedQuery(queryInfo)  };
+            return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
+        }
+
+        if (!TryToAddPersistedQueryOnFail)
+        {
+            return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
 
         if (qlResponse.Errors.All(o => o.Message != "PersistedQueryNotFound"))
         {
-            return qlResponse with { Query = FormatPersistedQuery(queryInfo)  };
+            return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
 
         qlRequest.Query = queryInfo.Query;

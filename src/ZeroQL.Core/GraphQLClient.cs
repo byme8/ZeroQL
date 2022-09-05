@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ZeroQL.Pipelines;
 using ZeroQL.Stores;
 
 namespace ZeroQL;
@@ -10,21 +11,21 @@ public interface IGraphQLClient
 {
     HttpClient HttpClient { get; }
 
-    IGraphQLQueryStrategy QueryStrategy { get; }
+    IGraphQLQueryPipeline QueryPipeline { get; }
 }
 
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 {
 
-    public GraphQLClient(HttpClient httpClient, IGraphQLQueryStrategy? queryStrategy = null)
+    public GraphQLClient(HttpClient httpClient, IGraphQLQueryPipeline? queryPipeline = null)
     {
         HttpClient = httpClient;
-        QueryStrategy = queryStrategy ?? new FullQueryStrategy();
+        QueryPipeline = queryPipeline ?? new FullQueryPipeline();
     }
 
     public HttpClient HttpClient { get; }
 
-    public IGraphQLQueryStrategy QueryStrategy { get; }
+    public IGraphQLQueryPipeline QueryPipeline { get; }
 
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,

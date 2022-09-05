@@ -44,7 +44,7 @@ public class CLITests
     }
     
     [Fact]
-    public async Task ExtractMutationAndQuery()
+    public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
         var uniqueId = Guid.NewGuid().ToString();
         var fileName = "../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/" + uniqueId;
@@ -56,13 +56,15 @@ public class CLITests
         await File.WriteAllBytesAsync(fileName, bytes);
         
         using var console = new FakeInMemoryConsole();
-        var generateCommand = new ExtractQueriesCommand();
-        generateCommand.AssemblyFile = fileName;
-        generateCommand.ClientName = "GraphQL.TestServer.TestServerClient";
-        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries/" + uniqueId;
+        var command = new ExtractQueriesCommand();
+        command.AssemblyFile = fileName;
+        command.ClientName = "GraphQL.TestServer.TestServerClient";
+        command.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries/" + uniqueId;
 
-        await generateCommand.ExecuteAsync(console);
+        await command.ExecuteAsync(console);
 
-        Directory.EnumerateFiles(generateCommand.Output).Should().NotBeEmpty();;
+        Directory.EnumerateFiles(command.Output).Should().NotBeEmpty();
+
+        return command;
     }
 }

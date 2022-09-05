@@ -91,7 +91,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
         public static async Task<GraphQLResult<{resolver.RequestExecutorQueryType}>> Execute(IGraphQLClient qlClient, string queryKey, object variablesObject)
         {{
             var variables = ({resolver.RequestExecutorInputArgumentSymbol.ToGlobalName()})variablesObject;
-            var qlResponse = await qlClient.QueryStrategy.ExecuteAsync<{resolver.RequestExecutorQueryType}>(qlClient.HttpClient, queryKey, variablesObject, queryRequest => 
+            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{resolver.RequestExecutorQueryType}>(qlClient.HttpClient, queryKey, variablesObject, queryRequest => 
             {{
                 {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
                 return content;
