@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ZeroQL.Internal;
+using ZeroQL.Json;
 using ZeroQL.Stores;
 
 namespace ZeroQL.Pipelines;

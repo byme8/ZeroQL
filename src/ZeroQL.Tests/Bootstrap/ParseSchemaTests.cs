@@ -231,6 +231,14 @@ public class ParseSchemaTests
                           o.ArgumentList!.Arguments.First().Expression.ToString() == @"""User""");
 
     }
+    
+    [Fact]
+    public void EnumJsonConvertersGenerated()
+    {
+        var initializer = SyntaxTree.GetClass("JsonConvertersInitializers")!;
+
+        initializer.Should().NotBeNull();
+    }
 
     [Fact]
     public void SchemaWithoutMutationHandledProperly()

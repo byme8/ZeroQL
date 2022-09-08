@@ -7,8 +7,8 @@ public class UserGraphQLExtensions
 {
     public static Dictionary<int, User> Users = new()
     {
-        { 1, new User() { Id = 1, FirstName = "Jon", LastName = "Smith", UserKind = UserKind.Good } },
-        { 2, new User() { Id = 2, FirstName = "Ben", LastName = "Smith", UserKind = UserKind.Bad } }
+        { 1, new User() { Id = 1, FirstName = "Jon", LastName = "Smith", UserKind = UserKind.SupperGood } },
+        { 2, new User() { Id = 2, FirstName = "Ben", LastName = "Smith", UserKind = UserKind.Bad } },
     };
 
     public User Me()
