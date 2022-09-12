@@ -9,6 +9,7 @@ public class UserGraphQLMutations
     {
         var user = new User
         {
+            Id = 10,
             FirstName = firstName,
             LastName = lastName
         };

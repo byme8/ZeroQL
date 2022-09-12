@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using ZeroQL.SourceGenerators.Resolver;
+using ZeroQL.SourceGenerators.Resolver.Context;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -82,9 +82,9 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
         }
 
         var semanticModel = context.SemanticModel;
-        var resolver = new GraphQLQueryContainerResolver();
-        var query = resolver.Resolve(invocation, semanticModel, context.CancellationToken);
-        if (query is ErrorWithData<Diagnostic> error)
+        var resolver = new GraphQLLambdaLikeContextResolver();
+        var (lambdaContext, resolveError) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+        if (resolveError is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);
         }
@@ -93,7 +93,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(
                 Descriptors.GraphQLQueryPreview,
                 memberAccess.Name.GetLocation(),
-                resolver.Query));
+                lambdaContext.OperationQuery));
         }
     }
 

@@ -12,6 +12,11 @@ public interface IGraphQLClient
     HttpClient HttpClient { get; }
 
     IGraphQLQueryPipeline QueryPipeline { get; }
+
+    Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
+        TVariables? variables,
+        Func<TVariables?, TOperationType?, TResult?> queryMapper,
+        string queryKey);
 }
 
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable

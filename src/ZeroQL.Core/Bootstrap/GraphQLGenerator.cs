@@ -56,7 +56,7 @@ public static class GraphQLGenerator
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
         var clientDeclaration = new[] { GenerateClient(clientName, queryType, mutationType) };
-        var typesDeclaration = GenerateTypes(types);
+        var typesDeclaration = GenerateTypes(types, queryType, mutationType);
         var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
 
@@ -139,7 +139,9 @@ using System.Text.Json.Serialization;
             .ToArray();
     }
 
-    private static IReadOnlyList<ClassDeclarationSyntax> GenerateTypes(ClassDefinition[] definitions)
+    
+
+    private static IEnumerable<MemberDeclarationSyntax> GenerateTypes(ClassDefinition[] definitions, GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
     {
         var csharpDefinitions = definitions
             .Select(o =>
@@ -160,10 +162,21 @@ using System.Text.Json.Serialization;
                     });
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                return CSharpHelper.Class(o.Name)
+                var @class = CSharpHelper.Class(o.Name)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
+                if (o.Name == queryType?.Name.StringValue)
+                {
+                    @class = @class.AddBaseListTypes(SimpleBaseType(IdentifierName("global::ZeroQL.Internal.IQuery")));
+                }
+                
+                if (o.Name == mutationType?.Name.StringValue)
+                {
+                    @class = @class.AddBaseListTypes(SimpleBaseType(IdentifierName("global::ZeroQL.Internal.IMutation")));
+                }
+
+                return @class;
             })
             .ToList();
 

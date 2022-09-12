@@ -5,8 +5,17 @@ using System.Threading.Tasks;
 
 namespace ZeroQL;
 
+public static class GraphQLClientRequestExtensions
+{
+    public static async Task<GraphQLResult<TResult>> Execute<TQuery, TResult>(
+        this IGraphQLClient client, GraphQL<TQuery, TResult> request)
+    {
+        return await client.Execute<GraphQL<TQuery, TResult>, TQuery, TResult>(request, (i, q) => request.Execute(q), request.GetType().Name);
+    }
+}
+
 [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-public static class GraphQLClientExtensions
+public static class GraphQLClientLambdaExtensions
 {
     public static async Task<GraphQLResult<TResult>> Query<TVariables, TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,

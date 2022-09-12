@@ -8,7 +8,9 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace ZeroQL.SourceGenerators.Resolver;
+#pragma warning disable CS8618
+
+namespace ZeroQL.SourceGenerators.Resolver.Context;
 
 public class UploadInfoByType
 {
@@ -17,31 +19,9 @@ public class UploadInfoByType
     public IPropertySymbol[] UploadProperties { get; set; }
 }
 
-public class GraphQLQueryContainerResolver
+public class GraphQLLambdaLikeContextResolver
 {
-    public string Key { get; private set; }
-
-    public INamedTypeSymbol UploadType { get; private set; }
-
-    public string? Name { get; private set; }
-
-    public string OperationKind { get; private set; }
-
-    public string Query { get; private set; }
-
-    public string Hash { get; private set; }
-
-    public IMethodSymbol GraphQLLambdaSymbol { get; private set; }
-
-    public string RequestExecutorQueryType { get; private set; }
-
-    public INamedTypeSymbol GraphQLInputSymbol { get; private set; }
-
-    public INamedTypeSymbol RequestExecutorInputArgumentSymbol { get; private set; }
-
-    public UploadInfoByType[] UploadPropeties { get; private set; }
-
-    public Error? Resolve(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+    public Result<GraphQLSourceGenerationContext> Resolve(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
     {
         var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation);
         if (queryMethod is null)
@@ -55,21 +35,20 @@ public class GraphQLQueryContainerResolver
         }
 
         var graphqlLambda = invocation.ArgumentList.Arguments.Last();
-        Key = graphqlLambda.ToString();
+        var key = graphqlLambda.ToString();
 
         var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
-        if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol lambdaSymbol)
+        if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol graphQLMethodSymbol)
         {
             return new Error("Could not find lambda symbol");
         }
-        GraphQLLambdaSymbol = lambdaSymbol;
 
         if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return new Error("Could not find member access");
         }
 
-        OperationKind = memberAccess.Name.Identifier.Text.ToLower();
+        var operationKind = memberAccess.Name.Identifier.Text.ToLower();
 
         var possibleMethodSymbol = semanticModel.GetSymbolInfo(invocation);
         if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
@@ -77,6 +56,51 @@ public class GraphQLQueryContainerResolver
             return new Error("Could not find method symbol");
         }
 
+        var (name, nameError) = ResolveName(invocation, methodSymbol).Unwrap();
+        if (nameError)
+        {
+            return nameError;
+        }
+
+        var graphQLMethodInputType = GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
+        var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType ? graphQLMethodInputType.BaseType! : graphQLMethodInputType;
+        var queryTypeName = graphQLMethodSymbol.Parameters.Last().ToGlobalName();
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return new Error("Cancelled");
+        }
+
+        var (uploadType, uploadProperties) = FindAllUploadProperties(graphQLMethodInputType, semanticModel);
+        var (queryBody, error) = GraphQLQueryResolver.Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
+        if (error)
+        {
+            return error;
+        }
+
+        var query = $"{operationKind} {name ?? string.Empty}{queryBody}";
+        var hash = ComputeHash(query);
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return new Error("Cancelled");
+        }
+
+        return new GraphQLSourceGenerationContext(
+            key,
+            name,
+            operationKind,
+            query,
+            hash,
+            queryTypeName,
+            graphQLMethodInputType,
+            requestExecutorInputArgumentSymbol,
+            uploadType,
+            uploadProperties);
+    }
+
+    private Result<string?> ResolveName(InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol)
+    {
         var hasName = methodSymbol.Parameters.First().Name == "name";
         if (hasName)
         {
@@ -92,38 +116,13 @@ public class GraphQLQueryContainerResolver
                     diagnostic);
             }
 
-            Name = literal.Token.ValueText;
+            return literal.Token.ValueText;
         }
 
-        GraphQLInputSymbol = GetInputSymbol(lambdaSymbol, semanticModel.Compilation);
-        RequestExecutorInputArgumentSymbol = GraphQLInputSymbol.IsAnonymousType ? GraphQLInputSymbol.BaseType! : GraphQLInputSymbol;
-        RequestExecutorQueryType = lambdaSymbol.Parameters.Last().ToGlobalName();
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return new Error("Cancelled");
-        }
-
-        FindAllUploadProperties(lambdaSymbol, semanticModel);
-
-        var (queryBody, error) = GraphQLQueryResolver.Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
-        if (error)
-        {
-            return error;
-        }
-
-        Query = $"{OperationKind} {Name ?? string.Empty}{queryBody}";
-        Hash = ComputeHash(Query);
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return new Error("Cancelled");
-        }
-
-        return null;
+        return (string?)null;
     }
 
-    private string ComputeHash(string queryBody)
+    public static string ComputeHash(string queryBody)
     {
         using var sha256 = SHA256.Create();
         var body = Encoding.UTF8.GetBytes(queryBody);
@@ -138,15 +137,13 @@ public class GraphQLQueryContainerResolver
         return builder.ToString();
     }
 
-    private void FindAllUploadProperties(IMethodSymbol lambdaSymbol, SemanticModel semanticModel)
+    public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties) FindAllUploadProperties(INamedTypeSymbol inputType, SemanticModel semanticModel)
     {
-        var inputType = lambdaSymbol.Parameters
-            .First()
-            .GetNamedTypeSymbol();
-
-        UploadType = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload")!;
-        UploadPropeties = FindUploadPropertiesForType(inputType, UploadType, new HashSet<string>())
+        var uploadType = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload")!;
+        var uploadProperties = FindUploadPropertiesForType(inputType, uploadType, new HashSet<string>())
             .ToArray();
+
+        return (uploadType, uploadProperties);
     }
 
 
