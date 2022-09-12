@@ -14,7 +14,7 @@ public class QueryAnalyzerHelper
         }
         var possibleMethod = semanticModel.GetSymbolInfo(memberAccess.Name);
         if (possibleMethod.Symbol is not IMethodSymbol { ContainingSymbol: INamedTypeSymbol containingType } method ||
-            containingType.ConstructedFrom.ToString() != "ZeroQL.GraphQLClientLambdaExtensions")
+            containingType.ConstructedFrom.ToString() != "GraphQLClientLambdaExtensions")
         {
             return null;
         }

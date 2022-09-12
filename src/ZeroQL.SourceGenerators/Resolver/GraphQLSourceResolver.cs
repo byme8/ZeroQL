@@ -24,6 +24,7 @@ using System.Text.Json;
 using System.Net.Http;
 using ZeroQL;
 using ZeroQL.Stores;
+using ZeroQL.Json;
 using ZeroQL.Internal;
 
 namespace {semanticModel.Compilation.Assembly.Name}

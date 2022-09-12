@@ -2,6 +2,7 @@
 
 public enum UserKind
 {
+    SupperGood,
     Good,
     Bad
 }

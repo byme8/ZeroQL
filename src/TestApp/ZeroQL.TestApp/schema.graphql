@@ -101,6 +101,7 @@ input UserInfoInput {
 }
 
 enum UserKind {
+  SUPPER_GOOD
   GOOD
   BAD
 }

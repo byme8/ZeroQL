@@ -332,7 +332,17 @@ namespace GraphQL.TestServer
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public enum UserKind
     {
+        SupperGood,
         Good,
         Bad
+    }
+
+    public static class JsonConvertersInitializers
+    {
+        [global::System.Runtime.CompilerServices.ModuleInitializer]
+        public static void Init()
+        {
+            global::ZeroQL.Json.ZeroQLEnumJsonSerializersStore.Converters[typeof(UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<UserKind>(new global::System.Collections.Generic.Dictionary<string, UserKind>{{"SUPPER_GOOD", UserKind.SupperGood}, {"GOOD", UserKind.Good}, {"BAD", UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<UserKind, string>{{UserKind.SupperGood, "SUPPER_GOOD"}, {UserKind.Good, "GOOD"}, {UserKind.Bad, "BAD"}, });
+        }
     }
 }

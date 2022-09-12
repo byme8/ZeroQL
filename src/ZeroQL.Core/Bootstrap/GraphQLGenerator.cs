@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using GraphQLParser;
 using GraphQLParser.AST;
 using Microsoft.CodeAnalysis;
@@ -59,12 +60,14 @@ public static class GraphQLGenerator
         var typesDeclaration = GenerateTypes(types, queryType, mutationType);
         var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
+        var enumsInitializers = GenerateEnumsInitializers(enums);
 
         namespaceDeclaration = namespaceDeclaration
             .WithMembers(List<MemberDeclarationSyntax>(clientDeclaration)
                 .AddRange(typesDeclaration)
                 .AddRange(inputsDeclaration)
-                .AddRange(enumsDeclaration));
+                .AddRange(enumsDeclaration)
+                .Add(enumsInitializers));
 
         var formattedSource = namespaceDeclaration.NormalizeWhitespace().ToFullString();
         return $@"// This file generated for ZeroQL.
@@ -139,7 +142,61 @@ using System.Text.Json.Serialization;
             .ToArray();
     }
 
-    
+    private static ClassDeclarationSyntax GenerateEnumsInitializers(GraphQLEnumTypeDefinition[] enums)
+    {
+        var initializers = new StringBuilder();
+        foreach (var @enum in enums)
+        {
+            var enumName = @enum.Name;
+            initializers.AppendLine(@$"global::ZeroQL.Json.ZeroQLEnumJsonSerializersStore.Converters[typeof({enumName})] =");
+            initializers.AppendLine(@$"
+                new global::ZeroQL.Json.ZeroQLEnumConverter<{enumName}>(
+                    new global::System.Collections.Generic.Dictionary<string, {enumName}>
+                    {{");
+
+            if (@enum.Values is not null)
+            {
+                foreach (var value in @enum.Values)
+                {
+                    initializers.AppendLine(@$"{{ ""{value.Name.StringValue}"", {enumName}.{value.Name.StringValue.ToPascalCase()} }}, ");
+                }
+            }
+
+            initializers.AppendLine(@$"
+                }},
+                new global::System.Collections.Generic.Dictionary<{enumName}, string>
+                {{");
+
+            if (@enum.Values is not null)
+            {
+                foreach (var value in @enum.Values)
+                {
+                    initializers.AppendLine(@$"{{ {enumName}.{value.Name.StringValue.ToPascalCase()}, ""{value.Name.StringValue}"" }},");
+                }
+            }
+
+            initializers.AppendLine("});");
+        }
+
+        var source = @$"
+            public static class JsonConvertersInitializers
+            {{
+                [global::System.Runtime.CompilerServices.ModuleInitializer]
+                public static void Init()
+                {{
+                    {initializers}
+                }} 
+            }}
+            ";
+
+        var classDeclarationSyntax = ParseSyntaxTree(source)
+            .GetRoot()
+            .DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First();
+
+        return classDeclarationSyntax;
+    }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateTypes(ClassDefinition[] definitions, GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
     {
