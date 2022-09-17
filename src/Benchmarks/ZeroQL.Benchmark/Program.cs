@@ -17,9 +17,10 @@ await ZeroQL.TestServer.Program.VerifyServiceIsRunning(serverContext);
 var benchmark = new RawVSZeroQL();
 var raw = await benchmark.Raw();
 var strawberry = await benchmark.StrawberryShake();
-var zeroQL = await benchmark.ZeroQL();
+var zeroQLLambda = await benchmark.ZeroQLLambda();
+var zeroQLRequest = await benchmark.ZeroQLRequest();
 
-if (!(raw == strawberry && strawberry == zeroQL))
+if (!(raw == strawberry && strawberry == zeroQLLambda && zeroQLLambda == zeroQLRequest))
 {
     Console.WriteLine("Raw, StrawberryShake and ZeroQL are not equal");
     return;
@@ -45,6 +46,7 @@ public class RawVSZeroQL
     private readonly HttpClient httpClient;
     private readonly TestServerClient zeroQLClient;
     private readonly StrawberryShakeTestServerClient strawberryShake;
+    private readonly Upload upload;
 
     public RawVSZeroQL()
     {
@@ -53,6 +55,7 @@ public class RawVSZeroQL
 
         zeroQLClient = new TestServerClient(httpClient);
         strawberryShake = StrawberryShakeTestServerClientCreator.Create(httpClient);
+        upload = new Upload("image.png", new MemoryStream(new byte[42]));
     }
 
     [Benchmark]
@@ -74,12 +77,49 @@ public class RawVSZeroQL
     }
 
     [Benchmark]
-    public async Task<string> ZeroQL()
+    public async Task<string> ZeroQLLambda()
     {
         var firstname = await zeroQLClient.Query(static q => q.Me(o => o.FirstName));
 
-        return firstname.Data;
+        return firstname.Data!;
     }
+
+    [Benchmark]
+    public async Task<string> ZeroQLRequest()
+    {
+        var firstname = await zeroQLClient.Execute(new GetMeQuery());
+
+        return firstname.Data!;
+    }
+    
+    [Benchmark]
+    public async Task<int> ZeroQLLambdaUpload()
+    {
+        var variables = new { Id = 1, File = upload };
+        var size = await zeroQLClient.Mutation(variables, static (i, m) => m.AddUserProfileImage(i.Id, i.File));
+
+        return size.Data;
+    }
+
+    [Benchmark]
+    public async Task<int> ZeroQLRequestUpload()
+    {
+        var size = await zeroQLClient.Execute(new AddAvatar(1, upload));
+
+        return size.Data;
+    }
+}
+
+public record GetMeQuery : GraphQL<Query, string>
+{
+    public override string Execute(Query query)
+        => query.Me(o => o.FirstName);
+}
+
+public record AddAvatar(int Id, Upload File) : GraphQL<Mutation, int>
+{
+    public override int Execute(Mutation mutation)
+        => mutation.AddUserProfileImage(Id, File);
 }
 
 public static class StrawberryShakeTestServerClientCreator
@@ -95,7 +135,7 @@ public static class StrawberryShakeTestServerClientCreator
 
         return client;
     }
-    
+
     private class FakeFactory : IHttpClientFactory
     {
         private readonly HttpClient client;
