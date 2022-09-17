@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,8 +20,18 @@ public interface IGraphQLClient
         string queryKey);
 }
 
+public record ClientOperations
+(
+    Dictionary<string, QueryInfo>? Queries,
+    Dictionary<string, QueryInfo>? Mutations
+);
+
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 {
+    public static ClientOperations GetBakedOperations()
+    {
+        return new ClientOperations(GraphQLQueryStore<TQuery>.Query, GraphQLQueryStore<TMutation>.Query);
+    }
 
     public GraphQLClient(HttpClient httpClient, IGraphQLQueryPipeline? queryPipeline = null)
     {

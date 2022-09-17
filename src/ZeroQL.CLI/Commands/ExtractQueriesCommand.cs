@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Runtime.Loader;
+using System.Xml;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
@@ -26,9 +28,32 @@ public class ExtractQueriesCommand : ICommand
             return;
         }
 
-        var assemblyAbsolutePath = Path.GetFullPath(AssemblyFile);
-        var assembly = Assembly.LoadFile(assemblyAbsolutePath);
-        var clientType = assembly.GetType(ClientName);
+        var folderWithAssemblies = Path.GetDirectoryName(AssemblyFile)!;
+        var files = Directory
+            .EnumerateFiles(folderWithAssemblies)
+            .ToArray();
+
+        var assemblyPaths = files
+            .Where(o => o.EndsWith(".dll") && !o.EndsWith("ZeroQL.Core.dll"))
+            .ToArray();
+
+        var context = AssemblyLoadContext.Default;
+        foreach (var assemblyPath in assemblyPaths.Select(Path.GetFullPath))
+        {
+            try
+            {
+                context.LoadFromAssemblyPath(assemblyPath);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        
+        var clientType = context.Assemblies
+            .Select(o => o.GetType(ClientName))
+            .FirstOrDefault(o => o is not null);
+        
         if (clientType == null)
         {
             await console.Error.WriteLineAsync("The client class does not exist. Check that the class exist.");
@@ -42,11 +67,11 @@ public class ExtractQueriesCommand : ICommand
             return;
         }
 
-        var queryType = baseType.GenericTypeArguments.First();
-        var mutationType = baseType.GenericTypeArguments.Last();
+        var method = baseType.GetMethod("GetBakedOperations", BindingFlags.Static | BindingFlags.Public);
+        var clientOperations = (ClientOperations)method!.Invoke(null, null)!;
 
-        var queries = GetPropertyFromStore(queryType);
-        var mutations = GetPropertyFromStore(mutationType);
+        var queries = clientOperations.Queries;
+        var mutations = clientOperations.Mutations;
 
         var graphqlInfo = new List<QueryInfo>();
         if (queries != null)

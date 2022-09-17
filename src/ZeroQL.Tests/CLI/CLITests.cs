@@ -21,13 +21,15 @@ public class CLITests
 
         await generateCommand.ExecuteAsync(console);
 
+        console.ReadErrorString().Should().BeEmpty();
         await TestProject.Project.CompileToRealAssembly();
     }
 
     [Fact]
     public async Task Extract()
     {
-        var fileName = "../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/" +  Guid.NewGuid();
+        var uniqueId = Guid.NewGuid().ToString();
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}.dll";
         var bytes = await TestProject.Project.CompileToRealAssemblyAsBytes();
         
         await File.WriteAllBytesAsync(fileName, bytes);
@@ -36,10 +38,11 @@ public class CLITests
         var generateCommand = new ExtractQueriesCommand();
         generateCommand.AssemblyFile = fileName;
         generateCommand.ClientName = "GraphQL.TestServer.TestServerClient";
-        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries";
+        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries/" + uniqueId;
 
         await generateCommand.ExecuteAsync(console);
 
+        console.ReadErrorString().Should().BeEmpty();
         Directory.EnumerateFiles(generateCommand.Output).Should().NotBeEmpty();
     }
     
@@ -47,7 +50,7 @@ public class CLITests
     public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
         var uniqueId = Guid.NewGuid().ToString();
-        var fileName = "../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/" + uniqueId;
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}.dll";
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", "// place to replace", @"await qlClient.Mutation(static q => q.AddUser(""Jon"", ""Smith"", o => o.Id));");
         
@@ -63,6 +66,7 @@ public class CLITests
 
         await command.ExecuteAsync(console);
 
+        console.ReadErrorString().Should().BeEmpty();
         Directory.EnumerateFiles(command.Output).Should().NotBeEmpty();
 
         return command;

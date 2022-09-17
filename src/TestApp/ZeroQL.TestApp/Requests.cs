@@ -7,7 +7,7 @@ public record GetUserById(int Id) : GraphQL<Query, UserModel?>
 {
     public override UserModel? Execute(Query query)
     {
-        return query.User(Id, o => new UserModel(o.FirstName, o.LastName, o.Role(role => role.Name)));
+        return query.User(Id, o => new UserModel(o!.FirstName, o.LastName, o.Role(role => role!.Name)!));
     }
 }
 
