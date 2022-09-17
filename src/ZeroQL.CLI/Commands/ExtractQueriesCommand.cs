@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
-using System.Xml;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
@@ -28,7 +27,8 @@ public class ExtractQueriesCommand : ICommand
             return;
         }
 
-        var folderWithAssemblies = Path.GetDirectoryName(AssemblyFile)!;
+        var absolutePathAssemblyFile = Path.GetFullPath(AssemblyFile);
+        var folderWithAssemblies = Path.GetDirectoryName(absolutePathAssemblyFile)!;
         var files = Directory
             .EnumerateFiles(folderWithAssemblies)
             .ToArray();
@@ -37,23 +37,16 @@ public class ExtractQueriesCommand : ICommand
             .Where(o => o.EndsWith(".dll") && !o.EndsWith("ZeroQL.Core.dll"))
             .ToArray();
 
-        var context = AssemblyLoadContext.Default;
+        var context = new AssemblyLoadContext(Guid.NewGuid().ToString());
         foreach (var assemblyPath in assemblyPaths.Select(Path.GetFullPath))
         {
-            try
-            {
-                context.LoadFromAssemblyPath(assemblyPath);
-            }
-            catch
-            {
-                // ignored
-            }
+            LoadAssembly(context, assemblyPath);
         }
-        
+
         var clientType = context.Assemblies
             .Select(o => o.GetType(ClientName))
             .FirstOrDefault(o => o is not null);
-        
+
         if (clientType == null)
         {
             await console.Error.WriteLineAsync("The client class does not exist. Check that the class exist.");
@@ -66,6 +59,8 @@ public class ExtractQueriesCommand : ICommand
             await console.Error.WriteLineAsync("The client class does not inherit from GraphQLClient. Check that the class inherit from GraphQLClient.");
             return;
         }
+
+        ForceModuleInitializersToRun(context);
 
         var method = baseType.GetMethod("GetBakedOperations", BindingFlags.Static | BindingFlags.Public);
         var clientOperations = (ClientOperations)method!.Invoke(null, null)!;
@@ -102,13 +97,35 @@ public class ExtractQueriesCommand : ICommand
         await console.Output.WriteLineAsync("Queries extracted: " + graphqlInfo.Count);
     }
 
-    private static Dictionary<string, QueryInfo>? GetPropertyFromStore(Type queryType)
+    private static Assembly? LoadAssembly(AssemblyLoadContext context, string assemblyPath)
     {
-        var queryStoreType = typeof(GraphQLQueryStore<>).MakeGenericType(queryType);
-        var queries = (Dictionary<string, QueryInfo>?)queryStoreType
-            .GetProperty("Query", BindingFlags.Static | BindingFlags.Public)?
-            .GetValue(null);
+        try
+        {
+            return context.LoadFromAssemblyPath(assemblyPath);
+        }
+        catch
+        {
+            // ignored
+        }
 
-        return queries;
+        return null;
+    }
+
+    private static void ForceModuleInitializersToRun(AssemblyLoadContext context)
+    {
+        foreach (var assembly in context.Assemblies)
+        {
+            var initializers = assembly
+                .ExportedTypes
+                .Where(o => o.FullName?.Contains("ZeroQLModuleInitializer") ?? false)
+                .ToArray();
+
+            foreach (var initializer in initializers)
+            {
+                initializer
+                    .GetMethod("Init", BindingFlags.Static | BindingFlags.Public)!
+                    .Invoke(null, null);
+            }
+        }
     }
 }

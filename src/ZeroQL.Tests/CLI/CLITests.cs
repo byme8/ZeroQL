@@ -28,17 +28,19 @@ public class CLITests
     [Fact]
     public async Task Extract()
     {
-        var uniqueId = Guid.NewGuid().ToString();
-        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}.dll";
+        var uniqueId = Guid.NewGuid().ToString("N");
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";
         var bytes = await TestProject.Project.CompileToRealAssemblyAsBytes();
-        
+
+        var path = Path.GetDirectoryName(fileName)!;
+        Directory.CreateDirectory(path);
         await File.WriteAllBytesAsync(fileName, bytes);
         
         using var console = new FakeInMemoryConsole();
         var generateCommand = new ExtractQueriesCommand();
         generateCommand.AssemblyFile = fileName;
         generateCommand.ClientName = "GraphQL.TestServer.TestServerClient";
-        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries/" + uniqueId;
+        generateCommand.Output = $"../../../../TestApp/ZeroQL.TestApp/bin/{uniqueId}/queries";
 
         await generateCommand.ExecuteAsync(console);
 
@@ -49,20 +51,22 @@ public class CLITests
     [Fact]
     public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
-        var uniqueId = Guid.NewGuid().ToString();
-        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}.dll";
+        var uniqueId = Guid.NewGuid().ToString("N");
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", "// place to replace", @"await qlClient.Mutation(static q => q.AddUser(""Jon"", ""Smith"", o => o.Id));");
         
         var bytes = await project.CompileToRealAssemblyAsBytes();
         
+        var path = Path.GetDirectoryName(fileName)!;
+        Directory.CreateDirectory(path);
         await File.WriteAllBytesAsync(fileName, bytes);
         
         using var console = new FakeInMemoryConsole();
         var command = new ExtractQueriesCommand();
         command.AssemblyFile = fileName;
         command.ClientName = "GraphQL.TestServer.TestServerClient";
-        command.Output = "../../../../TestApp/ZeroQL.TestApp/bin/queries/" + uniqueId;
+        command.Output = $"../../../../TestApp/ZeroQL.TestApp/bin/queries/{uniqueId}/queries";
 
         await command.ExecuteAsync(console);
 
