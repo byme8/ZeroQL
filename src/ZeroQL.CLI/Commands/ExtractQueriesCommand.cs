@@ -28,20 +28,8 @@ public class ExtractQueriesCommand : ICommand
         }
 
         var absolutePathAssemblyFile = Path.GetFullPath(AssemblyFile);
-        var folderWithAssemblies = Path.GetDirectoryName(absolutePathAssemblyFile)!;
-        var files = Directory
-            .EnumerateFiles(folderWithAssemblies)
-            .ToArray();
-
-        var assemblyPaths = files
-            .Where(o => o.EndsWith(".dll") && !o.EndsWith("ZeroQL.Core.dll"))
-            .ToArray();
-
         var context = new AssemblyLoadContext(Guid.NewGuid().ToString());
-        foreach (var assemblyPath in assemblyPaths.Select(Path.GetFullPath))
-        {
-            LoadAssembly(context, assemblyPath);
-        }
+        LoadAssemblyWithDependencies(context, absolutePathAssemblyFile);
 
         var clientType = context.Assemblies
             .Select(o => o.GetType(ClientName))
@@ -97,20 +85,6 @@ public class ExtractQueriesCommand : ICommand
         await console.Output.WriteLineAsync("Queries extracted: " + graphqlInfo.Count);
     }
 
-    private static Assembly? LoadAssembly(AssemblyLoadContext context, string assemblyPath)
-    {
-        try
-        {
-            return context.LoadFromAssemblyPath(assemblyPath);
-        }
-        catch
-        {
-            // ignored
-        }
-
-        return null;
-    }
-
     private static void ForceModuleInitializersToRun(AssemblyLoadContext context)
     {
         foreach (var assembly in context.Assemblies)
@@ -125,6 +99,47 @@ public class ExtractQueriesCommand : ICommand
                 initializer
                     .GetMethod("Init", BindingFlags.Static | BindingFlags.Public)!
                     .Invoke(null, null);
+            }
+        }
+    }
+
+    private static Assembly? LoadAssemblyWithDependencies(AssemblyLoadContext context, string assemblyPath)
+    {
+        var assembly = context.LoadFromAssemblyPath(assemblyPath);
+        var loaded = new HashSet<string>();
+        LoadReferences(context, assembly, loaded);
+
+        return assembly;
+
+        static void LoadReferences(AssemblyLoadContext context, Assembly assembly, HashSet<string> loaded)
+        {
+            var assemblyNames = assembly
+                .GetReferencedAssemblies();
+
+            foreach (var assemblyName in assemblyNames.Where(o => !loaded.Contains(o.FullName)))
+            {
+                try
+                {
+                    var childAssembly = context.LoadFromAssemblyName(assemblyName);
+                    loaded.Add(assemblyName.FullName);
+                    LoadReferences(context, childAssembly, loaded);
+                }
+                catch
+                {
+                    try
+                    {
+                        var directory = Path.GetDirectoryName(assembly.Location);
+                        var childAssembly = context.LoadFromAssemblyPath(Path.Combine(directory!, assemblyName.Name + ".dll"));
+                        loaded.Add(assemblyName.FullName);
+                        LoadReferences(context, childAssembly, loaded);
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+
+                    // ignored
+                }
             }
         }
     }
