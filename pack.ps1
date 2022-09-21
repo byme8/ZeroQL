@@ -1,9 +1,5 @@
-cd src/ZeroQL
-dotnet build -c Release
-dotnet pack -c Release -o ../../nugets
 
-cd ../ZeroQL.CLI
-dotnet build -c Release
-dotnet pack -c Release -o ../../nugets
-
-cd ../..
+$version = Get-Date -Format "999.yy.MM-dd-HH-mm-ss"
+dotnet clean
+dotnet build -c Release /p:Version=$version
+dotnet pack -c Release --no-build --verbosity normal /p:Version=$version -o ./nugets

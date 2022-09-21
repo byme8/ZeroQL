@@ -28,7 +28,7 @@ public class ExtractQueriesCommand : ICommand
         }
 
         var absolutePathAssemblyFile = Path.GetFullPath(AssemblyFile);
-        var context = new AssemblyLoadContext(Guid.NewGuid().ToString());
+        var context = AssemblyLoadContext.Default;
         LoadAssemblyWithDependencies(context, absolutePathAssemblyFile);
 
         var clientType = context.Assemblies
