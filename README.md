@@ -5,10 +5,13 @@ The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-li
 There is a more detailed list of what the ZeroQL can do at the moment:
 - [ ] Bootstrap schema.graphql file from graphql endpoint
 - [x] Bootstrap client from schema.graphql file
-- [x] Support for queries
-- [x] Support for mutations
-- [x] Support for fragments
+- [x] Support for queries and mutations
+    - [x] ["Lambda" like syntax](#graphql-lambda-syntax)
+    - [x] ["Request" like syntax](#graphql-request-syntax)
 - [ ] Support for subscriptions
+- [x] [Support for fragments](#fragments)
+- [x] [Support for file uploads](#file-upload)
+- [x] [Support for persisted queries](#persisted-queries)
 - [ ] Support for @defer
 - [ ] Support for @stream
 
@@ -49,12 +52,18 @@ As a result, the graphql client will be generated on every build.
 Let's suppose that schema.graphql file contains the following:
 ``` graphql
 schema {
-  query: Query
+  query: Queries
+  mutation: Mutation
 }
 
-type Query {
+type Queries {
   me: User!
   user(id: Int!): User
+}
+
+type Mutation {
+  addUser(firstName: String!, lastName: String!): User!
+  addUserProfileImage(userId: Int! file: Upload!): Int!
 }
 
 type User {
@@ -75,7 +84,9 @@ and we want to execute the query like that:
 query { me { id firstName lastName } }
 ```
 
-Here how we can achieve it with ZeroQL:
+## GraphQL lambda syntax
+
+Here how we can achieve it with ZeroQL "lambda" syntax:
 ``` csharp
 var httpClient = new HttpClient();
 httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
@@ -116,6 +127,28 @@ Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query GetUserWithRo
 Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}, Role: {response.Data.Role}"); // 1: Jon Smith, Role: Admin
 ```
 
+## GraphQL request syntax
+
+In more complex queries, the "lambda" syntax may look verbose, and extracting requests into a separate entity would be nice. Now it is possible to do it via the "request" syntax. Here is an example:
+``` csharp
+
+// define a request
+public record GetUserQuery(int Id) : GraphQL<Queries, UserModel?>
+{
+    public override UserModel? Execute(Queries query) 
+        => query.User(Id, o => new UserModel(o.Id, o.FirstName, o.LastName));
+}
+
+// execute a request
+var response = await client.Execute(new GetUserQuery(variables.FriendId));
+
+Console.WriteLine(response.Query); // query GetUserQuery($id: Int!) { user(id: $id) { id firstName lastName } }
+Console.WriteLine(response.Data); // UserModel { Id = 2, FirstName = Ben, LastName = Smith }
+
+```
+
+You need to create a record from the base record `` GraphQL<TOperationType, TResult> ``. Where the `` TOperationType `` is a root query type(`` Query ``, `` Mutation ``) that associated with the `` GraphQLClient<TQuery, TMutataion> `` instance.
+
 # Fragments
 It is possible to define and reuse fragments:
 ``` csharp
@@ -150,6 +183,49 @@ Console.WriteLine($"{response.Data.User.Id}: {response.Data.User.FirstName} {res
 ```
 
 The fragment should be marked with the `` [GraphQLFragment] `` attribute, and it should be an extension method. If the fragment is defined in another assembly, it should be a partial method. The last requirement is necessary because source generators don't have access to source code from another assembly. So, a workaround will be to define fragments as a partial method and generate additional metadata.
+
+# File upload
+
+The ZeroQL supports file uploading via the "official" GraphQL way - the Upload type. 
+There is an example:
+``` csharp
+public record AddAvatar(int Id, Upload File) : GraphQL<Mutation, int>
+{
+    public override int Execute(Mutation mutation)
+        => mutation.AddUserProfileImage(Id, File);
+}
+```
+
+> There is one nuance associated with the `` Upload `` type. Pay attention to how you pass the `` Upload `` instance.
+For example, if it is a anonymous type `` new { File = new Upload("image.png", new MemoryStream()) } `` that means that reflection is going to be utilized to get the value. As a result, the Reflection.Emit is involved, which can be an issue in AOT scenarios. So, the "request" syntax would be better for such a case.
+
+# Persisted queries
+
+To use persisted queries, we need to pass `` PersistedQueryPipeline `` inside GraphQLClient:
+``` csharp
+var client = new TestServerGraphQLClient(httpClient, new PersistedQueryPipeline()); 
+var response = await client.Execute(new GetUserQuery(1)); 
+
+Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: 8cc1ee42eecdac2a8590486826856c041b04981a2c55d5cc560c338e1f6f0285:query GetUserQuery($id: Int!) { user(id: $id) { id firstName lastName } }
+Console.WriteLine(response.Data); // UserModel { Id = 1, FirstName = Jon, LastName = Smith }
+```
+
+Now the client will follow "automatic persisted queries" pipeline. Description is here [here](https://chillicream.com/docs/hotchocolate/performance/automatic-persisted-queries).
+
+When we need the "persisted queries" pipeline, described [here](https://chillicream.com/docs/hotchocolate/performance/persisted-queries), then change the client initialization like that:
+``` csharp
+var client = new TestServerGraphQLClient(httpClient, new PersistedQueryPipeline(tryToAddPersistedQueryOnFail: false));
+```
+and export defined queries from the assembly:
+``` bash
+ dotnet zeroql queries extract -a .\bin\Debug\net6.0\TestProject.dll -c TestServer.Client.TestServerGraphQLClient -o ./queries
+```
+
+The `` queries `` folder will contain the set of the "hashed" GraphQL files that you need for your GraphQL server setup:
+``` bash
+8cc1ee42eecdac2a8590486826856c041b04981a2c55d5cc560c338e1f6f0285.graphql # query GetUserQuery($id: Int!) { user(id: $id) { id firstName lastName } }
+21cc96eaf0c0db2b5f980c8ec8b5aba2e40eb24f370cfc0cd7e4825509742ae2.graphql # mutation AddAvatar($id: Int!, $file: Upload!) { addUserProfileImage(userId: $id, file: $file)}
+```
 
 # Benchmarks
 
@@ -187,19 +263,20 @@ public async Task<string> ZeroQL()
 Here results:
 ``` ini
 
-BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.4 (21F79) [Darwin 21.5.0]
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.5.1 (21G83) [Darwin 21.6.0]
 Apple M1, 1 CPU, 8 logical and 8 physical cores
-.NET SDK=6.0.302
-  [Host]     : .NET 6.0.7 (6.0.722.32202), Arm64 RyuJIT
-  DefaultJob : .NET 6.0.7 (6.0.722.32202), Arm64 RyuJIT
+.NET SDK=6.0.400
+  [Host]     : .NET 6.0.8 (6.0.822.36306), Arm64 RyuJIT
+  DefaultJob : .NET 6.0.8 (6.0.822.36306), Arm64 RyuJIT
 
 
 ```
-|          Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
-|---------------- |---------:|--------:|--------:|-------:|----------:|
-|             Raw | 182.5 μs | 1.07 μs | 1.00 μs | 2.4414 |      5 KB |
-| StrawberryShake | 190.9 μs | 0.74 μs | 0.69 μs | 3.1738 |      6 KB |
-|          ZeroQL | 185.9 μs | 1.39 μs | 1.30 μs | 2.9297 |      6 KB |
+|              Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+|-------------------- |---------:|--------:|--------:|-------:|----------:|
+|                 Raw | 186.0 μs | 1.08 μs | 1.01 μs | 2.4414 |      5 KB |
+|     StrawberryShake | 193.8 μs | 1.28 μs | 1.20 μs | 3.1738 |      6 KB |
+|        ZeroQLLambda | 187.5 μs | 1.23 μs | 1.09 μs | 2.6855 |      6 KB |
+|       ZeroQLRequest | 188.2 μs | 0.83 μs | 0.74 μs | 2.9297 |      6 KB |
 
 As you can see, the ``Raw`` method is the fastest.
 The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 
