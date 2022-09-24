@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 using Xunit;
+using ZeroQL.SourceGenerators;
+using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
@@ -61,5 +63,18 @@ public class GraphQLRequestTests : IntegrationTest
         int id = response.Data;
 
         id.Should().Be(42);
+    }
+    
+    [Fact]
+    public async Task QueryPreviewForRequestGenerated()
+    {
+        var csharpQuery = "await qlClient.Execute(new GetUserById(1));";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryRequestAnalyzer());
+        diagnostics!.Select(o => o.Id)
+            .Should().Contain(Descriptors.GraphQLQueryPreview.Id);
     }
 }
