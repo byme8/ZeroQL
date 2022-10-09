@@ -87,7 +87,7 @@ public class ExtractQueriesCommand : ICommand
 
     private static void ForceModuleInitializersToRun(AssemblyLoadContext context)
     {
-        foreach (var assembly in context.Assemblies)
+        foreach (var assembly in context.Assemblies.Where(o => !o.IsDynamic))
         {
             var initializers = assembly
                 .ExportedTypes

@@ -1,8 +1,6 @@
-using System.Reflection;
 using FluentAssertions;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
-using ZeroQL.SourceGenerators.Generator;
 using Xunit;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
@@ -256,5 +254,21 @@ public class QueryTests : IntegrationTest
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
         diagnostics.Should().Contain(o => o.Id == Descriptors.GraphQLQueryNameShouldBeLiteral.Id);
+    }
+
+    [Fact]
+    public async Task SupportsExtensionsInsideError()
+    {
+        var csharpQuery = "Mutation(static m => m.DoError)";
+        var graphqlQuery = @"mutation { doError}";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+
+        var response = await project.Validate(graphqlQuery, false);
+        
+        var value = response.Errors!.First().Extensions!.First();
+        value.Key.Should().Be("message");
+        value.Value.ToString().Should().Be("This is an error");
     }
 }

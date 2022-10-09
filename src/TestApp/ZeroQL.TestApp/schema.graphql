@@ -10,6 +10,7 @@ type KeyValuePairOfStringAndString {
 
 type Mutation {
   addUser(firstName: String! lastName: String!): User!
+  doError: Int!
   addUserProfileImage(userId: Int! file: Upload!): Int!
   addMyProfileImage(file: Upload!): Int!
   addUsersInfo(users: [UserInfoInput!]!): Int!

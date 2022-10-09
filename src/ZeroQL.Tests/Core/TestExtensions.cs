@@ -60,8 +60,9 @@ public static class TestExtensions
 
     public static async Task<byte[]> CompileToRealAssemblyAsBytes(this Project project)
     {
-
-        var compilation = await project.GetCompilationAsync();
+        var newName = $"{project.Name}.Guid{Guid.NewGuid():N}";
+        var fixedProject = project.WithAssemblyName(newName);
+        var compilation = await fixedProject.GetCompilationAsync();
         var analyzerResults = await compilation!
             .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
             {

@@ -1,4 +1,5 @@
-﻿using ZeroQL.TestServer.Query.Models;
+﻿using HotChocolate.Resolvers;
+using ZeroQL.TestServer.Query.Models;
 
 namespace ZeroQL.TestServer.Query;
 
@@ -15,6 +16,14 @@ public class UserGraphQLMutations
         };
 
         return user;
+    }
+
+    public int DoError(IResolverContext context)
+    {
+        throw new GraphQLException(new Error("Error", extensions: new Dictionary<string, object?>
+        {
+            {"message", "This is an error"}
+        }));
     }
 
     public async Task<int> AddUserProfileImage(int userId, IFile file)

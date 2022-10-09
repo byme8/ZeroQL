@@ -56,13 +56,10 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
         var result = await queryRunner.Invoke(this, queryKey, variables);
         if (result.Errors?.Any() ?? false)
         {
-            return new GraphQLResult<TResult>(result.Query, default, result.Errors);
+            return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
         }
 
-        return new GraphQLResult<TResult>(
-            result.Query,
-            queryMapper(variables, result.Data),
-            result.Errors);
+        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data), result.Errors, result.Extensions);
     }
 
     public void Dispose()

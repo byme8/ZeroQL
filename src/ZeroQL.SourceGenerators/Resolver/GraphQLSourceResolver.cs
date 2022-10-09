@@ -69,14 +69,16 @@ namespace {semanticModel.Compilation.Assembly.Name}
                 return new GraphQLResult<{context.QueryTypeName}>
                 {{
                     Query = qlResponse.Query,
-                    Errors = qlResponse.Errors
+                    Errors = qlResponse.Errors,
+                    Extensions = qlResponse.Extensions
                 }};
             }}
 
             return new GraphQLResult<{context.QueryTypeName}>
             {{
                 Query = qlResponse.Query,
-                Data = qlResponse.Data
+                Data = qlResponse.Data,
+                Extensions = qlResponse.Extensions
             }};
         }}
 

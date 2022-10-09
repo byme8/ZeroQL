@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 
 namespace ZeroQL;
 
@@ -10,7 +10,9 @@ public interface IGraphQLResult
 {
     string Query { get; }
 
-    public GraphQueryError[] Errors { get; set; }
+    public GraphQueryError[]? Errors { get; }
+
+    public Dictionary<string, object>? Extensions { get; }
 }
 
 public class GraphQLResult<TData> : IGraphQLResult
@@ -20,11 +22,12 @@ public class GraphQLResult<TData> : IGraphQLResult
         
     }
     
-    public GraphQLResult(string query, TData? data, GraphQueryError[]? errors)
+    public GraphQLResult(string query, TData? data, GraphQueryError[]? errors, Dictionary<string, object>? extensions)
     {
         Query = query;
         Data = data;
         Errors = errors;
+        Extensions = extensions;
     }
 
     public string Query { get; set; }
@@ -32,6 +35,8 @@ public class GraphQLResult<TData> : IGraphQLResult
     public TData? Data { get; set; }
 
     public GraphQueryError[]? Errors { get; set; }
+
+    public Dictionary<string, object>? Extensions { get; set; }
 }
 
 public record GraphQLResponse<TData>
@@ -41,6 +46,8 @@ public record GraphQLResponse<TData>
     public TData? Data { get; set; }
 
     public GraphQueryError[]? Errors { get; set; }
+    
+    public Dictionary<string, object>? Extensions { get; set; }
 }
 
 public class GraphQueryError
@@ -49,11 +56,5 @@ public class GraphQueryError
 
     public object[] Path { get; set; }
     
-    public QLResponseExtenstion Extensions { get; set; }
-}
-
-public class QLResponseExtenstion
-{
-    public string Code { get; set; }
-    public string Field { get; set; }
+    public Dictionary<string, object>? Extensions { get; set; }
 }

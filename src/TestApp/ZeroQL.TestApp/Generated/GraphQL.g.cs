@@ -47,6 +47,8 @@ namespace GraphQL.TestServer
             return selector(__AddUser);
         }
 
+        public int DoError { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public int AddUserProfileImage(int userId, global::ZeroQL.Upload file)
         {
