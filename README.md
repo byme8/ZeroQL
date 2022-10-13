@@ -18,6 +18,7 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 The articles:
 - [ZeroQL - C# friendly graphql client](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
 - [ZeroQL - C# GraphQL client adds fragments support](https://dev.to/byme8/zeroql-c-graphql-client-adds-fragments-support-1lcf)
+- [ZeroQL V2 - C# GraphQL client](https://dev.to/byme8/zeroql-v2-c-graphql-client-1o8d)
 
 # How to setup
 
