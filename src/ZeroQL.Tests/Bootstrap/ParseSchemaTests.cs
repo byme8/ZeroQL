@@ -318,7 +318,7 @@ public class ParseSchemaTests
     }
     
     [Fact]
-    public void InstantScalarIsDetected()
+    public void UserDefinedScalarIsDetected()
     {
         SyntaxTree.GetClass("Query")?
             .GetProperty("Instant")

@@ -1,0 +1,6 @@
+﻿{
+  Query: query { instant},
+  Data: {
+    DateTimeOffset: DateTimeOffset_1
+  }
+}
