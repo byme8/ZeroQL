@@ -77,6 +77,9 @@ namespace GraphQL.TestServer
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Query : global::ZeroQL.Internal.IQuery
     {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Instant")]
+        public Instant __Instant { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
         public User __Me { get; set; }
 
@@ -106,6 +109,12 @@ namespace GraphQL.TestServer
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Instant<T>(Func<Instant, T> selector)
+        {
+            return selector(__Instant);
+        }
 
         [ZeroQL.GraphQLFieldSelector]
         public T Me<T>(Func<User, T> selector)

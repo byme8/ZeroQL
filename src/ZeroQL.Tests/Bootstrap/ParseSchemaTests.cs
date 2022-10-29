@@ -316,4 +316,12 @@ public class ParseSchemaTests
         var genericName = (GenericNameSyntax)name.Right;
         genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("Mutations");
     }
+    
+    [Fact]
+    public void InstantScalarIsDetected()
+    {
+        SyntaxTree.GetClass("Query")?
+            .GetProperty("Instant")
+            .Should().NotBeNull();
+    }
 }

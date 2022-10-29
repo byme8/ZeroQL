@@ -18,6 +18,7 @@ type Mutation {
 }
 
 type Query {
+  instant: Instant!
   me: User!
   users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
   userKinds: [UserKind!]!
@@ -127,6 +128,9 @@ scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time"
 
 "The built-in `Decimal` scalar type."
 scalar Decimal
+
+"Represents an instant on the global timeline, with nanosecond resolution."
+scalar Instant
 
 "The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
 scalar Long

@@ -1,5 +1,6 @@
 using System.Net;
 using HotChocolate.Language;
+using HotChocolate.Types.NodaTime;
 using ZeroQL.TestServer.Query;
 using ZeroQL.TestServer.Query.Models;
 
@@ -30,6 +31,8 @@ public class Program
             .AddQueryType<Query.Query>()
             .AddMutationType<Mutation>()
             .AddType<UploadType>()
+            .AddType<InstantType>()
+            .AddTypeExtension<NodeTimeGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>();
