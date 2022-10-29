@@ -42,8 +42,13 @@ public static class GraphQLGenerator
             .Type;
 
         var enumsNames = new HashSet<string>(enums.Select(o => o.Name.StringValue));
+        var scalarTypes = schema.Definitions
+            .OfType<GraphQLScalarTypeDefinition>()
+            .Select(o => o.Name.StringValue)
+            .ToArray();
 
-        var context = new TypeFormatter(enumsNames);
+        var context = new TypeFormatter(enumsNames, scalarTypes);
+        
         var inputs = schema.Definitions
             .OfType<GraphQLInputObjectTypeDefinition>()
             .Select(o => CreateInputDefinition(context, o))
@@ -53,7 +58,6 @@ public static class GraphQLGenerator
             .OfType<GraphQLObjectTypeDefinition>()
             .Select(o => CreateTypesDefinition(context, o))
             .ToArray();
-
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
         var clientDeclaration = new[] { GenerateClient(clientName, queryType, mutationType) };
@@ -75,6 +79,7 @@ public static class GraphQLGenerator
 using System; 
 using System.Linq; 
 using System.Text.Json.Serialization; 
+using ZeroQL; 
 
 #nullable enable
 

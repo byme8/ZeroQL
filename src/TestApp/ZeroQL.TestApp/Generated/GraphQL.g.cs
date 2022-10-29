@@ -3,6 +3,7 @@
 using System; 
 using System.Linq; 
 using System.Text.Json.Serialization; 
+using ZeroQL; 
 
 #nullable enable
 
@@ -106,6 +107,8 @@ namespace GraphQL.TestServer
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
+
+        public global::ZeroQL.Instant Instant { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T Me<T>(Func<User, T> selector)

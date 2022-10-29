@@ -20,13 +20,21 @@ internal class TypeFormatter
         { "DateTime", "DateTimeOffset" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
-        { "Boolean", "bool" },
-        { "Upload", "global::ZeroQL.Upload" },
+        { "Boolean", "bool" }
     };
 
-    public TypeFormatter(HashSet<string> enums)
+    public TypeFormatter(HashSet<string> enums, string[] customScalars)
     {
         Enums = enums;
+        foreach (var scalar in customScalars)
+        {
+            if (GraphQLToCsharpScalarTypes.ContainsKey(scalar))
+            {
+                continue;
+            }
+            
+            GraphQLToCsharpScalarTypes[scalar] = $"global::ZeroQL.{scalar}";
+        }
     }
 
     public HashSet<string> Enums

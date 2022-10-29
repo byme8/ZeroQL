@@ -12,6 +12,7 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [x] [Support for fragments](#fragments)
 - [x] [Support for file uploads](#file-upload)
 - [x] [Support for persisted queries](#persisted-queries)
+- [x] [Support for user defined scalars](#user-defined-scalars)
 - [ ] Support for @defer
 - [ ] Support for @stream
 
@@ -226,6 +227,60 @@ The `` queries `` folder will contain the set of the "hashed" GraphQL files that
 ``` bash
 8cc1ee42eecdac2a8590486826856c041b04981a2c55d5cc560c338e1f6f0285.graphql # query GetUserQuery($id: Int!) { user(id: $id) { id firstName lastName } }
 21cc96eaf0c0db2b5f980c8ec8b5aba2e40eb24f370cfc0cd7e4825509742ae2.graphql # mutation AddAvatar($id: Int!, $file: Upload!) { addUserProfileImage(userId: $id, file: $file)}
+```
+
+# User defined scalars
+
+Let's suppose that server returns the `` Instant `` type from `` NodaTime ``.
+The schema looks like that
+``` graphql
+
+"""
+Represents an instant on the global timeline, with nanosecond resolution.
+"""
+scalar Instant
+
+type Query {
+  instant: Instant!
+}
+```
+
+The ZeroQL knows nothing about the scalar type `` Instant ``, but we should be able to add support for it. To make it work, create the class `` Instant `` in the ZeroQL namespace and define a JSON serializer for it:
+``` cs
+namespace ZeroQL;
+
+public class Instant
+{
+    public DateTimeOffset DateTimeOffset { get; set; }
+}
+
+public class InstantJsonConverter : JsonConverter<Instant?>
+{
+    public override Instant? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var text = reader.GetString();
+        if (string.IsNullOrEmpty(text))
+        {
+            return null;
+        }
+        return new Instant { DateTimeOffset = DateTimeOffset.Parse(text) };
+    }
+
+    public override void Write(Utf8JsonWriter writer, Instant? value, JsonSerializerOptions options)
+    {
+        var text = value?.DateTimeOffset.ToString("O");
+        writer.WriteStringValue(text);
+    }
+}
+```
+
+Then, somewhere in your app, add this serializer to JSON options:
+``` cs
+ZeroQLJsonOptions.Configure(o => o.Converters.Add(new InstantJsonConverter()));
+```
+Now we are ready to consume it:
+``` cs
+var response = await qlClient.Query(static q => q.Instant);
 ```
 
 # Benchmarks
