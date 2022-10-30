@@ -44,7 +44,7 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
 
             context.ReportDiagnostic(
                 Diagnostic.Create(
-                    Descriptors.FailedToConvert,
+                    Descriptors.FailedToConvertPartOfTheQuery,
                     record
                         .Members
                         .OfType<MethodDeclarationSyntax>()

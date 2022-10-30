@@ -644,7 +644,7 @@ public class GraphQLQueryResolver
     private static Error Failed(CSharpSyntaxNode node, DiagnosticDescriptor? descriptor = null)
     {
         var diagnostic = Diagnostic.Create(
-            descriptor ?? Descriptors.FailedToConvert,
+            descriptor ?? Descriptors.FailedToConvertPartOfTheQuery,
             node.GetLocation(),
             node.ToString());
 

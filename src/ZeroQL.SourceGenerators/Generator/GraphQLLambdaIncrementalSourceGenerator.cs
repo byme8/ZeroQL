@@ -40,7 +40,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
 
             context.ReportDiagnostic(
                 Diagnostic.Create(
-                    Descriptors.FailedToConvert,
+                    Descriptors.FailedToConvertPartOfTheQuery,
                     invocation
                         .ArgumentList
                         .Arguments

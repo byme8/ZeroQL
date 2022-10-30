@@ -4,10 +4,18 @@ namespace ZeroQL.SourceGenerators;
 
 public class Descriptors
 {
+    public static DiagnosticDescriptor FailedToConvertPartOfTheQuery = new(
+        nameof(FailedToConvertPartOfTheQuery),
+        "Failed to convert to graphql query",
+        "Failed to convert to graphql query: {0}",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        true);
+    
     public static DiagnosticDescriptor FailedToConvert = new(
         nameof(FailedToConvert),
         "Failed to convert to graphql query",
-        "Failed to convert to graphql query: {0}",
+        "{0}",
         "ZeroQL",
         DiagnosticSeverity.Error,
         true);

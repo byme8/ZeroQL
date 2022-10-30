@@ -11,14 +11,15 @@ namespace ZeroQL.SourceGenerators.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class QueryRequestAnalyzer : DiagnosticAnalyzer
 {
- #pragma warning disable RS1026
+#pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
- #pragma warning restore RS1026
+#pragma warning restore RS1026
     {
 #if !DEBUG
             context.EnableConcurrentExecution();
 #endif
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
+                                               GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.RegisterSyntaxNodeAction(Handle, SyntaxKind.RecordDeclaration);
     }
 
@@ -37,7 +38,7 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-        
+
         var executeMethod = record.Members
             .OfType<MethodDeclarationSyntax>()
             .FirstOrDefault(m => m.Identifier.Text == "Execute");
@@ -46,7 +47,7 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-        
+
         var innerLambdas = executeMethod
             .DescendantNodes()
             .OfType<LambdaExpressionSyntax>()
@@ -68,20 +69,34 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        
         var resolver = new ZeroQLRequestLikeContextResolver();
-        var (requestContext, resolveError) = resolver.Resolve(record, semanticModel, context.CancellationToken).Unwrap();
+        var (requestContext, resolveError) =
+            resolver.Resolve(record, semanticModel, context.CancellationToken).Unwrap();
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         if (resolveError is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);
+            return;
         }
-        else
+
+        if (resolveError)
         {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptors.GraphQLQueryPreview,
-                record.Identifier.GetLocation(),
-                requestContext.OperationQuery));
+            context.ReportDiagnostic(Diagnostic
+                .Create(
+                    Descriptors.FailedToConvert,
+                    record.Identifier.GetLocation(),
+                    resolveError.Code));
+            return;
         }
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            Descriptors.GraphQLQueryPreview,
+            record.Identifier.GetLocation(),
+            requestContext.OperationQuery));
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -90,6 +105,7 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
             Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUseOutScopeValues,
+            Descriptors.FailedToConvertPartOfTheQuery,
             Descriptors.FailedToConvert,
             Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
             Descriptors.GraphQLQueryNameShouldBeLiteral,

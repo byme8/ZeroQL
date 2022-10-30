@@ -56,7 +56,7 @@ public class GraphQLFragmentTemplateIncrementalSourceGenerator : IIncrementalGen
                 return;
             }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptors.FailedToConvert, methodDeclaration.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(Descriptors.FailedToConvertPartOfTheQuery, methodDeclaration.GetLocation()));
             return;
         }
 

@@ -11,14 +11,15 @@ namespace ZeroQL.SourceGenerators.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 {
- #pragma warning disable RS1026
+#pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
- #pragma warning restore RS1026
+#pragma warning restore RS1026
     {
 #if !DEBUG
             context.EnableConcurrentExecution();
 #endif
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
+                                               GeneratedCodeAnalysisFlags.ReportDiagnostics);
         context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression);
     }
 
@@ -83,18 +84,34 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
         var semanticModel = context.SemanticModel;
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContext, resolveError) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+        var (lambdaContext, resolveError) =
+            resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         if (resolveError is ErrorWithData<Diagnostic> error)
         {
             context.ReportDiagnostic(error.Data);
+            return;
         }
-        else
+
+        if (resolveError)
         {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptors.GraphQLQueryPreview,
-                memberAccess.Name.GetLocation(),
-                lambdaContext.OperationQuery));
+            context.ReportDiagnostic(Diagnostic
+                .Create(
+                    Descriptors.FailedToConvert,
+                    memberAccess.Name.GetLocation(),
+                    resolveError.Code));
+            return;
         }
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            Descriptors.GraphQLQueryPreview,
+            memberAccess.Name.GetLocation(),
+            lambdaContext.OperationQuery));
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -103,6 +120,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUseOutScopeValues,
+            Descriptors.FailedToConvertPartOfTheQuery,
             Descriptors.FailedToConvert,
             Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
             Descriptors.GraphQLQueryNameShouldBeLiteral,
