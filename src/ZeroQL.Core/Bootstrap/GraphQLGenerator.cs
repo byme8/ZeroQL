@@ -114,8 +114,8 @@ public static class GraphQLGenerator
 
         return CSharpHelper.Class(clientName ?? "GraphQLClient")
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(IdentifierName($"global::ZeroQL.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
-            .WithMembers(SingletonList<MemberDeclarationSyntax>(
-                ConstructorDeclaration(clientName ?? "GraphQLClient")
+            .WithMembers(List<MemberDeclarationSyntax>()
+                .Add(ConstructorDeclaration(clientName ?? "GraphQLClient")
                     .WithParameterList(ParseParameterList("(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
                     // call base constructor
                     .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
@@ -124,7 +124,18 @@ public static class GraphQLGenerator
                             .Add(Argument(IdentifierName("queryPipeline")))
                         )))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                    .WithBody(Block())));
+                    .WithBody(Block()))
+                .Add(ConstructorDeclaration(clientName ?? "GraphQLClient")
+                    .WithParameterList(ParseParameterList("(global::ZeroQL.IGraphQLTransport transport, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
+                    // call base constructor
+                    .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
+                        ArgumentList(SeparatedList<ArgumentSyntax>()
+                            .Add(Argument(IdentifierName("transport")))
+                            .Add(Argument(IdentifierName("queryPipeline")))
+                        )))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithBody(Block()))
+            );
     }
 
     private static ClassDeclarationSyntax[] GenerateInputs(ClassDefinition[] inputs)

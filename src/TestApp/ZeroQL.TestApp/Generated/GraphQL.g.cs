@@ -14,6 +14,10 @@ namespace GraphQL.TestServer
         public TestServerClient(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
         {
         }
+
+        public TestServerClient(global::ZeroQL.IGraphQLTransport transport, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(transport, queryPipeline)
+        {
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

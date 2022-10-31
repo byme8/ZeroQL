@@ -10,7 +10,7 @@ namespace ZeroQL.Pipelines;
 
 public class FullQueryPipeline : IGraphQLQueryPipeline
 {
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(IGraphQLTransport transport, string queryKey, object? variables, Func<GraphQLRequest, IGraphQLTransportContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
         var query = queryInfo.Query;
@@ -21,9 +21,8 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
         };
 
         var content = contentCreator(qlRequest);
-        var response = await httpClient.PostAsync("", content);
-        var responseJson = await response.Content.ReadAsStreamAsync();
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+
+        var qlResponse = await transport.DeliverAsync<TQuery>(qlRequest.Query, content);
 
         if (qlResponse is not null)
         {

@@ -7,5 +7,5 @@ namespace ZeroQL.Pipelines;
 
 public interface IGraphQLQueryPipeline
 {
-    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator);
+    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(IGraphQLTransport transport, string queryKey, object? variables, Func<GraphQLRequest, IGraphQLTransportContent> contentCreator);
 }

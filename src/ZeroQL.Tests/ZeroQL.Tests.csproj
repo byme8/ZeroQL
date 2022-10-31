@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -21,10 +21,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\TestApp\ZeroQL.TestApp\ZeroQL.TestApp.csproj" />
         <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
         <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
-        <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
-        <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
+		<ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
+		<ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
 
 </Project>

@@ -47,10 +47,15 @@ namespace {semanticModel.Compilation.Assembly.Name}
         public static async Task<GraphQLResult<{context.QueryTypeName}>> Execute(IGraphQLClient qlClient, string queryKey, object variablesObject)
         {{
             var variables = ({context.RequestExecutorInputSymbol.ToGlobalName()})variablesObject;
-            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{context.QueryTypeName}>(qlClient.HttpClient, queryKey, variablesObject, queryRequest => 
+            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{context.QueryTypeName}>(qlClient.Transport, queryKey, variablesObject, queryRequest => 
             {{
-                {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
-                return content;
+                if (qlClient.Transport is HttpTransport)
+                {{
+                    {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}
+                    return new HttpTransportContent(content);
+                }}
+
+                return qlClient.Transport.CreateContent(queryRequest);
             }});
 
             if (qlResponse is null)

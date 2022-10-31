@@ -1,4 +1,5 @@
 using System.Net;
+using HotChocolate.Execution.Configuration;
 using HotChocolate.Language;
 using HotChocolate.Types.NodaTime;
 using ZeroQL.TestServer.Query;
@@ -19,15 +20,8 @@ public class Program
         });
     }
 
-    public static async Task StartServer(ServerContext context)
-    {
-        var builder = WebApplication.CreateBuilder(context.Arguments);
-        builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(context.Port));
-
-        builder.Services.AddMemoryCache()
-            .AddSha256DocumentHashProvider(HashFormat.Hex);
-
-        var graphQLServer = builder.Services.AddGraphQLServer()
+    public static IRequestExecutorBuilder AddBasicGraphQLServices(IServiceCollection services) =>
+        services.AddGraphQLServer()
             .AddQueryType<Query.Query>()
             .AddMutationType<Mutation>()
             .AddType<UploadType>()
@@ -36,6 +30,16 @@ public class Program
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>();
+
+    public static async Task StartServer(ServerContext context)
+    {
+        var builder = WebApplication.CreateBuilder(context.Arguments);
+        builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(context.Port));
+
+        builder.Services.AddMemoryCache()
+            .AddSha256DocumentHashProvider(HashFormat.Hex);
+
+        var graphQLServer = AddBasicGraphQLServices(builder.Services);
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {

@@ -10,8 +10,7 @@ namespace ZeroQL;
 
 public interface IGraphQLClient
 {
-    HttpClient HttpClient { get; }
-
+    IGraphQLTransport Transport { get; }
     IGraphQLQueryPipeline QueryPipeline { get; }
 
     Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
@@ -34,12 +33,18 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
     }
 
     public GraphQLClient(HttpClient httpClient, IGraphQLQueryPipeline? queryPipeline = null)
+        : this(new HttpTransport(httpClient), queryPipeline)
     {
-        HttpClient = httpClient;
+
+    }
+
+    public GraphQLClient(IGraphQLTransport transport, IGraphQLQueryPipeline? queryPipeline = null)
+    {
+        Transport = transport;
         QueryPipeline = queryPipeline ?? new FullQueryPipeline();
     }
 
-    public HttpClient HttpClient { get; }
+    public IGraphQLTransport Transport { get; }
 
     public IGraphQLQueryPipeline QueryPipeline { get; }
 
@@ -64,6 +69,9 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 
     public void Dispose()
     {
-        HttpClient.Dispose();
+        if (Transport is IDisposable disposableTransport)
+        {
+            disposableTransport.Dispose();
+        }
     }
 }

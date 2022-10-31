@@ -18,7 +18,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
 
     public bool TryToAddPersistedQueryOnFail { get; }
 
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, Func<GraphQLRequest, HttpContent> contentCreator)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(IGraphQLTransport transport, string queryKey, object? variables, Func<GraphQLRequest, IGraphQLTransportContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
         var qlRequest = new GraphQLRequest
@@ -35,8 +35,8 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
         };
 
         var content = contentCreator(qlRequest);
-        var response = await httpClient.PostAsync("", content);
-        var qlResponse = await ReadResponse<TQuery>(response);
+
+        var qlResponse = await transport.DeliverAsync<TQuery>(qlRequest.Query, content);
 
         if (qlResponse.Errors is null)
         {
@@ -55,8 +55,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
 
         qlRequest.Query = queryInfo.Query;
         content = contentCreator(qlRequest);
-        response = await httpClient.PostAsync("", content);
-        qlResponse = await ReadResponse<TQuery>(response);
+        qlResponse = qlResponse = await transport.DeliverAsync<TQuery>(qlRequest.Query, content);
 
         return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
     }
