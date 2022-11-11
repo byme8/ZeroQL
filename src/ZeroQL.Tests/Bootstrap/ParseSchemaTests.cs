@@ -324,4 +324,60 @@ public class ParseSchemaTests
             .GetProperty("Instant")
             .Should().NotBeNull();
     }
+
+    [Fact]
+    public void DefaultValuesForInputObjects()
+    {
+        const string clientClassName = "Book";
+        var rawSchema = @"
+schema {
+  mutation: Mutation
+}
+
+input " + clientClassName + @" {
+  bookId: ID! = 1
+  pages: int! = 100
+  price: float! = 1.99
+  title: string = ""The Hobbit""
+  archive: bool = true
+  
+}
+
+type Mutation {
+  addBook(input: Book): int
+}
+";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var clientClass = syntaxTree.GetClass(clientClassName)!;
+        clientClass.Should().NotBeNull();
+
+        var bookIdProperty = clientClass.GetProperty("BookId");
+        VerifyProperty(bookIdProperty, SyntaxKind.StringLiteralExpression, "1");
+
+        var pagesProperty = clientClass.GetProperty("Pages");
+        VerifyProperty(pagesProperty, SyntaxKind.NumericLiteralExpression, 100);
+
+        var priceProperty = clientClass.GetProperty("Price");
+        VerifyProperty(priceProperty, SyntaxKind.NumericLiteralExpression, 1.99);
+
+        var titleProperty = clientClass.GetProperty("Title");
+        VerifyProperty(titleProperty, SyntaxKind.StringLiteralExpression, "The Hobbit");
+
+        var archiveProperty = clientClass.GetProperty("Archive");
+        VerifyProperty(archiveProperty, SyntaxKind.TrueLiteralExpression, true);
+    }
+
+    private void VerifyProperty(PropertyDeclarationSyntax property, SyntaxKind syntaxKind, object exprectedDefaultValue)
+    {
+        property.Should().NotBeNull();
+        var initializer = property.Initializer;
+        initializer.Should().NotBeNull();
+        var bookIdDefaultValue = initializer!.Value as LiteralExpressionSyntax;
+        bookIdDefaultValue.Should().NotBeNull();
+        Assert.Equal(syntaxKind, bookIdDefaultValue!.Kind());
+        Assert.Equal(exprectedDefaultValue, bookIdDefaultValue.Token.Value);
+    }
 }
