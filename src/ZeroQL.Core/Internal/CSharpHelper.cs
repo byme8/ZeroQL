@@ -59,7 +59,7 @@ internal static class CSharpHelper
         "int"       => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(int.Parse(strValue))),
         "bool"      => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(bool.Parse(strValue) ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
 
-        //ID is always represented as a string in client-server communication.  REF: https://chillicream.com/docs/hotchocolate/v12/defining-a-schema/scalars#id
+        //ID is always represented as a string in client-server communication. REF: https://chillicream.com/docs/hotchocolate/v12/defining-a-schema/scalars#id
         "ID"        => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(strValue)),
 
         _ => null

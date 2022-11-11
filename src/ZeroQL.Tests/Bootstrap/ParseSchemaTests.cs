@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Xunit;
 using ZeroQL.Bootstrap;
 using ZeroQL.Extensions;
 using ZeroQL.Tests.Core;

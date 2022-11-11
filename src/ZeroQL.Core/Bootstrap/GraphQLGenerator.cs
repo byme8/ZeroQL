@@ -423,7 +423,7 @@ public static class GraphQLGenerator
     }
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
-        => new(type.Name.StringValue, CretePropertyDefinition(typeFormatter, type));
+        => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type));
 
     private static string? GetDefaultValue(GraphQLInputValueDefinition field)
     {
@@ -447,7 +447,7 @@ public static class GraphQLGenerator
     }
 
 
-    private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)
+    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)
     {
         return typeQL.Fields?.Select(field =>
             {
