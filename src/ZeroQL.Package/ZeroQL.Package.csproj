@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -16,7 +15,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
+        <ProjectReference Include="..\ZeroQL.Runtime\ZeroQL.Runtime.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
     </ItemGroup>
 
@@ -26,7 +25,7 @@
 
     <Target Name="_AddAnalyzersToOutput">
         <ItemGroup>
-            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Core.dll" PackagePath="lib/net6.0" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Runtime.dll" PackagePath="lib/$(TargetFramework)" />
             <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
         </ItemGroup>
     </Target>

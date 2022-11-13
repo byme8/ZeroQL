@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <RootNamespace>ZeroQL</RootNamespace>
     </PropertyGroup>
@@ -9,6 +9,10 @@
     <ItemGroup>
         <PackageReference Include="GraphQL-Parser" Version="8.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ZeroQL.Runtime\ZeroQL.Runtime.csproj" />
     </ItemGroup>
 
 </Project>

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GraphQL.TestServer;
 using ZeroQL;
 using ZeroQL.Json; // do not remove this
-using ZeroQL.Schema; // do not remove this
 using ZeroQL.Pipelines; // do not remove this
 using ZeroQL.TestApp.Models;
 

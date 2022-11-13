@@ -18,10 +18,8 @@ jobs:
         dotnet-version: 6.0.301
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build -c Release /p:Version=${GITHUB_REF_NAME:1} --no-restore
-    - name: Push
-      run: |
-        dotnet pack -c Release --no-build --verbosity normal /p:Version=${GITHUB_REF_NAME:1} -o ./nugets
+    - name: Build And Pack
+      run: | 
+        pwsh -version ${GITHUB_REF_NAME:1}
         cd ./nugets
         dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 

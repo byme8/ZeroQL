@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
-        <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
+        <ProjectReference Include="..\ZeroQL.Tools\ZeroQL.Tools.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
         <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
