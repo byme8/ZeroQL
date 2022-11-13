@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -54,7 +55,7 @@ internal static class CSharpHelper
 
     private static ExpressionSyntax? GetInitializerExpression(TypeDefinition type, string? strValue) => type.Name switch
     {
-        "float"     => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(double.Parse(strValue))),
+        "float"     => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(double.Parse(strValue, CultureInfo.InvariantCulture))),
         "string"    => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(strValue)),
         "int"       => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(int.Parse(strValue))),
         "bool"      => string.IsNullOrEmpty(strValue) ? null : LiteralExpression(bool.Parse(strValue) ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression),
