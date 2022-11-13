@@ -24,6 +24,6 @@ jobs:
       run: dotnet restore
     - name: Build And Pack
       run: | 
-        pwsh -version ${GITHUB_REF_NAME:1}
+        pwsh ./pack.ps1 -version ${GITHUB_REF_NAME:1}
         cd ./nugets
         dotnet nuget push *.nupkg --skip-duplicate -s https://nuget.org -k ${{ secrets.API_KEY }} 
