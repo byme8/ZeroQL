@@ -133,7 +133,7 @@ public static class GraphQLGenerator
             .Select(o =>
             {
                 var fields = o.Properties
-                    .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition.Name + property.TypeDefinition.NullableAnnotation()));
+                    .Select(property => CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue));
 
                 return CSharpHelper.Class(o.Name)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
@@ -144,7 +144,7 @@ public static class GraphQLGenerator
     }
 
     private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, CretePropertyDefinition(typeFormatter, input));
+        => new(input.Name.StringValue, CreatePropertyDefinition(typeFormatter, input));
 
     private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
     {
@@ -240,7 +240,7 @@ public static class GraphQLGenerator
                         };
 
                         return CSharpHelper
-                            .Property("__" + property.Name, property.TypeDefinition.Name)
+                            .Property("__" + property.Name, property.TypeDefinition, false, null)
                             .AddAttributes(jsonNameAttributes);
                     });
 
@@ -279,7 +279,7 @@ public static class GraphQLGenerator
             return GenerateQueryPropertyDeclaration(field, parameters);
         }
 
-        return CSharpHelper.Property(field.Name, field.TypeDefinition.NameWithNullableAnnotation());
+        return CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue);
     }
 
 
@@ -423,20 +423,31 @@ public static class GraphQLGenerator
     }
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
-        => new(type.Name.StringValue, CretePropertyDefinition(typeFormatter, type));
+        => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type));
 
-    private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition typeQL)
+    private static string? GetDefaultValue(GraphQLInputValueDefinition field)
+    {
+        if (field.DefaultValue is not IHasValueNode hasValueNode)
+            return null;
+
+        return (string)hasValueNode.Value;
+    }
+
+
+    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition typeQL)
     {
         return typeQL.Fields?
             .Select(field =>
             {
                 var type = typeFormatter.GetTypeDefinition(field.Type);
-                return new FieldDefinition(field.Name.StringValue.FirstToUpper(), type, Array.Empty<ArgumentDefinition>());
+                var defaultValue = GetDefaultValue(field);
+                return new FieldDefinition(field.Name.StringValue.FirstToUpper(), type, Array.Empty<ArgumentDefinition>(), defaultValue);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
 
-    private static FieldDefinition[] CretePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)
+
+    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)
     {
         return typeQL.Fields?.Select(field =>
             {
@@ -446,7 +457,8 @@ public static class GraphQLGenerator
                     type,
                     field.Arguments?
                         .Select(arg => new ArgumentDefinition(arg.Name.StringValue, typeFormatter.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
-                        .ToArray() ?? Array.Empty<ArgumentDefinition>());
+                        .ToArray() ?? Array.Empty<ArgumentDefinition>(),
+                    null);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
