@@ -15,6 +15,16 @@ public static class NodeExtensions
 
         return type;
     }
+    
+    public static InterfaceDeclarationSyntax? GetInterface(this SyntaxTree syntaxTree, string name)
+    {
+        var type = syntaxTree.GetRoot()
+            .DescendantNodes()
+            .OfType<InterfaceDeclarationSyntax>()
+            .FirstOrDefault(o => o.Identifier.ValueText == name);
+
+        return type;
+    }
 
     public static MethodDeclarationSyntax GetMethod(this ClassDeclarationSyntax @class, string name)
     {

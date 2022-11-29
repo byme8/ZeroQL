@@ -58,10 +58,16 @@ public static class GraphQLGenerator
             .OfType<GraphQLObjectTypeDefinition>()
             .Select(o => CreateTypesDefinition(context, o))
             .ToArray();
+        
+        var interfaces = schema.Definitions
+            .OfType<GraphQLInterfaceTypeDefinition>()
+            .Select(o => CreateInterfaceDefinition(context, o))
+            .ToArray();
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(clientNamespace));
         var clientDeclaration = new[] { GenerateClient(clientName, queryType, mutationType) };
         var typesDeclaration = GenerateTypes(types, queryType, mutationType);
+        var interfacesDeclaration = GenerateInterfaces(interfaces);
         var inputsDeclaration = GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(enums);
         var enumsInitializers = GenerateEnumsInitializers(enums);
@@ -69,6 +75,7 @@ public static class GraphQLGenerator
         namespaceDeclaration = namespaceDeclaration
             .WithMembers(List<MemberDeclarationSyntax>(clientDeclaration)
                 .AddRange(typesDeclaration)
+                .AddRange(interfacesDeclaration)
                 .AddRange(inputsDeclaration)
                 .AddRange(enumsDeclaration)
                 .Add(enumsInitializers));
@@ -144,7 +151,7 @@ public static class GraphQLGenerator
     }
 
     private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter, GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, CreatePropertyDefinition(typeFormatter, input));
+        => new(input.Name.StringValue, CreatePropertyDefinition(typeFormatter, input), null);
 
     private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
     {
@@ -249,6 +256,18 @@ public static class GraphQLGenerator
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
+                if (o.Implements is not null)
+                {
+                    var bases = o.Implements
+                        .Select(baseType => SimpleBaseType(ParseTypeName(baseType)))
+                        .OfType<BaseTypeSyntax>()
+                        .ToArray();
+
+                    @class = @class
+                        .AddBaseListTypes(bases);
+
+                }
+
                 if (o.Name == queryType?.Name.StringValue)
                 {
                     @class = @class.AddBaseListTypes(SimpleBaseType(IdentifierName("global::ZeroQL.Internal.IQuery")));
@@ -260,6 +279,23 @@ public static class GraphQLGenerator
                 }
 
                 return @class;
+            })
+            .ToList();
+
+        return csharpDefinitions;
+    }
+    
+    private static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(InterfaceDefinition[] interfaces)
+    {
+        var csharpDefinitions = interfaces
+            .Select(o =>
+            {
+                var fields = o.Properties.Select(GeneratePropertiesDeclarations);
+                var @interface = CSharpHelper.Interface(o.Name)
+                    .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                    .WithMembers(List(fields));
+
+                return @interface;
             })
             .ToList();
 
@@ -423,7 +459,10 @@ public static class GraphQLGenerator
     }
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
-        => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type));
+        => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type.Fields), type.Interfaces?.Select(o => o.Name.StringValue).ToArray());
+
+    private static InterfaceDefinition CreateInterfaceDefinition(TypeFormatter typeFormatter, GraphQLInterfaceTypeDefinition definition)
+        => new(definition.Name.StringValue, CreatePropertyDefinition(typeFormatter, definition.Fields));
 
     private static string? GetDefaultValue(GraphQLInputValueDefinition field)
     {
@@ -446,10 +485,9 @@ public static class GraphQLGenerator
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
 
-
-    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition typeQL)
+    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter, GraphQLFieldsDefinition? fields)
     {
-        return typeQL.Fields?.Select(field =>
+        return fields?.Select(field =>
             {
                 var type = typeFormatter.GetTypeDefinition(field.Type);
                 return new FieldDefinition(

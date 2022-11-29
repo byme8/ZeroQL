@@ -16,10 +16,17 @@ internal static class CSharpHelper
         return ClassDeclaration(name)
             .AddModifiers(ParseToken("public"));
     }
-
-    public static ClassDeclarationSyntax AddAttributes(this ClassDeclarationSyntax classDeclarationSyntax, params string[] attributes)
+    
+    public static InterfaceDeclarationSyntax Interface(string name)
     {
-        return classDeclarationSyntax
+        return InterfaceDeclaration(name)
+            .AddModifiers(ParseToken("public"));
+    }
+
+    public static T AddAttributes<T>(this T declarationSyntax, params string[] attributes)
+        where T : TypeDeclarationSyntax
+    {
+        return (T)declarationSyntax
             .AddAttributeLists(AttributeList()
                 .AddAttributes(attributes
                     .Select(o => Attribute(ParseName(o)))

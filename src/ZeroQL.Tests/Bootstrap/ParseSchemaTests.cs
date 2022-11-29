@@ -8,6 +8,7 @@ using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.Bootstrap;
 
+[UsesVerify]
 public class ParseSchemaTests
 {
     public ParseSchemaTests()
@@ -367,6 +368,60 @@ type Mutation {
 
         var archiveProperty = clientClass.GetProperty("Archive");
         VerifyProperty(archiveProperty, SyntaxKind.TrueLiteralExpression, true);
+    }
+    
+    [Fact]
+    public async Task Interfaces()
+    {
+        var rawSchema = @"
+schema {
+  query: Query
+}
+
+interface IFigure {
+  perimeter: Float!
+}
+
+type Circle implements IFigure {
+  center: Point!
+  radius: Float!
+  perimeter: Float!
+}
+
+type Point implements IFigure {
+  x: Float!
+  y: Float!
+  perimeter: Float!
+}
+
+type Square implements IFigure {
+  topLeft: Point!
+  bottomRight: Point!
+  perimeter: Float!
+}
+
+type Query {
+  figures: [IFigure!]!
+  circles: [Circle!]!
+  squares: [Square!]!
+}
+";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var figureInterface = syntaxTree.GetInterface("IFigure")?.ToFullString();
+        var squareClass = syntaxTree.GetClass("Square")?.ToFullString();
+        var circleClass = syntaxTree.GetClass("Circle")?.ToFullString();
+        var point = syntaxTree.GetClass("Point")?.ToFullString();
+
+        await Verify(new
+        {
+            figureInterface,
+            squareClass,
+            circleClass,
+            point
+        });
     }
 
     private void VerifyProperty(PropertyDeclarationSyntax property, SyntaxKind syntaxKind, object exprectedDefaultValue)

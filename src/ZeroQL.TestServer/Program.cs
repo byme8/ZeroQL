@@ -32,6 +32,7 @@ public class Program
             .AddMutationType<Mutation>()
             .AddType<UploadType>()
             .AddType<InstantType>()
+            .AddTypeExtension<InterfacesExtensions>()
             .AddTypeExtension<NodeTimeGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLMutations>()

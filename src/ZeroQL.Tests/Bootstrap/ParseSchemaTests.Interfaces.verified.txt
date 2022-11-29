@@ -1,0 +1,63 @@
+﻿{
+  figureInterface:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public interface IFigure
+    {
+        public double Perimeter { get; set; }
+    }
+,
+  squareClass:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Square : IFigure
+    {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
+        public Point __TopLeft { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
+        public Point __BottomRight { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T TopLeft<T>(Func<Point, T> selector)
+        {
+            return selector(__TopLeft);
+        }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T BottomRight<T>(Func<Point, T> selector)
+        {
+            return selector(__BottomRight);
+        }
+
+        public double Perimeter { get; set; }
+    }
+,
+  circleClass:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Circle : IFigure
+    {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
+        public Point __Center { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Center<T>(Func<Point, T> selector)
+        {
+            return selector(__Center);
+        }
+
+        public double Radius { get; set; }
+
+        public double Perimeter { get; set; }
+    }
+,
+  point:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Point : IFigure
+    {
+        public double X { get; set; }
+
+        public double Y { get; set; }
+
+        public double Perimeter { get; set; }
+    }
+
+}

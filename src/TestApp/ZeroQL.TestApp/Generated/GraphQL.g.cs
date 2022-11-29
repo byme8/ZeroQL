@@ -17,6 +17,23 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Circle : IFigure
+    {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
+        public Point __Center { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Center<T>(Func<Point, T> selector)
+        {
+            return selector(__Center);
+        }
+
+        public double Radius { get; set; }
+
+        public double Perimeter { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class KeyValuePairOfStringAndString
     {
         public string Key { get; set; }
@@ -76,8 +93,27 @@ namespace GraphQL.TestServer
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Point : IFigure
+    {
+        public double X { get; set; }
+
+        public double Y { get; set; }
+
+        public double Perimeter { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Query : global::ZeroQL.Internal.IQuery
     {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figures")]
+        public IFigure[] __Figures { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Circles")]
+        public Circle[] __Circles { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Squares")]
+        public Square[] __Squares { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
         public User __Me { get; set; }
 
@@ -107,6 +143,24 @@ namespace GraphQL.TestServer
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T[] Figures<T>(Func<IFigure, T> selector)
+        {
+            return __Figures.Select(o => selector(o)).ToArray();
+        }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T[] Circles<T>(Func<Circle, T> selector)
+        {
+            return __Circles.Select(o => selector(o)).ToArray();
+        }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T[] Squares<T>(Func<Square, T> selector)
+        {
+            return __Squares.Select(o => selector(o)).ToArray();
+        }
 
         public global::ZeroQL.Instant Instant { get; set; }
 
@@ -179,6 +233,30 @@ namespace GraphQL.TestServer
         public int Id { get; set; }
 
         public string Name { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Square : IFigure
+    {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
+        public Point __TopLeft { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
+        public Point __BottomRight { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T TopLeft<T>(Func<Point, T> selector)
+        {
+            return selector(__TopLeft);
+        }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T BottomRight<T>(Func<Point, T> selector)
+        {
+            return selector(__BottomRight);
+        }
+
+        public double Perimeter { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -298,6 +376,12 @@ namespace GraphQL.TestServer
         {
             return __Role != default ? selector(__Role) : default;
         }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public interface IFigure
+    {
+        public double Perimeter { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

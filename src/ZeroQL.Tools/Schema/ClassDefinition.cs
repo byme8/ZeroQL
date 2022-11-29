@@ -1,14 +1,5 @@
 ﻿namespace ZeroQL.Schema;
 
-public class ClassDefinition
-{
-    public ClassDefinition(string name, FieldDefinition[] properties)
-    {
-        Name = name;
-        Properties = properties;
-    }
+public record ClassDefinition(string Name, FieldDefinition[] Properties, string[]? Implements);
 
-    public string Name { get; init; }
-
-    public FieldDefinition[] Properties { get; init; }
-}
+public record InterfaceDefinition(string Name, FieldDefinition[] Properties);
