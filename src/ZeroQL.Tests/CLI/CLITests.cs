@@ -1,7 +1,6 @@
 using CliFx.Infrastructure;
 using FluentAssertions;
 using ZeroQL.Tests.Core;
-using Xunit;
 using ZeroQL.CLI.Commands;
 using ZeroQL.Tests.Data;
 

@@ -2,6 +2,7 @@ using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using ZeroQL.Bootstrap;
+using ZeroQL.Internal;
 
 namespace ZeroQL.CLI.Commands;
 
@@ -19,6 +20,9 @@ public class GenerateCommand : ICommand
 
     [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'", IsRequired = true)]
     public string Output { get; set; }
+    
+    [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code", IsRequired = false)]
+    public bool Force { get; set; }
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
@@ -35,8 +39,25 @@ public class GenerateCommand : ICommand
             return;
         }
 
+        var options = new GraphQlGeneratorOptions(Namespace)
+        {
+            ClientName = ClientName
+        };
+
+        if (!Force && File.Exists(Output))
+        {
+            var checksumFile = ChecksumHelper.GenerateChecksumFromSchemaFile(Schema, options);
+            var checksumSourceCode = ChecksumHelper.ExtractChecksumFromSourceCode(Output);
+
+            if (checksumFile == checksumSourceCode)
+            {
+                await console.Output.WriteLineAsync("The source code is up-to-date with graphql schema. Skipping code generation.");
+                return;
+            }
+        }
+
         var graphql = await File.ReadAllTextAsync(Schema);
-        var csharpClient = GraphQLGenerator.ToCSharp(graphql, Namespace, ClientName);
+        var csharpClient = GraphQLGenerator.ToCSharp(graphql, options);
         var outputFolder = Path.GetDirectoryName(Output)!;
         if (!Directory.Exists(outputFolder))
         {
