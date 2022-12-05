@@ -4,10 +4,12 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
+using CliFx.Infrastructure;
 using GraphQL.TestServer;
 using Microsoft.Extensions.DependencyInjection;
 using StrawberryShake.TestServerClient;
 using ZeroQL;
+using ZeroQL.CLI.Commands;
 
 var serverContext = new ZeroQL.TestServer.Program.ServerContext();
 
@@ -26,7 +28,20 @@ if (!(raw == strawberry && strawberry == zeroQLLambda && zeroQLLambda == zeroQLR
     return;
 }
 
-BenchmarkRunner.Run<RawVSZeroQL>();
+if (!File.Exists(Generation.SchemaFile))
+{
+    var path = new Uri(Generation.SchemaFile).AbsolutePath;
+    Console.WriteLine($"Unable to find schema file: {path}");
+    return;
+}
+
+var switcher = new BenchmarkSwitcher(new[] {
+    typeof(RawVSZeroQL),
+    typeof(Generation),
+});
+
+switcher.Run(args);
+
 
 ZeroQL.TestServer.Program.StopServer(serverContext);
 
@@ -110,6 +125,54 @@ public class RawVSZeroQL
     }
 }
 
+public class Generation
+{
+    public const string SchemaFile = "../../TestApp/ZeroQL.TestApp/schema.graphql";
+    public const string OutputFile = "./bin/GraphQL.g.cs";
+    
+    
+    [GlobalSetup]
+    public void BeforeBenchmark() {
+        
+        if (!File.Exists(OutputFile))
+        {
+            return;
+        }
+        
+        File.Delete(OutputFile);
+    }
+    
+    [Benchmark]
+    public async Task GenerateWithoutChecksumOptimization()
+    {
+        using var console = new FakeInMemoryConsole();
+        var generateCommand = new GenerateCommand
+        {
+            Schema = SchemaFile,
+            Output = OutputFile,
+            Namespace = "GraphQL.Example",
+            ClientName = "TestClient",
+            Force = true,
+        };
+
+        await generateCommand.ExecuteAsync(console);
+    }   
+    
+    [Benchmark]
+    public async Task GenerateWithChecksumOptimization()
+    {
+        using var console = new FakeInMemoryConsole();
+        var generateCommand = new GenerateCommand
+        {
+            Schema = SchemaFile,
+            Output = OutputFile,
+            Namespace = "GraphQL.Example",
+            ClientName = "TestClient"
+        };
+        
+        await generateCommand.ExecuteAsync(console);
+    }   
+}
 public record GetMeQuery : GraphQL<Query, string>
 {
     public override string Execute(Query query)
