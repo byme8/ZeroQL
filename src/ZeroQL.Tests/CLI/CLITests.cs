@@ -1,6 +1,8 @@
 using CliFx.Infrastructure;
 using FluentAssertions;
 using ZeroQL.Tests.Core;
+using Xunit;
+using Xunit.Abstractions;
 using ZeroQL.CLI.Commands;
 using ZeroQL.Tests.Data;
 
@@ -9,19 +11,65 @@ namespace ZeroQL.Tests.CLI;
 public class CLITests
 {
     [Fact]
-    public async Task Generate()
+    public async Task Generate_CodeShouldCompile()
     {
         using var console = new FakeInMemoryConsole();
-        var generateCommand = new GenerateCommand();
-        generateCommand.Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql";
-        generateCommand.Namespace = "GraphQL.TestServer";
-        generateCommand.ClientName = "TestServerClient";
-        generateCommand.Output = "../../../../TestApp/ZeroQL.TestApp/Generated/GraphQL.g.cs";
+        
+        var generateCommand = new GenerateCommand
+        {
+            Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql",
+            Namespace = "GraphQL.TestServer",
+            ClientName = "TestServerClient",
+            Output = "../../../../TestApp/ZeroQL.TestApp/Generated/GraphQL.g.cs",
+            Force = true
+        };
 
         await generateCommand.ExecuteAsync(console);
 
         console.ReadErrorString().Should().BeEmpty();
         await TestProject.Project.CompileToRealAssembly();
+    }
+    
+    [Fact]
+    public async Task Generate_ShouldNotGenerateCodeIfNotNeeded()
+    {
+        var outputFile = "GraphQL.g.cs";
+
+        if (File.Exists(outputFile))
+        {
+            File.Delete(outputFile);
+        }
+        
+        using var console = new FakeInMemoryConsole();
+        var generateCommand = new GenerateCommand
+        {
+            Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql",
+            Namespace = "GraphQL.TestServer",
+            ClientName = "TestServerClient",
+            Output = outputFile,
+        };
+        
+        
+        // should generate file the first time
+        await generateCommand.ExecuteAsync(console);
+        
+        File.Exists(outputFile).Should().BeTrue();
+        console.ReadErrorString().Should().BeEmpty();
+        var lastWriteTime = File.GetLastWriteTime(outputFile);
+        console.Clear();
+
+        // nothing changed. should skip generation
+        await generateCommand.ExecuteAsync(console);
+        File.Exists(outputFile).Should().BeTrue();
+        File.GetLastWriteTime(outputFile).Should().Be(lastWriteTime);
+        console.ReadOutputString().Should().Contain("The source code is up-to-date with graphql schema. Skipping code generation.");
+        console.Clear();
+        
+        // setting updated. should trigger new code generation
+        generateCommand.ClientName = "UpdatedClientName";
+        await generateCommand.ExecuteAsync(console);
+        File.Exists(outputFile).Should().BeTrue();
+        File.GetLastWriteTime(outputFile).Should().BeAfter(lastWriteTime);
     }
 
     [Fact]

@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using CliFx.Infrastructure;
 using GraphQL.TestServer;
@@ -36,8 +35,13 @@ if (!File.Exists(Generation.SchemaFile))
     return;
 }
 
-//BenchmarkRunner.Run<RawVSZeroQL>();
-BenchmarkRunner.Run<Generation>(new DebugInProcessConfig());
+var switcher = new BenchmarkSwitcher(new[] {
+    typeof(RawVSZeroQL),
+    typeof(Generation),
+});
+
+switcher.Run(args);
+
 
 ZeroQL.TestServer.Program.StopServer(serverContext);
 
