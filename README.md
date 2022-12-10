@@ -10,6 +10,8 @@ There is a more detailed list of what the ZeroQL can do at the moment:
     - [x] ["Request" like syntax](#graphql-request-syntax)
 - [ ] Support for subscriptions
 - [x] [Support for fragments](#fragments)
+- [x] [Support for interfaces](#interfaces)
+- [x] [Support for unions](#unions)
 - [x] [Support for file uploads](#file-upload)
 - [x] [Support for persisted queries](#persisted-queries)
 - [x] [Support for user defined scalars](#user-defined-scalars)
@@ -38,7 +40,7 @@ dotnet tool install ZeroQL.CLI
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
 # to bootstrap schema.graphql file from graphql schema
-dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
+dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
 
 It is possible to add next target to csproj to keep generated client in sync with schema.graphql:
@@ -185,6 +187,147 @@ Console.WriteLine($"{response.Data.User.Id}: {response.Data.User.FirstName} {res
 ```
 
 The fragment should be marked with the `` [GraphQLFragment] `` attribute, and it should be an extension method. If the fragment is defined in another assembly, it should be a partial method. The last requirement is necessary because source generators don't have access to source code from another assembly. So, a workaround will be to define fragments as a partial method and generate additional metadata.
+
+# Interfaces
+For example, we have the following schema:
+``` graphql
+schema {
+  query: Query
+}
+
+interface IFigure {
+  perimeter: Float!
+}
+
+type Circle implements IFigure {
+  center: Point!
+  radius: Float!
+  perimeter: Float!
+}
+
+type Point implements IFigure {
+  x: Float!
+  y: Float!
+  perimeter: Float!
+}
+
+type Square implements IFigure {
+  topLeft: Point!
+  bottomRight: Point!
+  perimeter: Float!
+}
+
+type Query {
+  figures: [IFigure!]!
+}
+```
+
+To get figures we can use next request:
+``` csharp
+ var response = await qlClient.Query(static q => q
+    .Figures(o => new
+    {
+        o.Perimeter,
+        Circle = o.On<Circle>().Select(oo => new
+        {
+            oo.Radius,
+            Center = oo.Center(ooo => new { ooo.X, ooo.Y })
+        }),
+        Square = o.On<Square>().Select(oo => new
+        {
+            TopLeft = oo.TopLeft(ooo => new { ooo.X, ooo.Y }),
+            BottomRight = oo.BottomRight(ooo => new { ooo.X, ooo.Y })
+        })
+    }));
+
+Console.WriteLine(JsonSerializer.Serialize(response)); 
+// {
+//   "Query": "query { figures { perimeter ... on Circle { radius center { x y }  } ... on Square { topLeft { x y }  topLeft { x y }  } __typename } }",
+//   "Data": [
+//     {
+//       "Perimeter": 6.2831854820251465,
+//       "Circle": {
+//         "Radius": 1,
+//         "Center": {
+//           "X": 1,
+//           "Y": 1
+//         }
+//       }
+//     },
+//     {
+//       "Perimeter": 40,
+//       "Square": {
+//         "TopLeft": {
+//           "X": 1,
+//           "Y": 1
+//         },
+//         "BottomRight": {
+//           "X": 11,
+//           "Y": 11
+//         }
+//       }
+//     }
+//   ]
+// }
+```
+
+# Unions
+Let's suppose that we have the following schema:
+``` graphql
+schema {
+  query: Query
+}
+
+type TextContent {
+  text: String!
+}
+
+type ImageContent {
+  imageUrl: String!
+  height: Int!
+}
+
+union PostContent = TextContent | ImageContent
+
+type Query {
+  posts: [PostContent!]!
+}
+```
+Here how we can get posts:
+``` csharp
+ var response = await qlClient.Query(static q => q
+        .Posts(
+            o => new
+            {
+                Image = o.On<ImageContent>().Select(oo => new
+                {
+                    oo.ImageUrl,
+                    oo.Height
+                }),
+                Text = o.On<TextContent>().Select(oo => new
+                {
+                    oo.Text
+                }),
+            }));
+
+Console.WriteLine(JsonSerializer.Serialize(response));
+// {
+//   "Query": "query { posts { ... on ImageContent { imageUrl height } ... on TextContent { text } __typename } }",
+//   "Data": [
+//     {
+//       "Image": {
+//         "ImageUrl": "http://example.com/image.png",
+//         "Height": 1920
+//       }
+//     },
+//     {
+//       "Text": {
+//         "Text": "Hello World!"
+//       }
+//     }
+//   ]
+// }
+```
 
 # File upload
 
