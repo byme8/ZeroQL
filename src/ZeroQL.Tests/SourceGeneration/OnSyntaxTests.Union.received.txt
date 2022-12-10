@@ -1,0 +1,16 @@
+﻿{
+  Query: query { posts { ... on ImageContent { imageUrl height } ... on TextContent { text } __typename } },
+  Data: [
+    {
+      Image: {
+        ImageUrl: http://example.com/image.png,
+        Height: 1920
+      }
+    },
+    {
+      Text: {
+        Text: Hello World!
+      }
+    }
+  ]
+}

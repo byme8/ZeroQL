@@ -1,0 +1,45 @@
+﻿{
+  postContentUnionInterface:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public interface PostContent : global::ZeroQL.IUnionType
+    {
+    }
+,
+  textContentClass:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class TextContent : PostContent
+    {
+        public string Text { get; set; }
+    }
+,
+  imageClass:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class ImageContent : PostContent
+    {
+        public string ImageUrl { get; set; }
+
+        public int Height { get; set; }
+    }
+,
+  converter:
+    public class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
+    {
+        public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
+        {
+            "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
+            "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
+            _ => null
+        };
+    }
+,
+  initializers:
+    public static class JsonConvertersInitializers
+    {
+        [global::System.Runtime.CompilerServices.ModuleInitializer]
+        public static void Init()
+        {
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(PostContent)] = new ZeroQLPostContentConverter();
+        }
+    }
+
+}

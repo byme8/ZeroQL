@@ -1,7 +1,7 @@
 ﻿{
   figureInterface:
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public interface IFigure
+    public interface IFigure : global::ZeroQL.IUnionType
     {
         public double Perimeter { get; set; }
     }

@@ -71,7 +71,10 @@ public static class GraphQLGenerator
         var interfaces = schema.Definitions
             .OfType<GraphQLInterfaceTypeDefinition>()
             .Select(o => CreateInterfaceDefinition(context, o))
-            .ToArray();
+            .ToList();
+
+
+        AddUnions(schema, interfaces, types);
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(options.ClientNamespace));
         var clientDeclaration = new[] { GenerateClient(options.ClientName, queryType, mutationType) };
@@ -99,7 +102,7 @@ public static class GraphQLGenerator
             .WithErrorCodes(
                 SingletonSeparatedList<ExpressionSyntax>(LiteralExpression(SyntaxKind.NumericLiteralExpression,
                     Literal(8618))));
-        
+
         var namespacesToImport = new[]
         {
             "System",
@@ -132,6 +135,27 @@ public static class GraphQLGenerator
             .ToFullString();
 
         return formattedSource;
+    }
+
+    private static void AddUnions(GraphQLDocument schema, List<InterfaceDefinition> interfaces, ClassDefinition[] types)
+    {
+        var unions = schema.Definitions
+            .OfType<GraphQLUnionTypeDefinition>()
+            .Select(CreateUnionDefinition)
+            .ToArray();
+
+        foreach (var union in unions)
+        {
+            interfaces.Add(new InterfaceDefinition(union.Name, Array.Empty<FieldDefinition>()));
+            foreach (var unionType in union.Types)
+            {
+                var type = types.FirstOrDefault(o => o.Name == unionType);
+                if (type is not null)
+                {
+                    type.Implements.Add(union.Name);
+                }
+            }
+        }
     }
 
     private static ClassDeclarationSyntax[] GenerateInterfaceInitializers(ClassDefinition[] types)
@@ -245,7 +269,7 @@ public static class GraphQLGenerator
 
     private static ClassDeclarationSyntax GenerateJsonInitializers(
         GraphQLEnumTypeDefinition[] enums,
-        InterfaceDefinition[] interfaces)
+        IReadOnlyList<InterfaceDefinition> interfaces)
     {
         var enumInitializers = EnumInitializers(enums);
         var interfaceInitializers = InterfaceInitializers(interfaces);
@@ -271,7 +295,7 @@ public static class GraphQLGenerator
         return classDeclarationSyntax;
     }
 
-    private static StringBuilder InterfaceInitializers(InterfaceDefinition[] interfaces)
+    private static StringBuilder InterfaceInitializers(IReadOnlyList<InterfaceDefinition> interfaces)
     {
         var sb = new StringBuilder();
         foreach (var interfaceDefinition in interfaces)
@@ -352,7 +376,7 @@ public static class GraphQLGenerator
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
-                if (o.Implements is not null)
+                if (o.Implements.Any())
                 {
                     var bases = o.Implements
                         .Select(baseType => SimpleBaseType(ParseTypeName(baseType)))
@@ -381,7 +405,8 @@ public static class GraphQLGenerator
         return csharpDefinitions;
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(InterfaceDefinition[] interfaces)
+    private static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(
+        IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
         var csharpDefinitions = interfaces
             .Select(o =>
@@ -389,6 +414,7 @@ public static class GraphQLGenerator
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
                 var @interface = CSharpHelper.Interface(o.Name)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                    .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
                     .WithMembers(List(fields));
 
                 return @interface;
@@ -557,11 +583,18 @@ public static class GraphQLGenerator
 
     private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
         => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type.Fields),
-            type.Interfaces?.Select(o => o.Name.StringValue).ToArray());
+            type.Interfaces?.Select(o => o.Name.StringValue).ToList() ?? new List<string>());
 
     private static InterfaceDefinition CreateInterfaceDefinition(TypeFormatter typeFormatter,
         GraphQLInterfaceTypeDefinition definition)
         => new(definition.Name.StringValue, CreatePropertyDefinition(typeFormatter, definition.Fields));
+
+    private static UnionDefinition CreateUnionDefinition(GraphQLUnionTypeDefinition union)
+    {
+        return new UnionDefinition(
+            union.Name.StringValue,
+            union.Types?.Select(o => o.Name.StringValue).ToArray() ?? Array.Empty<string>());
+    }
 
     private static string? GetDefaultValue(GraphQLInputValueDefinition field)
     {

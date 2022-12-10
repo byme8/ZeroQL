@@ -215,7 +215,6 @@ public class ParseSchemaTests
         user.ParameterList.Parameters
             .Should()
             .Contain(o => o.Identifier.ValueText == "id" && o.Type!.ToString() == "int");
-
     }
 
     [Fact]
@@ -229,9 +228,8 @@ public class ParseSchemaTests
             .Should()
             .Contain(o => o.Name.ToString() == "JsonPropertyName" &&
                           o.ArgumentList!.Arguments.First().Expression.ToString() == @"""User""");
-
     }
-    
+
     [Fact]
     public void EnumJsonConvertersGenerated()
     {
@@ -288,7 +286,7 @@ public class ParseSchemaTests
 
         syntaxTree.GetClass("Query").Should().BeNull();
         syntaxTree.GetClass("Queries").Should().NotBeNull();
-        
+
         var clientClass = syntaxTree.GetClass("GraphQLClient")!;
         clientClass.Should().NotBeNull();
 
@@ -296,7 +294,7 @@ public class ParseSchemaTests
         var genericName = (GenericNameSyntax)name.Right;
         genericName.TypeArgumentList.Arguments[0].ToString().Should().Be("Queries");
     }
-    
+
     [Fact]
     public void SchemaWithRenamedMutationHandledProperly()
     {
@@ -316,7 +314,7 @@ public class ParseSchemaTests
         var genericName = (GenericNameSyntax)name.Right;
         genericName.TypeArgumentList.Arguments[1].ToString().Should().Be("Mutations");
     }
-    
+
     [Fact]
     public void UserDefinedScalarIsDetected()
     {
@@ -369,43 +367,43 @@ type Mutation {
         var archiveProperty = clientClass.GetProperty("Archive");
         VerifyProperty(archiveProperty, SyntaxKind.TrueLiteralExpression, true);
     }
-    
+
     [Fact]
     public async Task Interfaces()
     {
         var rawSchema = @"
-schema {
-  query: Query
-}
+            schema {
+              query: Query
+            }
 
-interface IFigure {
-  perimeter: Float!
-}
+            interface IFigure {
+              perimeter: Float!
+            }
 
-type Circle implements IFigure {
-  center: Point!
-  radius: Float!
-  perimeter: Float!
-}
+            type Circle implements IFigure {
+              center: Point!
+              radius: Float!
+              perimeter: Float!
+            }
 
-type Point implements IFigure {
-  x: Float!
-  y: Float!
-  perimeter: Float!
-}
+            type Point implements IFigure {
+              x: Float!
+              y: Float!
+              perimeter: Float!
+            }
 
-type Square implements IFigure {
-  topLeft: Point!
-  bottomRight: Point!
-  perimeter: Float!
-}
+            type Square implements IFigure {
+              topLeft: Point!
+              bottomRight: Point!
+              perimeter: Float!
+            }
 
-type Query {
-  figures: [IFigure!]!
-  circles: [Circle!]!
-  squares: [Square!]!
-}
-";
+            type Query {
+              figures: [IFigure!]!
+              circles: [Circle!]!
+              squares: [Square!]!
+            }
+        ";
 
         var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
         var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
@@ -416,13 +414,56 @@ type Query {
         var point = syntaxTree.GetClass("Point")?.ToFullString();
         var converter = syntaxTree.GetClass("ZeroQLIFigureConverter")?.ToFullString();
         var initializers = syntaxTree.GetClass("JsonConvertersInitializers")?.ToFullString();
-        
+
         await Verify(new
         {
             figureInterface,
             squareClass,
             circleClass,
             point,
+            converter,
+            initializers
+        });
+    }
+
+    [Fact]
+    public async Task Union()
+    {
+        var rawSchema = @"
+            schema {
+              query: Query
+            }
+
+            type TextContent {
+              text: String!
+            }
+
+            type ImageContent {
+              imageUrl: String!
+              height: Int!
+            }
+
+            union PostContent = TextContent | ImageContent
+
+            type Query {
+              posts: [PostContent!]!
+            }
+        ";  
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var postContentUnionInterface = syntaxTree.GetInterface("PostContent")?.ToFullString();
+        var textContentClass = syntaxTree.GetClass("TextContent")?.ToFullString();
+        var imageClass = syntaxTree.GetClass("ImageContent")?.ToFullString();
+        var converter = syntaxTree.GetClass("ZeroQLPostContentConverter")?.ToFullString();
+        var initializers = syntaxTree.GetClass("JsonConvertersInitializers")?.ToFullString();
+
+        await Verify(new
+        {
+            postContentUnionInterface,
+            textContentClass,
+            imageClass,
             converter,
             initializers
         });

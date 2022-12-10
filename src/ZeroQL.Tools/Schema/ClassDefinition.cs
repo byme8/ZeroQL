@@ -1,5 +1,9 @@
-﻿namespace ZeroQL.Schema;
+﻿using System.Collections.Generic;
 
-public record ClassDefinition(string Name, FieldDefinition[] Properties, string[]? Implements);
+namespace ZeroQL.Schema;
+
+public record ClassDefinition(string Name, FieldDefinition[] Properties, List<string> Implements);
 
 public record InterfaceDefinition(string Name, FieldDefinition[] Properties);
+
+public record UnionDefinition(string Name, string[] Types);
