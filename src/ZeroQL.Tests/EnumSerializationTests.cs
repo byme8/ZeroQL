@@ -9,7 +9,7 @@ public class EnumSerializationTests
 {
     public EnumSerializationTests()
     {
-        ZeroQLEnumJsonSerializersStore.Converters[typeof(Kinds)] =
+        ZeroQLJsonSerializersStore.Converters[typeof(Kinds)] =
             new ZeroQLEnumConverter<Kinds>(
                 new Dictionary<string, Kinds>
                 {

@@ -19,7 +19,7 @@ public class Square : IFigure
 
     public Point BottomRight { get; set; }
     
-    public float Perimeter => (TopLeft.Y - BottomRight.Y) * 2 + (BottomRight.Y - TopLeft.Y) * 2;
+    public float Perimeter => Math.Abs(TopLeft.Y - BottomRight.Y) * 2 + Math.Abs(BottomRight.Y - TopLeft.Y) * 2;
 }
 
 public class Circle : IFigure
@@ -37,8 +37,8 @@ public class InterfacesExtensions
 {
     public IFigure[] GetFigures()
     {
-        return GetCircles().Concat(
-                GetSquares().OfType<IFigure>())
+        return GetCircles().Skip(1).Take(1).Concat(
+                GetSquares().Skip(1).Take(1).OfType<IFigure>())
             .ToArray();
     }
 
@@ -61,7 +61,7 @@ public class InterfacesExtensions
             .Select(o => new Square
             {
                 TopLeft = new Point { X = o, Y = o },
-                BottomRight = new Point { X = o + 1, Y = o + 1 },
+                BottomRight = new Point { X = o + 10, Y = o + 10 },
             })
             .ToArray();
     }

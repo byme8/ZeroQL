@@ -414,13 +414,17 @@ type Query {
         var squareClass = syntaxTree.GetClass("Square")?.ToFullString();
         var circleClass = syntaxTree.GetClass("Circle")?.ToFullString();
         var point = syntaxTree.GetClass("Point")?.ToFullString();
-
+        var converter = syntaxTree.GetClass("ZeroQLIFigureConverter")?.ToFullString();
+        var initializers = syntaxTree.GetClass("JsonConvertersInitializers")?.ToFullString();
+        
         await Verify(new
         {
             figureInterface,
             squareClass,
             circleClass,
-            point
+            point,
+            converter,
+            initializers
         });
     }
 

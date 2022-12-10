@@ -1,0 +1,14 @@
+﻿{
+  Query: query { figures { __typename perimeter ... on Circle { radius } } },
+  Data: [
+    {
+      Perimeter: 6.2831854820251465,
+      Circle: {
+        Radius: 1.0
+      }
+    },
+    {
+      Perimeter: 40.0
+    }
+  ]
+}

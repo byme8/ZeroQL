@@ -9,6 +9,12 @@ public class GraphQLFieldSelector : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+public class GraphQLSyntax : Attribute
+{
+    
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class GraphQLFragment : Attribute
 {
     

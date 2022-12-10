@@ -6,6 +6,8 @@ public class SourceGeneratorInfo
 
     public static string CodeGenerationAttribute { get; } = $@"[System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")]";
 
+    public static string GraphQLSyntaxAttribute { get; } = "ZeroQL.GraphQLSyntax";
+
     public static string GraphQLFieldSelectorAttribute { get; } = "ZeroQL.GraphQLFieldSelector";
 
     public static string GraphQLFragmentAttributeFullName { get; } = "ZeroQL.GraphQLFragment";

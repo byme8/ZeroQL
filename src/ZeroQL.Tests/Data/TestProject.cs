@@ -35,7 +35,17 @@ public static class TestProject
         return await method.Invoke();
     }
 
-    public static async Task<IGraphQLResult> Validate(this Project project, string? graphqlQuery, bool checkError = true)
+    public static async Task<IGraphQLResult> Execute(this Project project)
+    {
+        project = await project.RemoveSyntaxTreesFromReferences();
+        var assembly = await project.CompileToRealAssembly();
+        var response = await assembly.ExecuteRequest();
+
+        return response;
+    }
+
+    public static async Task<IGraphQLResult> Validate(this Project project, string? graphqlQuery,
+        bool checkError = true)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
         var assembly = await project.CompileToRealAssembly();

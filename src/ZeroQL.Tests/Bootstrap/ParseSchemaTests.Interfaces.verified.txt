@@ -59,5 +59,27 @@
 
         public double Perimeter { get; set; }
     }
+,
+  converter:
+    public class ZeroQLIFigureConverter : InterfaceJsonConverter<IFigure?>
+    {
+        public override IFigure? Deserialize(string typeName, JsonObject json) => typeName switch
+        {
+            "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
+            "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
+            "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
+            _ => null
+        };
+    }
+,
+  initializers:
+    public static class JsonConvertersInitializers
+    {
+        [global::System.Runtime.CompilerServices.ModuleInitializer]
+        public static void Init()
+        {
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(IFigure)] = new ZeroQLIFigureConverter();
+        }
+    }
 
 }

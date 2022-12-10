@@ -17,7 +17,7 @@ public static class ZeroQLJsonOptions
     {
         Converters =
         {
-            new ZeroQLEnumStringConverter(),
+            new ZeroQLConverter(),
             new ZeroQLUploadJsonConverter(),
             new ZeroQLDateOnlyConverter()
         },

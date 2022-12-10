@@ -9,11 +9,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ZeroQL.SourceGenerators.Resolver;
 
-public class GraphQLQueryResolver
+public static class GraphQLQueryResolver
 {
-    public const string CANCELLED = nameof(CANCELLED);
+    public const string Cancelled = nameof(Cancelled);
 
-    public static Result<string> Resolve(SemanticModel semanticModel, ExpressionSyntax query, CancellationToken cancellationToken)
+    public static Result<string> Resolve(SemanticModel semanticModel, ExpressionSyntax query,
+        CancellationToken cancellationToken)
     {
         if (query is not LambdaExpressionSyntax lambda)
         {
@@ -22,7 +23,8 @@ public class GraphQLQueryResolver
 
         var inputs = GetQueryInputs(lambda);
         var variables = GetVariablesFromLambda(semanticModel, lambda, cancellationToken);
-        var availableVariables = inputs.VariablesName is null ? new Dictionary<string, string>()
+        var availableVariables = inputs.VariablesName is null
+            ? new Dictionary<string, string>()
             : variables
                 .ToDictionary(
                     o => $"{inputs.VariablesName}.{o.Name}",
@@ -56,6 +58,7 @@ public class GraphQLQueryResolver
 
             stringBuilder.Append(variablesBody);
         }
+
         stringBuilder.Append("{ ");
         stringBuilder.Append(body.Value);
         stringBuilder.Append("}");
@@ -63,7 +66,8 @@ public class GraphQLQueryResolver
         return stringBuilder.ToString();
     }
 
-    public static Result<string> Resolve(SemanticModel semanticModel, MethodDeclarationSyntax method, CancellationToken cancellationToken)
+    public static Result<string> Resolve(SemanticModel semanticModel, MethodDeclarationSyntax method,
+        CancellationToken cancellationToken)
     {
         var inputs = GetQueryInputs(method);
         var variables = GetVariablesFromRequestMethod(semanticModel, method, cancellationToken);
@@ -100,6 +104,7 @@ public class GraphQLQueryResolver
 
             stringBuilder.Append(variablesBody);
         }
+
         stringBuilder.Append("{ ");
         stringBuilder.Append(body.Value);
         stringBuilder.Append("}");
@@ -107,7 +112,8 @@ public class GraphQLQueryResolver
         return stringBuilder.ToString();
     }
 
-    public static Result<string> ResolveFragmentTemplate(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
+    public static Result<string> ResolveFragmentTemplate(SemanticModel semanticModel,
+        MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
     {
         var parameters = methodDeclaration.ParameterList.Parameters;
         var queryName = parameters.First().Identifier.Text;
@@ -115,7 +121,8 @@ public class GraphQLQueryResolver
             .Select(o => o.Identifier.Text.FirstToLower())
             .ToArray();
 
-        var availableVariables = !variables.Any() ? new Dictionary<string, string>()
+        var availableVariables = !variables.Any()
+            ? new Dictionary<string, string>()
             : variables
                 .ToDictionary(
                     o => o,
@@ -165,7 +172,8 @@ public class GraphQLQueryResolver
         return default;
     }
 
-    private static (string Name, string Type)[] GetVariablesFromLambda(SemanticModel semanticModel, LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
+    private static (string Name, string Type)[] GetVariablesFromLambda(SemanticModel semanticModel,
+        LambdaExpressionSyntax lambda, CancellationToken cancellationToken)
     {
         var symbol = semanticModel.GetSymbolInfo(lambda, cancellationToken);
         if (symbol.Symbol is not IMethodSymbol method)
@@ -187,7 +195,8 @@ public class GraphQLQueryResolver
             .ToArray();
     }
 
-    private static (string Name, string Type)[] GetVariablesFromRequestMethod(SemanticModel semanticModel, MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
+    private static (string Name, string Type)[] GetVariablesFromRequestMethod(SemanticModel semanticModel,
+        MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
     {
         var method = semanticModel.GetDeclaredSymbol(methodDeclaration, cancellationToken);
         if (method!.ContainingSymbol is not INamedTypeSymbol containingType)
@@ -206,7 +215,7 @@ public class GraphQLQueryResolver
     {
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(CANCELLED);
+            return new Error(Cancelled);
         }
 
         switch (node)
@@ -241,7 +250,8 @@ public class GraphQLQueryResolver
             }
             case AnonymousObjectMemberDeclaratorSyntax anonymousMember:
             {
-                return ResolveQuery(context.WithParent(anonymousMember), anonymousMember.Expression);
+                var query = ResolveQuery(context.WithParent(anonymousMember), anonymousMember.Expression);
+                return query;
             }
             case ObjectCreationExpressionSyntax objectCreation:
             {
@@ -260,7 +270,8 @@ public class GraphQLQueryResolver
         return Failed(node);
     }
 
-    private static Result<string> HandleObjectCreation(GraphQLResolveContext context, ObjectCreationExpressionSyntax objectCreation)
+    private static Result<string> HandleObjectCreation(GraphQLResolveContext context,
+        ObjectCreationExpressionSyntax objectCreation)
     {
         var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
         var initializers = objectCreation.Initializer?.Expressions
@@ -301,7 +312,8 @@ public class GraphQLQueryResolver
         return ResolveQuery(context.WithParent(argument), argument.Expression);
     }
 
-    private static Result<string> HandleAnonymousObjectCreation(GraphQLResolveContext context, AnonymousObjectCreationExpressionSyntax anonymous)
+    private static Result<string> HandleAnonymousObjectCreation(GraphQLResolveContext context,
+        AnonymousObjectCreationExpressionSyntax anonymous)
     {
         var initializers = new List<string>(anonymous.Initializers.Count);
         foreach (var initializer in anonymous.Initializers)
@@ -315,7 +327,20 @@ public class GraphQLQueryResolver
             initializers.Add(result);
         }
 
-        return initializers.Join(" ");
+        var fullSelector = CreateFullSelector(initializers);
+
+        return fullSelector;
+    }
+
+    private static string CreateFullSelector(ICollection<string> initializers)
+    {
+        if (initializers.Any(o => o.Contains("... on")))
+        {
+            initializers.Add("__typename");
+        }
+        
+        var selector = initializers.Join(" ");
+        return selector;
     }
 
     private static Result<string> HandleArgumentAsVariable(GraphQLResolveContext context, ArgumentSyntax argument)
@@ -349,7 +374,8 @@ public class GraphQLQueryResolver
         return Failed(argument);
     }
 
-    private static Result<string> HandlerSimpleLambda(GraphQLResolveContext context, SimpleLambdaExpressionSyntax simpleLambda)
+    private static Result<string> HandlerSimpleLambda(GraphQLResolveContext context,
+        SimpleLambdaExpressionSyntax simpleLambda)
     {
         if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
         {
@@ -362,7 +388,8 @@ public class GraphQLQueryResolver
         return ResolveQuery(childContext.WithParent(simpleLambda), simpleLambda.Body);
     }
 
-    private static Result<string> HanleIndentifier(GraphQLResolveContext context, CSharpSyntaxNode node, IdentifierNameSyntax identifierNameSyntax)
+    private static Result<string> HanleIndentifier(GraphQLResolveContext context, CSharpSyntaxNode node,
+        IdentifierNameSyntax identifierNameSyntax)
     {
         if (identifierNameSyntax.Identifier.ValueText == context.QueryVariableName)
         {
@@ -379,7 +406,8 @@ public class GraphQLQueryResolver
             return ResolveQuery(context.WithParent(member), left);
         }
 
-        if (member.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == context.QueryVariableName)
+        if (member.Expression is IdentifierNameSyntax identifier &&
+            identifier.Identifier.ValueText == context.QueryVariableName)
         {
             return member.Name.Identifier.ValueText.FirstToLower();
         }
@@ -409,41 +437,78 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(CANCELLED);
+            return new Error(Cancelled);
         }
 
         var attributes = method
             .GetAttributes();
 
-        var hasFieldSelector = attributes
-            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
-
-        var hasFragment = attributes
-            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FragmentAttribute));
+        var hasSyntax = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.SyntaxAttribute));
+        if (hasSyntax)
+        {
+            return HandleSyntaxNode(context, invocation, method);
+        }
 
         var hasFragmentTemplate = attributes
             .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.TemplateAttribute));
-
-        if (!hasFieldSelector && !hasFragment && !hasFragmentTemplate)
-        {
-            return Failed(invocation, Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
-        }
-
         if (hasFragmentTemplate)
         {
             return HandleFragmentWithoutSyntaxTree(context, invocation, method);
         }
 
+        var hasFragment = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FragmentAttribute));
+        if (hasFragment)
+        {
+            return HandleFragment(context, invocation, method);
+        }
+
+        var hasFieldSelector = attributes
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
         if (hasFieldSelector)
         {
             return HandleFieldSelector(context, invocation, method);
         }
 
-        return HandleFragment(context, invocation, method);
-
+        return Failed(invocation, Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
     }
 
-    private static Result<string> HandleFragment(GraphQLResolveContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleSyntaxNode(
+        GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation,
+        IMethodSymbol method)
+    {
+        if (invocation.Expression is MemberAccessExpressionSyntax
+            {
+                Expression: InvocationExpressionSyntax
+                {
+                    Expression: MemberAccessExpressionSyntax { Name: { Identifier: { Text: "On" } } }
+                }
+            })
+        {
+            return HandleOn(context, invocation, method);
+        }
+
+        return Failed(invocation);
+    }
+
+    private static Result<string> HandleOn(GraphQLResolveContext context, InvocationExpressionSyntax invocation,
+        IMethodSymbol method)
+    {
+        var (selector, error) =
+            ResolveQuery(context.WithParent(invocation), invocation.ArgumentList.Arguments[0].Expression)
+                .Unwrap();
+        if (error)
+        {
+            return error;
+        }
+
+        return $"... on {method.TypeArguments[0].Name} {{ {selector} }}";
+    }
+
+    private static Result<string> HandleFragment(GraphQLResolveContext context, InvocationExpressionSyntax invocation,
+        IMethodSymbol method)
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
         {
@@ -493,7 +558,7 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(CANCELLED);
+            return new Error(Cancelled);
         }
 
         var newSemanticModel = compilation.Value.GetSemanticModel(fragment.SyntaxTree);
@@ -506,7 +571,8 @@ public class GraphQLQueryResolver
         return HandleMethod(context, invocation, methodDeclaration);
     }
 
-    private static Result<string> HandleMethod(GraphQLResolveContext context, CSharpSyntaxNode node, MethodDeclarationSyntax methodDeclaration)
+    private static Result<string> HandleMethod(GraphQLResolveContext context, CSharpSyntaxNode node,
+        MethodDeclarationSyntax methodDeclaration)
     {
         if (methodDeclaration.Body is not null)
         {
@@ -520,18 +586,20 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(CANCELLED);
+            return new Error(Cancelled);
         }
 
         if (methodDeclaration.ExpressionBody is not null)
         {
-            return ResolveQuery(context.WithParent(methodDeclaration.ExpressionBody), methodDeclaration.ExpressionBody.Expression);
+            return ResolveQuery(context.WithParent(methodDeclaration.ExpressionBody),
+                methodDeclaration.ExpressionBody.Expression);
         }
 
         return Failed(node);
     }
 
-    private static Result<string> HandleFragmentWithoutSyntaxTree(GraphQLResolveContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFragmentWithoutSyntaxTree(GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation, IMethodSymbol method)
     {
         var graphQLQueryTemplate = method
             .GetAttributes()
@@ -567,7 +635,7 @@ public class GraphQLQueryResolver
 
         if (context.CancellationToken.IsCancellationRequested)
         {
-            return new Error(CANCELLED);
+            return new Error(Cancelled);
         }
 
         var finalGraphQLQuery = fragmentVariablesToInputVariables
@@ -578,7 +646,8 @@ public class GraphQLQueryResolver
         return finalGraphQLQuery;
     }
 
-    private static Result<string> HandleFieldSelector(GraphQLResolveContext context, InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFieldSelector(GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation, IMethodSymbol method)
     {
         var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
@@ -608,13 +677,16 @@ public class GraphQLQueryResolver
 
             stringBuilder.Append(formattedArguments);
         }
+
         if (ignoreLastParameter)
         {
-            var body = ResolveQuery(context.WithParent(invocation), invocation.ArgumentList.Arguments.Last().Expression);
+            var body = ResolveQuery(context.WithParent(invocation),
+                invocation.ArgumentList.Arguments.Last().Expression);
             if (body.Error)
             {
                 return body;
             }
+
             stringBuilder.Append($" {{ {body.Value} }} ");
         }
 
