@@ -1,8 +1,6 @@
 using CliFx.Infrastructure;
 using FluentAssertions;
 using ZeroQL.Tests.Core;
-using Xunit;
-using Xunit.Abstractions;
 using ZeroQL.CLI.Commands;
 using ZeroQL.Tests.Data;
 
@@ -33,12 +31,7 @@ public class CLITests
     [Fact]
     public async Task Generate_ShouldNotGenerateCodeIfNotNeeded()
     {
-        var outputFile = "GraphQL.g.cs";
-
-        if (File.Exists(outputFile))
-        {
-            File.Delete(outputFile);
-        }
+        var outputFile = Path.GetTempFileName();
         
         using var console = new FakeInMemoryConsole();
         var generateCommand = new GenerateCommand

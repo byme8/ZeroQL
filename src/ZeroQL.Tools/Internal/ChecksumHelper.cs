@@ -1,15 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using ZeroQL.Bootstrap;
 
 namespace ZeroQL.Internal;
 
-public class ChecksumHelper
+public static class ChecksumHelper
 {
     /// <summary>
     /// Calculate a MD5 checksum from a schema string
@@ -19,12 +19,26 @@ public class ChecksumHelper
     /// <returns></returns>
     public static string GenerateChecksumFromSchemaFile(string schemaFile, GraphQlGeneratorOptions options)
     {
-        using var md5 = MD5.Create();
-        using var stream = File.OpenRead(schemaFile);
-        var checksum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", String.Empty).ToLower();
+        var bytes = File.ReadAllBytes(schemaFile);
+        var checksum = Checksum(bytes);
+
         return AppendOptionsToChecksum(checksum, options);
     }
+
+    public static string Checksum(byte[] bytes)
+    {
+        var hash = MD5.HashData(bytes);
+        var checksum = BitConverter.ToString(hash)
+            .Replace("-", String.Empty)
+            .ToLower();
+        return checksum;
+    }
     
+    public static string Checksum(string text)
+    {
+        return Checksum(Encoding.UTF8.GetBytes(text));
+    }
+
     /// <summary>
     /// Calculate a MD5 checksum from a schema string
     /// </summary>
@@ -33,10 +47,10 @@ public class ChecksumHelper
     /// <returns></returns>
     public static string GenerateChecksumFromInlineSchema(string schema, GraphQlGeneratorOptions options)
     {
-        var checksum = GetHashFromString(schema);
+        var checksum = Checksum(schema);
         return AppendOptionsToChecksum(checksum, options);
     }
-    
+
     /// <summary>
     /// Fetches the stored checksum from a previous generated source code file
     /// </summary>
@@ -44,22 +58,8 @@ public class ChecksumHelper
     /// <returns></returns>
     public static string? ExtractChecksumFromSourceCode(string file)
     {
-        var regex = new Regex(@"<checksum>(?<checksum>\w+)<\/checksum>");
-        foreach (var line in File.ReadLines(file))
-        {
-            if (!line.StartsWith("//"))
-            {
-                break;
-            }
-
-            var match = regex.Match(line);
-            if (match.Success)
-            {
-                return match.Groups["checksum"].Value;
-            }
-        }
-        
-        return null;
+        var firstLine = File.ReadLines(file).FirstOrDefault();
+        return firstLine?[3..];
     }
 
     /// <summary>
@@ -71,24 +71,11 @@ public class ChecksumHelper
     private static string AppendOptionsToChecksum(string checksumHash, GraphQlGeneratorOptions options)
     {
         var serializedOptions = JsonSerializer.Serialize(options);
-        var optionsChecksumHash = GetHashFromString(serializedOptions);
-        
+        var optionsChecksumHash = Checksum(serializedOptions);
+
         // Also append the version of ZeroQL.CLI into the checksum
         // since updated tooling may affect the source code generated
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(); 
-        return GetHashFromString(checksumHash + optionsChecksumHash + version);
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+        return Checksum(checksumHash + optionsChecksumHash + version);
     }
-
-    /// <summary>
-    /// Generates a MD5 checksum based on a input string
-    /// </summary>
-    /// <param name="value">The value to generate a checksum for</param>
-    /// <returns>The MD5 checksum hash</returns>
-    private static string GetHashFromString(string value)
-    {
-        using var md5 = MD5.Create();
-        var hash = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-", String.Empty).ToLower();
-        return hash;
-    }
-    
 }
