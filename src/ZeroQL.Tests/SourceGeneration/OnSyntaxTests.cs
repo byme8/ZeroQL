@@ -22,7 +22,7 @@ public class OnSyntaxTests : IntegrationTest
                             .Select(oo => new 
                                 { 
                                     TopLeft = oo.TopLeft(ooo => new { ooo.X, ooo.Y }), 
-                                    BottomRight = oo.TopLeft(ooo => new { ooo.X, ooo.Y }) 
+                                    BottomRight = oo.BottomRight(ooo => new { ooo.X, ooo.Y }) 
                                 })
                     })
                 """;

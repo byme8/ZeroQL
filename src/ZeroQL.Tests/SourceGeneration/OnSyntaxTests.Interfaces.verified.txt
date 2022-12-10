@@ -1,5 +1,5 @@
 ﻿{
-  Query: query { figures { perimeter ... on Circle { radius center { x y }  } ... on Square { topLeft { x y }  topLeft { x y }  } __typename } },
+  Query: query { figures { perimeter ... on Circle { radius center { x y }  } ... on Square { topLeft { x y }  bottomRight { x y }  } __typename } },
   Data: [
     {
       Perimeter: 6.2831854820251465,
@@ -19,8 +19,8 @@
           Y: 1.0
         },
         BottomRight: {
-          X: 1.0,
-          Y: 1.0
+          X: 11.0,
+          Y: 11.0
         }
       }
     }
