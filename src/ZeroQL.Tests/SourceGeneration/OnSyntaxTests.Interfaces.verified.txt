@@ -1,14 +1,28 @@
 ﻿{
-  Query: query { figures { perimeter ... on Circle { radius } __typename } },
+  Query: query { figures { perimeter ... on Circle { radius center { x y }  } ... on Square { topLeft { x y }  topLeft { x y }  } __typename } },
   Data: [
     {
       Perimeter: 6.2831854820251465,
       Circle: {
-        Radius: 1.0
+        Radius: 1.0,
+        Center: {
+          X: 1.0,
+          Y: 1.0
+        }
       }
     },
     {
-      Perimeter: 40.0
+      Perimeter: 40.0,
+      Square: {
+        TopLeft: {
+          X: 1.0,
+          Y: 1.0
+        },
+        BottomRight: {
+          X: 1.0,
+          Y: 1.0
+        }
+      }
     }
   ]
 }

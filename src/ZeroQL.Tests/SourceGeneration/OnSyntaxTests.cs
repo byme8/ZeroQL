@@ -15,7 +15,13 @@ public class OnSyntaxTests : IntegrationTest
                     {
                         o.Perimeter,
                         Circle = o.On<Circle>()
-                            .Select(oo => new { oo.Radius })
+                            .Select(oo => new { oo.Radius, Center = oo.Center(ooo => new { ooo.X, ooo.Y }) }),
+                        Square = o.On<Square>()
+                            .Select(oo => new 
+                                { 
+                                    TopLeft = oo.TopLeft(ooo => new { ooo.X, ooo.Y }), 
+                                    BottomRight = oo.TopLeft(ooo => new { ooo.X, ooo.Y }) 
+                                })
                     })
                 """;
 
