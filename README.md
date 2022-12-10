@@ -38,7 +38,7 @@ dotnet tool install ZeroQL.CLI
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
 # to bootstrap schema.graphql file from graphql schema
-dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
+dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
 
 It is possible to add next target to csproj to keep generated client in sync with schema.graphql:
