@@ -11,7 +11,7 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [ ] Support for subscriptions
 - [x] [Support for fragments](#fragments)
 - [x] [Support for interfaces](#interfaces)
-- [x] [Support for unions](#fragments)
+- [x] [Support for unions](#unions)
 - [x] [Support for file uploads](#file-upload)
 - [x] [Support for persisted queries](#persisted-queries)
 - [x] [Support for user defined scalars](#user-defined-scalars)
