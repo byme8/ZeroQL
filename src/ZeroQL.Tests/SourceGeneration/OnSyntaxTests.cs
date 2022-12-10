@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
@@ -32,7 +34,7 @@ public class OnSyntaxTests : IntegrationTest
 
         await Verify(result);
     }
-    
+
     [Fact]
     public async Task Union()
     {
@@ -53,5 +55,32 @@ public class OnSyntaxTests : IntegrationTest
         var result = await project.Execute();
 
         await Verify(result);
+    }
+
+    [Fact]
+    public async Task AppliedToWrongType()
+    {
+        var csharpQuery = """
+                static q => q.Figures(
+                o => new
+                {
+                    Circle = o.On<ImageContent>()
+                        .Select(oo => new { oo.ImageUrl, oo.Height }),
+                })
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryOnSyntaxAnalyzer());
+
+        await Verify(diagnostics
+            .Where(o => o.Severity == DiagnosticSeverity.Error)
+            .Select(o => new
+            {
+                o.Descriptor.Id,
+                Highlighted = o.Location.SourceTree!.GetRoot().FindNode(o.Location.SourceSpan).ToString(),
+                Message = o.GetMessage()
+            }));
     }
 }

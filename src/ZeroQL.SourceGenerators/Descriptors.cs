@@ -75,4 +75,12 @@ public class Descriptors
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
+    
+    public static DiagnosticDescriptor GraphQLQueryInvalidUnionType = new(
+        nameof(GraphQLQueryInvalidUnionType),
+        "Invalid union type.",
+        "Type {0} has to implement {1} interface.",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

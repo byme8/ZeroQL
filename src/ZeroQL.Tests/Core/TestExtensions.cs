@@ -136,7 +136,7 @@ public static class TestExtensions
         return project;
     }
 
-    public static async Task<Diagnostic[]?> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
+    public static async Task<Diagnostic[]> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
     {
         var compilation = await project.GetCompilationAsync();
         var analyzerResults = await compilation!
