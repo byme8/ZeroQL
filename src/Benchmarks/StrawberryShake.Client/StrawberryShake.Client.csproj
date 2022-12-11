@@ -9,8 +9,8 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-        <PackageReference Include="StrawberryShake.CodeGeneration.CSharp.Analyzers" Version="12.8.1" PrivateAssets="All" />
-        <PackageReference Include="StrawberryShake.Transport.Http" Version="12.7.0" />
+        <PackageReference Include="StrawberryShake.CodeGeneration.CSharp.Analyzers" Version="12.15.2" PrivateAssets="All" />
+        <PackageReference Include="StrawberryShake.Transport.Http" Version="12.15.2" />
     </ItemGroup>
 
 </Project>
