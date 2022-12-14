@@ -21,7 +21,8 @@ public class UploadInfoByType
 
 public class GraphQLLambdaLikeContextResolver
 {
-    public Result<GraphQLSourceGenerationContext> Resolve(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+    public Result<GraphQLSourceGenerationContext> Resolve(InvocationExpressionSyntax invocation,
+        SemanticModel semanticModel, CancellationToken cancellationToken)
     {
         var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation);
         if (queryMethod is null)
@@ -34,7 +35,8 @@ public class GraphQLLambdaLikeContextResolver
             return new Error("Cancelled");
         }
 
-        var graphqlLambda = invocation.ArgumentList.Arguments.Last();
+        var graphqlLambda = invocation.ArgumentList.Arguments
+            .Last(o => o.Expression is LambdaExpressionSyntax);
         var key = graphqlLambda.ToString();
 
         var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
@@ -63,7 +65,9 @@ public class GraphQLLambdaLikeContextResolver
         }
 
         var graphQLMethodInputType = GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
-        var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType ? graphQLMethodInputType.BaseType! : graphQLMethodInputType;
+        var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType
+            ? graphQLMethodInputType.BaseType!
+            : graphQLMethodInputType;
         var queryTypeName = graphQLMethodSymbol.Parameters.Last().ToGlobalName();
 
         if (cancellationToken.IsCancellationRequested)
@@ -72,7 +76,8 @@ public class GraphQLLambdaLikeContextResolver
         }
 
         var (uploadType, uploadProperties) = FindAllUploadProperties(graphQLMethodInputType, semanticModel);
-        var (queryBody, error) = GraphQLQueryResolver.Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
+        var (queryBody, error) = GraphQLQueryResolver
+            .Resolve(semanticModel, graphqlLambda.Expression, cancellationToken).Unwrap();
         if (error)
         {
             return error;
@@ -137,7 +142,8 @@ public class GraphQLLambdaLikeContextResolver
         return builder.ToString();
     }
 
-    public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties) FindAllUploadProperties(INamedTypeSymbol inputType, SemanticModel semanticModel)
+    public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties) FindAllUploadProperties(
+        INamedTypeSymbol inputType, SemanticModel semanticModel)
     {
         var uploadType = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload")!;
         var uploadProperties = FindUploadPropertiesForType(inputType, uploadType, new HashSet<string>())
@@ -178,7 +184,8 @@ public class GraphQLLambdaLikeContextResolver
             }
             case IArrayTypeSymbol arrayTypeSymbol:
             {
-                var uploadPropertiesForArrayElement = FindUploadPropertiesForType(arrayTypeSymbol.ElementType, upload, processedTypes);
+                var uploadPropertiesForArrayElement =
+                    FindUploadPropertiesForType(arrayTypeSymbol.ElementType, upload, processedTypes);
                 if (uploadPropertiesForArrayElement.Any())
                 {
                     return uploadPropertiesForArrayElement.Add(new UploadInfoByType()
@@ -195,7 +202,8 @@ public class GraphQLLambdaLikeContextResolver
         return ImmutableArray<UploadInfoByType>.Empty;
     }
 
-    private static ImmutableArray<UploadInfoByType> HandleNamedType(INamedTypeSymbol inputType, INamedTypeSymbol upload, HashSet<string> processedTypes)
+    private static ImmutableArray<UploadInfoByType> HandleNamedType(INamedTypeSymbol inputType, INamedTypeSymbol upload,
+        HashSet<string> processedTypes)
     {
         var properties = inputType
             .GetRealProperties()

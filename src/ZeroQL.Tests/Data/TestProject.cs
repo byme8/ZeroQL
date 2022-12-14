@@ -12,6 +12,7 @@ public static class TestProject
     public const string PLACE_TO_REPLACE = "// place to replace";
     public const string ME_QUERY = @"static q => q.Me(o => o.FirstName)";
     public const string FULL_ME_QUERY = @"Query(static q => q.Me(o => o.FirstName))";
+    public const string FULL_CALL = "await qlClient.Query(static q => q.Me(o => o.FirstName));";
 
     static TestProject()
     {
@@ -26,20 +27,21 @@ public static class TestProject
 
     public static AdhocWorkspace Workspace { get; }
 
-    public static async Task<IGraphQLResult> ExecuteRequest(this Assembly assembly)
+    public static async Task<IGraphQLResult> ExecuteRequest(this Assembly assembly, CancellationToken token = default)
     {
         var method = (assembly.GetType("ZeroQL.TestApp.Program")!
-            .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-            .CreateDelegate(typeof(Func<Task<IGraphQLResult>>)) as Func<Task<IGraphQLResult>>)!;
+                .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
+                .CreateDelegate(typeof(Func<CancellationToken, Task<IGraphQLResult>>)) as
+            Func<CancellationToken, Task<IGraphQLResult>>)!;
 
-        return await method.Invoke();
+        return await method.Invoke(token);
     }
 
-    public static async Task<IGraphQLResult> Execute(this Project project)
+    public static async Task<IGraphQLResult> Execute(this Project project, CancellationToken token = default)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
         var assembly = await project.CompileToRealAssembly();
-        var response = await assembly.ExecuteRequest();
+        var response = await assembly.ExecuteRequest(token);
 
         return response;
     }

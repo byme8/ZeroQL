@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using ZeroQL.Pipelines;
 using ZeroQL.Stores;
@@ -17,7 +18,8 @@ public interface IGraphQLClient
     Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,
         Func<TVariables?, TOperationType?, TResult?> queryMapper,
-        string queryKey);
+        string queryKey,
+        CancellationToken cancellationToken = default);
 }
 
 public record ClientOperations
@@ -46,20 +48,22 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,
         Func<TVariables?, TOperationType?, TResult?> queryMapper,
-        string queryKey)
+        string queryKey,
+        CancellationToken cancellationToken = default)
     {
         if (!GraphQLQueryStore<TOperationType>.Executor.TryGetValue(queryKey, out var queryRunner))
         {
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
-        var result = await queryRunner.Invoke(this, queryKey, variables);
+        var result = await queryRunner.Invoke(this, queryKey, variables, cancellationToken);
         if (result.Errors?.Any() ?? false)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
         }
 
-        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data), result.Errors, result.Extensions);
+        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data), result.Errors,
+            result.Extensions);
     }
 
     public void Dispose()

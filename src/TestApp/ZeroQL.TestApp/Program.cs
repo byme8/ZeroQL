@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.IO; // do not remove this
-using System.Collections.Generic; // do not remove this
+using System.Collections.Generic;
+using System.Threading; // do not remove this
 using System.Threading.Tasks;
 using GraphQL.TestServer;
 using ZeroQL;
@@ -23,7 +24,7 @@ public class Program
         await Execute();
     }
 
-    public static async Task<IGraphQLResult> Execute()
+    public static async Task<IGraphQLResult> Execute(CancellationToken cancellationToken = default)
     {
         var httpClient = new HttpClient
         {

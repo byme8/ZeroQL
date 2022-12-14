@@ -1,0 +1,4 @@
+﻿{
+  IsCompleted: true,
+  IsCanceled: true
+}

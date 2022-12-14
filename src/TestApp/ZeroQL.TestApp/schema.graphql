@@ -39,6 +39,7 @@ type Point implements IFigure {
 }
 
 type Query {
+  longOperation: Int!
   posts: [PostContent!]!
   image: ImageContent!
   text: TextContent!

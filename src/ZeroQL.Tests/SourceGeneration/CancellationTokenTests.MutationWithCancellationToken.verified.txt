@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation { addUser(firstName: "Jon", lastName: "Smith") { firstName } },
+  Data: Jon
+}

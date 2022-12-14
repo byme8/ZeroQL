@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ZeroQL.Stores;
 
 public static class GraphQLQueryStore<TQuery>
 {
-    public static Dictionary<string, Func<IGraphQLClient, string, object?, Task<GraphQLResult<TQuery>>>> Executor { get; } = new();
+    public static Dictionary<string, Func<IGraphQLClient, string, object?, CancellationToken, Task<GraphQLResult<TQuery>>>> Executor { get; } = new();
 
     public static Dictionary<string, QueryInfo> Query { get; } = new();
 }

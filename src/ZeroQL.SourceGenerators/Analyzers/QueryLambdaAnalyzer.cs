@@ -43,7 +43,9 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var possibleLambdaQuery = invocation.ArgumentList.Arguments.Last().Expression;
+        var possibleLambdaQuery = invocation.ArgumentList.Arguments
+            .LastOrDefault(o => o.Expression is LambdaExpressionSyntax)?
+            .Expression;
         if (possibleLambdaQuery is not LambdaExpressionSyntax lambda)
         {
             return;
