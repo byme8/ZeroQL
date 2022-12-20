@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="GraphQL-Parser" Version="8.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0" />
     </ItemGroup>
 
     <ItemGroup>
