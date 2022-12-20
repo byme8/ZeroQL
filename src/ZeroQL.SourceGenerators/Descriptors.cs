@@ -4,6 +4,14 @@ namespace ZeroQL.SourceGenerators;
 
 public class Descriptors
 {
+    public static DiagnosticDescriptor UnexpectedFail = new(
+        nameof(UnexpectedFail),
+        "Source generator failed unexpectedly",
+        "Source generator failed unexpectedly with exception message:\n{0}",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        true);
+    
     public static DiagnosticDescriptor FailedToConvertPartOfTheQuery = new(
         nameof(FailedToConvertPartOfTheQuery),
         "Failed to convert to graphql query",

@@ -24,7 +24,8 @@ public class GraphQLFragmentTemplateIncrementalSourceGenerator : IIncrementalGen
                 return (Method: method, c.SemanticModel);
             });
 
-        context.RegisterImplementationSourceOutput(fragments, AddMetadataForFragment);
+        context.RegisterImplementationSourceOutput(fragments,(sourceContext, data) => 
+            Utils.ErrorWrapper(sourceContext, data.Method, () => AddMetadataForFragment(sourceContext, data)));
     }
 
     private void AddMetadataForFragment(

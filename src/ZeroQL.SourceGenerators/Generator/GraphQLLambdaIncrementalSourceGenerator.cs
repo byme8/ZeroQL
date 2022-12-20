@@ -15,9 +15,10 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         var invocations = context.SyntaxProvider
             .CreateSyntaxProvider(FindMethods, (c, ct) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
-        context.RegisterImplementationSourceOutput(invocations, GenerateSource);
+        context.RegisterImplementationSourceOutput(invocations, (sourceContext, data) => 
+            Utils.ErrorWrapper(sourceContext, data.Invocation,() => GenerateSource(sourceContext, data)));
     }
-
+    
     private void GenerateSource(
         SourceProductionContext context,
         (InvocationExpressionSyntax Invocation, SemanticModel SemanticModel) input)

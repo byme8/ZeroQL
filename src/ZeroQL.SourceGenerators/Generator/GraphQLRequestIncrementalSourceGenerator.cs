@@ -15,13 +15,15 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var invocations = context.SyntaxProvider
-            .CreateSyntaxProvider(FindGraphQLRequests, (c, ct) => (Record: (RecordDeclarationSyntax)c.Node, c.SemanticModel));
-        
-        context.RegisterImplementationSourceOutput(invocations, GenerateSource);
+            .CreateSyntaxProvider(FindGraphQLRequests,
+                (c, ct) => (Record: (RecordDeclarationSyntax)c.Node, c.SemanticModel));
 
+        context.RegisterImplementationSourceOutput(invocations, (sourceContext, data) =>
+            Utils.ErrorWrapper(sourceContext, data.Record, () => GenerateSource(sourceContext, data)));
     }
 
-    private void GenerateSource(SourceProductionContext context, (RecordDeclarationSyntax Record, SemanticModel SemanticModel) input)
+    private void GenerateSource(SourceProductionContext context,
+        (RecordDeclarationSyntax Record, SemanticModel SemanticModel) input)
     {
         var (record, semanticModel) = input;
         var recordSymbol = semanticModel.GetDeclaredSymbol(record);
@@ -60,12 +62,12 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
 
         var uniqId = Guid.NewGuid().ToString("N");
         var source = GraphQLSourceResolver.Resolve(semanticModel, uniqId, requestLikeContext);
-        
+
         if (context.CancellationToken.IsCancellationRequested)
         {
             return;
         }
-        
+
         context.AddSource($"ZeroQLModuleInitializer.{uniqId}.g.cs", source);
     }
 
@@ -74,8 +76,11 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
         if (node is RecordDeclarationSyntax recordDeclaration)
         {
             var possibleGraphQLRequest = recordDeclaration.BaseList?.Types
-                .FirstOrDefault(type => type is SimpleBaseTypeSyntax { Type: GenericNameSyntax { Identifier.Text: "GraphQL" } });
-            
+                .FirstOrDefault(type => type is SimpleBaseTypeSyntax
+                {
+                    Type: GenericNameSyntax { Identifier.Text: "GraphQL" }
+                });
+
             return possibleGraphQLRequest is not null;
         }
 

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace ZeroQL.SourceGenerators;
 
@@ -118,8 +120,9 @@ public static class Utils
     {
         return typeSymbol switch
         {
-            IArrayTypeSymbol arrayTypeSymbol => $"[{arrayTypeSymbol.ElementType.ToGraphQLType()}]{typeSymbol.Nullable()}",
-            INamedTypeSymbol {Name: "Nullable" } namedType => namedType.TypeArguments[0].ToGraphQLType(),
+            IArrayTypeSymbol arrayTypeSymbol =>
+                $"[{arrayTypeSymbol.ElementType.ToGraphQLType()}]{typeSymbol.Nullable()}",
+            INamedTypeSymbol { Name: "Nullable" } namedType => namedType.TypeArguments[0].ToGraphQLType(),
             _ => Map(typeSymbol) + typeSymbol.Nullable(),
         };
     }
@@ -190,7 +193,7 @@ public static class Utils
 
         return name;
     }
-    
+
     public static string ToSafeGlobalName(this ISymbol symbol)
     {
         var name = symbol.ToGlobalName();
@@ -205,5 +208,32 @@ public static class Utils
             .Replace(",", "")
             .Replace(":", "")
             .Replace(".", "");
+    }
+
+    public static void ErrorWrapper(SourceProductionContext context, CSharpSyntaxNode location, Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception e)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(Descriptors.UnexpectedFail, location.GetLocation(), e.Format()));
+        }
+    }
+    
+    public static string Format(this Exception exception)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(exception.Message);
+        sb.AppendLine(exception.StackTrace);
+        if (exception.InnerException != null)
+        {
+            sb.AppendLine("InnerException:");
+            sb.AppendLine(exception.InnerException.Format());
+        }
+
+        return sb.ToString();
     }
 }
