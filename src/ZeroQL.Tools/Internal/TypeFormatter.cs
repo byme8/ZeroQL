@@ -20,6 +20,7 @@ internal class TypeFormatter
         { "DateTime", "DateTimeOffset" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
+        { "ID", "ID" },
         { "Boolean", "bool" }
     };
 

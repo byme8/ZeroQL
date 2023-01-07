@@ -112,7 +112,7 @@ type TypesContainer {
 }
 
 type User {
-  id: Int!
+  id: ID!
   firstName: String!
   lastName: String!
   userKind: UserKind!

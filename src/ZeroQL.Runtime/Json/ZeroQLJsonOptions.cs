@@ -19,7 +19,8 @@ public static class ZeroQLJsonOptions
         {
             new ZeroQLConverter(),
             new ZeroQLUploadJsonConverter(),
-            new ZeroQLDateOnlyConverter()
+            new ZeroQLDateOnlyConverter(),
+            new ZeroQLIDJsonConverter()
         },
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

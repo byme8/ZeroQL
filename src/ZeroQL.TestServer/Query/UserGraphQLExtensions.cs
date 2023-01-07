@@ -72,6 +72,11 @@ public class UserGraphQLExtensions
         return Users.GetValueOrDefault(id);
     }
     
+    public User? GetUserGLID([ID("User")]string id)
+    {
+        return Me();
+    }
+    
     public User[] GetUsersByIds(int[] ids)
     {
         return Users

@@ -2,6 +2,7 @@
 
 public class User
 {
+    [ID("User")]
     public int Id { get; set; }
 
     public string FirstName { get; set; }

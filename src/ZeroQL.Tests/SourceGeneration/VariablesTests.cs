@@ -16,9 +16,9 @@ public class VariablesTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, "new { Id = 2 }, " + csharpQuery));
 
-        var response = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        var response = (GraphQLResult<ID>)await project.Validate(graphqlQuery);
 
-        response.Data.Should().Be(2);
+        response.Data.Should().Be(new ID("2"));
     }
 
     [Fact]
@@ -42,9 +42,9 @@ public class VariablesTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, "\"TestQuery\", new { Id = 1 }, " + csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        var result = (GraphQLResult<ID>)await project.Validate(graphqlQuery);
 
-        result.Data.Should().Be(1);
+        result.Data.Should().Be(new ID("1"));
     }
 
     [Fact]
@@ -56,9 +56,9 @@ public class VariablesTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, "\"TestQuery\", new { Ids = new int [] { 1, 2 }  }, " + csharpQuery));
 
-        var result = (GraphQLResult<int[]>)await project.Validate(graphqlQuery);
+        var result = (GraphQLResult<ID[]>)await project.Validate(graphqlQuery);
 
-        result.Data.Should().Contain(new [] { 1, 2 });
+        result.Data.Should().Contain(new ID[] { 1, 2 });
     }
     
     [Fact]

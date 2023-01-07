@@ -1,5 +1,4 @@
-﻿
-// ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
 namespace ZeroQL;
 
 public abstract record GraphQL<TQuery, TResult>

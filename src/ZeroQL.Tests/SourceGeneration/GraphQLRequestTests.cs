@@ -44,9 +44,9 @@ public class GraphQLRequestTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
 
         dynamic response = await project.Validate(graphqlQuery);
-        int id = response.Data;
+        string id = response.Data;
 
-        id.Should().Be(10);
+        id.Should().Be("10");
     }
     
     [Fact]

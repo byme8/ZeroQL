@@ -17,9 +17,9 @@ public record GetUserByIdExpression(int Id) : GraphQL<Query, UserModel?>
         => query.User(Id, o => new UserModel(o!.FirstName, o.LastName, o.Role(role => role!.Name)!));
 }
 
-public record AddUser(string FirstName, string LastName) : GraphQL<Mutation, int>
+public record AddUser(string FirstName, string LastName) : GraphQL<Mutation, string>
 {
-    public override int Execute(Mutation query)
+    public override string Execute(Mutation query)
     {
         return query.AddUser(FirstName, LastName, o => o.Id);
     }
