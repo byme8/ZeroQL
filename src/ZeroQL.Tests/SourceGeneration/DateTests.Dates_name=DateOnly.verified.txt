@@ -1,0 +1,4 @@
+{
+  Query: mutation ($input: Date!) { dateOnly(dateOnly: $input)},
+  Data: 2042-12-11
+}

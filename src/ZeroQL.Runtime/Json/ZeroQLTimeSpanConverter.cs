@@ -1,26 +1,25 @@
-using System;
+﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml;
 
 namespace ZeroQL.Json;
 
-public class ZeroQLDateOnlyConverter : JsonConverter<DateOnly>
+public class ZeroQLTimeSpanConverter : JsonConverter<TimeSpan>
 {
-    private readonly string serializationFormat = "yyyy-MM-dd";
-
-    public override DateOnly Read(ref Utf8JsonReader reader,
+    public override TimeSpan Read(ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options)
     {
         var value = reader.GetString();
-        return DateOnly.Parse(value!);
+        return XmlConvert.ToTimeSpan(value!);
     }
 
     public override void Write(Utf8JsonWriter writer,
-        DateOnly value,
+        TimeSpan value,
         JsonSerializerOptions options)
     {
-        var text = value.ToString(serializationFormat);
+        var text = XmlConvert.ToString(value);
         writer.WriteStringValue(text);
     }
 }

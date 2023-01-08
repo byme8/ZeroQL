@@ -1,0 +1,4 @@
+{
+  Query: mutation ($input: DateTime!) { dateTimeOffset(dateTimeOffset: $input)},
+  Data: 2042-12-11 10:09:08.007 +1
+}

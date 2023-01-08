@@ -37,6 +37,7 @@ public class Program
             .AddTypeExtension<InterfacesExtensions>()
             .AddTypeExtension<NodeTimeGraphQLExtensions>()
             .AddTypeExtension<UserGraphQLExtensions>()
+            .AddTypeExtension<DateMutation>()
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>();
 

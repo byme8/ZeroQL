@@ -13,6 +13,7 @@ public static class TestProject
     public const string ME_QUERY = @"static q => q.Me(o => o.FirstName)";
     public const string FULL_ME_QUERY = @"Query(static q => q.Me(o => o.FirstName))";
     public const string FULL_CALL = "await qlClient.Query(static q => q.Me(o => o.FirstName));";
+    public const string FULL_LINE = "var response = await qlClient.Query(static q => q.Me(o => o.FirstName));";
 
     static TestProject()
     {

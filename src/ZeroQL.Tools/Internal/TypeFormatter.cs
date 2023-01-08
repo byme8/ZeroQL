@@ -18,6 +18,7 @@ internal class TypeFormatter
         { "Float", "double" },
         { "Decimal", "decimal" },
         { "DateTime", "DateTimeOffset" },
+        { "TimeSpan", "TimeSpan" },
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "ID", "ID" },

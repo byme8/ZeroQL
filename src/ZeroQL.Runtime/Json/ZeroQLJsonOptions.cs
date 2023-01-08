@@ -19,6 +19,7 @@ public static class ZeroQLJsonOptions
         {
             new ZeroQLConverter(),
             new ZeroQLUploadJsonConverter(),
+            new ZeroQLTimeSpanConverter(),
             new ZeroQLDateOnlyConverter(),
             new ZeroQLIDJsonConverter()
         },

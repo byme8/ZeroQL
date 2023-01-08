@@ -24,6 +24,11 @@ type KeyValuePairOfStringAndString {
 }
 
 type Mutation {
+  dateTime(dateTime: DateTime!): DateTime!
+  dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
+  timeSpan(timeSpan: TimeSpan!): TimeSpan!
+  dateOnly(dateOnly: Date!): Date!
+  timeOnly(timeOnly: TimeSpan!): TimeSpan!
   addUser(firstName: String! lastName: String!): User!
   doError: Int!
   addUserProfileImage(userId: Int! file: Upload!): Int!
@@ -177,6 +182,9 @@ scalar Long
 
 "The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
 scalar Short
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
 
 scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
 
