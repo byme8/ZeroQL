@@ -1,14 +1,19 @@
+using System.Text.Json;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using ZeroQL.Bootstrap;
 using ZeroQL.Internal;
+#pragma warning disable CS8618
 
 namespace ZeroQL.CLI.Commands;
 
 [Command("generate", Description = "Generates C# classes from graphql file.")]
 public class GenerateCommand : ICommand
 {
+    [CommandOption("config", 'c', Description = "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.", IsRequired = true)]
+    public string? Config { get; set; }
+    
     [CommandOption("schema", 's', Description = "The schema to generate the query. For example, './schema.graphql'", IsRequired = true)]
     public string Schema { get; set; }
 
@@ -26,6 +31,12 @@ public class GenerateCommand : ICommand
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
+        var canContinue = await ReadConfig(console);
+        if (!canContinue)
+        {
+            return;
+        }
+        
         if (!File.Exists(Schema))
         {
             await console.Error.WriteLineAsync("Schema file does not exist. Check that file exist.");
@@ -66,5 +77,48 @@ public class GenerateCommand : ICommand
         }
 
         await File.WriteAllTextAsync(outputPath, csharpClient);
+    }
+
+    public async Task<bool> ReadConfig(IConsole console)
+    {
+        if (Config is null)
+        {
+            return true;
+        }
+        
+        if (!File.Exists(Config))
+        {
+            await console.Error.WriteLineAsync($"Config file '{Config}' does not exist. Check that file exist.");
+            return false;
+        }
+        
+        var config = await File.ReadAllTextAsync(Config);
+        var configObject = JsonSerializer.Deserialize<ZeroQLFileConfig>(config);
+        if (configObject is null)
+        {
+            await console.Error.WriteLineAsync("Config file is not valid. Check that file is valid.");
+            return false;
+        }
+        
+        if (string.IsNullOrEmpty(Schema))
+        {
+            Schema = configObject.GraphQL;
+        }
+        if (string.IsNullOrEmpty(Namespace))
+        {
+            Namespace = configObject.Namespace;
+        }
+        
+        if (string.IsNullOrEmpty(ClientName))
+        {
+            ClientName = configObject.ClientName;
+        }
+        
+        if (string.IsNullOrEmpty(Output))
+        {
+            Output = configObject.Output;
+        }
+        
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using ZeroQL.SourceGenerators.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -151,4 +152,10 @@ public static class TestExtensions
 
         return error.ToArray();
     }
+    
+    public static SettingsTask Track(this SettingsTask settingsTask, string value, [CallerArgumentExpression("value")]string name = null!)
+    {
+        settingsTask.AddScrubber(o => o.Replace(value, name));
+        return settingsTask;
+    } 
 }

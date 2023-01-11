@@ -1,5 +1,8 @@
+using System.Text.Json;
 using CliFx.Infrastructure;
+using ZeroQL.CLI;
 using ZeroQL.CLI.Commands;
+using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.CLI;
 
@@ -45,5 +48,36 @@ public class ConfigCliTests
         var config = await File.ReadAllTextAsync(tempFile);
         
         await Verify(config);
+    }
+
+    [Fact]
+    public async Task ConfigCanBeParsed()
+    {
+        using var console = new FakeInMemoryConsole();
+        var tempFile = Path.GetTempFileName();
+        var config = new ZeroQLFileConfig()
+        {
+            GraphQL = "./service.graphql",
+            Namespace = "Service.ZeroQL.Client",
+            ClientName = "ServiceZeroQLClient",
+            Output = "QL.g.cs"
+        };
+        
+        var json = JsonSerializer.Serialize(config, new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        });
+        
+        await File.WriteAllTextAsync(tempFile, json);
+        
+        var generateCommand = new GenerateCommand
+        {
+            Config = tempFile,
+        };
+
+        await generateCommand.ReadConfig(console);
+
+        await Verify(generateCommand)
+            .Track(tempFile);
     }
 }

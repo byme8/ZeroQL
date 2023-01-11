@@ -1,0 +1,8 @@
+﻿{
+  Config: tempFile,
+  Schema: ./service.graphql,
+  Namespace: Service.ZeroQL.Client,
+  ClientName: ServiceZeroQLClient,
+  Output: QL.g.cs,
+  Force: false
+}
