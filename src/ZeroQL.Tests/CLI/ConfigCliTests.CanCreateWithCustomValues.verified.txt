@@ -1,0 +1,7 @@
+﻿{
+  "$schema": null,
+  "graphql": "./service.graphql",
+  "namespace": "Service.ZeroQL.Client",
+  "clientName": "ServiceZeroQLClient",
+  "output": "QL.g.cs"
+}

@@ -1,0 +1,29 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ZeroQLFileConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "graphql",
+    "namespace",
+    "clientName",
+    "output"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "graphql": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "clientName": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string"
+    }
+  }
+}

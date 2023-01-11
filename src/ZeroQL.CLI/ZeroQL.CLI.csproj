@@ -9,10 +9,12 @@
         <PackAsTool>true</PackAsTool>
         <Description>The ZeroQL CLI to generate C# classes from *.graphql files.</Description>
         <AssemblyName>zeroql</AssemblyName>
+        <LangVersion>Latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CliFx" Version="2.3.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
     <ItemGroup>
