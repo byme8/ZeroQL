@@ -55,6 +55,7 @@ public class InitConfigCommand : ICommand
         var json = JsonConvert.SerializeObject(config, new JsonSerializerSettings()
         {
             Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         });
 

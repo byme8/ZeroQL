@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Bootstrap;
 using ZeroQL.Extensions;
+using ZeroQL.Internal.Enums;
 using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.Bootstrap;
@@ -13,7 +14,12 @@ public class ParseSchemaTests
 {
     public ParseSchemaTests()
     {
-        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, "TestApp", "GraphQLClient");
+        var options = new GraphQlGeneratorOptions("GraphQLClient", ClientVisibility.Public)
+        {
+            ClientName = "TestApp"
+        };
+
+        Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
         SyntaxTree = CSharpSyntaxTree.ParseText(Csharp);
     }
 
@@ -21,6 +27,31 @@ public class ParseSchemaTests
 
     public SyntaxTree SyntaxTree { get; }
 
+    [Fact]
+    public async Task PublicClient()
+    {
+        var options = new GraphQlGeneratorOptions("GraphQLClient", ClientVisibility.Public)
+        {
+            ClientName = "TestApp"
+        };
+
+        var graphql = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
+
+        await Verify(graphql);
+    }
+    
+    [Fact]
+    public async Task InternalClient()
+    {
+        var options = new GraphQlGeneratorOptions("GraphQLClient", ClientVisibility.Internal)
+        {
+            ClientName = "TestApp"
+        };
+
+        var graphql = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
+
+        await Verify(graphql);
+    }
 
     [Fact]
     public void QueryDetected()
@@ -448,7 +479,7 @@ type Mutation {
             type Query {
               posts: [PostContent!]!
             }
-        ";  
+        ";
 
         var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
         var syntaxTree = CSharpSyntaxTree.ParseText(csharp);

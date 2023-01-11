@@ -1,7 +1,8 @@
+using ZeroQL.Internal.Enums;
+
 namespace ZeroQL.Bootstrap;
 
-public record GraphQlGeneratorOptions(string ClientNamespace)
+public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility Visibility)
 {
-    public string ClientNamespace { get; } = ClientNamespace;
     public string? ClientName { get; set; }
 }

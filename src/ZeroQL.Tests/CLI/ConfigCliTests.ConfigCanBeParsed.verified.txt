@@ -4,5 +4,6 @@
   Namespace: Service.ZeroQL.Client,
   ClientName: ServiceZeroQLClient,
   Output: QL.g.cs,
+  Visibility: Internal,
   Force: false
 }

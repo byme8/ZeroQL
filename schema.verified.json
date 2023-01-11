@@ -22,8 +22,32 @@
     "clientName": {
       "type": "string"
     },
+    "visibility": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/ClientVisibility"
+        }
+      ]
+    },
     "output": {
       "type": "string"
+    }
+  },
+  "definitions": {
+    "ClientVisibility": {
+      "type": "integer",
+      "description": "",
+      "x-enumNames": [
+        "Public",
+        "Internal"
+      ],
+      "enum": [
+        0,
+        1
+      ]
     }
   }
 }

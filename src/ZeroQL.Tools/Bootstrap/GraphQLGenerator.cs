@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
 using ZeroQL.Internal;
+using ZeroQL.Internal.Enums;
 using ZeroQL.Schema;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -18,7 +19,7 @@ public static class GraphQLGenerator
 {
     public static string ToCSharp(string graphql, string clientNamespace, string? clientName)
     {
-        var options = new GraphQlGeneratorOptions(clientNamespace)
+        var options = new GraphQlGeneratorOptions(clientNamespace, ClientVisibility.Public)
         {
             ClientName = clientName
         };
@@ -77,11 +78,11 @@ public static class GraphQLGenerator
         AddUnions(schema, interfaces, types);
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(options.ClientNamespace));
-        var clientDeclaration = new[] { GenerateClient(options.ClientName, queryType, mutationType) };
-        var typesDeclaration = GenerateTypes(types, queryType, mutationType);
-        var interfacesDeclaration = GenerateInterfaces(interfaces);
-        var inputsDeclaration = GenerateInputs(inputs);
-        var enumsDeclaration = GenerateEnums(enums);
+        var clientDeclaration = new[] { GenerateClient(options, queryType, mutationType) };
+        var typesDeclaration = GenerateTypes(options, types, queryType, mutationType);
+        var interfacesDeclaration = GenerateInterfaces(options, interfaces);
+        var inputsDeclaration = GenerateInputs(options, inputs);
+        var enumsDeclaration = GenerateEnums(options, enums);
         var jsonInitializers = GenerateJsonInitializers(enums, interfaces);
         var interfaceInitializers = GenerateInterfaceInitializers(types);
 
@@ -175,7 +176,7 @@ public static class GraphQLGenerator
             {
                 var typeName = group.Key;
                 var source = $$"""
-                    public class ZeroQL{{typeName}}Converter : InterfaceJsonConverter<{{typeName}}?>
+                    internal class ZeroQL{{typeName}}Converter : InterfaceJsonConverter<{{typeName}}?>
                     {
                         public override {{typeName}}? Deserialize(string typeName, JsonObject json) =>
                             typeName switch
@@ -202,13 +203,14 @@ public static class GraphQLGenerator
         return syntaxTree;
     }
 
-    private static ClassDeclarationSyntax GenerateClient(string? clientName, GraphQLNamedType? queryType,
+    private static ClassDeclarationSyntax GenerateClient(GraphQlGeneratorOptions options, GraphQLNamedType? queryType,
         GraphQLNamedType? mutationType)
     {
+        var clientName = options.ClientName;
         var queryTypeName = queryType?.Name.StringValue ?? "ZeroQL.Unit";
         var mutationTypeName = mutationType?.Name.StringValue ?? "ZeroQL.Unit";
 
-        return CSharpHelper.Class(clientName ?? "GraphQLClient")
+        return CSharpHelper.Class(clientName ?? "GraphQLClient", options.Visibility)
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(
                 SimpleBaseType(IdentifierName($"global::ZeroQL.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
             .WithMembers(SingletonList<MemberDeclarationSyntax>(
@@ -225,7 +227,9 @@ public static class GraphQLGenerator
                     .WithBody(Block())));
     }
 
-    private static ClassDeclarationSyntax[] GenerateInputs(ClassDefinition[] inputs)
+    private static ClassDeclarationSyntax[] GenerateInputs(
+        GraphQlGeneratorOptions options,
+        ClassDefinition[] inputs)
     {
         return inputs
             .Select(o =>
@@ -234,7 +238,7 @@ public static class GraphQLGenerator
                     .Select(property =>
                         CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue));
 
-                return CSharpHelper.Class(o.Name)
+                return CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(fields));
             })
@@ -245,7 +249,9 @@ public static class GraphQLGenerator
         GraphQLInputObjectTypeDefinition input)
         => new(input.Name.StringValue, CreatePropertyDefinition(typeFormatter, input), null);
 
-    private static EnumDeclarationSyntax[] GenerateEnums(GraphQLEnumTypeDefinition[] enums)
+    private static EnumDeclarationSyntax[] GenerateEnums(
+        GraphQlGeneratorOptions options,
+        GraphQLEnumTypeDefinition[] enums)
     {
         return enums.Select(e =>
             {
@@ -260,7 +266,10 @@ public static class GraphQLGenerator
                     .AddAttributeLists(AttributeList()
                         .AddAttributes(Attribute(ParseName(ZeroQLGenerationInfo.CodeGenerationAttribute))))
                     .AddMembers(members)
-                    .AddModifiers(Token(SyntaxKind.PublicKeyword));
+                    .AddModifiers(Token(
+                        options.Visibility == ClientVisibility.Public
+                            ? SyntaxKind.PublicKeyword
+                            : SyntaxKind.InternalKeyword));
 
                 return enumSyntax;
             })
@@ -275,7 +284,7 @@ public static class GraphQLGenerator
         var interfaceInitializers = InterfaceInitializers(interfaces);
 
         var source = @$"
-            public static class JsonConvertersInitializers
+            internal static class JsonConvertersInitializers
             {{
                 [global::System.Runtime.CompilerServices.ModuleInitializer]
                 public static void Init()
@@ -349,7 +358,9 @@ public static class GraphQLGenerator
         return enumInitializers;
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> GenerateTypes(ClassDefinition[] definitions,
+    private static IEnumerable<MemberDeclarationSyntax> GenerateTypes(
+        GraphQlGeneratorOptions options,
+        ClassDefinition[] definitions,
         GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
     {
         var csharpDefinitions = definitions
@@ -372,7 +383,7 @@ public static class GraphQLGenerator
                     });
 
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                var @class = CSharpHelper.Class(o.Name)
+                var @class = CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
 
@@ -406,13 +417,14 @@ public static class GraphQLGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(
+        GraphQlGeneratorOptions options,
         IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
         var csharpDefinitions = interfaces
             .Select(o =>
             {
                 var fields = o.Properties.Select(GeneratePropertiesDeclarations);
-                var @interface = CSharpHelper.Interface(o.Name)
+                var @interface = CSharpHelper.Interface(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
                     .WithMembers(List(fields));

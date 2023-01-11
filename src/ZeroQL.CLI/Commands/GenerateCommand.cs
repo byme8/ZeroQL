@@ -4,6 +4,9 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using ZeroQL.Bootstrap;
 using ZeroQL.Internal;
+using ZeroQL.Internal.Enums;
+using ZeroQL.Json;
+
 #pragma warning disable CS8618
 
 namespace ZeroQL.CLI.Commands;
@@ -11,21 +14,38 @@ namespace ZeroQL.CLI.Commands;
 [Command("generate", Description = "Generates C# classes from graphql file.")]
 public class GenerateCommand : ICommand
 {
-    [CommandOption("config", 'c', Description = "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.", IsRequired = true)]
+    [CommandOption(
+        "config",
+        'c',
+        Description =
+            "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.",
+        IsRequired = true)]
     public string? Config { get; set; }
-    
-    [CommandOption("schema", 's', Description = "The schema to generate the query. For example, './schema.graphql'", IsRequired = true)]
+
+    [CommandOption(
+        "schema",
+        's',
+        Description = "The schema to generate the query. For example, './schema.graphql'",
+        IsRequired = true)]
     public string Schema { get; set; }
 
     [CommandOption("namespace", 'n', Description = "The graphql client namespace", IsRequired = true)]
     public string Namespace { get; set; }
 
-    [CommandOption("client-name", 'q', Description = "The graphql client name. Can be useful if you have multiple clients at the same time.", IsRequired = false)]
+    [CommandOption(
+        "client-name",
+        'q',
+        Description = "The graphql client name. Can be useful if you have multiple clients at the same time.",
+        IsRequired = false)]
     public string? ClientName { get; set; }
 
-    [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'", IsRequired = true)]
+    [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'",
+        IsRequired = true)]
     public string Output { get; set; }
-    
+
+    [CommandOption("access", 'a', Description = "The client visibility within the assembly", IsRequired = false)]
+    public ClientVisibility? Visibility { get; set; }
+
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code", IsRequired = false)]
     public bool Force { get; set; }
 
@@ -36,7 +56,7 @@ public class GenerateCommand : ICommand
         {
             return;
         }
-        
+
         if (!File.Exists(Schema))
         {
             await console.Error.WriteLineAsync("Schema file does not exist. Check that file exist.");
@@ -46,11 +66,12 @@ public class GenerateCommand : ICommand
         var fileName = Path.GetFileName(Output);
         if (string.IsNullOrEmpty(fileName))
         {
-            await console.Error.WriteLineAsync("The output file name has wrong format. It should be path to file. For example, './Generated/GraphQL.g.cs'");
+            await console.Error.WriteLineAsync(
+                "The output file name has wrong format. It should be path to file. For example, './Generated/GraphQL.g.cs'");
             return;
         }
 
-        var options = new GraphQlGeneratorOptions(Namespace)
+        var options = new GraphQlGeneratorOptions(Namespace, Visibility ?? ClientVisibility.Public)
         {
             ClientName = ClientName
         };
@@ -62,7 +83,8 @@ public class GenerateCommand : ICommand
 
             if (checksumFile == checksumSourceCode)
             {
-                await console.Output.WriteLineAsync("The source code is up-to-date with graphql schema. Skipping code generation.");
+                await console.Output.WriteLineAsync(
+                    "The source code is up-to-date with graphql schema. Skipping code generation.");
                 return;
             }
         }
@@ -85,40 +107,46 @@ public class GenerateCommand : ICommand
         {
             return true;
         }
-        
+
         if (!File.Exists(Config))
         {
             await console.Error.WriteLineAsync($"Config file '{Config}' does not exist. Check that file exist.");
             return false;
         }
-        
-        var config = await File.ReadAllTextAsync(Config);
-        var configObject = JsonSerializer.Deserialize<ZeroQLFileConfig>(config);
-        if (configObject is null)
+
+        var json = await File.ReadAllTextAsync(Config);
+        var config = JsonSerializer.Deserialize<ZeroQLFileConfig>(json, ZeroQLJsonOptions.Options);
+        if (config is null)
         {
             await console.Error.WriteLineAsync("Config file is not valid. Check that file is valid.");
             return false;
         }
-        
+
         if (string.IsNullOrEmpty(Schema))
         {
-            Schema = configObject.GraphQL;
+            Schema = config.GraphQL;
         }
+
         if (string.IsNullOrEmpty(Namespace))
         {
-            Namespace = configObject.Namespace;
+            Namespace = config.Namespace;
         }
-        
+
         if (string.IsNullOrEmpty(ClientName))
         {
-            ClientName = configObject.ClientName;
+            ClientName = config.ClientName;
         }
-        
+
+        if (!Visibility.HasValue)
+        {
+            Visibility = config.Visibility;
+        }
+
         if (string.IsNullOrEmpty(Output))
         {
-            Output = configObject.Output;
+            Output = config.Output;
         }
-        
+
         return true;
     }
 }

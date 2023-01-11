@@ -22,7 +22,7 @@
     }
 ,
   converter:
-    public class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
+    internal class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
     {
         public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
         {
@@ -33,7 +33,7 @@
     }
 ,
   initializers:
-    public static class JsonConvertersInitializers
+    internal static class JsonConvertersInitializers
     {
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()

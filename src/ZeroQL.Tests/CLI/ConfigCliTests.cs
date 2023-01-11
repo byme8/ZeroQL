@@ -2,6 +2,8 @@ using System.Text.Json;
 using CliFx.Infrastructure;
 using ZeroQL.CLI;
 using ZeroQL.CLI.Commands;
+using ZeroQL.Internal.Enums;
+using ZeroQL.Json;
 using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.CLI;
@@ -20,12 +22,12 @@ public class ConfigCliTests
         };
 
         await command.ExecuteAsync(console);
-        
+
         var config = await File.ReadAllTextAsync(tempFile);
-        
+
         await Verify(config);
     }
-    
+
     [Fact]
     public async Task CanCreateWithCustomValues()
     {
@@ -36,7 +38,7 @@ public class ConfigCliTests
                     ServiceZeroQLClient
                     QL.g.cs
                     """);
-        
+
         var tempFile = Path.GetTempFileName();
         var command = new InitConfigCommand()
         {
@@ -44,9 +46,9 @@ public class ConfigCliTests
         };
 
         await command.ExecuteAsync(console);
-        
+
         var config = await File.ReadAllTextAsync(tempFile);
-        
+
         await Verify(config);
     }
 
@@ -60,16 +62,14 @@ public class ConfigCliTests
             GraphQL = "./service.graphql",
             Namespace = "Service.ZeroQL.Client",
             ClientName = "ServiceZeroQLClient",
+            Visibility = ClientVisibility.Internal,
             Output = "QL.g.cs"
         };
-        
-        var json = JsonSerializer.Serialize(config, new JsonSerializerOptions()
-        {
-            WriteIndented = true
-        });
-        
+
+        var json = JsonSerializer.Serialize(config, ZeroQLJsonOptions.Options);
+
         await File.WriteAllTextAsync(tempFile, json);
-        
+
         var generateCommand = new GenerateCommand
         {
             Config = tempFile,
