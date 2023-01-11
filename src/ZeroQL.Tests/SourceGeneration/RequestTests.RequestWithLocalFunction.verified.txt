@@ -1,0 +1,8 @@
+{
+  Query: query GetUserByIdWithLocalFunction($id: Int!) { user(id: $id) { firstName lastName role { name }  } },
+  Data: {
+    FirstName: Jon,
+    LastName: Smith,
+    Role: Admin
+  }
+}

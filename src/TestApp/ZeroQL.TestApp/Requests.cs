@@ -11,6 +11,14 @@ public record GetUserById(int Id) : GraphQL<Query, UserModel?>
     }
 }
 
+public record GetUserByIdWithLocalFunction(int Id) : GraphQL<Query, UserModel?>
+{
+    public override UserModel? Execute(Query query) => 
+        query.User(Id, GetUserModel);
+
+    static UserModel GetUserModel(User? o) => new(o!.FirstName, o.LastName, o.Role(role => role!.Name)!);
+}
+
 public record GetUserByIdExpression(int Id) : GraphQL<Query, UserModel?>
 {
     public override UserModel? Execute(Query query)

@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Xunit;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
@@ -8,7 +7,8 @@ using static ZeroQL.Tests.Data.TestProject;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
-public class GraphQLRequestTests : IntegrationTest
+[UsesVerify]
+public class RequestTests : IntegrationTest
 {
     [Fact]
     public async Task CanSendRequestLikeQuery()
@@ -75,5 +75,18 @@ public class GraphQLRequestTests : IntegrationTest
         var diagnostics = await project.ApplyAnalyzer(new QueryRequestAnalyzer());
         diagnostics!.Select(o => o.Id)
             .Should().Contain(Descriptors.GraphQLQueryPreview.Id);
+    }
+    
+    [Fact]
+    public async Task RequestWithLocalFunction()
+    {
+        var csharpQuery = "await qlClient.Execute(new GetUserByIdWithLocalFunction(1));";
+
+        var project = await Project
+            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 }

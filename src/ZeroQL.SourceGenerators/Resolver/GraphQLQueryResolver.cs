@@ -236,7 +236,7 @@ public static class GraphQLQueryResolver
             {
                 return HandlerSimpleLambda(context, simpleLambda);
             }
-            case ArgumentSyntax argument when context.Parent is ObjectCreationExpressionSyntax:
+            case ArgumentSyntax argument when context.Parent is BaseObjectCreationExpressionSyntax:
             {
                 return HandleArgumentAsObjectCreation(context, argument);
             }
@@ -257,6 +257,10 @@ public static class GraphQLQueryResolver
             {
                 return HandleObjectCreation(context, objectCreation);
             }
+            case ImplicitObjectCreationExpressionSyntax implicitObjectCreation:
+            {
+                return HandleObjectCreation(context, implicitObjectCreation);
+            }
             case MethodDeclarationSyntax methodDeclaration:
             {
                 return HandleMethod(context, methodDeclaration, methodDeclaration);
@@ -265,13 +269,26 @@ public static class GraphQLQueryResolver
             {
                 return ResolveQuery(context.WithParent(postfixUnary), postfixUnary.Operand);
             }
+            case BlockSyntax blockSyntax:
+            {
+                if (blockSyntax.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
+                {
+                    return ResolveQuery(context.WithParent(returnStatement), returnStatement.Expression);
+                }
+
+                return Failed(blockSyntax.Statements.First());
+            }
+            case ArrowExpressionClauseSyntax arrowExpression:
+            {
+                return ResolveQuery(context.WithParent(arrowExpression), arrowExpression.Expression);
+            }
         }
 
         return Failed(node);
     }
 
     private static Result<string> HandleObjectCreation(GraphQLResolveContext context,
-        ObjectCreationExpressionSyntax objectCreation)
+        BaseObjectCreationExpressionSyntax objectCreation)
     {
         var arguments = objectCreation.ArgumentList?.Arguments.ToArray();
         var initializers = objectCreation.Initializer?.Expressions
@@ -338,7 +355,7 @@ public static class GraphQLQueryResolver
         {
             initializers.Add("__typename");
         }
-        
+
         var selector = initializers.Join(" ");
         return selector;
     }
@@ -394,6 +411,63 @@ public static class GraphQLQueryResolver
         if (identifierNameSyntax.Identifier.ValueText == context.QueryVariableName)
         {
             return string.Empty;
+        }
+
+        var possibleSymbol = context.SemanticModel.GetSymbolInfo(node);
+        if (possibleSymbol.Symbol is IMethodSymbol method)
+        {
+            var syntaxReference = method.DeclaringSyntaxReferences.FirstOrDefault();
+            if (syntaxReference is null)
+            {
+                return Failed(node);
+            }
+
+            var possibleMethodDeclaration = syntaxReference.GetSyntax(context.CancellationToken);
+            if (possibleMethodDeclaration is LocalFunctionStatementSyntax
+                {
+                    ParameterList.Parameters.Count: 1
+                } localFunction)
+            {
+                var identifierValueText = localFunction.ParameterList.Parameters.First().Identifier.ValueText;
+                var newContext = context with
+                {
+                    QueryVariableName = identifierValueText,
+                    Parent = localFunction
+                };
+            
+                if (localFunction.ExpressionBody is not null)
+                {
+                    return ResolveQuery(newContext, localFunction.ExpressionBody);
+                }
+
+                if (localFunction.Body is not null)
+                {
+                    return ResolveQuery(newContext, localFunction.Body);
+                }
+            }
+            
+            if (possibleMethodDeclaration is MethodDeclarationSyntax
+                {
+                    ParameterList.Parameters.Count: 1
+                } methodDeclaration)
+            {
+                var identifierValueText = methodDeclaration.ParameterList.Parameters.First().Identifier.ValueText;
+                var newContext = context with
+                {
+                    QueryVariableName = identifierValueText,
+                    Parent = methodDeclaration
+                };
+            
+                if (methodDeclaration.ExpressionBody is not null)
+                {
+                    return ResolveQuery(newContext, methodDeclaration.ExpressionBody);
+                }
+
+                if (methodDeclaration.Body is not null)
+                {
+                    return ResolveQuery(newContext, methodDeclaration.Body);
+                }
+            }
         }
 
         return Failed(node);
@@ -576,12 +650,7 @@ public static class GraphQLQueryResolver
     {
         if (methodDeclaration.Body is not null)
         {
-            if (methodDeclaration.Body.Statements.First() is ReturnStatementSyntax { Expression: { } } returnStatement)
-            {
-                return ResolveQuery(context.WithParent(returnStatement), returnStatement.Expression);
-            }
-
-            return Failed(methodDeclaration.Body.Statements.First());
+            return ResolveQuery(context.WithParent(methodDeclaration), methodDeclaration.Body);
         }
 
         if (context.CancellationToken.IsCancellationRequested)
@@ -591,8 +660,7 @@ public static class GraphQLQueryResolver
 
         if (methodDeclaration.ExpressionBody is not null)
         {
-            return ResolveQuery(context.WithParent(methodDeclaration.ExpressionBody),
-                methodDeclaration.ExpressionBody.Expression);
+            return ResolveQuery(context.WithParent(methodDeclaration), methodDeclaration.ExpressionBody);
         }
 
         return Failed(node);

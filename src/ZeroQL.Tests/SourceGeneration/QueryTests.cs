@@ -1,12 +1,12 @@
 using FluentAssertions;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
-using Xunit;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
+[UsesVerify]
 public class QueryTests : IntegrationTest
 {
 
@@ -270,5 +270,21 @@ public class QueryTests : IntegrationTest
         var value = response.Errors!.First().Extensions!.First();
         value.Key.Should().Be("message");
         value.Value.ToString().Should().Be("This is an error");
+    }
+    
+    [Fact]
+    public async Task SupportsLocalStaticFunctionAsFragment()
+    {
+        var csharpQuery = """
+                var response = await qlClient.Query(static q => q.Me(GetFirstName));
+                static string GetFirstName(User user) => user.FirstName;
+                """;
+        
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 }
