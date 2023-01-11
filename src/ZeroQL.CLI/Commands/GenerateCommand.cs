@@ -19,7 +19,7 @@ public class GenerateCommand : ICommand
         'c',
         Description =
             "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.",
-        IsRequired = true)]
+        IsRequired = false)]
     public string? Config { get; set; }
 
     [CommandOption(
