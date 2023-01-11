@@ -31,7 +31,7 @@ using ZeroQL.Internal;
 namespace {semanticModel.Compilation.Assembly.Name}
 {{
     {SourceGeneratorInfo.CodeGenerationAttribute}
-    public static class ZeroQLModuleInitializer_{uniqId}
+    internal static class ZeroQLModuleInitializer_{uniqId}
     {{
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()

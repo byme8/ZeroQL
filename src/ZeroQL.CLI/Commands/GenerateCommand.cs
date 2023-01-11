@@ -18,41 +18,43 @@ public class GenerateCommand : ICommand
         "config",
         'c',
         Description =
-            "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.",
-        IsRequired = false)]
+            "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.")]
     public string? Config { get; set; }
 
     [CommandOption(
         "schema",
         's',
-        Description = "The schema to generate the query. For example, './schema.graphql'",
-        IsRequired = true)]
+        Description = "The schema to generate the query. For example, './schema.graphql'")]
     public string Schema { get; set; }
 
-    [CommandOption("namespace", 'n', Description = "The graphql client namespace", IsRequired = true)]
+    [CommandOption("namespace", 'n', Description = "The graphql client namespace")]
     public string Namespace { get; set; }
 
     [CommandOption(
         "client-name",
         'q',
-        Description = "The graphql client name. Can be useful if you have multiple clients at the same time.",
-        IsRequired = false)]
+        Description = "The graphql client name. Can be useful if you have multiple clients at the same time.")]
     public string? ClientName { get; set; }
 
-    [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'",
-        IsRequired = true)]
+    [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'")]
     public string Output { get; set; }
 
-    [CommandOption("access", 'a', Description = "The client visibility within the assembly", IsRequired = false)]
+    [CommandOption("access", 'a', Description = "The client visibility within the assembly")]
     public ClientVisibility? Visibility { get; set; }
 
-    [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code", IsRequired = false)]
+    [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]
     public bool Force { get; set; }
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
         var canContinue = await ReadConfig(console);
         if (!canContinue)
+        {
+            return;
+        }
+        
+        var validationSuccessful = await Validate(console);
+        if (!validationSuccessful)
         {
             return;
         }
@@ -99,6 +101,29 @@ public class GenerateCommand : ICommand
         }
 
         await File.WriteAllTextAsync(outputPath, csharpClient);
+    }
+
+    private async Task<bool> Validate(IConsole console)
+    {
+        if (string.IsNullOrEmpty(Schema))
+        {
+            await console.Error.WriteLineAsync("Schema file is not specified. Use --schema option.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Namespace))
+        {
+            await console.Error.WriteLineAsync("Namespace is not specified. Use --namespace option.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Output))
+        {
+            await console.Error.WriteLineAsync("Output file is not specified. Use --output option.");
+            return false;
+        }
+
+        return true;
     }
 
     public async Task<bool> ReadConfig(IConsole console)
