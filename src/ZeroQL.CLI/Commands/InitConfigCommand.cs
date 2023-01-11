@@ -45,7 +45,7 @@ public class InitConfigCommand : ICommand
 
         var config = new ZeroQLFileConfig()
         {
-            // Schema = "https://raw.githubusercontent.com/",
+            Schema = "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
             GraphQL = graphql,
             Namespace = @namespace,
             ClientName = className,
