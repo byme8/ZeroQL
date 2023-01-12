@@ -57,18 +57,17 @@ public class ConfigCliTests
     {
         using var console = new FakeInMemoryConsole();
         var tempFile = Path.GetTempFileName();
-        var config = new ZeroQLFileConfig()
-        {
-            GraphQL = "./service.graphql",
-            Namespace = "Service.ZeroQL.Client",
-            ClientName = "ServiceZeroQLClient",
-            Visibility = ClientVisibility.Internal,
-            Output = "QL.g.cs"
-        };
+        var config = """
+            {
+              "graphql": "./service.graphql",
+              "namespace": "Service.ZeroQL.Client",
+              "clientName": "ServiceZeroQLClient",
+              "visibility": "Internal",
+              "output": "QL.g.cs"
+            }
+            """;
 
-        var json = JsonSerializer.Serialize(config, ZeroQLJsonOptions.Options);
-
-        await File.WriteAllTextAsync(tempFile, json);
+        await File.WriteAllTextAsync(tempFile, config);
 
         var generateCommand = new GenerateCommand
         {

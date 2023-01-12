@@ -1,11 +1,10 @@
-using System.Text.Json;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
+using Newtonsoft.Json;
 using ZeroQL.Bootstrap;
 using ZeroQL.Internal;
 using ZeroQL.Internal.Enums;
-using ZeroQL.Json;
 
 #pragma warning disable CS8618
 
@@ -140,7 +139,7 @@ public class GenerateCommand : ICommand
         }
 
         var json = await File.ReadAllTextAsync(Config);
-        var config = JsonSerializer.Deserialize<ZeroQLFileConfig>(json, ZeroQLJsonOptions.Options);
+        var config = JsonConvert.DeserializeObject<ZeroQLFileConfig>(json);
         if (config is null)
         {
             await console.Error.WriteLineAsync("Config file is not valid. Check that file is valid.");
