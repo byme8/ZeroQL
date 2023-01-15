@@ -10,6 +10,7 @@
         <Description>The ZeroQL CLI to generate C# classes from *.graphql files.</Description>
         <AssemblyName>zeroql</AssemblyName>
         <LangVersion>Latest</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

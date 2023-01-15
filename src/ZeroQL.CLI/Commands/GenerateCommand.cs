@@ -23,22 +23,22 @@ public class GenerateCommand : ICommand
     [CommandOption(
         "schema",
         's',
-        Description = "The schema to generate the query. For example, './schema.graphql'")]
+        Description = "The path to the graphql schema file. For example, './schema.graphql'")]
     public string Schema { get; set; }
 
-    [CommandOption("namespace", 'n', Description = "The graphql client namespace")]
+    [CommandOption("namespace", 'n', Description = "The namespace for generated client")]
     public string Namespace { get; set; }
 
     [CommandOption(
         "client-name",
         'q',
-        Description = "The graphql client name. Can be useful if you have multiple clients at the same time.")]
+        Description = "The client name for the generated client")]
     public string? ClientName { get; set; }
 
     [CommandOption("output", 'o', Description = "The output file. For example, './Generated/GraphQL.g.cs'")]
     public string Output { get; set; }
 
-    [CommandOption("access", 'a', Description = "The client visibility within the assembly")]
+    [CommandOption("visibility", 'v', Description = "The visibility within the assembly for the generated client")]
     public ClientVisibility? Visibility { get; set; }
 
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]

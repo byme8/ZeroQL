@@ -7,7 +7,7 @@ using ZeroQL.Stores;
 
 namespace ZeroQL.CLI.Commands;
 
-[Command("queries extract", Description = "Generates C# classes from graphql file.")]
+[Command("queries extract", Description = "Extracts graphql queries from assembly.")]
 public class ExtractQueriesCommand : ICommand
 {
     [CommandOption("assembly", 'a', Description = "The assembly that contains the graphql client. For example, './MyApp.dll'", IsRequired = true)]

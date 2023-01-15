@@ -11,18 +11,25 @@
   ],
   "properties": {
     "$schema": {
-      "type": "string"
+      "type": "string",
+      "description": "Stub property to set schema url"
     },
     "graphql": {
-      "type": "string"
+      "type": "string",
+      "description": "The path to the graphql schema file"
     },
     "namespace": {
-      "type": "string"
+      "type": "string",
+      "description": "The namespace for generated client",
+      "x-example": "UserService.GraphQL.Clients"
     },
     "clientName": {
-      "type": "string"
+      "type": "string",
+      "description": "The client name for the generated client",
+      "x-example": "UserServiceGraphQLClient"
     },
     "visibility": {
+      "description": "The visibility within the assembly for the generated client",
       "oneOf": [
         {
           "type": "null"
@@ -33,7 +40,9 @@
       ]
     },
     "output": {
-      "type": "string"
+      "type": "string",
+      "description": "The path to the output file",
+      "x-example": "./Generated/GraphQL.g.cs"
     }
   },
   "definitions": {
