@@ -51,6 +51,24 @@ It is possible to add next target to csproj to keep generated client in sync wit
 ```
 As a result, the graphql client will be generated on every build.
 
+## Config
+
+There is a way to simplify the CLI command. The command `` dotnet zeroql config init `` creates the `` zeroql.josn ``. It may look like that:
+``` json
+{
+  "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
+  "graphql": "./schema.graphql",
+  "namespace": "ZeroQL.Client",
+  "clientName": "ZeroQLClient",
+  "output": "./Generated/GraphQL.g.cs"
+}
+```
+
+Then we can use it like that:
+``` bash
+dotnet zeroql -c ./zeroql.json
+```
+
 # How to use
 
 Let's suppose that schema.graphql file contains the following:
