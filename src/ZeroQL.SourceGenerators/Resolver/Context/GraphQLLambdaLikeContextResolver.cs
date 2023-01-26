@@ -38,6 +38,11 @@ public class GraphQLLambdaLikeContextResolver
         var graphqlLambda = invocation.ArgumentList.Arguments
             .Last(o => o.Expression is LambdaExpressionSyntax);
         var key = graphqlLambda.ToString();
+        var nameColon = graphqlLambda.NameColon?.ToString();
+        if (nameColon is not null)
+        {
+            key = key.Replace(nameColon, string.Empty).Trim();
+        }
 
         var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
         if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol graphQLMethodSymbol)

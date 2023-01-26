@@ -287,4 +287,19 @@ public class QueryTests : IntegrationTest
 
         await Verify(response);
     }
+    
+    [Fact]
+    public async Task NamedArgumentsAreSupported()
+    {
+        var csharpQuery = """
+            var cts = new CancellationTokenSource();
+            var response = await qlClient.Query(cancellationToken: cts.Token, query: static q => q.Me(o => o.FirstName));
+        """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
+
+        var response = await project.Execute();
+        await Verify(response);
+    }
 }
