@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,6 +7,7 @@ using ZeroQL.Bootstrap;
 using ZeroQL.Extensions;
 using ZeroQL.Internal.Enums;
 using ZeroQL.Tests.Core;
+using Task = System.Threading.Tasks.Task;
 
 namespace ZeroQL.Tests.Bootstrap;
 
@@ -37,7 +39,9 @@ public class ParseSchemaTests
 
         var graphql = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
 
-        await Verify(graphql);
+        var hashCodeLine = graphql.GetLines().First();
+        await Verify(graphql)
+            .Track(hashCodeLine);
     }
     
     [Fact]
@@ -50,7 +54,9 @@ public class ParseSchemaTests
 
         var graphql = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
 
-        await Verify(graphql);
+        var hashCodeLine = graphql.GetLines().First();
+        await Verify(graphql)
+            .Track(hashCodeLine);
     }
 
     [Fact]

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using GraphQLParser.AST;
+using ZeroQL.Bootstrap;
 using ZeroQL.Schema;
 
 namespace ZeroQL.Internal;
 
-internal class TypeFormatter
+internal class TypeContext
 {
-
     public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
     {
         { "String", "string" },
@@ -22,27 +22,30 @@ internal class TypeFormatter
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "ID", "ID" },
-        { "Boolean", "bool" }
+        { "Boolean", "bool" },
+        { "Upload", "global::ZeroQL.Upload" }
     };
 
-    public TypeFormatter(HashSet<string> enums, string[] customScalars)
+    public TypeContext(GraphQlGeneratorOptions options, HashSet<string> enums, string[] customScalars)
     {
         Enums = enums;
+        CustomScalars = new List<ScalarDefinition>();
         foreach (var scalar in customScalars)
         {
             if (GraphQLToCsharpScalarTypes.ContainsKey(scalar))
             {
                 continue;
             }
-            
-            GraphQLToCsharpScalarTypes[scalar] = $"global::ZeroQL.{scalar}";
+
+            var scalarDefinition = new ScalarDefinition(scalar);
+            CustomScalars.Add(scalarDefinition);
+            GraphQLToCsharpScalarTypes[scalar] = options.GetDefinitionFullTypeName(scalarDefinition);
         }
     }
 
-    public HashSet<string> Enums
-    {
-        get;
-    }
+    public List<ScalarDefinition> CustomScalars { get; }
+
+    public HashSet<string> Enums { get; }
 
     public TypeDefinition GetTypeDefinition(GraphQLType type)
     {

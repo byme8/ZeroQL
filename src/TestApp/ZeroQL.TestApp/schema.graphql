@@ -24,6 +24,7 @@ type KeyValuePairOfStringAndString {
 }
 
 type Mutation {
+  createInstant(instant: Instant!): Instant!
   dateTime(dateTime: DateTime!): DateTime!
   dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
   timeSpan(timeSpan: TimeSpan!): TimeSpan!
@@ -52,6 +53,7 @@ type Query {
   circles: [Circle!]!
   squares: [Square!]!
   instant: Instant!
+  zonedDateTime: ZonedDateTime!
   me: User!
   users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
   userKinds: [UserKind!]!
@@ -190,3 +192,6 @@ scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
 
 "The `Upload` scalar type represents a file upload."
 scalar Upload
+
+"A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.\nA ZonedDateTime is global, in that it maps to a single Instant."
+scalar ZonedDateTime

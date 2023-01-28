@@ -9,17 +9,18 @@ public class UserScalarTests: IntegrationTest
     [Fact]
     public async Task InstantScalarTypeWorks()
     {
-        var csharpQuery = "static q => q.Instant";
-        var graphqlQuery = @"query { instant}";
+        var csharpQuery = """
+            var instantResponse = await qlClient.Query(static q => q.Instant);
+            var input = new { Instant = instantResponse.Data };
+            var response = await qlClient.Mutation(input, static (i, m) => m.CreateInstant(i.Instant));
+            """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs",
-                (TestProject.PLACE_TO_REPLACE, "global::ZeroQL.Json.ZeroQLJsonOptions.Configure(o => o.Converters.Add(new InstantJsonConverter()));"),
-                (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
 
-        var response = await project.Validate(graphqlQuery, false);
+        var response = await project.Execute();
 
-        await Verify(response);
+        await Verify(response)
+            .DontScrubDateTimes();
     }
-    
 }

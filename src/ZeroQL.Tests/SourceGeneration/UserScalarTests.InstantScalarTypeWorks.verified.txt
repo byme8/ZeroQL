@@ -1,6 +1,6 @@
 ﻿{
-  Query: query { instant},
+  Query: mutation ($instant: Instant!) { createInstant(instant: $instant)},
   Data: {
-    DateTimeOffset: DateTimeOffset_1
+    Value: 2042-06-06T06:06:06Z
   }
 }

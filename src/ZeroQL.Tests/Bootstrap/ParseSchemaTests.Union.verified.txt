@@ -38,7 +38,7 @@
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(PostContent)] = new ZeroQLPostContentConverter();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.PostContent)] = new ZeroQLPostContentConverter();
         }
     }
 

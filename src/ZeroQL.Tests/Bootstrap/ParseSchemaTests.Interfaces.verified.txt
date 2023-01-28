@@ -78,7 +78,7 @@
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(IFigure)] = new ZeroQLIFigureConverter();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.IFigure)] = new ZeroQLIFigureConverter();
         }
     }
 

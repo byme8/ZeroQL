@@ -32,6 +32,11 @@ public static class GraphQLGenerator
         var schema = Parser.Parse(graphql);
         var enums = schema.Definitions
             .OfType<GraphQLEnumTypeDefinition>()
+            .Select(o => new EnumDefinition(
+                o.Name.StringValue,
+                o.Values?
+                    .Select(v => v.Name.StringValue)
+                    .ToArray()))
             .ToArray();
 
         var schemaDefinition = schema.Definitions
@@ -51,13 +56,14 @@ public static class GraphQLGenerator
             .FirstOrDefault(x => x.Operation == OperationType.Mutation)?
             .Type;
 
-        var enumsNames = new HashSet<string>(enums.Select(o => o.Name.StringValue));
+        var enumsNames = new HashSet<string>(enums.Select(o => o.Name));
         var scalarTypes = schema.Definitions
             .OfType<GraphQLScalarTypeDefinition>()
             .Select(o => o.Name.StringValue)
             .ToArray();
 
-        var context = new TypeFormatter(enumsNames, scalarTypes);
+        var context = new TypeContext(options, enumsNames, scalarTypes);
+        var customScalars = context.CustomScalars;
 
         var inputs = schema.Definitions
             .OfType<GraphQLInputObjectTypeDefinition>()
@@ -74,7 +80,6 @@ public static class GraphQLGenerator
             .Select(o => CreateInterfaceDefinition(context, o))
             .ToList();
 
-
         AddUnions(schema, interfaces, types);
 
         var namespaceDeclaration = NamespaceDeclaration(IdentifierName(options.ClientNamespace));
@@ -83,7 +88,8 @@ public static class GraphQLGenerator
         var interfacesDeclaration = GenerateInterfaces(options, interfaces);
         var inputsDeclaration = GenerateInputs(options, inputs);
         var enumsDeclaration = GenerateEnums(options, enums);
-        var jsonInitializers = GenerateJsonInitializers(enums, interfaces);
+        var scalarDeclaration = GenerateScalars(options, customScalars);
+        var jsonInitializers = GenerateJsonInitializers(options, customScalars, enums, interfaces);
         var interfaceInitializers = GenerateInterfaceInitializers(types);
 
         namespaceDeclaration = namespaceDeclaration
@@ -91,6 +97,7 @@ public static class GraphQLGenerator
                 .AddRange(typesDeclaration)
                 .AddRange(interfacesDeclaration)
                 .AddRange(inputsDeclaration)
+                .AddRange(scalarDeclaration)
                 .AddRange(enumsDeclaration)
                 .AddRange(interfaceInitializers)
                 .Add(jsonInitializers));
@@ -136,6 +143,40 @@ public static class GraphQLGenerator
             .ToFullString();
 
         return formattedSource;
+    }
+
+    private static RecordDeclarationSyntax[] GenerateScalars(GraphQlGeneratorOptions options,
+        IReadOnlyList<ScalarDefinition> customScalars)
+    {
+        return customScalars
+            .Select(scalarDefinition =>
+            {
+                var source = $$"""
+                    {{options.AccessLevel}} sealed record {{scalarDefinition.Name}} : ZeroQLScalar
+                    {
+                        public {{scalarDefinition.Name}}()
+                        {
+                        }
+
+                        public {{scalarDefinition.Name}}(string value)
+                        {
+                            Value = value;
+                        }
+
+                        public static implicit operator {{scalarDefinition.Name}}(string value) => new {{scalarDefinition.Name}}(value);
+
+                        public static implicit operator string({{scalarDefinition.Name}} scalar) => scalar.Value;
+                    }
+                    """;
+
+                var classDeclarationSyntax = ParseCompilationUnit(source)
+                    .DescendantNodesAndSelf()
+                    .OfType<RecordDeclarationSyntax>()
+                    .First();
+
+                return classDeclarationSyntax;
+            })
+            .ToArray();
     }
 
     private static void AddUnions(GraphQLDocument schema, List<InterfaceDefinition> interfaces, ClassDefinition[] types)
@@ -245,24 +286,24 @@ public static class GraphQLGenerator
             .ToArray();
     }
 
-    private static ClassDefinition CreateInputDefinition(TypeFormatter typeFormatter,
+    private static ClassDefinition CreateInputDefinition(TypeContext typeContext,
         GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, CreatePropertyDefinition(typeFormatter, input), null);
+        => new(input.Name.StringValue, CreatePropertyDefinition(typeContext, input), null);
 
     private static EnumDeclarationSyntax[] GenerateEnums(
         GraphQlGeneratorOptions options,
-        GraphQLEnumTypeDefinition[] enums)
+        EnumDefinition[] enums)
     {
         return enums.Select(e =>
             {
                 var members = e.Values.Select(o =>
                     {
-                        var name = o.Name.StringValue.ToPascalCase();
+                        var name = o.ToPascalCase();
                         return EnumMemberDeclaration(Identifier(name));
                     })
                     .ToArray();
 
-                var enumSyntax = EnumDeclaration(Identifier(e.Name.StringValue))
+                var enumSyntax = EnumDeclaration(Identifier(e.Name))
                     .AddAttributeLists(AttributeList()
                         .AddAttributes(Attribute(ParseName(ZeroQLGenerationInfo.CodeGenerationAttribute))))
                     .AddMembers(members)
@@ -277,11 +318,14 @@ public static class GraphQLGenerator
     }
 
     private static ClassDeclarationSyntax GenerateJsonInitializers(
-        GraphQLEnumTypeDefinition[] enums,
+        GraphQlGeneratorOptions options,
+        IReadOnlyList<ScalarDefinition> customScalars,
+        IReadOnlyList<EnumDefinition> enums,
         IReadOnlyList<InterfaceDefinition> interfaces)
     {
-        var enumInitializers = EnumInitializers(enums);
-        var interfaceInitializers = InterfaceInitializers(interfaces);
+        var customScalarInitializers = CustomScalarInitializers(options, customScalars);
+        var enumInitializers = EnumInitializers(options, enums);
+        var interfaceInitializers = InterfaceInitializers(options, interfaces);
 
         var source = @$"
             internal static class JsonConvertersInitializers
@@ -289,6 +333,7 @@ public static class GraphQLGenerator
                 [global::System.Runtime.CompilerServices.ModuleInitializer]
                 public static void Init()
                 {{
+                    {customScalarInitializers}
                     {enumInitializers}
                     {interfaceInitializers}
                 }} 
@@ -304,24 +349,44 @@ public static class GraphQLGenerator
         return classDeclarationSyntax;
     }
 
-    private static StringBuilder InterfaceInitializers(IReadOnlyList<InterfaceDefinition> interfaces)
+    private static StringBuilder InterfaceInitializers(
+        GraphQlGeneratorOptions options,
+        IReadOnlyList<InterfaceDefinition> interfaces)
     {
         var sb = new StringBuilder();
         foreach (var interfaceDefinition in interfaces)
         {
+            var typeName = options.GetDefinitionFullTypeName(interfaceDefinition);
             sb.AppendLine(
-                $"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({interfaceDefinition.Name})] = new ZeroQL{interfaceDefinition.Name}Converter();");
+                $"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({typeName})] = new ZeroQL{interfaceDefinition.Name}Converter();");
         }
 
         return sb;
     }
 
-    private static StringBuilder EnumInitializers(GraphQLEnumTypeDefinition[] enums)
+    private static StringBuilder CustomScalarInitializers(
+        GraphQlGeneratorOptions options,
+        IReadOnlyList<ScalarDefinition> customScalars)
+    {
+        var sb = new StringBuilder();
+        foreach (var scalar in customScalars)
+        {
+            var fullTypeName = options.GetDefinitionFullTypeName(scalar);
+            sb.AppendLine(
+                $"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({fullTypeName})] = new ZeroQLScalarJsonConverter<{fullTypeName}>();");
+        }
+
+        return sb;
+    }
+
+    private static StringBuilder EnumInitializers(
+        GraphQlGeneratorOptions options,
+        IReadOnlyList<EnumDefinition> enums)
     {
         var enumInitializers = new StringBuilder();
         foreach (var @enum in enums)
         {
-            var enumName = @enum.Name;
+            var enumName = options.GetDefinitionFullTypeName(@enum);
             enumInitializers.AppendLine(
                 @$"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({enumName})] =");
             enumInitializers.AppendLine(@$"
@@ -334,7 +399,7 @@ public static class GraphQLGenerator
                 foreach (var value in @enum.Values)
                 {
                     enumInitializers.AppendLine(
-                        @$"{{ ""{value.Name.StringValue}"", {enumName}.{value.Name.StringValue.ToPascalCase()} }}, ");
+                        @$"{{ ""{value}"", {enumName}.{value.ToPascalCase()} }}, ");
                 }
             }
 
@@ -348,7 +413,7 @@ public static class GraphQLGenerator
                 foreach (var value in @enum.Values)
                 {
                     enumInitializers.AppendLine(
-                        @$"{{ {enumName}.{value.Name.StringValue.ToPascalCase()}, ""{value.Name.StringValue}"" }},");
+                        @$"{{ {enumName}.{value.ToPascalCase()}, ""{value}"" }},");
                 }
             }
 
@@ -593,13 +658,13 @@ public static class GraphQLGenerator
         }
     }
 
-    private static ClassDefinition CreateTypesDefinition(TypeFormatter typeFormatter, GraphQLObjectTypeDefinition type)
-        => new(type.Name.StringValue, CreatePropertyDefinition(typeFormatter, type.Fields),
+    private static ClassDefinition CreateTypesDefinition(TypeContext typeContext, GraphQLObjectTypeDefinition type)
+        => new(type.Name.StringValue, CreatePropertyDefinition(typeContext, type.Fields),
             type.Interfaces?.Select(o => o.Name.StringValue).ToList() ?? new List<string>());
 
-    private static InterfaceDefinition CreateInterfaceDefinition(TypeFormatter typeFormatter,
+    private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
         GraphQLInterfaceTypeDefinition definition)
-        => new(definition.Name.StringValue, CreatePropertyDefinition(typeFormatter, definition.Fields));
+        => new(definition.Name.StringValue, CreatePropertyDefinition(typeContext, definition.Fields));
 
     private static UnionDefinition CreateUnionDefinition(GraphQLUnionTypeDefinition union)
     {
@@ -617,13 +682,13 @@ public static class GraphQLGenerator
     }
 
 
-    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter,
+    private static FieldDefinition[] CreatePropertyDefinition(TypeContext typeContext,
         GraphQLInputObjectTypeDefinition typeQL)
     {
         return typeQL.Fields?
             .Select(field =>
             {
-                var type = typeFormatter.GetTypeDefinition(field.Type);
+                var type = typeContext.GetTypeDefinition(field.Type);
                 var defaultValue = GetDefaultValue(field);
                 return new FieldDefinition(field.Name.StringValue.FirstToUpper(), type,
                     Array.Empty<ArgumentDefinition>(), defaultValue);
@@ -631,18 +696,18 @@ public static class GraphQLGenerator
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
 
-    private static FieldDefinition[] CreatePropertyDefinition(TypeFormatter typeFormatter,
+    private static FieldDefinition[] CreatePropertyDefinition(TypeContext typeContext,
         GraphQLFieldsDefinition? fields)
     {
         return fields?.Select(field =>
             {
-                var type = typeFormatter.GetTypeDefinition(field.Type);
+                var type = typeContext.GetTypeDefinition(field.Type);
                 return new FieldDefinition(
                     field.Name.StringValue.FirstToUpper(),
                     type,
                     field.Arguments?
                         .Select(arg => new ArgumentDefinition(arg.Name.StringValue,
-                            typeFormatter.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
+                            typeContext.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
                         .ToArray() ?? Array.Empty<ArgumentDefinition>(),
                     null);
             })
