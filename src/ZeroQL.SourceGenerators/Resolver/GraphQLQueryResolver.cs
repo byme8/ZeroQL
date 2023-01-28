@@ -344,20 +344,7 @@ public static class GraphQLQueryResolver
             initializers.Add(result);
         }
 
-        var fullSelector = CreateFullSelector(initializers);
-
-        return fullSelector;
-    }
-
-    private static string CreateFullSelector(ICollection<string> initializers)
-    {
-        if (initializers.Any(o => o.Contains("... on")))
-        {
-            initializers.Add("__typename");
-        }
-
-        var selector = initializers.Join(" ");
-        return selector;
+        return initializers.Join(" ");
     }
 
     private static Result<string> HandleArgumentAsVariable(GraphQLResolveContext context, ArgumentSyntax argument)
@@ -434,7 +421,7 @@ public static class GraphQLQueryResolver
                     QueryVariableName = identifierValueText,
                     Parent = localFunction
                 };
-            
+
                 if (localFunction.ExpressionBody is not null)
                 {
                     return ResolveQuery(newContext, localFunction.ExpressionBody);
@@ -445,7 +432,7 @@ public static class GraphQLQueryResolver
                     return ResolveQuery(newContext, localFunction.Body);
                 }
             }
-            
+
             if (possibleMethodDeclaration is MethodDeclarationSyntax
                 {
                     ParameterList.Parameters.Count: 1
@@ -457,7 +444,7 @@ public static class GraphQLQueryResolver
                     QueryVariableName = identifierValueText,
                     Parent = methodDeclaration
                 };
-            
+
                 if (methodDeclaration.ExpressionBody is not null)
                 {
                     return ResolveQuery(newContext, methodDeclaration.ExpressionBody);
@@ -714,8 +701,10 @@ public static class GraphQLQueryResolver
         return finalGraphQLQuery;
     }
 
-    private static Result<string> HandleFieldSelector(GraphQLResolveContext context,
-        InvocationExpressionSyntax invocation, IMethodSymbol method)
+    private static Result<string> HandleFieldSelector(
+        GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation,
+        IMethodSymbol method)
     {
         var ignoreLastParameter = method.Parameters.Last().Type.Name.StartsWith("Func");
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
@@ -755,10 +744,27 @@ public static class GraphQLQueryResolver
                 return body;
             }
 
-            stringBuilder.Append($" {{ {body.Value} }} ");
+            if (method.Parameters.Last().Type is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return Failed(invocation);
+            }
+
+            var isUnionType = IsUnionType(context, namedTypeSymbol);
+
+            var typeName = isUnionType ? " __typename" : string.Empty;
+            stringBuilder.Append($" {{ {body.Value}{typeName} }} ");
         }
 
         return stringBuilder.ToString();
+    }
+
+    private static bool IsUnionType(GraphQLResolveContext context, INamedTypeSymbol namedTypeSymbol)
+    {
+        var selectorType = namedTypeSymbol.TypeArguments.FirstOrDefault();
+        var isUnionType = selectorType?.AllInterfaces
+            .Any(o => SymbolEqualityComparer.Default.Equals(o, context.UnionType));
+        
+        return isUnionType ?? false;
     }
 
     private static Result<Compilation> GetCompilation(SyntaxTree syntaxTree, Compilation compilation)

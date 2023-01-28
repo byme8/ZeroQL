@@ -10,4 +10,12 @@ public class User
     public string LastName { get; set; }
 
     public UserKind UserKind { get; set; }
+
+    public static User Create() => new User()
+    {
+        Id = 1,
+        FirstName = "John",
+        LastName = "Smith",
+        UserKind = UserKind.Good
+    };
 }

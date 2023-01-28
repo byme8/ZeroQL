@@ -431,26 +431,10 @@ public static class GraphQLGenerator
         var csharpDefinitions = definitions
             .Select(o =>
             {
-                var backedFields = o.Properties
-                    .Where(RequireSelector)
-                    .Select(property =>
-                    {
-                        var jsonNameAttributes = new[]
-                        {
-                            ("global::System.ComponentModel.EditorBrowsable",
-                                "global::System.ComponentModel.EditorBrowsableState.Never"),
-                            ("JsonPropertyName", Literal(property.Name).Text)
-                        };
-
-                        return CSharpHelper
-                            .Property("__" + property.Name, property.TypeDefinition, false, null)
-                            .AddAttributes(jsonNameAttributes);
-                    });
-
-                var fields = o.Properties.Select(GeneratePropertiesDeclarations);
+                var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
                 var @class = CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
-                    .WithMembers(List<MemberDeclarationSyntax>(backedFields).AddRange(fields));
+                    .WithMembers(List(fields));
 
                 if (o.Implements.Any())
                 {
@@ -481,6 +465,20 @@ public static class GraphQLGenerator
         return csharpDefinitions;
     }
 
+    private static PropertyDeclarationSyntax BackedField(FieldDefinition field)
+    {
+        var jsonNameAttributes = new[]
+        {
+            ("global::System.ComponentModel.EditorBrowsable",
+                "global::System.ComponentModel.EditorBrowsableState.Never"),
+            ("JsonPropertyName", Literal(field.Name).Text)
+        };
+
+        return CSharpHelper
+            .Property("__" + field.Name, field.TypeDefinition, false, null)
+            .AddAttributes(jsonNameAttributes);
+    }
+
     private static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(
         GraphQlGeneratorOptions options,
         IReadOnlyCollection<InterfaceDefinition> interfaces)
@@ -488,7 +486,7 @@ public static class GraphQLGenerator
         var csharpDefinitions = interfaces
             .Select(o =>
             {
-                var fields = o.Properties.Select(GeneratePropertiesDeclarations);
+                var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
                 var @interface = CSharpHelper.Interface(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
@@ -501,20 +499,23 @@ public static class GraphQLGenerator
         return csharpDefinitions;
     }
 
-    private static MemberDeclarationSyntax GeneratePropertiesDeclarations(FieldDefinition field)
+    private static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(FieldDefinition field)
     {
         if (RequireSelector(field))
         {
+            var backedField = BackedField(field);
+
             var parameters = field.Arguments
                 .Select(o =>
                     Parameter(Identifier(o.Name))
                         .WithType(ParseTypeName(o.TypeName)))
                 .ToArray();
 
-            return GenerateQueryPropertyDeclaration(field, parameters);
+            var selector = GenerateQueryPropertyDeclaration(field, parameters);
+            return new[] { backedField, selector };
         }
 
-        return CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue);
+        return new[] { CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue) };
     }
 
 

@@ -1,5 +1,5 @@
 ﻿{
-  Query: query { posts { ... on ImageContent { imageUrl height } ... on TextContent { text } __typename } },
+  Query: query { posts { ... on ImageContent { imageUrl height } ... on TextContent { text } ... on FigureContent { figure { ... on Circle { radius } __typename }  } __typename } },
   Data: [
     {
       Image: {
@@ -10,6 +10,13 @@
     {
       Text: {
         Text: Hello World!
+      }
+    },
+    {
+      Figure: {
+        Circle: {
+          Radius: 5.0
+        }
       }
     }
   ]

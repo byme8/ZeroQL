@@ -12,6 +12,7 @@ public record struct GraphQLResolveContext(
     SemanticModel SemanticModel,
     CancellationToken CancellationToken)
 {
+    private INamedTypeSymbol? unionType;
     private INamedTypeSymbol? syntaxAttribute;
     private INamedTypeSymbol? fragmentAttribute = null;
     private INamedTypeSymbol? fieldSelectorAttribute = null;
@@ -36,6 +37,11 @@ public record struct GraphQLResolveContext(
     public INamedTypeSymbol SyntaxAttribute
     {
         get => syntaxAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLSyntaxAttribute)!;
+    }
+    
+    public INamedTypeSymbol UnionType
+    {
+        get => unionType ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLUnionType)!;
     }
 
     public SemanticModel SemanticModel

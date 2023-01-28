@@ -46,6 +46,8 @@ public class OnSyntaxTests : IntegrationTest
                         .Select(oo => new { oo.ImageUrl, oo.Height }),
                     Text = o.On<TextContent>()
                         .Select(oo => new { oo.Text }),
+                    Figure = o.On<FigureContent>()
+                        .Select(oo => oo.Figure(ooo => new { Circle = ooo.On<Circle>().Select(oooo => new { oooo.Radius }) }))
                 })
                 """;
 

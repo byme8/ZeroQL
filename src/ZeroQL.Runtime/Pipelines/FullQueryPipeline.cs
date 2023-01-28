@@ -11,7 +11,8 @@ namespace ZeroQL.Pipelines;
 
 public class FullQueryPipeline : IGraphQLQueryPipeline
 {
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey,
+        object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
         var query = queryInfo.Query;
@@ -23,8 +24,17 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
 
         var content = contentCreator(qlRequest);
         var response = await httpClient.PostAsync("", content, cancellationToken);
+#if DEBUG
+        var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+        var qlResponse =
+            JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+#else
         var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options, cancellationToken);
+        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
+                responseJson,
+                ZeroQLJsonOptions.Options,
+                cancellationToken);
+#endif
 
         if (qlResponse is not null)
         {

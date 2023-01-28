@@ -13,14 +13,14 @@
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
         public Point __TopLeft { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
-        public Point __BottomRight { get; set; }
-
         [ZeroQL.GraphQLFieldSelector]
         public T TopLeft<T>(Func<Point, T> selector)
         {
             return selector(__TopLeft);
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
+        public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T BottomRight<T>(Func<Point, T> selector)

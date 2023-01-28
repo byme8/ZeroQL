@@ -35,14 +35,58 @@ namespace GraphQLClient
         public double Radius { get; set; }
 
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Creator<T>(Func<User, T> selector)
+        {
+            return selector(__Creator);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class FigureContent : PostContent
+    {
+        public int Id { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figure")]
+        public IFigure __Figure { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Figure<T>(Func<IFigure, T> selector)
+        {
+            return selector(__Figure);
+        }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
+        public User __Author { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Author<T>(Func<User, T> selector)
+        {
+            return selector(__Author);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class ImageContent : PostContent
     {
+        public int Id { get; set; }
+
         public string ImageUrl { get; set; }
 
         public int Height { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
+        public User __Author { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Author<T>(Func<User, T> selector)
+        {
+            return selector(__Author);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -59,41 +103,14 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("CreateInstant")]
         public global::GraphQLClient.Instant __CreateInstant { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTime")]
-        public DateTimeOffset __DateTime { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTimeOffset")]
-        public DateTimeOffset __DateTimeOffset { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeSpan")]
-        public TimeSpan __TimeSpan { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateOnly")]
-        public DateOnly __DateOnly { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeOnly")]
-        public TimeSpan __TimeOnly { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
-        public User __AddUser { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
-        public int __AddUserProfileImage { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddMyProfileImage")]
-        public int __AddMyProfileImage { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUsersInfo")]
-        public int __AddUsersInfo { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddValues")]
-        public int __AddValues { get; set; }
-
         [ZeroQL.GraphQLFieldSelector]
         public global::GraphQLClient.Instant CreateInstant(global::GraphQLClient.Instant instant)
         {
             return __CreateInstant;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTime")]
+        public DateTimeOffset __DateTime { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public DateTimeOffset DateTime(DateTimeOffset dateTime)
@@ -101,11 +118,17 @@ namespace GraphQLClient
             return __DateTime;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTimeOffset")]
+        public DateTimeOffset __DateTimeOffset { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public DateTimeOffset DateTimeOffset(DateTimeOffset dateTimeOffset)
         {
             return __DateTimeOffset;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeSpan")]
+        public TimeSpan __TimeSpan { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public TimeSpan TimeSpan(TimeSpan timeSpan)
@@ -113,17 +136,26 @@ namespace GraphQLClient
             return __TimeSpan;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateOnly")]
+        public DateOnly __DateOnly { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public DateOnly DateOnly(DateOnly dateOnly)
         {
             return __DateOnly;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeOnly")]
+        public TimeSpan __TimeOnly { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public TimeSpan TimeOnly(TimeSpan timeOnly)
         {
             return __TimeOnly;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
+        public User __AddUser { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
@@ -133,11 +165,17 @@ namespace GraphQLClient
 
         public int DoError { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
+        public int __AddUserProfileImage { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public int AddUserProfileImage(int userId, global::ZeroQL.Upload file)
         {
             return __AddUserProfileImage;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddMyProfileImage")]
+        public int __AddMyProfileImage { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public int AddMyProfileImage(global::ZeroQL.Upload file)
@@ -145,11 +183,17 @@ namespace GraphQLClient
             return __AddMyProfileImage;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUsersInfo")]
+        public int __AddUsersInfo { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public int AddUsersInfo(UserInfoInput[] users)
         {
             return __AddUsersInfo;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddValues")]
+        public int __AddValues { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public int AddValues(string text, byte value1, byte? value2, short value3, short? value4, int value5, int? value6, long value7, long? value8, double value9, double? value10, double value11, double? value12, decimal value13, decimal? value14, DateTimeOffset value15, DateTimeOffset? value16, DateOnly value17, DateOnly? value18, Guid value19, Guid? value20, Guid[] value21, Guid[]? value22, Guid[] value23, Guid[]? value24, Guid[] value25, Guid[]? value26, KeyValuePairOfStringAndStringInput[] value27, KeyValuePairOfStringAndStringInput[]? value28, KeyValuePairOfStringAndStringInput value29, KeyValuePairOfStringAndStringInput? value30, DateTimeOffset value31, DateTimeOffset? value32)
@@ -166,60 +210,24 @@ namespace GraphQLClient
         public double Y { get; set; }
 
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Creator<T>(Func<User, T> selector)
+        {
+            return selector(__Creator);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Query : global::ZeroQL.Internal.IQuery
     {
+        public int LongOperation { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Posts")]
         public PostContent[] __Posts { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Image")]
-        public ImageContent __Image { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Text")]
-        public TextContent __Text { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figures")]
-        public IFigure[] __Figures { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Circles")]
-        public Circle[] __Circles { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Squares")]
-        public Square[] __Squares { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
-        public User __Me { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
-        public User[] __Users { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
-        public User[][] __UsersMatrix { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByKind")]
-        public User[] __UsersByKind { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersIds")]
-        public int[] __UsersIds { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
-        public User __User { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByIds")]
-        public User[] __UsersByIds { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKind")]
-        public UserKind __UserKind { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Admin")]
-        public User __Admin { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
-        public TypesContainer __Container { get; set; }
-
-        public int LongOperation { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T[] Posts<T>(Func<PostContent, T> selector)
@@ -227,11 +235,17 @@ namespace GraphQLClient
             return __Posts.Select(o => selector(o)).ToArray();
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Image")]
+        public ImageContent __Image { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T Image<T>(Func<ImageContent, T> selector)
         {
             return selector(__Image);
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Text")]
+        public TextContent __Text { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T Text<T>(Func<TextContent, T> selector)
@@ -239,17 +253,35 @@ namespace GraphQLClient
             return selector(__Text);
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figure")]
+        public FigureContent __Figure { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Figure<T>(Func<FigureContent, T> selector)
+        {
+            return selector(__Figure);
+        }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figures")]
+        public IFigure[] __Figures { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T[] Figures<T>(Func<IFigure, T> selector)
         {
             return __Figures.Select(o => selector(o)).ToArray();
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Circles")]
+        public Circle[] __Circles { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T[] Circles<T>(Func<Circle, T> selector)
         {
             return __Circles.Select(o => selector(o)).ToArray();
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Squares")]
+        public Square[] __Squares { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T[] Squares<T>(Func<Square, T> selector)
@@ -261,11 +293,17 @@ namespace GraphQLClient
 
         public global::GraphQLClient.ZonedDateTime ZonedDateTime { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
+        public User __Me { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T Me<T>(Func<User, T> selector)
         {
             return selector(__Me);
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
+        public User[] __Users { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
@@ -275,11 +313,17 @@ namespace GraphQLClient
 
         public UserKind[] UserKinds { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
+        public User[][] __UsersMatrix { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
             return __UsersMatrix.Select(o => o.Select(o => selector(o)).ToArray()).ToArray();
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByKind")]
+        public User[] __UsersByKind { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
@@ -287,11 +331,17 @@ namespace GraphQLClient
             return __UsersByKind.Select(o => selector(o)).ToArray();
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersIds")]
+        public int[] __UsersIds { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public int[] UsersIds(UserKind kind, int page, int size)
         {
             return __UsersIds;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
+        public User __User { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T? User<T>(int id, Func<User?, T> selector)
@@ -299,11 +349,17 @@ namespace GraphQLClient
             return __User != default ? selector(__User) : default;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByIds")]
+        public User[] __UsersByIds { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T[] UsersByIds<T>(int[] ids, Func<User, T> selector)
         {
             return __UsersByIds.Select(o => selector(o)).ToArray();
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKind")]
+        public UserKind __UserKind { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public UserKind UserKind(int id)
@@ -311,11 +367,17 @@ namespace GraphQLClient
             return __UserKind;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Admin")]
+        public User __Admin { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T? Admin<T>(int id, Func<User?, T> selector)
         {
             return __Admin != default ? selector(__Admin) : default;
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
+        public TypesContainer __Container { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T Container<T>(Func<TypesContainer, T> selector)
@@ -338,14 +400,14 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
         public Point __TopLeft { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
-        public Point __BottomRight { get; set; }
-
         [ZeroQL.GraphQLFieldSelector]
         public T TopLeft<T>(Func<Point, T> selector)
         {
             return selector(__TopLeft);
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
+        public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T BottomRight<T>(Func<Point, T> selector)
@@ -354,29 +416,37 @@ namespace GraphQLClient
         }
 
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Creator<T>(Func<User, T> selector)
+        {
+            return selector(__Creator);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TextContent : PostContent
     {
+        public int Id { get; set; }
+
         public string Text { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
+        public User __Author { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Author<T>(Func<User, T> selector)
+        {
+            return selector(__Author);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TypesContainer
     {
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
-        public KeyValuePairOfStringAndString[] __Value27 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value28")]
-        public KeyValuePairOfStringAndString[] __Value28 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value29")]
-        public KeyValuePairOfStringAndString __Value29 { get; set; }
-
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value30")]
-        public KeyValuePairOfStringAndString __Value30 { get; set; }
-
         public string Text { get; set; }
 
         public byte Value1 { get; set; }
@@ -431,11 +501,17 @@ namespace GraphQLClient
 
         public Guid[]? Value26 { get; set; }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
+        public KeyValuePairOfStringAndString[] __Value27 { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value27.Select(o => selector(o)).ToArray();
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value28")]
+        public KeyValuePairOfStringAndString[] __Value28 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
@@ -443,11 +519,17 @@ namespace GraphQLClient
             return __Value28?.Select(o => selector(o)).ToArray();
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value29")]
+        public KeyValuePairOfStringAndString __Value29 { get; set; }
+
         [ZeroQL.GraphQLFieldSelector]
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return selector(__Value29);
         }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value30")]
+        public KeyValuePairOfStringAndString __Value30 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T? Value30<T>(Func<KeyValuePairOfStringAndString?, T> selector)
@@ -463,9 +545,6 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class User
     {
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
-        public Role __Role { get; set; }
-
         public ID Id { get; set; }
 
         public string FirstName { get; set; }
@@ -473,6 +552,9 @@ namespace GraphQLClient
         public string LastName { get; set; }
 
         public UserKind UserKind { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
+        public Role __Role { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
         public T? Role<T>(Func<Role?, T> selector)
@@ -485,6 +567,15 @@ namespace GraphQLClient
     public interface IFigure : global::ZeroQL.IUnionType
     {
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Creator<T>(Func<User, T> selector)
+        {
+            return selector(__Creator);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -579,6 +670,7 @@ namespace GraphQLClient
     {
         public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
         {
+            "FigureContent" => json.Deserialize<FigureContent>(ZeroQLJsonOptions.Options),
             "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
             "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
             _ => null

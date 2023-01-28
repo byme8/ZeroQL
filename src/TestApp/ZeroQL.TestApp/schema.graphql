@@ -5,17 +5,27 @@ schema {
 
 interface IFigure {
   perimeter: Float!
+  creator: User!
 }
 
 type Circle implements IFigure {
   center: Point!
   radius: Float!
   perimeter: Float!
+  creator: User!
+}
+
+type FigureContent {
+  id: Int!
+  figure: IFigure!
+  author: User!
 }
 
 type ImageContent {
+  id: Int!
   imageUrl: String!
   height: Int!
+  author: User!
 }
 
 type KeyValuePairOfStringAndString {
@@ -42,6 +52,7 @@ type Point implements IFigure {
   x: Float!
   y: Float!
   perimeter: Float!
+  creator: User!
 }
 
 type Query {
@@ -49,6 +60,7 @@ type Query {
   posts: [PostContent!]!
   image: ImageContent!
   text: TextContent!
+  figure: FigureContent!
   figures: [IFigure!]!
   circles: [Circle!]!
   squares: [Square!]!
@@ -76,10 +88,13 @@ type Square implements IFigure {
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
+  creator: User!
 }
 
 type TextContent {
+  id: Int!
   text: String!
+  author: User!
 }
 
 type TypesContainer {
@@ -126,7 +141,7 @@ type User {
   role: Role
 }
 
-union PostContent = TextContent | ImageContent
+union PostContent = FigureContent | TextContent | ImageContent
 
 input KeyValuePairOfStringAndStringInput {
   key: String!
