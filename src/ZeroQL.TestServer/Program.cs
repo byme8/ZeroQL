@@ -33,6 +33,8 @@ public class Program
             .AddType<UploadType>()
             .AddType<InstantType>()
             .AddType<ZonedDateTimeType>()
+            .AddType<IInterfaceThatNeverGetsUsed>()
+            .AddType<Person>()
             .AddTypeExtension<LongOperationsExtensions>()
             .AddTypeExtension<UnionExtensions>()
             .AddTypeExtension<InterfacesExtensions>()

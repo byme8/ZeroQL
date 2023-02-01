@@ -28,8 +28,7 @@
         {
             "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
             "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
-            _ => null
-        };
+            _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)};
     }
 ,
   initializers:

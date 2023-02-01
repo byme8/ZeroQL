@@ -2,11 +2,43 @@ using ZeroQL.TestServer.Query.Models;
 
 namespace ZeroQL.TestServer.Query;
 
+[InterfaceType("InterfaceThatNeverGetsUsed")]
+public interface IInterfaceThatNeverGetsUsed
+{
+    public int Id { get; set; }
+}
+
+[InterfaceType("IPerson")]
+public interface IPerson
+{
+    public int Id { get; set; }
+
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+}
+
+public class Person : IPerson
+{
+    public int Id { get; set; }
+
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+
+    public static IPerson Create() => new Person()
+    {
+        Id = 1,
+        FirstName = "John",
+        LastName = "Smith",
+    };
+}
+
 public interface IFigure
 {
     float Perimeter { get; }
-    
-    User Creator { get; set; }
+
+    IPerson Creator { get; set; }
 }
 
 public class Point : IFigure
@@ -15,8 +47,8 @@ public class Point : IFigure
     public float Y { get; set; }
 
     public float Perimeter => 0;
-    
-    public User Creator { get; set; }
+
+    public IPerson Creator { get; set; }
 }
 
 public class Square : IFigure
@@ -24,10 +56,10 @@ public class Square : IFigure
     public Point TopLeft { get; set; }
 
     public Point BottomRight { get; set; }
-    
+
     public float Perimeter => Math.Abs(TopLeft.Y - BottomRight.Y) * 2 + Math.Abs(BottomRight.Y - TopLeft.Y) * 2;
 
-    public User Creator { get; set; }
+    public IPerson Creator { get; set; }
 }
 
 public class Circle : IFigure
@@ -35,10 +67,10 @@ public class Circle : IFigure
     public Point Center { get; set; }
 
     public float Radius { get; set; }
-    
+
     public float Perimeter => (float)Math.PI * 2 * Radius;
 
-    public User Creator { get; set; }
+    public IPerson Creator { get; set; }
 }
 
 [ExtendObjectType(typeof(Query))]
@@ -59,7 +91,7 @@ public class InterfacesExtensions
             {
                 Center = new Point { X = o, Y = o },
                 Radius = o,
-                Creator = User.Create(),
+                Creator = Person.Create(),
             })
             .ToArray();
     }
@@ -72,7 +104,7 @@ public class InterfacesExtensions
             {
                 TopLeft = new Point { X = o, Y = o },
                 BottomRight = new Point { X = o + 10, Y = o + 10 },
-                Creator = User.Create(),
+                Creator = Person.Create(),
             })
             .ToArray();
     }

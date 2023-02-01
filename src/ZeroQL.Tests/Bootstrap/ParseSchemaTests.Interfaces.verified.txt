@@ -68,8 +68,7 @@
             "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
             "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
             "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
-            _ => null
-        };
+            _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)};
     }
 ,
   initializers:

@@ -90,7 +90,7 @@ public static class GraphQLGenerator
         var enumsDeclaration = GenerateEnums(options, enums);
         var scalarDeclaration = GenerateScalars(options, customScalars);
         var jsonInitializers = GenerateJsonInitializers(options, customScalars, enums, interfaces);
-        var interfaceInitializers = GenerateInterfaceInitializers(types);
+        var interfaceInitializers = GenerateInterfaceInitializers(interfaces, types);
 
         namespaceDeclaration = namespaceDeclaration
             .WithMembers(List<MemberDeclarationSyntax>(clientDeclaration)
@@ -200,13 +200,25 @@ public static class GraphQLGenerator
         }
     }
 
-    private static ClassDeclarationSyntax[] GenerateInterfaceInitializers(ClassDefinition[] types)
+    private static ClassDeclarationSyntax[] GenerateInterfaceInitializers(
+        List<InterfaceDefinition> interfaces,
+        ClassDefinition[] types)
     {
         var typesByInterface = types
-            .Where(o => o.Implements is not null)
-            .SelectMany(o => o.Implements!.Select(oo => (Interface: oo, Type: o)))
+            .Where(o => o.Implements.Any())
+            .SelectMany(o => o.Implements.Select(oo => (Interface: oo, Type: o)))
             .GroupBy(o => o.Interface)
-            .ToDictionary(o => o.Key);
+            .ToDictionary(o => o.Key, o => o.ToArray());
+
+        foreach (var @interface in interfaces)
+        {
+            if (typesByInterface.ContainsKey(@interface.Name))
+            {
+                continue;
+            }
+
+            typesByInterface.Add(@interface.Name, Array.Empty<(string Interface, ClassDefinition Type)>());
+        }
 
         if (!typesByInterface.Any())
         {
@@ -225,7 +237,7 @@ public static class GraphQLGenerator
                                 {{group.Value
                                     .Select(o => $@"""{o.Type.Name}"" => json.Deserialize<{o.Type.Name}>(ZeroQLJsonOptions.Options),")
                                     .JoinWithNewLine()}}
-                                _ => null
+                                _ => json.Deserialize<{{typeName}}Stub>(ZeroQLJsonOptions.Options)
                             };
                     }
 
@@ -288,7 +300,7 @@ public static class GraphQLGenerator
 
     private static ClassDefinition CreateInputDefinition(TypeContext typeContext,
         GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, CreatePropertyDefinition(typeContext, input), null);
+        => new(input.Name.StringValue, CreatePropertyDefinition(typeContext, input), new List<string>());
 
     private static EnumDeclarationSyntax[] GenerateEnums(
         GraphQlGeneratorOptions options,
@@ -296,12 +308,12 @@ public static class GraphQLGenerator
     {
         return enums.Select(e =>
             {
-                var members = e.Values.Select(o =>
+                var members = e.Values?.Select(o =>
                     {
                         var name = o.ToPascalCase();
                         return EnumMemberDeclaration(Identifier(name));
                     })
-                    .ToArray();
+                    .ToArray() ?? Array.Empty<EnumMemberDeclarationSyntax>();
 
                 var enumSyntax = EnumDeclaration(Identifier(e.Name))
                     .AddAttributeLists(AttributeList()
@@ -484,15 +496,23 @@ public static class GraphQLGenerator
         IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
         var csharpDefinitions = interfaces
-            .Select(o =>
+            .SelectMany(o =>
             {
-                var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
+                var fields = o.Properties
+                    .SelectMany(GeneratePropertiesDeclarations)
+                    .ToArray();
+
                 var @interface = CSharpHelper.Interface(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
                     .WithMembers(List(fields));
 
-                return @interface;
+                var stub = CSharpHelper.Class(o.Name + "Stub", options.Visibility)
+                    .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                    .AddBaseListTypes(SimpleBaseType(ParseTypeName(o.Name)))
+                    .WithMembers(List(fields));
+
+                return new MemberDeclarationSyntax[] { @interface, stub };
             })
             .ToList();
 
@@ -515,7 +535,10 @@ public static class GraphQLGenerator
             return new[] { backedField, selector };
         }
 
-        return new[] { CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue) };
+        return new MemberDeclarationSyntax[]
+        {
+            CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
+        };
     }
 
 

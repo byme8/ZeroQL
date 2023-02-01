@@ -37,10 +37,10 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
-        public User __Creator { get; set; }
+        public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
-        public T Creator<T>(Func<User, T> selector)
+        public T Creator<T>(Func<IPerson, T> selector)
         {
             return selector(__Creator);
         }
@@ -203,6 +203,16 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class Person : IPerson
+    {
+        public int Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Point : IFigure
     {
         public double X { get; set; }
@@ -212,10 +222,10 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
-        public User __Creator { get; set; }
+        public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
-        public T Creator<T>(Func<User, T> selector)
+        public T Creator<T>(Func<IPerson, T> selector)
         {
             return selector(__Creator);
         }
@@ -418,10 +428,10 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
-        public User __Creator { get; set; }
+        public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
-        public T Creator<T>(Func<User, T> selector)
+        public T Creator<T>(Func<IPerson, T> selector)
         {
             return selector(__Creator);
         }
@@ -569,17 +579,69 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
-        public User __Creator { get; set; }
+        public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector]
-        public T Creator<T>(Func<User, T> selector)
+        public T Creator<T>(Func<IPerson, T> selector)
         {
             return selector(__Creator);
         }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class IFigureStub : IFigure
+    {
+        public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
+        public IPerson __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector]
+        public T Creator<T>(Func<IPerson, T> selector)
+        {
+            return selector(__Creator);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal interface IPerson : global::ZeroQL.IUnionType
+    {
+        public int Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class IPersonStub : IPerson
+    {
+        public int Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal interface InterfaceThatNeverGetsUsed : global::ZeroQL.IUnionType
+    {
+        public int Id { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class InterfaceThatNeverGetsUsedStub : InterfaceThatNeverGetsUsed
+    {
+        public int Id { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal interface PostContent : global::ZeroQL.IUnionType
+    {
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class PostContentStub : PostContent
     {
     }
 
@@ -662,8 +724,7 @@ namespace GraphQLClient
             "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
             "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
             "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
-            _ => null
-        };
+            _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)};
     }
 
     internal class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
@@ -673,8 +734,22 @@ namespace GraphQLClient
             "FigureContent" => json.Deserialize<FigureContent>(ZeroQLJsonOptions.Options),
             "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
             "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
-            _ => null
-        };
+            _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)};
+    }
+
+    internal class ZeroQLIPersonConverter : InterfaceJsonConverter<IPerson?>
+    {
+        public override IPerson? Deserialize(string typeName, JsonObject json) => typeName switch
+        {
+            "Person" => json.Deserialize<Person>(ZeroQLJsonOptions.Options),
+            _ => json.Deserialize<IPersonStub>(ZeroQLJsonOptions.Options)};
+    }
+
+    internal class ZeroQLInterfaceThatNeverGetsUsedConverter : InterfaceJsonConverter<InterfaceThatNeverGetsUsed?>
+    {
+        public override InterfaceThatNeverGetsUsed? Deserialize(string typeName, JsonObject json) => typeName switch
+        {
+            _ => json.Deserialize<InterfaceThatNeverGetsUsedStub>(ZeroQLJsonOptions.Options)};
     }
 
     internal static class JsonConvertersInitializers
@@ -686,6 +761,8 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind>{{"SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood}, {"GOOD", global::GraphQLClient.UserKind.Good}, {"BAD", global::GraphQLClient.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string>{{global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQLClient.UserKind.Good, "GOOD"}, {global::GraphQLClient.UserKind.Bad, "BAD"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IFigure)] = new ZeroQLIFigureConverter();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IPerson)] = new ZeroQLIPersonConverter();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.InterfaceThatNeverGetsUsed)] = new ZeroQLInterfaceThatNeverGetsUsedConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.PostContent)] = new ZeroQLPostContentConverter();
         }
     }
