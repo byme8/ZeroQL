@@ -69,8 +69,8 @@ public class ParseSchemaTests
             "T[][] UsersMatrix<T>(Func<User, T> selector)",
             "T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)",
             "int[] UsersIds(UserKind kind, int page, int size)",
-            "T? User<T>(int id, Func<User?, T> selector)",
-            "T? Admin<T>(int id, Func<User?, T> selector)",
+            "T? User<T>(int id, Func<User, T> selector)",
+            "T? Admin<T>(int id, Func<User, T> selector)",
             "T Container<T>(Func<TypesContainer, T> selector)"
         };
 

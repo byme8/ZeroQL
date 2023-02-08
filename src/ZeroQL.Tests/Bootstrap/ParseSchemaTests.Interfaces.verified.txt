@@ -16,7 +16,7 @@
         [ZeroQL.GraphQLFieldSelector]
         public T TopLeft<T>(Func<Point, T> selector)
         {
-            return selector(__TopLeft);
+            return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
         }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
@@ -25,7 +25,7 @@
         [ZeroQL.GraphQLFieldSelector]
         public T BottomRight<T>(Func<Point, T> selector)
         {
-            return selector(__BottomRight);
+            return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
 
         public double Perimeter { get; set; }
@@ -41,7 +41,7 @@
         [ZeroQL.GraphQLFieldSelector]
         public T Center<T>(Func<Point, T> selector)
         {
-            return selector(__Center);
+            return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
 
         public double Radius { get; set; }

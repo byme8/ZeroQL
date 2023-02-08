@@ -549,7 +549,7 @@ public static class GraphQLGenerator
         var name = GetPropertyName(field.Name, field.TypeDefinition);
         var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
 
-        var funcType = GetPropertyFuncType(field.TypeDefinition);
+        var funcType = GetPropertyFuncType(field.TypeDefinition, true);
         var selectorParameter = Parameter(Identifier("selector")).WithType(ParseTypeName($"Func<{funcType}, T>"));
 
         var list = SeparatedList(parameters);
@@ -628,38 +628,45 @@ public static class GraphQLGenerator
         }
     }
 
-    private static string GetPropertyFuncType(TypeDefinition typeDefinition)
+    private static string GetPropertyFuncType(TypeDefinition typeDefinition, bool ignoreNullable)
     {
         switch (typeDefinition)
         {
             case ObjectTypeDefinition:
             case ScalarTypeDefinition:
             case EnumTypeDefinition:
+                var typeName = typeDefinition.Name;
+                if (ignoreNullable)
+                {
+                    return typeName;
+                }
+
                 return typeDefinition.Name + typeDefinition.NullableAnnotation();
             case ListTypeDefinition type:
-                return GetPropertyFuncType(type.ElementTypeDefinition);
+                return GetPropertyFuncType(type.ElementTypeDefinition, ignoreNullable);
             default:
                 throw new NotImplementedException();
         }
     }
 
-    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition)
+    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition, string? parentFieldName = null)
     {
+        var fieldNameToReport = (parentFieldName ?? fieldName).TrimStart('_');
         switch (typeDefinition)
         {
             case ScalarTypeDefinition:
             case EnumTypeDefinition:
                 return fieldName;
             case ObjectTypeDefinition { CanBeNull: true }:
-                return $"{fieldName} != default ? selector({fieldName}) : default";
+                return $"{fieldName} is null ? default : selector({fieldName})";
             case ObjectTypeDefinition { CanBeNull: false }:
-                return $"selector({fieldName})";
+                return $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : selector({fieldName})";
             case ListTypeDefinition { ElementTypeDefinition: ScalarTypeDefinition or EnumTypeDefinition }:
                 return fieldName;
             case ListTypeDefinition { CanBeNull: true } type:
-                return $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
+                return $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
             case ListTypeDefinition { CanBeNull: false } type:
-                return $"{fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition)}).ToArray()";
+                return $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : {fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
             default:
                 throw new NotImplementedException();
         }
