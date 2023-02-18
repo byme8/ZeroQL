@@ -60,15 +60,14 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var uniqId = Guid.NewGuid().ToString("N");
-        var source = GraphQLSourceResolver.Resolve(semanticModel, uniqId, requestLikeContext);
+        var source = GraphQLSourceResolver.Resolve(semanticModel, requestLikeContext);
 
         if (context.CancellationToken.IsCancellationRequested)
         {
             return;
         }
 
-        context.AddSource($"ZeroQLModuleInitializer.{uniqId}.g.cs", source);
+        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.OperationHash}.g.cs", source);
     }
 
     private bool FindGraphQLRequests(SyntaxNode node, CancellationToken cancellationToken)

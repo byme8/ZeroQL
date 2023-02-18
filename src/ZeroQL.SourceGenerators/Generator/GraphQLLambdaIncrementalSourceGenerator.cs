@@ -56,10 +56,8 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var uniqId = Guid.NewGuid().ToString("N");
         var source = GraphQLSourceResolver.Resolve(
             semanticModel,
-            uniqId,
             lambdaContext);
 
         if (context.CancellationToken.IsCancellationRequested)
@@ -67,7 +65,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        context.AddSource($"ZeroQLModuleInitializer.{uniqId}.g.cs", source);
+        context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.OperationHash}.g.cs", source);
     }
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)

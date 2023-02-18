@@ -86,7 +86,7 @@ public static class TestExtensions
         return bytes;
     }
 
-    public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, ISourceGenerator generator)
+    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project, ISourceGenerator generator)
     {
         var compilation = await project.GetCompilationAsync();
 
@@ -94,10 +94,10 @@ public static class TestExtensions
             .RunGenerators(compilation!);
 
         var result = driver.GetRunResult();
-        return result.Diagnostics.ToArray();
+        return result;
     }
 
-    public static async Task<Diagnostic[]?> ApplyGenerator(this Project project, IIncrementalGenerator generator)
+    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project, IIncrementalGenerator generator)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
 
@@ -106,7 +106,7 @@ public static class TestExtensions
             .RunGenerators(projectCompilation!);
 
         var result = driver.GetRunResult();
-        return result.Diagnostics.Where(o => o.Severity == DiagnosticSeverity.Error).ToArray();
+        return result;
     }
 
     public static async Task<Project> RemoveSyntaxTreesFromReferences(this Project project)

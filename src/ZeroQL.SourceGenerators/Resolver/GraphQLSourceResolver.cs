@@ -9,7 +9,6 @@ public class GraphQLSourceResolver
 {
     public static string Resolve(
         SemanticModel semanticModel,
-        string uniqId,
         GraphQLSourceGenerationContext context)
     {
         var graphQLInputTypeSafeName = context.GraphQLMethodInputSymbol.ToSafeGlobalName();
@@ -31,7 +30,7 @@ using ZeroQL.Internal;
 namespace {semanticModel.Compilation.Assembly.Name}
 {{
     {SourceGeneratorInfo.CodeGenerationAttribute}
-    internal static class ZeroQLModuleInitializer_{uniqId}
+    internal static class ZeroQLModuleInitializer_{context.OperationHash}
     {{
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()

@@ -143,7 +143,7 @@ public static class Utils
         };
     }
 
-    public static INamedTypeSymbol GetNamedTypeSymbol(this ISymbol info)
+    public static INamedTypeSymbol? GetNamedTypeSymbol(this ISymbol info)
     {
         switch (info)
         {
@@ -180,9 +180,14 @@ public static class Utils
             return anonymousType.ToDisplayString();
         }
 
-        if (symbol is INamedTypeSymbol { SpecialType: SpecialType.System_Object } namedTypeSymbol)
+        if (symbol is INamedTypeSymbol { SpecialType: SpecialType.System_Object })
         {
             return "object?";
+        }
+
+        if (symbol is IParameterSymbol parameterSymbol)
+        {
+            return parameterSymbol.Type.ToGlobalName();
         }
 
         var name = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

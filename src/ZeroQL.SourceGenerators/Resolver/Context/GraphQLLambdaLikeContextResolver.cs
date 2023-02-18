@@ -70,6 +70,11 @@ public class GraphQLLambdaLikeContextResolver
         }
 
         var graphQLMethodInputType = GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
+        if (graphQLMethodInputType is null)
+        {
+            return new Error("Could not find input type");
+        }
+        
         var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType
             ? graphQLMethodInputType.BaseType!
             : graphQLMethodInputType;
@@ -158,7 +163,7 @@ public class GraphQLLambdaLikeContextResolver
     }
 
 
-    private static INamedTypeSymbol GetInputSymbol(IMethodSymbol lambdaSymbol, Compilation compilation)
+    private static INamedTypeSymbol? GetInputSymbol(IMethodSymbol lambdaSymbol, Compilation compilation)
     {
         if (lambdaSymbol.Parameters.Length == 1)
         {

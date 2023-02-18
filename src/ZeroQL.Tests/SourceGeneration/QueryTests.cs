@@ -1,6 +1,7 @@
 using FluentAssertions;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
+using ZeroQL.SourceGenerators.Generator;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
@@ -301,5 +302,14 @@ public class QueryTests : IntegrationTest
 
         var response = await project.Execute();
         await Verify(response);
+    }
+    
+    [Fact]
+    public async Task LambdaModuleInitializerGenerated()
+    {
+        var result = await TestProject.Project
+            .ApplyGenerator(new GraphQLLambdaIncrementalSourceGenerator());
+
+        await Verify(result.GeneratedTrees.Select(o => o.GetText().ToString()));
     }
 }
