@@ -14,7 +14,7 @@ public class FileUploadTests : IntegrationTest
         var graphqlQuery = @"mutation ($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
         result.Data.Should().Be(42);
@@ -27,7 +27,7 @@ public class FileUploadTests : IntegrationTest
         var graphqlQuery = @"mutation ($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
         result.Data.Should().Be(42);
@@ -40,7 +40,7 @@ public class FileUploadTests : IntegrationTest
         var graphqlQuery = @"mutation ($file: Upload!) { addMyProfileImage(file: $file)}";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
         result.Data.Should().Be(42);
@@ -60,8 +60,8 @@ public class FileUploadTests : IntegrationTest
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
-                (TestProject.PLACE_TO_REPLACE, usersVariable), 
-                (TestProject.FULL_ME_QUERY, csharpQuery));
+                (TestProject.PlaceToReplace, usersVariable), 
+                (TestProject.FullMeQuery, csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
         result.Data.Should().Be(84);

@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Xunit;
 using ZeroQL.Tests.CLI;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
@@ -49,7 +48,7 @@ public class PersistentQueryTest
                 ));
 
         var result = await project.Validate(query, false);
-        result.Errors
+        result.Errors!
             .Select(o => o.Message)
             .Should()
             .Contain("PersistedQueryNotFound");
@@ -60,7 +59,7 @@ public class PersistentQueryTest
     [Fact]
     public async Task CanSendPersistedQueryWhenServerHasIt()
     {
-        var cli = new CLITests();
+        var cli = new CliTests();
         var command = await cli.ExtractMutationAndQuery();
 
         var context = await RunServer(10_001, command.Output);
@@ -91,8 +90,8 @@ public class PersistentQueryTest
             Port = port
         };
 
-        var server = Program.StartServer(context);
-        if (!await Program.VerifyServiceIsRunning(context!))
+        _ = Program.StartServer(context);
+        if (!await Program.VerifyServiceIsRunning(context))
         {
             throw new InvalidOperationException("Server failed to bootstrap");
         }

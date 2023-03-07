@@ -1,4 +1,4 @@
-namespace ZeroQL.TestApp.Models;
+namespace ZeroQL.TestApp;
 
 public record UserModel
 {
@@ -7,7 +7,7 @@ public record UserModel
         
     }
     
-    public UserModel(string firstName, string lastName, string role)
+    public UserModel(string firstName, string lastName, string? role)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -26,7 +26,7 @@ public record UserModel
         init;
     }
 
-    public string Role
+    public string? Role
     {
         get;
         init;

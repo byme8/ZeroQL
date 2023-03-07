@@ -6,8 +6,6 @@ using ZeroQL.Bootstrap;
 using ZeroQL.Internal;
 using ZeroQL.Internal.Enums;
 
-#pragma warning disable CS8618
-
 namespace ZeroQL.CLI.Commands;
 
 [Command("generate", Description = "Generates C# classes from graphql file.")]

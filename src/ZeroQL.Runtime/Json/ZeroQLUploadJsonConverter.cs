@@ -9,7 +9,7 @@ public class ZeroQLUploadJsonConverter : JsonConverter<Upload>
     public override Upload Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
-        JsonSerializerOptions options) => null;
+        JsonSerializerOptions options) => null!;
 
     public override void Write(
         Utf8JsonWriter writer,

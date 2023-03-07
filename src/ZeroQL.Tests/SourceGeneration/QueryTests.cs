@@ -35,7 +35,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -47,9 +47,9 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { user(id: 10) { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var result = await project.Validate(graphqlQuery);
+        await project.Validate(graphqlQuery);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -70,7 +70,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => q.Me(o => o.FirstName))";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
@@ -84,7 +84,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => o)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         diagnostics.Should()
@@ -97,7 +97,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => o.ToString())";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
         diagnostics.Should()
@@ -110,7 +110,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "q => q.Me(o => o.FirstName)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
@@ -124,7 +124,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "new { Id = 1}, (i, q) => q.Me(o => o.FirstName)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
@@ -139,10 +139,10 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
-        var queryPreview = diagnostics!.First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
+        var queryPreview = diagnostics.First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
 
         queryPreview.GetMessage().Should().Be(graphqlQuery);
     }
@@ -154,7 +154,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -166,7 +166,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { firstName lastName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -178,7 +178,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"{ m1: me { firstName lastName } m2: me { firstName lastName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -190,7 +190,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { user(id: 42) { firstName lastName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -202,7 +202,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { me { userKind } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -215,7 +215,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, $"{arguments}, {csharpQuery}"));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, $"{arguments}, {csharpQuery}"));
 
         await project.Validate(graphqlQuery);
     }
@@ -227,7 +227,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query { usersIds(kind: GOOD, page: 0, size: 10)}";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -239,7 +239,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"query Me{ me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, @"""Me"", " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"""Me"", " + csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -250,7 +250,7 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => o.FirstName)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, @"nameof(Execute), " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(Execute), " + csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
@@ -264,7 +264,7 @@ public class QueryTests : IntegrationTest
         var graphqlQuery = @"mutation { doError}";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
         var response = await project.Validate(graphqlQuery, false);
         
@@ -282,7 +282,7 @@ public class QueryTests : IntegrationTest
                 """;
         
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
         var response = await project.Execute();
 
@@ -298,7 +298,7 @@ public class QueryTests : IntegrationTest
         """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
         var response = await project.Execute();
         await Verify(response);

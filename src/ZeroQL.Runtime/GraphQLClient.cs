@@ -17,7 +17,7 @@ public interface IGraphQLClient
 
     Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,
-        Func<TVariables?, TOperationType?, TResult?> queryMapper,
+        Func<TVariables?, TOperationType, TResult?> queryMapper,
         string queryKey,
         CancellationToken cancellationToken = default);
 }
@@ -47,7 +47,7 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 
     public async Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,
-        Func<TVariables?, TOperationType?, TResult?> queryMapper,
+        Func<TVariables?, TOperationType, TResult?> queryMapper,
         string queryKey,
         CancellationToken cancellationToken = default)
     {
@@ -62,7 +62,7 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
         }
 
-        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data), result.Errors,
+        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data!), result.Errors,
             result.Extensions);
     }
 

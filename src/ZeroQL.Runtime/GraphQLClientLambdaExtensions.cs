@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ZeroQL;
 
+// ReSharper disable once CheckNamespace
 public static class GraphQLClientRequestExtensions
 {
     public static async Task<GraphQLResult<TResult>> Execute<TQuery, TResult>(
@@ -12,7 +13,7 @@ public static class GraphQLClientRequestExtensions
     {
         return await client.Execute<GraphQL<TQuery, TResult>, TQuery, TResult>(
             request,
-            (i, q) => request.Execute(q),
+            (_, q) => request.Execute(q),
             request.GetType().Name,
             cancellationToken);
     }
@@ -51,7 +52,7 @@ public static class GraphQLClientLambdaExtensions
     {
         return await client.Execute<Unit, TQuery, TResult>(
             null,
-            (i, q) => query(q),
+            (_, q) => query(q),
             queryKey,
             cancellationToken);
     }
@@ -64,7 +65,7 @@ public static class GraphQLClientLambdaExtensions
     {
         return await client.Execute<Unit, TQuery, TResult>(
             null,
-            (i, q) => query(q),
+            (_, q) => query(q),
             queryKey,
             cancellationToken);
     }
@@ -99,7 +100,7 @@ public static class GraphQLClientLambdaExtensions
     {
         return await client.Execute<Unit, TMutation, TResult>(
             null,
-            (i, q) => query(q),
+            (_, q) => query(q),
             queryKey,
             cancellationToken);
     }
@@ -112,7 +113,7 @@ public static class GraphQLClientLambdaExtensions
     {
         return await client.Execute<Unit, TMutation, TResult>(
             null,
-            (i, q) => query(q), queryKey,
+            (_, q) => query(q), queryKey,
             cancellationToken);
     }
 }

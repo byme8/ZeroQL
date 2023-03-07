@@ -6,7 +6,7 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.CLI;
 
-public class CLITests
+public class CliTests
 {
     [Fact]
     public async Task Generate_CodeShouldCompile()

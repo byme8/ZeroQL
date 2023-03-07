@@ -20,7 +20,7 @@ public class DateTests : IntegrationTest
         """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FULL_LINE, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
         var response = await project.Execute();
         await Verify(response)

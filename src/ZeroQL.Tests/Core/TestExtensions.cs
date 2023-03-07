@@ -121,7 +121,7 @@ public static class TestExtensions
             .Select(o =>
             {
                 var memoryStream = new MemoryStream();
-                o.Emit(memoryStream);
+                o!.Emit(memoryStream);
                 return memoryStream.ToArray();
             })
             .ToArray();

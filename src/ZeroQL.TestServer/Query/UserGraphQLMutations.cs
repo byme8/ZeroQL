@@ -66,7 +66,7 @@ public class UserGraphQLMutations
         return sum;
     }
 
-    public async Task<int> AddValues(
+    public Task<int> AddValues(
         string text,
         byte value1,
         byte? value2,
@@ -102,6 +102,6 @@ public class UserGraphQLMutations
         DateTimeOffset? value32
     )
     {
-        return 1;
+        return Task.FromResult(1);
     }
 }

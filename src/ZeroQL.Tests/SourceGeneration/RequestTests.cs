@@ -17,7 +17,7 @@ public class RequestTests : IntegrationTest
         var graphqlQuery = "query GetUserById($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         await project.Validate(graphqlQuery);
     } 
@@ -29,7 +29,7 @@ public class RequestTests : IntegrationTest
         var graphqlQuery = "query GetUserByIdExpression($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
@@ -41,7 +41,7 @@ public class RequestTests : IntegrationTest
         var graphqlQuery = "mutation AddUser($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { id } }";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         dynamic response = await project.Validate(graphqlQuery);
         string id = response.Data;
@@ -56,7 +56,7 @@ public class RequestTests : IntegrationTest
         var graphqlQuery = "mutation AddAvatar($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         dynamic response = await project.Validate(graphqlQuery);
         int id = response.Data;
@@ -70,7 +70,7 @@ public class RequestTests : IntegrationTest
         var csharpQuery = "await qlClient.Execute(new GetUserById(1));";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryRequestAnalyzer());
         diagnostics!.Select(o => o.Id)
@@ -83,7 +83,7 @@ public class RequestTests : IntegrationTest
         var csharpQuery = "await qlClient.Execute(new GetUserByIdWithLocalFunction(1));";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         var response = await project.Execute();
 

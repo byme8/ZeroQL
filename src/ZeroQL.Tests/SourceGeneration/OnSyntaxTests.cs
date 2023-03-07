@@ -28,7 +28,7 @@ public class OnSyntaxTests : IntegrationTest
                 """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var result = await project.Execute();
 
@@ -52,7 +52,7 @@ public class OnSyntaxTests : IntegrationTest
                 """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var result = await project.Execute();
 
@@ -72,7 +72,7 @@ public class OnSyntaxTests : IntegrationTest
                 """;
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzer(new QueryOnSyntaxAnalyzer());
 

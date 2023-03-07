@@ -14,7 +14,7 @@ public class CancellationTokenTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => o.FirstName), cancellationToken";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
         var cancellationToken = new CancellationTokenSource();
         var response = await project.Execute(cancellationToken.Token);
@@ -28,7 +28,7 @@ public class CancellationTokenTests : IntegrationTest
         var csharpQuery = "static q => q.LongOperation, cancellationToken";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (MeQuery, csharpQuery));
 
         var cancellationToken = new CancellationTokenSource();
         var response = project.Execute(cancellationToken.Token);
@@ -52,7 +52,7 @@ public class CancellationTokenTests : IntegrationTest
         var csharpQuery = "Mutation(static m => m.AddUser(\"Jon\", \"Smith\", o => o.FirstName), cancellationToken)";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_ME_QUERY, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullMeQuery, csharpQuery));
 
         var cancellationToken = new CancellationTokenSource();
         var response = await project.Execute(cancellationToken.Token);
@@ -66,7 +66,7 @@ public class CancellationTokenTests : IntegrationTest
         var csharpQuery = "await qlClient.Execute(new GetUserById(1), cancellationToken);";
 
         var project = await Project
-            .ReplacePartOfDocumentAsync("Program.cs", (FULL_CALL, csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
         var cancellationToken = new CancellationTokenSource();
         var response = await project.Execute(cancellationToken.Token);

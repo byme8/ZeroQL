@@ -37,7 +37,7 @@ public abstract class InterfaceJsonConverter<TValue> : JsonConverter<TValue>
         switch (value)
         {
             case null:
-                JsonSerializer.Serialize(writer, default, options);
+                JsonSerializer.Serialize(writer, default!, options);
                 break;
             default:
             {

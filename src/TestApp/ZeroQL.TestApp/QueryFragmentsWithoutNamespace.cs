@@ -1,7 +1,8 @@
 using GraphQL.TestServer;
 using ZeroQL;
-using ZeroQL.TestApp.Models;
+using ZeroQL.TestApp;
 
+// ReSharper disable once CheckNamespace
 public static partial class QueryFragmentsWithoutNamespace
 {
     [GraphQLFragment]

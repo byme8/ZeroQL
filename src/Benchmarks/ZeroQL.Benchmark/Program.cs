@@ -16,7 +16,7 @@ var serverContext = new ZeroQL.TestServer.Program.ServerContext();
 _ = ZeroQL.TestServer.Program.StartServer(serverContext);
 await ZeroQL.TestServer.Program.VerifyServiceIsRunning(serverContext);
 
-var benchmark = new RawVSZeroQL();
+var benchmark = new RawVsZeroQL();
 var raw = await benchmark.Raw();
 var strawberry = await benchmark.StrawberryShake();
 var zeroQLLambda = await benchmark.ZeroQLLambda();
@@ -36,7 +36,7 @@ if (!File.Exists(Generation.SchemaFile))
 }
 
 var switcher = new BenchmarkSwitcher(new[] {
-    typeof(RawVSZeroQL),
+    typeof(RawVsZeroQL),
     typeof(Generation),
 });
 
@@ -46,7 +46,7 @@ switcher.Run(args);
 ZeroQL.TestServer.Program.StopServer(serverContext);
 
 [MemoryDiagnoser]
-public class RawVSZeroQL
+public class RawVsZeroQL
 {
     private readonly JsonSerializerOptions options = new()
     {
@@ -63,7 +63,7 @@ public class RawVSZeroQL
     private readonly StrawberryShakeTestServerClient strawberryShake;
     private readonly Upload upload;
 
-    public RawVSZeroQL()
+    public RawVsZeroQL()
     {
         httpClient = new ImmortalHttpClientForStrawberryShake();
         httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");

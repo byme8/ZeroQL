@@ -8,7 +8,7 @@ namespace ZeroQL.TestServer;
 
 public class Program
 {
-    public const string TEST_SERVER_URL_TEMPLATE = "http://localhost:{0}/graphql";
+    public const string TestServerUrlTemplate = "http://localhost:{0}/graphql";
 
     public static async Task Main(string[] args)
     {
@@ -72,7 +72,7 @@ public class Program
         {
             try
             {
-                var response = await httpClient.GetAsync(string.Format(TEST_SERVER_URL_TEMPLATE, context.Port) + "?sdl");
+                var response = await httpClient.GetAsync(string.Format(TestServerUrlTemplate, context.Port) + "?sdl");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     return true;

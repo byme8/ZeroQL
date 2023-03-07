@@ -30,7 +30,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
                 PersistedQuery = new GraphQLPersistedQueryExtension
                 {
                     Version = 1,
-                    SHA256Hash = queryInfo.Hash
+                    Sha256Hash = queryInfo.Hash
                 }
             }
         };

@@ -16,6 +16,7 @@ public record ID(string Value)
     public static implicit operator string(ID id) => id.Value;
 }
 
+// ReSharper disable once InconsistentNaming
 public class ZeroQLIDJsonConverter : JsonConverter<ID>
 {
     public override ID? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
