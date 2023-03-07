@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using ZeroQL.Internal;
 
 namespace ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -17,7 +18,7 @@ public class GraphQLSourceGenerationContext
         INamedTypeSymbol uploadType,
         UploadInfoByType[] uploadProperties)
     {
-        Key = key;
+        Key = QueryKey.Normalize(key);
         UploadType = uploadType;
         OperationName = operationName;
         OperationType = operationType;

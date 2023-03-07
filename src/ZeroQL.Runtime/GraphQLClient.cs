@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ZeroQL.Internal;
 using ZeroQL.Pipelines;
 using ZeroQL.Stores;
 
@@ -51,12 +52,13 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
         string queryKey,
         CancellationToken cancellationToken = default)
     {
-        if (!GraphQLQueryStore<TOperationType>.Executor.TryGetValue(queryKey, out var queryRunner))
+        var normalizedQueryKey = QueryKey.Normalize(queryKey);
+        if (!GraphQLQueryStore<TOperationType>.Executor.TryGetValue(normalizedQueryKey, out var queryRunner))
         {
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
-        var result = await queryRunner.Invoke(this, queryKey, variables, cancellationToken);
+        var result = await queryRunner.Invoke(this, normalizedQueryKey, variables, cancellationToken);
         if (result.Errors?.Any() ?? false)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);

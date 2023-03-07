@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -15,7 +14,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var invocations = context.SyntaxProvider
-            .CreateSyntaxProvider(FindMethods, (c, ct) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
+            .CreateSyntaxProvider(FindMethods, (c, _) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
         var collectedInvocations = invocations.Collect();
 
@@ -42,9 +41,8 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax? invocation, SemanticModel? semanticModel, HashSet<string> processed)
+    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax invocation, SemanticModel semanticModel, HashSet<string> processed)
     {
-
         var resolver = new GraphQLLambdaLikeContextResolver();
         var (lambdaContext, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
         if (error)

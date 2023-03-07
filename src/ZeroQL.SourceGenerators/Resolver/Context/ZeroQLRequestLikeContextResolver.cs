@@ -9,13 +9,13 @@ public class ZeroQLRequestLikeContextResolver
 {
     public Result<GraphQLSourceGenerationContext> Resolve(RecordDeclarationSyntax record, SemanticModel semanticModel, CancellationToken cancellationToken)
     {
-        var key = record.Identifier.Text;
         var possibleRecordType = semanticModel.GetDeclaredSymbol(record);
         if (possibleRecordType is not INamedTypeSymbol recordType)
         {
             return new Error("Could not resolve record type");
         }
 
+        var key = recordType.ToDisplayString();
         if (record.BaseList!.Types.First().Type is not GenericNameSyntax genericName)
         {
             return new Error("The base type must be a generic type");
