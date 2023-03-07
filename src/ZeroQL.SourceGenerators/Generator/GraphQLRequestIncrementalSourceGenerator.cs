@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -18,14 +20,27 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(FindGraphQLRequests,
                 (c, ct) => (Record: (RecordDeclarationSyntax)c.Node, c.SemanticModel));
 
-        context.RegisterImplementationSourceOutput(invocations, (sourceContext, data) =>
-            Utils.ErrorWrapper(sourceContext, data.Record, () => GenerateSource(sourceContext, data)));
+        var collectedInvocations = invocations.Collect();
+
+        context.RegisterImplementationSourceOutput(collectedInvocations, GenerateSource);
     }
 
     private void GenerateSource(SourceProductionContext context,
-        (RecordDeclarationSyntax Record, SemanticModel SemanticModel) input)
+        ImmutableArray<(RecordDeclarationSyntax Record, SemanticModel SemanticModel)> invocations)
     {
-        var (record, semanticModel) = input;
+        var processed = new HashSet<string>();
+        foreach (var input in invocations)
+        {
+            var (record, semanticModel) = input;
+            Utils.ErrorWrapper(
+                context,
+                record,
+                () => GenerateFile(context, semanticModel, record, processed));
+        }
+    }
+
+    private void GenerateFile(SourceProductionContext context, SemanticModel semanticModel, RecordDeclarationSyntax record, HashSet<string> processed)
+    {
         var recordSymbol = semanticModel.GetDeclaredSymbol(record);
         var graphQLRequest = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.GraphQL`2");
 
@@ -67,6 +82,12 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
+        if (processed.Contains(requestLikeContext.OperationHash))
+        {
+            return;
+        }
+
+        processed.Add(requestLikeContext.OperationHash);
         context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.OperationHash}.g.cs", source);
     }
 

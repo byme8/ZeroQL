@@ -17,7 +17,6 @@ public static class TestProject
 
     static TestProject()
     {
-        VerifyNodaTime.Enable();
         var manager = new AnalyzerManager();
         manager.GetProject(@"../../../../TestApp/ZeroQL.TestApp/ZeroQL.TestApp.csproj");
         Workspace = manager.GetWorkspace();

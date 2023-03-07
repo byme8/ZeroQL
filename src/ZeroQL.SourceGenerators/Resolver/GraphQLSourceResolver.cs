@@ -27,6 +27,8 @@ using ZeroQL.Stores;
 using ZeroQL.Json;
 using ZeroQL.Internal;
 
+#nullable enable
+
 namespace {semanticModel.Compilation.Assembly.Name}
 {{
     {SourceGeneratorInfo.CodeGenerationAttribute}
@@ -44,9 +46,9 @@ namespace {semanticModel.Compilation.Assembly.Name}
             }};
         }}
 
-        public static async Task<GraphQLResult<{context.QueryTypeName}>> Execute(IGraphQLClient qlClient, string queryKey, object variablesObject, CancellationToken cancellationToken)
+        public static async Task<GraphQLResult<{context.QueryTypeName}>> Execute(IGraphQLClient qlClient, string queryKey, object? variablesObject, CancellationToken cancellationToken)
         {{
-            var variables = ({context.RequestExecutorInputSymbol.ToGlobalName()})variablesObject;
+            var variables = ({context.RequestExecutorInputSymbol.ToGlobalName()})variablesObject!;
             var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{context.QueryTypeName}>(qlClient.HttpClient, queryKey, variablesObject, cancellationToken, queryRequest => 
             {{
                 {GraphQLUploadResolver.GenerateRequestPreparations(graphQLInputTypeSafeName, typeInfo)}

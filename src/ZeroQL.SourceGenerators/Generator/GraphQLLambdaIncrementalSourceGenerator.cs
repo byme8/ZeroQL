@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,19 +17,33 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         var invocations = context.SyntaxProvider
             .CreateSyntaxProvider(FindMethods, (c, ct) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
-        context.RegisterImplementationSourceOutput(invocations, (sourceContext, data) => 
-            Utils.ErrorWrapper(sourceContext, data.Invocation,() => GenerateSource(sourceContext, data)));
+        var collectedInvocations = invocations.Collect();
+
+        context.RegisterImplementationSourceOutput(collectedInvocations, GenerateSource);
     }
-    
+
     private void GenerateSource(
         SourceProductionContext context,
-        (InvocationExpressionSyntax Invocation, SemanticModel SemanticModel) input)
+        ImmutableArray<(InvocationExpressionSyntax Invocation, SemanticModel SemanticModel)> invocations)
     {
-        var (invocation, semanticModel) = input;
-        if (context.CancellationToken.IsCancellationRequested)
+        var processed = new HashSet<string>();
+        foreach (var input in invocations)
         {
-            return;
+            var (invocation, semanticModel) = input;
+            if (context.CancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            Utils.ErrorWrapper(
+                context,
+                invocation,
+                () => GenerateFile(context, invocation, semanticModel, processed));
         }
+    }
+
+    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax? invocation, SemanticModel? semanticModel, HashSet<string> processed)
+    {
 
         var resolver = new GraphQLLambdaLikeContextResolver();
         var (lambdaContext, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
@@ -65,6 +81,12 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
+        if (processed.Contains(lambdaContext.OperationHash))
+        {
+            return;
+        }
+
+        processed.Add(lambdaContext.OperationHash);
         context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.OperationHash}.g.cs", source);
     }
 
