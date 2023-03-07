@@ -16,7 +16,9 @@ public class Program
 {
     public static void Stub()
     {
+#pragma warning disable CS0168
         UserModel user;
+#pragma warning restore CS0168
     }
 
     public static async Task Main()
