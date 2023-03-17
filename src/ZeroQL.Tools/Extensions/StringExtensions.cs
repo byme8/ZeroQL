@@ -29,7 +29,7 @@ public static class StringExtensions
     public static string ToPascalCase(this string value)
     {
         return value
-            .Split("_")
+            .Split("_", StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())
             .Join(string.Empty);
     }
