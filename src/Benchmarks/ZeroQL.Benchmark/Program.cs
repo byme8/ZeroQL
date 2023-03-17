@@ -81,14 +81,14 @@ public class RawVsZeroQL
         var responseJson = await response.Content.ReadAsStreamAsync();
         var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-        return qlResponse["data"]["me"]["firstName"].GetValue<string>();
+        return qlResponse!["data"]!["me"]!["firstName"]!.GetValue<string>();
     }
 
     [Benchmark]
     public async Task<string> StrawberryShake()
     {
         var firstname = await strawberryShake.Me.ExecuteAsync();
-        return firstname.Data.Me.FirstName;
+        return firstname.Data!.Me.FirstName;
     }
 
     [Benchmark]

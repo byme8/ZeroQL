@@ -5,9 +5,7 @@
     "strawberryShake": {
       "name": "StrawberryShakeTestServerClient",
       "namespace": "StrawberryShake.TestServerClient",
-      "outputDirectoryName": "Generated",
-      "dependencyInjection": true,
-      "emitGeneratedCode": false
+      "dependencyInjection": true
     }
   }
 }

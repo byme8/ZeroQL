@@ -11,7 +11,10 @@ public static class DownloadHelper
     {
         const string sdlFilename = "schema.graphql";
 
-        if (!force && File.Exists(sdlFilename)) return sdlFilename;
+        if (!force && File.Exists(sdlFilename))
+        {
+            return sdlFilename;
+        }
 
         var client = CreateHttpClient(schemaUri, accessToken, authScheme, ParseHeadersArgument(customHeaders));
         await using var stream = File.OpenWrite(sdlFilename);
@@ -26,7 +29,10 @@ public static class DownloadHelper
     {
         var headers = new Dictionary<string, IEnumerable<string>>();
 
-        if (arguments == null) return headers;
+        if (arguments == null)
+        {
+            return headers;
+        }
 
         foreach (var argument in arguments)
         {
@@ -78,7 +84,10 @@ public static class DownloadHelper
             }
         }
 
-        if (customHeaders is null) return httpClient;
+        if (customHeaders is null)
+        {
+            return httpClient;
+        }
 
         foreach (var headerKey in customHeaders.Keys)
         {

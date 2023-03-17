@@ -6,30 +6,74 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.CLI;
 
-public class CliTests
+public class CliTests : IntegrationTest
 {
+    const string GeneratedFileName = "GraphQL.g.cs";
+    
     [Fact]
-    public async Task Generate_CodeShouldCompile()
+    public async Task GenerateWorksWithUrls()
     {
         using var console = new FakeInMemoryConsole();
-        
+     
+        var tempFile = Path.GetTempFileName();
         var generateCommand = new GenerateCommand
         {
-            Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql",
+            Schema = "http://localhost:10000/graphql",
             Namespace = "GraphQL.TestServer",
             ClientName = "TestServerClient",
-            Output = "../../../../TestApp/ZeroQL.TestApp/Generated/GraphQL.g.cs",
+            Output = tempFile,
             Force = true
         };
 
         await generateCommand.ExecuteAsync(console);
 
         console.ReadErrorString().Should().BeEmpty();
-        await TestProject.Project.CompileToRealAssembly();
+        
+        var project = TestProject.Project;
+
+        var generatedCode = await File.ReadAllTextAsync(tempFile);
+        var document = project.Documents.Single(x => x.Name == GeneratedFileName);
+        
+        await project
+            .RemoveDocument(document.Id)
+            .AddDocument(GeneratedFileName, generatedCode)
+            .Project
+            .CompileToRealAssembly();
     }
     
     [Fact]
-    public async Task Generate_ShouldNotGenerateCodeIfNotNeeded()
+    public async Task GeneratedCodeShouldCompile()
+    {
+        using var console = new FakeInMemoryConsole();
+
+        var tempFile = Path.GetTempFileName();
+        var generateCommand = new GenerateCommand
+        {
+            Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql",
+            Namespace = "GraphQL.TestServer",
+            ClientName = "TestServerClient",
+            Output = tempFile,
+            Force = true
+        };
+
+        await generateCommand.ExecuteAsync(console);
+
+        console.ReadErrorString().Should().BeEmpty();
+        
+        var project = TestProject.Project;
+
+        var generatedCode = await File.ReadAllTextAsync(tempFile);
+        var document = project.Documents.Single(x => x.Name == GeneratedFileName);
+        
+        await project
+            .RemoveDocument(document.Id)
+            .AddDocument(GeneratedFileName, generatedCode)
+            .Project
+            .CompileToRealAssembly();
+    }
+    
+    [Fact]
+    public async Task ShouldNotGenerateCodeIfNotNeeded()
     {
         var outputFile = Path.GetTempFileName();
         
