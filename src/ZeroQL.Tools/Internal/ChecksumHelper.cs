@@ -19,8 +19,8 @@ public static class ChecksumHelper
     /// <returns></returns>
     public static string GenerateChecksumFromSchemaFile(string schemaFile, GraphQlGeneratorOptions options)
     {
-        var bytes = File.ReadAllBytes(schemaFile);
-        var checksum = Checksum(bytes);
+        var text = File.ReadAllText(schemaFile); // Don't use File.ReadAllBytes(), since the file encoding headers (eg. UTF8 BOM) will become a part of the checksum
+        var checksum = Checksum(text);
 
         return AppendOptionsToChecksum(checksum, options);
     }
