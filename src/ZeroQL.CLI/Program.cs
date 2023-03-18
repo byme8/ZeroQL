@@ -5,5 +5,6 @@ await new CliApplicationBuilder()
     .AddCommand<GenerateCommand>()
     .AddCommand<ExtractQueriesCommand>()
     .AddCommand<InitConfigCommand>()
+    .AddCommand<PullSchemaCommand>()
     .Build()
     .RunAsync();

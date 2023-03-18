@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace ZeroQL.Extensions;
 
@@ -50,6 +51,6 @@ public static class StringExtensions
             upperCaseString.Add(char.ToUpper(name[i]));
         }
 
-        return new string(upperCaseString.ToArray());
+        return new string(CollectionsMarshal.AsSpan(upperCaseString));
     }
 }

@@ -21,7 +21,7 @@ public class GenerateCommand : ICommand
     [CommandOption(
         "schema",
         's',
-        Description = "The path or url get the schema file. For example, './schema.graphql' or https://server.com/graphql")]
+        Description = "The path to get the schema file. For example, './schema.graphql'")]
     public string Schema { get; set; }
 
     [CommandOption("namespace", 'n', Description = "The namespace for generated client")]
@@ -41,15 +41,6 @@ public class GenerateCommand : ICommand
 
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]
     public bool Force { get; set; }
-    
-    [CommandOption("token", 't', Description = "Access Token to use when downloading the schema")]
-    public string? AccessToken { get; set; }
-    
-    [CommandOption("auth", 'a', Description = "Auth scheme to use when downloading the schema")]
-    public string? AuthScheme { get; set; }
-    
-    [CommandOption("headers", 'x', Description = "Custom headers to use when downloading the schema. Example: --headers key1=value1 --headers key2=value2")]
-    public IReadOnlyList<string>? CustomHeaders { get; set; }
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
@@ -63,19 +54,6 @@ public class GenerateCommand : ICommand
         if (!validationSuccessful)
         {
             return;
-        }
-
-        if (Uri.TryCreate(Schema, UriKind.Absolute, out var schemaUri))
-        {
-            try
-            {
-                Schema = await schemaUri.DownloadSchema(Force, AccessToken, AuthScheme, CustomHeaders);
-            }
-            catch (Exception e)
-            {
-                await console.Error.WriteLineAsync($"Failed to download schema from {schemaUri}:\n{e}");
-                return;
-            }
         }
 
         if (!File.Exists(Schema))

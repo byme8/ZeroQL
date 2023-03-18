@@ -1,0 +1,219 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+}
+
+"The `Upload` scalar type represents a file upload."
+scalar Upload
+
+"Represents an instant on the global timeline, with nanosecond resolution."
+scalar Instant
+
+"A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.\nA ZonedDateTime is global, in that it maps to a single Instant."
+scalar ZonedDateTime
+
+type Query {
+  longOperation: Int!
+  posts: [PostContent!]!
+  image: ImageContent!
+  text: TextContent!
+  figure: FigureContent!
+  figures: [IFigure!]!
+  circles: [Circle!]!
+  squares: [Square!]!
+  instant: Instant!
+  zonedDateTime: ZonedDateTime!
+  me: User!
+  users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
+  userKinds: [UserKind!]!
+  usersMatrix: [[User!]!]!
+  usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
+  usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
+  user(id: Int!): User
+  usersByIds(ids: [Int!]!): [User!]!
+  userKind(id: Int!): UserKind!
+  admin(id: Int!): User
+  container: TypesContainer!
+}
+
+type Mutation {
+  createInstant(instant: Instant!): Instant!
+  dateTime(dateTime: DateTime!): DateTime!
+  dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
+  timeSpan(timeSpan: TimeSpan!): TimeSpan!
+  dateOnly(dateOnly: Date!): Date!
+  timeOnly(timeOnly: TimeSpan!): TimeSpan!
+  addUser(firstName: String! lastName: String!): User!
+  doError: Int!
+  addUserProfileImage(userId: Int! file: Upload!): Int!
+  addMyProfileImage(file: Upload!): Int!
+  addUsersInfo(users: [UserInfoInput!]!): Int!
+  addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
+}
+
+interface InterfaceThatNeverGetsUsed {
+  id: Int!
+}
+
+type Person implements IPerson {
+  id: Int!
+  firstName: String!
+  lastName: String!
+}
+
+enum UserKind {
+  SUPPER_GOOD
+  GOOD
+  BAD
+}
+
+input UserFilterInput {
+  userKind: UserKind!
+  page: PageInput
+}
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  userKind: UserKind!
+  role: Role
+}
+
+type Square implements IFigure {
+  topLeft: Point!
+  bottomRight: Point!
+  perimeter: Float!
+  creator: IPerson!
+}
+
+type Circle implements IFigure {
+  center: Point!
+  radius: Float!
+  perimeter: Float!
+  creator: IPerson!
+}
+
+interface IFigure {
+  perimeter: Float!
+  creator: IPerson!
+}
+
+type FigureContent {
+  id: Int!
+  figure: IFigure!
+  author: User!
+}
+
+type TextContent {
+  id: Int!
+  text: String!
+  author: User!
+}
+
+type ImageContent {
+  id: Int!
+  imageUrl: String!
+  height: Int!
+  author: User!
+}
+
+union PostContent = FigureContent | TextContent | ImageContent
+
+type TypesContainer {
+  text: String!
+  value1: Byte!
+  value2: Byte
+  value3: Short!
+  value4: Short
+  value5: Int!
+  value6: Int
+  value7: Long!
+  value8: Long
+  value9: Float!
+  value10: Float
+  value11: Float!
+  value12: Float
+  value13: Decimal!
+  value14: Decimal
+  value15: DateTime!
+  value16: DateTime
+  value17: Date!
+  value18: Date
+  value19: UUID!
+  value20: UUID
+  value21: [UUID!]!
+  value22: [UUID!]
+  value23: [UUID!]!
+  value24: [UUID!]
+  value25: [UUID!]!
+  value26: [UUID!]
+  value27: [KeyValuePairOfStringAndString!]!
+  value28: [KeyValuePairOfStringAndString!]
+  value29: KeyValuePairOfStringAndString!
+  value30: KeyValuePairOfStringAndString
+  value31: DateTime!
+  value32: DateTime
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
+
+"The `Date` scalar represents an ISO-8601 compliant date type."
+scalar Date
+
+input UserInfoInput {
+  firstName: String!
+  lastName: String!
+  avatar: Upload!
+}
+
+"The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
+
+"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
+scalar Short
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"The built-in `Decimal` scalar type."
+scalar Decimal
+
+scalar UUID
+
+input KeyValuePairOfStringAndStringInput {
+  key: String!
+  value: String!
+}
+
+type Role {
+  id: Int!
+  name: String!
+}
+
+type KeyValuePairOfStringAndString {
+  key: String!
+  value: String!
+}
+
+interface IPerson {
+  id: Int!
+  firstName: String!
+  lastName: String!
+}
+
+type Point implements IFigure {
+  x: Float!
+  y: Float!
+  perimeter: Float!
+  creator: IPerson!
+}
+
+input PageInput {
+  count: Int!
+  size: Int!
+}
