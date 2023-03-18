@@ -30,14 +30,14 @@ The initial setup:
 dotnet new console -o QLClient
 # go to project folder 
 cd QLClient
-# fetch graphql schema from server(depends on your web server)
-curl http://localhost:10000/graphql?sdl > schema.graphql 
 # create manifest file to track nuget tools
 dotnet new tool-manifest 
 # add ZeroQL.CLI nuget tool
 dotnet tool install ZeroQL.CLI
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
+# fetch graphql schema from server(depends on your web server)
+dotnet zeroql schema pull http://localhost:10000/graphql
 # to bootstrap schema.graphql file from graphql schema
 dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
