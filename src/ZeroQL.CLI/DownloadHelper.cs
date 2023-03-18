@@ -6,57 +6,24 @@ namespace ZeroQL.CLI;
 
 public static class DownloadHelper
 {
-    public static async Task<string> DownloadSchema(this Uri schemaUri, bool force, string? accessToken, string? authScheme,
-        IEnumerable<string>? customHeaders)
+    public static async Task DownloadSchema(
+        Uri schemaUri,
+        string output,
+        string? accessToken,
+        string? authScheme,
+        KeyValuePair<string, string>[]? customHeaders,
+        CancellationToken cancellationToken)
     {
-        const string sdlFilename = "schema.graphql";
-
-        if (!force && File.Exists(sdlFilename))
-        {
-            return sdlFilename;
-        }
-
-        var client = CreateHttpClient(schemaUri, accessToken, authScheme, ParseHeadersArgument(customHeaders));
-        await using var stream = File.OpenWrite(sdlFilename);
-        await IntrospectionClient.Default.DownloadSchemaAsync(client, stream,
-            new CancellationTokenSource(client.Timeout).Token);
-
-        return sdlFilename;
-    }
-
-    private static Dictionary<string, IEnumerable<string>> ParseHeadersArgument(
-        IEnumerable<string?>? arguments)
-    {
-        var headers = new Dictionary<string, IEnumerable<string>>();
-
-        if (arguments == null)
-        {
-            return headers;
-        }
-
-        foreach (var argument in arguments)
-        {
-            var argumentParts = argument?.Trim().Split("=", 2);
-            if (argumentParts?.Length != 2)
-            {
-                continue;
-            }
-
-            var argumentKey = argumentParts[0];
-
-            var argumentValueParts = argumentParts[1].Trim().Split(",");
-
-            _ = headers.TryAdd(argumentKey, argumentValueParts);
-        }
-
-        return headers;
+        var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
+        await using var stream = File.OpenWrite(output);
+        await IntrospectionClient.Default.DownloadSchemaAsync(client, stream, cancellationToken);
     }
 
     private static HttpClient CreateHttpClient(
         Uri uri,
         string? token,
         string? scheme,
-        Dictionary<string, IEnumerable<string>>? customHeaders)
+        KeyValuePair<string, string>[]? customHeaders)
     {
         var httpClient = new HttpClient
         {
@@ -89,11 +56,11 @@ public static class DownloadHelper
             return httpClient;
         }
 
-        foreach (var headerKey in customHeaders.Keys)
+        foreach (var header in customHeaders)
         {
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
-                headerKey,
-                customHeaders[headerKey]);
+                header.Key,
+                header.Value);
         }
 
         return httpClient;

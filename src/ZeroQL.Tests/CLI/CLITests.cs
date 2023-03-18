@@ -6,39 +6,28 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.CLI;
 
+[UsesVerify]
 public class CliTests : IntegrationTest
 {
     const string GeneratedFileName = "GraphQL.g.cs";
     
     [Fact]
-    public async Task GenerateWorksWithUrls()
+    public async Task CanPullSchemaFromRemoteServer()
     {
         using var console = new FakeInMemoryConsole();
      
         var tempFile = Path.GetTempFileName();
-        var generateCommand = new GenerateCommand
+        var pullCommand = new PullSchemaCommand
         {
-            Schema = "http://localhost:10000/graphql",
-            Namespace = "GraphQL.TestServer",
-            ClientName = "TestServerClient",
+            Url = new Uri("http://localhost:10000/graphql"),
             Output = tempFile,
-            Force = true
         };
 
-        await generateCommand.ExecuteAsync(console);
-
+        await pullCommand.ExecuteAsync(console);
         console.ReadErrorString().Should().BeEmpty();
-        
-        var project = TestProject.Project;
 
-        var generatedCode = await File.ReadAllTextAsync(tempFile);
-        var document = project.Documents.Single(x => x.Name == GeneratedFileName);
-        
-        await project
-            .RemoveDocument(document.Id)
-            .AddDocument(GeneratedFileName, generatedCode)
-            .Project
-            .CompileToRealAssembly();
+        var schema = await File.ReadAllTextAsync(tempFile);
+        await Verify(schema);
     }
     
     [Fact]
