@@ -66,7 +66,7 @@ There is a way to simplify the CLI command. The command `` dotnet zeroql config 
 
 Then we can use it like that:
 ``` bash
-dotnet zeroql -c ./zeroql.json
+dotnet zeroql generate -c ./zeroql.json
 ```
 
 # How to use
