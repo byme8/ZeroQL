@@ -53,7 +53,7 @@ As a result, the graphql client will be generated on every build.
 
 ## Config
 
-There is a way to simplify the CLI command. The command `` dotnet zeroql config init `` creates the `` zeroql.josn ``. It may look like that:
+There is a way to simplify the CLI command. The command `` dotnet zeroql config init `` creates the `` zeroql.json ``. It may look like that:
 ``` json
 {
   "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
