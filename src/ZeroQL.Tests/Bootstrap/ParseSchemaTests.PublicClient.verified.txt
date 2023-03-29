@@ -733,34 +733,43 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class KeyValuePairOfStringAndStringInput
     {
+        [JsonPropertyName("key")]
         public string Key { get; set; }
 
+        [JsonPropertyName("value")]
         public string Value { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class PageInput
     {
+        [JsonPropertyName("count")]
         public int Count { get; set; }
 
+        [JsonPropertyName("size")]
         public int Size { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class UserFilterInput
     {
+        [JsonPropertyName("userKind")]
         public UserKind UserKind { get; set; }
 
+        [JsonPropertyName("page")]
         public PageInput? Page { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class UserInfoInput
     {
+        [JsonPropertyName("firstName")]
         public string FirstName { get; set; }
 
+        [JsonPropertyName("lastName")]
         public string LastName { get; set; }
 
+        [JsonPropertyName("avatar")]
         public global::ZeroQL.Upload Avatar { get; set; }
     }
 

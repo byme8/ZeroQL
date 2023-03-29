@@ -33,6 +33,22 @@ internal static class CSharpHelper
                     .ToArray()));
     }
 
+    public static T AddAttribute<T>(this T declarationSyntax, string name, params string[] attributes)
+        where T : MemberDeclarationSyntax
+    {
+        return (T)declarationSyntax
+            .AddAttributeLists(AttributeList()
+                .AddAttributes(Attribute(ParseName(name))
+                    .WithArgumentList(AttributeArgumentList()
+                        .WithArguments(
+                            SeparatedList(attributes
+                                .Select(o => AttributeArgument(
+                                    LiteralExpression(
+                                        SyntaxKind.StringLiteralExpression,
+                                        Literal(o))))
+                                .ToArray())))));
+    }
+
     public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, bool withNullableAnnotation,
         string? defaultValue)
     {

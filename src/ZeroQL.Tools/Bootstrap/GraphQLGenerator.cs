@@ -289,7 +289,8 @@ public static class GraphQLGenerator
             {
                 var fields = o.Properties
                     .Select(property =>
-                        CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue));
+                        CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue)
+                            .AddAttribute(ZeroQLGenerationInfo.GraphQLJsonAttribute, property.GraphQLName));
 
                 return CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
@@ -538,15 +539,7 @@ public static class GraphQLGenerator
         return new MemberDeclarationSyntax[]
         {
             CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
-                .AddAttributeLists(AttributeList()
-                    .AddAttributes(Attribute(
-                            ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))
-                        .WithArgumentList(AttributeArgumentList(
-                            SingletonSeparatedList(
-                                AttributeArgument(
-                                    LiteralExpression(
-                                        SyntaxKind.StringLiteralExpression,
-                                        Literal(field.GraphQLName))))))))
+                .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
         };
     }
 
@@ -571,15 +564,7 @@ public static class GraphQLGenerator
                 IdentifierName(returnType),
                 Identifier(name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttributeLists(AttributeList()
-                .AddAttributes(Attribute(
-                        ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))
-                    .WithArgumentList(AttributeArgumentList(
-                        SingletonSeparatedList(
-                            AttributeArgument(
-                                LiteralExpression(
-                                    SyntaxKind.StringLiteralExpression,
-                                    Literal(field.GraphQLName))))))))
+            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
             .WithParameterList(ParameterList(list));
 
         var body = Block(
