@@ -83,6 +83,8 @@ type Query {
   instant: Instant!
   zonedDateTime: ZonedDateTime!
   me: User!
+  MEWITHSUPPERCASING: User!
+  MeWithPascalCasing: User!
   users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
   userKinds: [UserKind!]!
   usersMatrix: [[User!]!]!

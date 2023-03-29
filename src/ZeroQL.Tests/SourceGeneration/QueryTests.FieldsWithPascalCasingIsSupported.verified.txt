@@ -1,0 +1,6 @@
+﻿{
+  Query: query { MeWithPascalCasing { firstName } },
+  Data: {
+    FirstName: Jon
+  }
+}

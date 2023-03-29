@@ -9,6 +9,7 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TextContent : PostContent
     {
+        [ZeroQL.GraphQLFieldSelector("text")]
         public string Text { get; set; }
     }
 ,
@@ -16,8 +17,10 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class ImageContent : PostContent
     {
+        [ZeroQL.GraphQLFieldSelector("imageUrl")]
         public string ImageUrl { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("height")]
         public int Height { get; set; }
     }
 ,

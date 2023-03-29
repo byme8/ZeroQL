@@ -55,7 +55,7 @@ public class Descriptors
     public static DiagnosticDescriptor OnlyFieldSelectorsAndFragmentsAreAllowed = new(
         nameof(OnlyFieldSelectorsAndFragmentsAreAllowed),
         "Only field selectors and fragments are allowed",
-        "The method doesn't have field selector or fragment attribute and can't be used in the query",
+        "The member doesn't have field selector or fragment attribute and can't be used in the query",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);

@@ -538,6 +538,15 @@ public static class GraphQLGenerator
         return new MemberDeclarationSyntax[]
         {
             CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
+                .AddAttributeLists(AttributeList()
+                    .AddAttributes(Attribute(
+                            ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))
+                        .WithArgumentList(AttributeArgumentList(
+                            SingletonSeparatedList(
+                                AttributeArgument(
+                                    LiteralExpression(
+                                        SyntaxKind.StringLiteralExpression,
+                                        Literal(field.GraphQLName))))))))
         };
     }
 
@@ -563,9 +572,14 @@ public static class GraphQLGenerator
                 Identifier(name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddAttributeLists(AttributeList()
-                .AddAttributes(
-                    Attribute(
-                        ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))))
+                .AddAttributes(Attribute(
+                        ParseName(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))
+                    .WithArgumentList(AttributeArgumentList(
+                        SingletonSeparatedList(
+                            AttributeArgument(
+                                LiteralExpression(
+                                    SyntaxKind.StringLiteralExpression,
+                                    Literal(field.GraphQLName))))))))
             .WithParameterList(ParameterList(list));
 
         var body = Block(
@@ -649,7 +663,8 @@ public static class GraphQLGenerator
         }
     }
 
-    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition, string? parentFieldName = null)
+    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition,
+        string? parentFieldName = null)
     {
         var fieldNameToReport = (parentFieldName ?? fieldName).TrimStart('_');
         switch (typeDefinition)
@@ -660,13 +675,16 @@ public static class GraphQLGenerator
             case ObjectTypeDefinition { CanBeNull: true }:
                 return $"{fieldName} is null ? default : selector({fieldName})";
             case ObjectTypeDefinition { CanBeNull: false }:
-                return $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : selector({fieldName})";
+                return
+                    $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : selector({fieldName})";
             case ListTypeDefinition { ElementTypeDefinition: ScalarTypeDefinition or EnumTypeDefinition }:
                 return fieldName;
             case ListTypeDefinition { CanBeNull: true } type:
-                return $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
+                return
+                    $"{fieldName}?.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
             case ListTypeDefinition { CanBeNull: false } type:
-                return $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : {fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
+                return
+                    $@"{fieldName} is null ? throw new NullReferenceException(""{fieldNameToReport} is null but it should not be null. Schema can be outdated."") : {fieldName}.Select(o => {GetPropertyMethodBody("o", type.ElementTypeDefinition, fieldName)}).ToArray()";
             default:
                 throw new NotImplementedException();
         }
@@ -721,7 +739,10 @@ public static class GraphQLGenerator
             {
                 var type = typeContext.GetTypeDefinition(field.Type);
                 var defaultValue = GetDefaultValue(field);
-                return new FieldDefinition(field.Name.StringValue.FirstToUpper(), type,
+                return new FieldDefinition(
+                    field.Name.StringValue.FirstToUpper(),
+                    field.Name.StringValue,
+                    type,
                     Array.Empty<ArgumentDefinition>(), defaultValue);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
@@ -735,6 +756,7 @@ public static class GraphQLGenerator
                 var type = typeContext.GetTypeDefinition(field.Type);
                 return new FieldDefinition(
                     field.Name.StringValue.FirstToUpper(),
+                    field.Name.StringValue,
                     type,
                     field.Arguments?
                         .Select(arg => new ArgumentDefinition(arg.Name.StringValue,

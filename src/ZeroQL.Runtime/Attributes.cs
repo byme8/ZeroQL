@@ -2,10 +2,12 @@ using System;
 
 namespace ZeroQL;
 
-[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false)]
 public class GraphQLFieldSelector : Attribute
 {
-    
+    public GraphQLFieldSelector(string name)
+    {
+    }
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]

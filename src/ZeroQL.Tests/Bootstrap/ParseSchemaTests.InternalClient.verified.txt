@@ -26,20 +26,22 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
         public Point __Center { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("center")]
         public T Center<T>(Func<Point, T> selector)
         {
             return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
 
+        [ZeroQL.GraphQLFieldSelector("radius")]
         public double Radius { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("creator")]
         public T Creator<T>(Func<IPerson, T> selector)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -49,12 +51,13 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class FigureContent : PostContent
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figure")]
         public IFigure __Figure { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("figure")]
         public T Figure<T>(Func<IFigure, T> selector)
         {
             return __Figure is null ? throw new NullReferenceException("Figure is null but it should not be null. Schema can be outdated.") : selector(__Figure);
@@ -63,7 +66,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
         public User __Author { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("author")]
         public T Author<T>(Func<User, T> selector)
         {
             return __Author is null ? throw new NullReferenceException("Author is null but it should not be null. Schema can be outdated.") : selector(__Author);
@@ -73,16 +76,19 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class ImageContent : PostContent
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("imageUrl")]
         public string ImageUrl { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("height")]
         public int Height { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
         public User __Author { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("author")]
         public T Author<T>(Func<User, T> selector)
         {
             return __Author is null ? throw new NullReferenceException("Author is null but it should not be null. Schema can be outdated.") : selector(__Author);
@@ -92,8 +98,10 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class KeyValuePairOfStringAndString
     {
+        [ZeroQL.GraphQLFieldSelector("key")]
         public string Key { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value")]
         public string Value { get; set; }
     }
 
@@ -103,7 +111,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("CreateInstant")]
         public global::GraphQLClient.Instant __CreateInstant { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("createInstant")]
         public global::GraphQLClient.Instant CreateInstant(global::GraphQLClient.Instant instant)
         {
             return __CreateInstant;
@@ -112,7 +120,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTime")]
         public DateTimeOffset __DateTime { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("dateTime")]
         public DateTimeOffset DateTime(DateTimeOffset dateTime)
         {
             return __DateTime;
@@ -121,7 +129,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateTimeOffset")]
         public DateTimeOffset __DateTimeOffset { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("dateTimeOffset")]
         public DateTimeOffset DateTimeOffset(DateTimeOffset dateTimeOffset)
         {
             return __DateTimeOffset;
@@ -130,7 +138,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeSpan")]
         public TimeSpan __TimeSpan { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("timeSpan")]
         public TimeSpan TimeSpan(TimeSpan timeSpan)
         {
             return __TimeSpan;
@@ -139,7 +147,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("DateOnly")]
         public DateOnly __DateOnly { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("dateOnly")]
         public DateOnly DateOnly(DateOnly dateOnly)
         {
             return __DateOnly;
@@ -148,7 +156,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TimeOnly")]
         public TimeSpan __TimeOnly { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("timeOnly")]
         public TimeSpan TimeOnly(TimeSpan timeOnly)
         {
             return __TimeOnly;
@@ -157,18 +165,19 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUser")]
         public User __AddUser { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("addUser")]
         public T AddUser<T>(string firstName, string lastName, Func<User, T> selector)
         {
             return __AddUser is null ? throw new NullReferenceException("AddUser is null but it should not be null. Schema can be outdated.") : selector(__AddUser);
         }
 
+        [ZeroQL.GraphQLFieldSelector("doError")]
         public int DoError { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
         public int __AddUserProfileImage { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("addUserProfileImage")]
         public int AddUserProfileImage(int userId, global::ZeroQL.Upload file)
         {
             return __AddUserProfileImage;
@@ -177,7 +186,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddMyProfileImage")]
         public int __AddMyProfileImage { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("addMyProfileImage")]
         public int AddMyProfileImage(global::ZeroQL.Upload file)
         {
             return __AddMyProfileImage;
@@ -186,7 +195,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUsersInfo")]
         public int __AddUsersInfo { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("addUsersInfo")]
         public int AddUsersInfo(UserInfoInput[] users)
         {
             return __AddUsersInfo;
@@ -195,7 +204,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddValues")]
         public int __AddValues { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("addValues")]
         public int AddValues(string text, byte value1, byte? value2, short value3, short? value4, int value5, int? value6, long value7, long? value8, double value9, double? value10, double value11, double? value12, decimal value13, decimal? value14, DateTimeOffset value15, DateTimeOffset? value16, DateOnly value17, DateOnly? value18, Guid value19, Guid? value20, Guid[] value21, Guid[]? value22, Guid[] value23, Guid[]? value24, Guid[] value25, Guid[]? value26, KeyValuePairOfStringAndStringInput[] value27, KeyValuePairOfStringAndStringInput[]? value28, KeyValuePairOfStringAndStringInput value29, KeyValuePairOfStringAndStringInput? value30, DateTimeOffset value31, DateTimeOffset? value32)
         {
             return __AddValues;
@@ -205,26 +214,32 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Person : IPerson
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("firstName")]
         public string FirstName { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("lastName")]
         public string LastName { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Point : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("x")]
         public double X { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("y")]
         public double Y { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("creator")]
         public T Creator<T>(Func<IPerson, T> selector)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -234,12 +249,13 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Query : global::ZeroQL.Internal.IQuery
     {
+        [ZeroQL.GraphQLFieldSelector("longOperation")]
         public int LongOperation { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Posts")]
         public PostContent[] __Posts { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("posts")]
         public T[] Posts<T>(Func<PostContent, T> selector)
         {
             return __Posts is null ? throw new NullReferenceException("Posts is null but it should not be null. Schema can be outdated.") : __Posts.Select(o => o is null ? throw new NullReferenceException("Posts is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -248,7 +264,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Image")]
         public ImageContent __Image { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("image")]
         public T Image<T>(Func<ImageContent, T> selector)
         {
             return __Image is null ? throw new NullReferenceException("Image is null but it should not be null. Schema can be outdated.") : selector(__Image);
@@ -257,7 +273,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Text")]
         public TextContent __Text { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("text")]
         public T Text<T>(Func<TextContent, T> selector)
         {
             return __Text is null ? throw new NullReferenceException("Text is null but it should not be null. Schema can be outdated.") : selector(__Text);
@@ -266,7 +282,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figure")]
         public FigureContent __Figure { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("figure")]
         public T Figure<T>(Func<FigureContent, T> selector)
         {
             return __Figure is null ? throw new NullReferenceException("Figure is null but it should not be null. Schema can be outdated.") : selector(__Figure);
@@ -275,7 +291,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figures")]
         public IFigure[] __Figures { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("figures")]
         public T[] Figures<T>(Func<IFigure, T> selector)
         {
             return __Figures is null ? throw new NullReferenceException("Figures is null but it should not be null. Schema can be outdated.") : __Figures.Select(o => o is null ? throw new NullReferenceException("Figures is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -284,7 +300,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Circles")]
         public Circle[] __Circles { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("circles")]
         public T[] Circles<T>(Func<Circle, T> selector)
         {
             return __Circles is null ? throw new NullReferenceException("Circles is null but it should not be null. Schema can be outdated.") : __Circles.Select(o => o is null ? throw new NullReferenceException("Circles is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -293,40 +309,61 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Squares")]
         public Square[] __Squares { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("squares")]
         public T[] Squares<T>(Func<Square, T> selector)
         {
             return __Squares is null ? throw new NullReferenceException("Squares is null but it should not be null. Schema can be outdated.") : __Squares.Select(o => o is null ? throw new NullReferenceException("Squares is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
 
+        [ZeroQL.GraphQLFieldSelector("instant")]
         public global::GraphQLClient.Instant Instant { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("zonedDateTime")]
         public global::GraphQLClient.ZonedDateTime ZonedDateTime { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
         public User __Me { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("me")]
         public T Me<T>(Func<User, T> selector)
         {
             return __Me is null ? throw new NullReferenceException("Me is null but it should not be null. Schema can be outdated.") : selector(__Me);
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("MEWITHSUPPERCASING")]
+        public User __MEWITHSUPPERCASING { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("MEWITHSUPPERCASING")]
+        public T MEWITHSUPPERCASING<T>(Func<User, T> selector)
+        {
+            return __MEWITHSUPPERCASING is null ? throw new NullReferenceException("MEWITHSUPPERCASING is null but it should not be null. Schema can be outdated.") : selector(__MEWITHSUPPERCASING);
+        }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("MeWithPascalCasing")]
+        public User __MeWithPascalCasing { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("MeWithPascalCasing")]
+        public T MeWithPascalCasing<T>(Func<User, T> selector)
+        {
+            return __MeWithPascalCasing is null ? throw new NullReferenceException("MeWithPascalCasing is null but it should not be null. Schema can be outdated.") : selector(__MeWithPascalCasing);
+        }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Users")]
         public User[] __Users { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("users")]
         public T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)
         {
             return __Users is null ? throw new NullReferenceException("Users is null but it should not be null. Schema can be outdated.") : __Users.Select(o => o is null ? throw new NullReferenceException("Users is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
 
+        [ZeroQL.GraphQLFieldSelector("userKinds")]
         public UserKind[] UserKinds { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
         public User[][] __UsersMatrix { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("usersMatrix")]
         public T[][] UsersMatrix<T>(Func<User, T> selector)
         {
             return __UsersMatrix is null ? throw new NullReferenceException("UsersMatrix is null but it should not be null. Schema can be outdated.") : __UsersMatrix.Select(o => o is null ? throw new NullReferenceException("UsersMatrix is null but it should not be null. Schema can be outdated.") : o.Select(o => o is null ? throw new NullReferenceException("o is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray()).ToArray();
@@ -335,7 +372,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByKind")]
         public User[] __UsersByKind { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("usersByKind")]
         public T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)
         {
             return __UsersByKind is null ? throw new NullReferenceException("UsersByKind is null but it should not be null. Schema can be outdated.") : __UsersByKind.Select(o => o is null ? throw new NullReferenceException("UsersByKind is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -344,7 +381,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersIds")]
         public int[] __UsersIds { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("usersIds")]
         public int[] UsersIds(UserKind kind, int page, int size)
         {
             return __UsersIds;
@@ -353,7 +390,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("User")]
         public User __User { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("user")]
         public T? User<T>(int id, Func<User, T> selector)
         {
             return __User is null ? default : selector(__User);
@@ -362,7 +399,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersByIds")]
         public User[] __UsersByIds { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("usersByIds")]
         public T[] UsersByIds<T>(int[] ids, Func<User, T> selector)
         {
             return __UsersByIds is null ? throw new NullReferenceException("UsersByIds is null but it should not be null. Schema can be outdated.") : __UsersByIds.Select(o => o is null ? throw new NullReferenceException("UsersByIds is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -371,7 +408,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UserKind")]
         public UserKind __UserKind { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("userKind")]
         public UserKind UserKind(int id)
         {
             return __UserKind;
@@ -380,7 +417,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Admin")]
         public User __Admin { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("admin")]
         public T? Admin<T>(int id, Func<User, T> selector)
         {
             return __Admin is null ? default : selector(__Admin);
@@ -389,7 +426,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Container")]
         public TypesContainer __Container { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("container")]
         public T Container<T>(Func<TypesContainer, T> selector)
         {
             return __Container is null ? throw new NullReferenceException("Container is null but it should not be null. Schema can be outdated.") : selector(__Container);
@@ -399,8 +436,10 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Role
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("name")]
         public string Name { get; set; }
     }
 
@@ -410,7 +449,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
         public Point __TopLeft { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("topLeft")]
         public T TopLeft<T>(Func<Point, T> selector)
         {
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
@@ -419,18 +458,19 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
         public Point __BottomRight { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("bottomRight")]
         public T BottomRight<T>(Func<Point, T> selector)
         {
             return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("creator")]
         public T Creator<T>(Func<IPerson, T> selector)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -440,14 +480,16 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class TextContent : PostContent
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("text")]
         public string Text { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
         public User __Author { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("author")]
         public T Author<T>(Func<User, T> selector)
         {
             return __Author is null ? throw new NullReferenceException("Author is null but it should not be null. Schema can be outdated.") : selector(__Author);
@@ -457,64 +499,91 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class TypesContainer
     {
+        [ZeroQL.GraphQLFieldSelector("text")]
         public string Text { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value1")]
         public byte Value1 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value2")]
         public byte? Value2 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value3")]
         public short Value3 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value4")]
         public short? Value4 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value5")]
         public int Value5 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value6")]
         public int? Value6 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value7")]
         public long Value7 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value8")]
         public long? Value8 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value9")]
         public double Value9 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value10")]
         public double? Value10 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value11")]
         public double Value11 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value12")]
         public double? Value12 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value13")]
         public decimal Value13 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value14")]
         public decimal? Value14 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value15")]
         public DateTimeOffset Value15 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value16")]
         public DateTimeOffset? Value16 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value17")]
         public DateOnly Value17 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value18")]
         public DateOnly? Value18 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value19")]
         public Guid Value19 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value20")]
         public Guid? Value20 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value21")]
         public Guid[] Value21 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value22")]
         public Guid[]? Value22 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value23")]
         public Guid[] Value23 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value24")]
         public Guid[]? Value24 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value25")]
         public Guid[] Value25 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value26")]
         public Guid[]? Value26 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
         public KeyValuePairOfStringAndString[] __Value27 { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("value27")]
         public T[] Value27<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value27 is null ? throw new NullReferenceException("Value27 is null but it should not be null. Schema can be outdated.") : __Value27.Select(o => o is null ? throw new NullReferenceException("Value27 is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -523,7 +592,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value28")]
         public KeyValuePairOfStringAndString[] __Value28 { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("value28")]
         public T[]? Value28<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value28?.Select(o => o is null ? throw new NullReferenceException("Value28 is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
@@ -532,7 +601,7 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value29")]
         public KeyValuePairOfStringAndString __Value29 { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("value29")]
         public T Value29<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value29 is null ? throw new NullReferenceException("Value29 is null but it should not be null. Schema can be outdated.") : selector(__Value29);
@@ -541,32 +610,38 @@ namespace GraphQLClient
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value30")]
         public KeyValuePairOfStringAndString __Value30 { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("value30")]
         public T? Value30<T>(Func<KeyValuePairOfStringAndString, T> selector)
         {
             return __Value30 is null ? default : selector(__Value30);
         }
 
+        [ZeroQL.GraphQLFieldSelector("value31")]
         public DateTimeOffset Value31 { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("value32")]
         public DateTimeOffset? Value32 { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class User
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public ID Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("firstName")]
         public string FirstName { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("lastName")]
         public string LastName { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("userKind")]
         public UserKind UserKind { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
         public Role __Role { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("role")]
         public T? Role<T>(Func<Role, T> selector)
         {
             return __Role is null ? default : selector(__Role);
@@ -576,12 +651,13 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal interface IFigure : global::ZeroQL.IUnionType
     {
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("creator")]
         public T Creator<T>(Func<IPerson, T> selector)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -591,12 +667,13 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class IFigureStub : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("creator")]
         public T Creator<T>(Func<IPerson, T> selector)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -606,32 +683,40 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal interface IPerson : global::ZeroQL.IUnionType
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("firstName")]
         public string FirstName { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("lastName")]
         public string LastName { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class IPersonStub : IPerson
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("firstName")]
         public string FirstName { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("lastName")]
         public string LastName { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal interface InterfaceThatNeverGetsUsed : global::ZeroQL.IUnionType
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class InterfaceThatNeverGetsUsedStub : InterfaceThatNeverGetsUsed
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
         public int Id { get; set; }
     }
 

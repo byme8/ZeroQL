@@ -470,16 +470,37 @@ public static class GraphQLQueryResolver
         if (member.Expression is IdentifierNameSyntax identifier &&
             identifier.Identifier.ValueText == context.QueryVariableName)
         {
-            return member.Name.Identifier.ValueText.FirstToLower();
+            return ExtractSelectorName(context, member.Name);
         }
 
         if (member.Expression is PostfixUnaryExpressionSyntax { Operand: IdentifierNameSyntax postfixIdentifier } &&
             postfixIdentifier.Identifier.ValueText == context.QueryVariableName)
         {
-            return member.Name.Identifier.ValueText.FirstToLower();
+            return ExtractSelectorName(context, member.Name);
         }
 
         return Failed(member.Expression);
+    }
+
+    private static Result<string> ExtractSelectorName(GraphQLResolveContext context, CSharpSyntaxNode name)
+    {
+        var nameSymbol = context.SemanticModel.GetSymbolInfo(name);
+        if (nameSymbol.Symbol is null)
+        {
+            return Failed(name, Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed);
+        }
+
+        var attribute = nameSymbol.Symbol
+            .GetAttributes()
+            .FirstOrDefault(o =>
+                SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+
+        if (attribute is null)
+        {
+            return Failed(name);
+        }
+
+        return attribute.ConstructorArguments.First().Value!.ToString();
     }
 
     private static Result<string> HandleInvocation(GraphQLResolveContext context, InvocationExpressionSyntax invocation)
@@ -713,8 +734,14 @@ public static class GraphQLQueryResolver
             .Select(o => $"{o.Name.FirstToLower()}: ")
             .ToArray();
 
+        var (selectorName, error) = ExtractSelectorName(context, invocation.Expression).Unwrap();
+        if (error)
+        {
+            return error;
+        }
+            
         var stringBuilder = new StringBuilder();
-        stringBuilder.Append(method.Name.FirstToLower());
+        stringBuilder.Append(selectorName);
         if (argumentNames.Any())
         {
             var graphQLArguments = invocation.ArgumentList.Arguments

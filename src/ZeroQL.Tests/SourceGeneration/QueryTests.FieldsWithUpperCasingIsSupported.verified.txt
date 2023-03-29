@@ -1,0 +1,6 @@
+﻿{
+  Query: query { MEWITHSUPPERCASING { firstName } },
+  Data: {
+    FirstName: Jon
+  }
+}

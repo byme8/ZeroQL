@@ -3,6 +3,7 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public interface IFigure : global::ZeroQL.IUnionType
     {
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
     }
 ,
@@ -13,7 +14,7 @@
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
         public Point __TopLeft { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("topLeft")]
         public T TopLeft<T>(Func<Point, T> selector)
         {
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
@@ -22,12 +23,13 @@
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
         public Point __BottomRight { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("bottomRight")]
         public T BottomRight<T>(Func<Point, T> selector)
         {
             return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
     }
 ,
@@ -38,14 +40,16 @@
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
         public Point __Center { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector]
+        [ZeroQL.GraphQLFieldSelector("center")]
         public T Center<T>(Func<Point, T> selector)
         {
             return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
 
+        [ZeroQL.GraphQLFieldSelector("radius")]
         public double Radius { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
     }
 ,
@@ -53,10 +57,13 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Point : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("x")]
         public double X { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("y")]
         public double Y { get; set; }
 
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
     }
 ,
