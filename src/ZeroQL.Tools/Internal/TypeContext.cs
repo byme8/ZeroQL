@@ -6,7 +6,7 @@ using ZeroQL.Schema;
 
 namespace ZeroQL.Internal;
 
-internal class TypeContext
+public class TypeContext
 {
     public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
     {
