@@ -533,14 +533,38 @@ public static class GraphQLGenerator
                 .ToArray();
 
             var selector = GenerateQueryPropertyDeclaration(field, parameters);
+            selector = AddDirectives(field, selector);
+
             return new[] { backedField, selector };
         }
 
-        return new MemberDeclarationSyntax[]
+        MemberDeclarationSyntax property = CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
+            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName);
+        
+        property = AddDirectives(field, property);
+        return new[]
         {
-            CSharpHelper.Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
-                .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
+            property
         };
+    }
+
+    private static MemberDeclarationSyntax AddDirectives(FieldDefinition field, MemberDeclarationSyntax selector)
+    {
+        var possibleDeprecatedDirective = field.Directives?.FirstOrDefault(o => o.Name == "deprecated");
+        if (possibleDeprecatedDirective is { } directive)
+        {
+            var reason = directive.Arguments?.GetValueOrDefault("reason");
+            if (reason is not null)
+            {
+                selector = selector.AddAttribute(ZeroQLGenerationInfo.DeprecatedAttribute, reason);
+            }
+            else
+            {
+                selector = selector.AddAttribute(ZeroQLGenerationInfo.DeprecatedAttribute);
+            }
+        }
+
+        return selector;
     }
 
 
@@ -716,37 +740,74 @@ public static class GraphQLGenerator
     }
 
 
-    private static FieldDefinition[] CreatePropertyDefinition(TypeContext typeContext,
+    private static FieldDefinition[] CreatePropertyDefinition(
+        TypeContext typeContext,
         GraphQLInputObjectTypeDefinition typeQL)
     {
         return typeQL.Fields?
             .Select(field =>
             {
+                var graphQLName = field.Name.StringValue;
+                var csharpName = graphQLName.FirstToUpper();
+
+                var directives = GetDirectiveDefinitions(field.Directives);
+
                 var type = typeContext.GetTypeDefinition(field.Type);
                 var defaultValue = GetDefaultValue(field);
                 return new FieldDefinition(
-                    field.Name.StringValue.FirstToUpper(),
-                    field.Name.StringValue,
+                    csharpName,
+                    graphQLName,
                     type,
-                    Array.Empty<ArgumentDefinition>(), defaultValue);
+                    Array.Empty<ArgumentDefinition>(),
+                    directives,
+                    defaultValue);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
     }
 
-    private static FieldDefinition[] CreatePropertyDefinition(TypeContext typeContext,
+    private static DirectiveDefinition[]? GetDirectiveDefinitions(GraphQLDirectives? graphQLDirectives)
+    {
+        var directives = graphQLDirectives?
+            .Select(directive => new DirectiveDefinition(
+                directive.Name.StringValue,
+                directive.Arguments?
+                    .ToDictionary(
+                        argument => argument.Name.StringValue,
+                        GetArgumentValue)))
+            .ToArray();
+
+        return directives;
+    }
+
+    private static string? GetArgumentValue(GraphQLArgument argument) => argument.Value switch
+    {
+        GraphQLStringValue value => value.Value.ToString(),
+        _ => null
+    };
+
+    private static FieldDefinition[] CreatePropertyDefinition(
+        TypeContext typeContext,
         GraphQLFieldsDefinition? fields)
     {
         return fields?.Select(field =>
             {
                 var type = typeContext.GetTypeDefinition(field.Type);
+                var graphQLName = field.Name.StringValue;
+                var csharpName = graphQLName.FirstToUpper();
+
+                var argumentDefinitions = field.Arguments?
+                    .Select(arg => new ArgumentDefinition(arg.Name.StringValue,
+                        typeContext.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
+                    .ToArray() ?? Array.Empty<ArgumentDefinition>();
+
+                var directives = GetDirectiveDefinitions(field.Directives);
+
                 return new FieldDefinition(
-                    field.Name.StringValue.FirstToUpper(),
-                    field.Name.StringValue,
+                    csharpName,
+                    graphQLName,
                     type,
-                    field.Arguments?
-                        .Select(arg => new ArgumentDefinition(arg.Name.StringValue,
-                            typeContext.GetTypeDefinition(arg.Type).NameWithNullableAnnotation()))
-                        .ToArray() ?? Array.Empty<ArgumentDefinition>(),
+                    argumentDefinitions,
+                    directives,
                     null);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();

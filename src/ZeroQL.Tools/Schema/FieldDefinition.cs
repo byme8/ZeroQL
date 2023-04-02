@@ -5,4 +5,5 @@ public record FieldDefinition(
     string GraphQLName,
     TypeDefinition TypeDefinition,
     ArgumentDefinition[] Arguments,
+    DirectiveDefinition[]? Directives,
     string? DefaultValue = null);

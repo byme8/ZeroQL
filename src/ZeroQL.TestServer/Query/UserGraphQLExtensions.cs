@@ -20,28 +20,15 @@ public class UserGraphQLExtensions
             LastName = "Smith"
         };
     }
+
+    [GraphQLDeprecated("Use Me instead")]
+    public User CurrentUser() => Me();
     
     [GraphQLName(nameof(MEWITHSUPPERCASING))]
-    public User MEWITHSUPPERCASING()
-    {
-        return new User
-        {
-            Id = 1,
-            FirstName = "Jon",
-            LastName = "Smith"
-        };
-    }
-    
+    public User MEWITHSUPPERCASING() => Me();
+
     [GraphQLName(nameof(MeWithPascalCasing))]
-    public User MeWithPascalCasing()
-    {
-        return new User
-        {
-            Id = 1,
-            FirstName = "Jon",
-            LastName = "Smith"
-        };
-    }
+    public User MeWithPascalCasing() => Me();
 
     public User[] GetUsers(UserFilterInput filter, int page, int size)
     {

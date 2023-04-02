@@ -24,6 +24,7 @@ type Query {
   instant: Instant!
   zonedDateTime: ZonedDateTime!
   me: User!
+  currentUser: User! @deprecated(reason: "Use Me instead")
   MEWITHSUPPERCASING: User!
   MeWithPascalCasing: User!
   users(filter: UserFilterInput! page: Int! size: Int!): [User!]!

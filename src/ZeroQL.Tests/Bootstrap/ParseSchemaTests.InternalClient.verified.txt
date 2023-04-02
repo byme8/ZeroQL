@@ -330,6 +330,16 @@ namespace GraphQLClient
             return __Me is null ? throw new NullReferenceException("Me is null but it should not be null. Schema can be outdated.") : selector(__Me);
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("CurrentUser")]
+        public User __CurrentUser { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("currentUser")]
+        [System.ObsoleteAttribute("Use Me instead")]
+        public T CurrentUser<T>(Func<User, T> selector)
+        {
+            return __CurrentUser is null ? throw new NullReferenceException("CurrentUser is null but it should not be null. Schema can be outdated.") : selector(__CurrentUser);
+        }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("MEWITHSUPPERCASING")]
         public User __MEWITHSUPPERCASING { get; set; }
 
