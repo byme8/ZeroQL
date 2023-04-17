@@ -1,8 +1,12 @@
 # ZeroQL | [![GitHub](https://img.shields.io/github/license/byme8/ZeroQL?color=blue&style=flat-square)](https://github.com/byme8/ZeroQL/blob/main/LICENCE) [![Nuget](https://img.shields.io/nuget/v/zeroql?color=blue&style=flat-square)](https://www.nuget.org/packages/ZeroQL) [![.NET](https://github.com/byme8/ZeroQL/actions/workflows/dotnet.yml/badge.svg)](https://github.com/byme8/ZeroQL/actions/workflows/dotnet.yml)
 
-The ZeroQL is a high-performance C#-friendly GraphQL client. It supports Linq-like syntax. It doesn't require Reflection.Emit or expressions. As a result, the runtime provides performance very close to a raw HTTP call.
+🚀 Welcome to ZeroQL, a high-performance C#-friendly GraphQL client! 🎉
 
-There is a more detailed list of what the ZeroQL can do at the moment:
+ZeroQL makes it easy to perform queries and mutations with Linq-like syntax. Unlike other GraphQL clients, ZeroQL doesn't require Reflection.Emit or expressions, which means the runtime provides performance very close to a raw HTTP call.
+
+# Features
+
+Here's a quick rundown of what ZeroQL can do at the moment:
 - [x] Bootstrap schema.graphql file from graphql endpoint
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries and mutations
@@ -17,7 +21,7 @@ There is a more detailed list of what the ZeroQL can do at the moment:
 - [ ] Support for @defer
 - [ ] Support for @stream
 
-The articles:
+Check out our articles to learn more about ZeroQL:
 - [ZeroQL - C# friendly graphql client](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
 - [ZeroQL - C# GraphQL client adds fragments support](https://dev.to/byme8/zeroql-c-graphql-client-adds-fragments-support-1lcf)
 - [ZeroQL V2 - C# GraphQL client](https://dev.to/byme8/zeroql-v2-c-graphql-client-1o8d)
