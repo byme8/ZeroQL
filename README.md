@@ -21,6 +21,8 @@ Here's a quick rundown of what ZeroQL can do at the moment:
 - [ ] Support for @defer
 - [ ] Support for @stream
 
+You can find the full wiki [here](https://github.com/byme8/ZeroQL/wiki) or just by clicking on the feature bullet point you are interested in.
+
 Check out our articles to learn more about ZeroQL:
 - [ZeroQL - C# friendly graphql client](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
 - [ZeroQL - C# GraphQL client adds fragments support](https://dev.to/byme8/zeroql-c-graphql-client-adds-fragments-support-1lcf)
