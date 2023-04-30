@@ -65,6 +65,11 @@ public class UserGraphQLMutations
 
         return sum;
     }
+    
+    public int AddUserKindPascal(UserKindPascal userKindPascal)
+    {
+        return (int)userKindPascal + 10;
+    }
 
     public Task<int> AddValues(
         string text,

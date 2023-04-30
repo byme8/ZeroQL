@@ -16,6 +16,16 @@ public static class NodeExtensions
         return type;
     }
     
+    public static EnumDeclarationSyntax? GetEnum(this SyntaxTree syntaxTree, string name)
+    {
+        var type = syntaxTree.GetRoot()
+            .DescendantNodes()
+            .OfType<EnumDeclarationSyntax>()
+            .FirstOrDefault(o => o.Identifier.ValueText == name);
+
+        return type;
+    }
+    
     public static InterfaceDeclarationSyntax? GetInterface(this SyntaxTree syntaxTree, string name)
     {
         var type = syntaxTree.GetRoot()

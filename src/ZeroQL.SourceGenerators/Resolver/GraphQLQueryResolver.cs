@@ -355,23 +355,40 @@ public static class GraphQLQueryResolver
         }
 
         var value = argument.Expression.ToString();
-        if (context.AvailableVariables.ContainsKey(value))
+        if (context.AvailableVariables.TryGetValue(value, out var variable))
         {
-            return context.AvailableVariables[value];
+            return variable;
         }
 
         if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
         {
-            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Expression, context.CancellationToken);
+            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Name, context.CancellationToken);
             var namedType = symbol.GetTypeSymbol();
             if (namedType is null)
             {
                 return Failed(memberAccess);
             }
 
-            if (namedType.EnumUnderlyingType != null)
+            if (namedType.EnumUnderlyingType != null && symbol.Symbol is IFieldSymbol fieldSymbol)
             {
-                return memberAccess.Name.Identifier.Text.ToUpperCase();
+                var fieldSelector = fieldSymbol
+                    .GetAttributes()
+                    .FirstOrDefault(o =>
+                        SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+
+                var fieldName = memberAccess.Name.Identifier.Text.ToUpperCase();
+                if (fieldSelector is null)
+                {
+                    return fieldName;
+                }
+
+                var name = fieldSelector.ConstructorArguments.FirstOrDefault();
+                if (name.Value is null)
+                {
+                    return fieldName;
+                }
+                
+                return name.Value.ToString();
             }
         }
 
@@ -739,7 +756,7 @@ public static class GraphQLQueryResolver
         {
             return error;
         }
-            
+
         var stringBuilder = new StringBuilder();
         stringBuilder.Append(selectorName);
         if (argumentNames.Any())
@@ -790,7 +807,7 @@ public static class GraphQLQueryResolver
         var selectorType = namedTypeSymbol.TypeArguments.FirstOrDefault();
         var isUnionType = selectorType?.AllInterfaces
             .Any(o => SymbolEqualityComparer.Default.Equals(o, context.UnionType));
-        
+
         return isUnionType ?? false;
     }
 

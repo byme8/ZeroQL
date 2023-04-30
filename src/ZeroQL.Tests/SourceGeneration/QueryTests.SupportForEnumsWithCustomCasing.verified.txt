@@ -1,0 +1,8 @@
+﻿{
+  Query: query { userKindPascals},
+  Data: [
+    Good,
+    SupperGood,
+    Bad
+  ]
+}

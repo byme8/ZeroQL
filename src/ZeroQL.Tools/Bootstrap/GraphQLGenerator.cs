@@ -189,7 +189,8 @@ public static class GraphQLGenerator
                 var members = e.Values?.Select(o =>
                     {
                         var name = o.ToPascalCase();
-                        return EnumMemberDeclaration(Identifier(name));
+                        return EnumMemberDeclaration(Identifier(name))
+                            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, o);
                     })
                     .ToArray() ?? Array.Empty<EnumMemberDeclarationSyntax>();
 

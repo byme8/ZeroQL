@@ -1,0 +1,11 @@
+﻿
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public enum UserKindPascal
+    {
+        [ZeroQL.GraphQLFieldSelector("SupperGood")]
+        SupperGood,
+        [ZeroQL.GraphQLFieldSelector("Good")]
+        Good,
+        [ZeroQL.GraphQLFieldSelector("Bad")]
+        Bad
+    }

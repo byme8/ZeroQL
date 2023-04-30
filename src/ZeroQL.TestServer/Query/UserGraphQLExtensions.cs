@@ -45,6 +45,11 @@ public class UserGraphQLExtensions
     {
         return Users.Select(o => o.Value.UserKind).ToArray();
     }
+    
+    public UserKindPascal[] GetUserKindPascals()
+    {
+        return new []{ UserKindPascal.Good, UserKindPascal.SupperGood, UserKindPascal.Bad };
+    }
 
     public User[][] GetUsersMatrix()
     {

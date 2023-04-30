@@ -29,6 +29,11 @@ public static class StringExtensions
 
     public static string ToPascalCase(this string value)
     {
+        if (value.Any(o => char.IsLower(o) && char.IsLetter(o)))
+        {
+            return value;
+        }
+        
         return value
             .Split("_", StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())

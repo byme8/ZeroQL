@@ -274,6 +274,14 @@ public class ParseSchemaTests
 
         initializer.Should().NotBeNull();
     }
+    
+    [Fact]
+    public async Task EnumWithCustomNaming()
+    {
+        var initializer = SyntaxTree.GetEnum("UserKindPascal")!;
+
+        await Verify(initializer.ToFullString());
+    }
 
     [Fact]
     public void SchemaWithoutMutationHandledProperly()

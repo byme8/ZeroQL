@@ -230,6 +230,19 @@ public class QueryTests : IntegrationTest
 
         await project.Validate(graphqlQuery);
     }
+    
+    [Fact]
+    public async Task SupportForEnumsWithCustomCasing()
+    {
+        var csharpQuery = "static q => q.UserKindPascals";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+         var response = await project.Execute();
+
+         await Verify(response);
+    }
 
     [Fact]
     public async Task SupportForArray()

@@ -201,6 +201,15 @@ namespace GraphQLClient
             return __AddUsersInfo;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserKindPascal")]
+        public int __AddUserKindPascal { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("addUserKindPascal")]
+        public int AddUserKindPascal(UserKindPascal userKindPascal)
+        {
+            return __AddUserKindPascal;
+        }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddValues")]
         public int __AddValues { get; set; }
 
@@ -369,6 +378,9 @@ namespace GraphQLClient
 
         [ZeroQL.GraphQLFieldSelector("userKinds")]
         public UserKind[] UserKinds { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("userKindPascals")]
+        public UserKindPascal[] UserKindPascals { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
         public User[][] __UsersMatrix { get; set; }
@@ -816,8 +828,22 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal enum UserKind
     {
+        [ZeroQL.GraphQLFieldSelector("SUPPER_GOOD")]
         SupperGood,
+        [ZeroQL.GraphQLFieldSelector("GOOD")]
         Good,
+        [ZeroQL.GraphQLFieldSelector("BAD")]
+        Bad
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal enum UserKindPascal
+    {
+        [ZeroQL.GraphQLFieldSelector("SupperGood")]
+        SupperGood,
+        [ZeroQL.GraphQLFieldSelector("Good")]
+        Good,
+        [ZeroQL.GraphQLFieldSelector("Bad")]
         Bad
     }
 
@@ -864,6 +890,7 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.Instant)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.Instant>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind>{{"SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood}, {"GOOD", global::GraphQLClient.UserKind.Good}, {"BAD", global::GraphQLClient.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string>{{global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQLClient.UserKind.Good, "GOOD"}, {global::GraphQLClient.UserKind.Bad, "BAD"}, });
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal>{{"SupperGood", global::GraphQLClient.UserKindPascal.SupperGood}, {"Good", global::GraphQLClient.UserKindPascal.Good}, {"Bad", global::GraphQLClient.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string>{{global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQLClient.UserKindPascal.Good, "Good"}, {global::GraphQLClient.UserKindPascal.Bad, "Bad"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IFigure)] = new ZeroQLIFigureConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IPerson)] = new ZeroQLIPersonConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.InterfaceThatNeverGetsUsed)] = new ZeroQLInterfaceThatNeverGetsUsedConverter();

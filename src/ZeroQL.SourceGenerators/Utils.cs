@@ -168,6 +168,8 @@ public static class Utils
                 return local.Type.GetNamedTypeSymbol();
             case IParameterSymbol parameterSymbol:
                 return parameterSymbol.Type.GetNamedTypeSymbol();
+            case IFieldSymbol fieldSymbol:
+                return fieldSymbol.Type.GetNamedTypeSymbol();
             default:
                 return null;
         }
