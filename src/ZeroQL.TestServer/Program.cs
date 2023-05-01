@@ -43,7 +43,8 @@ public class Program
             .AddTypeExtension<UserGraphQLExtensions>()
             .AddTypeExtension<DateMutation>()
             .AddTypeExtension<UserGraphQLMutations>()
-            .AddTypeExtension<RoleGraphQLExtension>();
+            .AddTypeExtension<RoleGraphQLExtension>()
+            .AddTypeExtension<JSONQueryExtensions>();
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {

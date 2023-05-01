@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Namotion.Reflection;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
@@ -22,5 +24,31 @@ public class UserScalarTests: IntegrationTest
 
         await Verify(response)
             .DontScrubDateTimes();
+    }
+    
+    [Fact]
+    public async Task JsonElementTypeWorks()
+    {
+        var csharpQuery = "static q => q.JsonUsersElement";
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var response = await project.Execute();
+        var value = response.TryGetPropertyValue<JsonElement>("Data");
+
+        await Verify(value.ToString());
+    }
+    
+    [Fact]
+    public async Task JsonDocumentTypeWorks()
+    {
+        var csharpQuery = "static q => q.JsonUsersDocument(o => o.RootElement)";
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        var response = await project.Execute();
+        var value = response.TryGetPropertyValue<JsonElement>("Data");
+
+        await Verify(value.ToString());
     }
 }

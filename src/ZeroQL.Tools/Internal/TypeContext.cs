@@ -23,7 +23,8 @@ public class TypeContext
         { "UUID", "Guid" },
         { "ID", "ID" },
         { "Boolean", "bool" },
-        { "Upload", "global::ZeroQL.Upload" }
+        { "Upload", "global::ZeroQL.Upload" },
+        { "JSON", "global::System.Text.Json.JsonElement" },
     };
 
     public TypeContext(GraphQlGeneratorOptions options, HashSet<string> enums, string[] customScalars)

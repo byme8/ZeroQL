@@ -38,6 +38,8 @@ type Query {
   userKind(id: Int!): UserKind!
   admin(id: Int!): User
   container: TypesContainer!
+  jsonUsersElement: JSON!
+  jsonUsersDocument: JsonDocument!
 }
 
 type Mutation {
@@ -66,17 +68,17 @@ type Person implements IPerson {
   lastName: String!
 }
 
+enum UserKind {
+  SUPPER_GOOD
+  GOOD
+  BAD
+}
+
 enum UserKindPascal {
   default
   SupperGood
   Good
   Bad
-}
-
-enum UserKind {
-  SUPPER_GOOD
-  GOOD
-  BAD
 }
 
 input UserFilterInput {
@@ -205,6 +207,12 @@ input KeyValuePairOfStringAndStringInput {
 type Role {
   id: Int!
   name: String!
+}
+
+scalar JSON
+
+type JsonDocument {
+  rootElement: JSON!
 }
 
 type KeyValuePairOfStringAndString {
