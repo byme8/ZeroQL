@@ -39,7 +39,7 @@ public class MutationTests : IntegrationTest
     [Fact]
     public async Task MutationWithCustomEnums()
     {
-        var csharpQuery = "Mutation(static m => m.AddUserKindPascal(UserKindPascal.SupperGood))";
+        var csharpQuery = "Mutation(static m => m.AddUserKindPascal(UserKindPascal.Default))";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));

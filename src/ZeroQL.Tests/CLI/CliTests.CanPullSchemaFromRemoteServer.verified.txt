@@ -67,6 +67,7 @@ type Person implements IPerson {
 }
 
 enum UserKindPascal {
+  default
   SupperGood
   Good
   Bad

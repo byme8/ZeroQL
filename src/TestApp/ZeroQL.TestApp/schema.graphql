@@ -192,6 +192,7 @@ enum UserKind {
 }
 
 enum UserKindPascal {
+  default
   SupperGood
   Good
   Bad

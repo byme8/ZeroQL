@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace ZeroQL.Extensions;
 
@@ -31,31 +30,12 @@ public static class StringExtensions
     {
         if (value.Any(o => char.IsLower(o) && char.IsLetter(o)))
         {
-            return value;
+            return value.FirstToUpper();
         }
         
         return value
             .Split("_", StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())
             .Join(string.Empty);
-    }
-    
-    public static string ToUpperCase(this string name)
-    {
-        var upperCaseString = new List<char>(name.Length);
-        for (var i = 0; i < name.Length; i++)
-        {
-            var ch = name[i];
-            if (i != 0 && char.IsUpper(ch))
-            {
-                upperCaseString.Add('_');
-                upperCaseString.Add(ch);
-                continue;
-            }
-
-            upperCaseString.Add(char.ToUpper(name[i]));
-        }
-
-        return new string(CollectionsMarshal.AsSpan(upperCaseString));
     }
 }

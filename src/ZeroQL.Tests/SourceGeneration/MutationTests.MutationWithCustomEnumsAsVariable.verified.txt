@@ -1,4 +1,4 @@
 ﻿{
   Query: mutation ($input: UserKindPascal!) { addUserKindPascal(userKindPascal: $input)},
-  Data: 10
+  Data: 11
 }

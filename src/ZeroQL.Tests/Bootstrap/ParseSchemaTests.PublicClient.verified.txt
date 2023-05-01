@@ -839,6 +839,8 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public enum UserKindPascal
     {
+        [ZeroQL.GraphQLFieldSelector("default")]
+        Default,
         [ZeroQL.GraphQLFieldSelector("SupperGood")]
         SupperGood,
         [ZeroQL.GraphQLFieldSelector("Good")]
@@ -890,7 +892,7 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.Instant)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.Instant>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind>{{"SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood}, {"GOOD", global::GraphQLClient.UserKind.Good}, {"BAD", global::GraphQLClient.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string>{{global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQLClient.UserKind.Good, "GOOD"}, {global::GraphQLClient.UserKind.Bad, "BAD"}, });
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal>{{"SupperGood", global::GraphQLClient.UserKindPascal.SupperGood}, {"Good", global::GraphQLClient.UserKindPascal.Good}, {"Bad", global::GraphQLClient.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string>{{global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQLClient.UserKindPascal.Good, "Good"}, {global::GraphQLClient.UserKindPascal.Bad, "Bad"}, });
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal>{{"default", global::GraphQLClient.UserKindPascal.Default}, {"SupperGood", global::GraphQLClient.UserKindPascal.SupperGood}, {"Good", global::GraphQLClient.UserKindPascal.Good}, {"Bad", global::GraphQLClient.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string>{{global::GraphQLClient.UserKindPascal.Default, "default"}, {global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQLClient.UserKindPascal.Good, "Good"}, {global::GraphQLClient.UserKindPascal.Bad, "Bad"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IFigure)] = new ZeroQLIFigureConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IPerson)] = new ZeroQLIPersonConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.InterfaceThatNeverGetsUsed)] = new ZeroQLInterfaceThatNeverGetsUsedConverter();

@@ -1,4 +1,4 @@
 ﻿{
-  Query: mutation { addUserKindPascal(userKindPascal: SupperGood)},
+  Query: mutation { addUserKindPascal(userKindPascal: default)},
   Data: 10
 }

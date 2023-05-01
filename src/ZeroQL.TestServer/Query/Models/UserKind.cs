@@ -9,6 +9,8 @@ public enum UserKind
 
 public enum UserKindPascal
 {
+    [GraphQLName("default")]
+    Default,
     [GraphQLName("SupperGood")]
     SupperGood,
     [GraphQLName("Good")]

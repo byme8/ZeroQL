@@ -159,7 +159,7 @@ public static class GraphQLGenerator
 
     private static ClassDefinition CreateInputDefinition(TypeContext typeContext, GraphQLInputObjectTypeDefinition input)
         => new(input.Name.StringValue, typeContext.CreatePropertyDefinition(input), new List<string>());
-
+    
     private static void AddUnions(GraphQLDocument schema, List<InterfaceDefinition> interfaces, ClassDefinition[] types)
     {
         var unions = schema.Definitions
