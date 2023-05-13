@@ -8,7 +8,7 @@ namespace ZeroQL.SourceGenerators.Resolver;
 public record struct GraphQLResolveContext(
     string QueryVariableName,
     CSharpSyntaxNode Parent,
-    Dictionary<string, string> AvailableVariables,
+    Dictionary<string, (string Name, string Type)> AvailableVariables,
     SemanticModel SemanticModel,
     CancellationToken CancellationToken)
 {

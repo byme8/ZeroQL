@@ -24,11 +24,11 @@ public static class GraphQLQueryResolver
         var inputs = GetQueryInputs(lambda);
         var variables = GetVariablesFromLambda(semanticModel, lambda, cancellationToken);
         var availableVariables = inputs.VariablesName is null
-            ? new Dictionary<string, string>()
+            ? new Dictionary<string, (string Name, string Type)>()
             : variables
                 .ToDictionary(
                     o => $"{inputs.VariablesName}.{o.Name}",
-                    o => "$" + o.Name.FirstToLower());
+                    o => ("$" + o.Name.FirstToLower(), o.Type));
 
         var context = new GraphQLResolveContext(
             inputs.QueryName,
@@ -49,10 +49,10 @@ public static class GraphQLQueryResolver
         }
 
         var stringBuilder = new StringBuilder();
-        if (inputs.VariablesName != null)
+        if (context.AvailableVariables.Any())
         {
-            var variablesBody = variables
-                .Select(o => $"${o.Name.FirstToLower()}: {o.Type}")
+            var variablesBody = context.AvailableVariables
+                .Select(o => $"{o.Value.Name}: {o.Value.Type}")
                 .Join()
                 .Wrap("(", ") ");
 
@@ -74,7 +74,7 @@ public static class GraphQLQueryResolver
         var availableVariables = variables
             .ToDictionary(
                 o => o.Name,
-                o => "$" + o.Name.FirstToLower());
+                o => ("$" + o.Name.FirstToLower(), o.Type));
 
         var context = new GraphQLResolveContext(
             inputs.QueryName,
@@ -122,11 +122,11 @@ public static class GraphQLQueryResolver
             .ToArray();
 
         var availableVariables = !variables.Any()
-            ? new Dictionary<string, string>()
+            ? new Dictionary<string, (string, string)>()
             : variables
                 .ToDictionary(
                     o => o,
-                    o => "{{" + o + "}}");
+                    o => ("{{" + o + "}}", ""));
 
         var context = new GraphQLResolveContext(
             queryName,
@@ -357,7 +357,7 @@ public static class GraphQLQueryResolver
         var value = argument.Expression.ToString();
         if (context.AvailableVariables.TryGetValue(value, out var variable))
         {
-            return variable;
+            return variable.Name;
         }
 
         if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
@@ -387,9 +387,25 @@ public static class GraphQLQueryResolver
                 {
                     return fieldName;
                 }
-                
+
                 return name.Value.ToString();
             }
+        }
+
+        if (argument.Expression is IdentifierNameSyntax identifierName)
+        {
+            var symbol = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
+            if (symbol.Symbol is ILocalSymbol localSymbol)
+            {
+                var localSymbolName = localSymbol.Name;
+                var variableName = $"${localSymbolName}";
+                var variableType = localSymbol.Type.ToGraphQLType();
+                context.AvailableVariables.Add(localSymbolName, (variableName, variableType));
+                
+                return variableName;
+            }
+
+            return Failed(argument);
         }
 
         return Failed(argument);
@@ -664,7 +680,7 @@ public static class GraphQLQueryResolver
         context = context.WithVariableName(name) with
         {
             SemanticModel = newSemanticModel,
-            AvailableVariables = variables.ToDictionary(o => o.Key, o => o.Value.Value!)
+            AvailableVariables = variables.ToDictionary(o => o.Key, o => (o.Value.Value!, "_Fragment"))
         };
 
         return HandleMethod(context, invocation, methodDeclaration);

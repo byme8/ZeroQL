@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.SourceGenerators.Generator;
@@ -10,7 +11,6 @@ namespace ZeroQL.Tests.SourceGeneration;
 [UsesVerify]
 public class QueryTests : IntegrationTest
 {
-
     [Fact]
     public async Task CompilationWorks()
     {
@@ -39,7 +39,7 @@ public class QueryTests : IntegrationTest
 
         await project.Validate(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task FieldsWithUpperCasingIsSupported()
     {
@@ -51,7 +51,7 @@ public class QueryTests : IntegrationTest
 
         await Verify(response);
     }
-    
+
     [Fact]
     public async Task FieldsWithPascalCasingIsSupported()
     {
@@ -129,7 +129,7 @@ public class QueryTests : IntegrationTest
     }
 
     [Fact]
-    public async Task FailsWhenLambdaIsNotStatic()
+    public async Task SupportNotStaticLambdaWithoutArguments()
     {
         var csharpQuery = "q => q.Me(o => o.FirstName)";
 
@@ -138,8 +138,10 @@ public class QueryTests : IntegrationTest
 
         var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
 
-        diagnostics.Should()
-            .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
+        diagnostics
+            .Where(o => o.Severity == DiagnosticSeverity.Error)
+            .Should()
+            .BeEmpty();
     }
 
     [Fact]
@@ -198,7 +200,8 @@ public class QueryTests : IntegrationTest
     [Fact(Skip = "Figure out how to support this")]
     public async Task SupportsAnonymousTypeWithMultipleIdenticalFieldsInRootQuery()
     {
-        var csharpQuery = "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";
+        var csharpQuery =
+            "static q => new { Me1 = q.Me(o => new { o.FirstName, o.LastName }), Me2 = q.Me(o => new { o.FirstName, o.LastName }) }";
         var graphqlQuery = @"{ m1: me { firstName lastName } m2: me { firstName lastName } }";
 
         var project = await TestProject.Project
@@ -230,7 +233,7 @@ public class QueryTests : IntegrationTest
 
         await project.Validate(graphqlQuery);
     }
-    
+
     [Fact]
     public async Task SupportForEnumsWithCustomCasing()
     {
@@ -239,9 +242,9 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-         var response = await project.Execute();
+        var response = await project.Execute();
 
-         await Verify(response);
+        await Verify(response);
     }
 
     [Fact]
@@ -249,7 +252,8 @@ public class QueryTests : IntegrationTest
     {
         var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good } }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
-        var graphqlQuery = @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
+        var graphqlQuery =
+            @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, $"{arguments}, {csharpQuery}"));
@@ -304,12 +308,12 @@ public class QueryTests : IntegrationTest
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
         var response = await project.Validate(graphqlQuery, false);
-        
+
         var value = response.Errors!.First().Extensions!.First();
         value.Key.Should().Be("message");
         value.Value.ToString().Should().Be("This is an error");
     }
-    
+
     [Fact]
     public async Task SupportsLocalStaticFunctionAsFragment()
     {
@@ -317,7 +321,7 @@ public class QueryTests : IntegrationTest
                 var response = await qlClient.Query(static q => q.Me(GetFirstName));
                 static string GetFirstName(User user) => user.FirstName;
                 """;
-        
+
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
@@ -325,7 +329,23 @@ public class QueryTests : IntegrationTest
 
         await Verify(response);
     }
-    
+
+    [Fact]
+    public async Task SupportForVariablesPassedViaClosure()
+    {
+        var csharpQuery = """
+                var userIds = new[] { 1 };
+                var response = await qlClient.Query(q => q.UsersByIds(userIds, o => o.FirstName));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+
     [Fact]
     public async Task NamedArgumentsAreSupported()
     {
@@ -340,7 +360,7 @@ public class QueryTests : IntegrationTest
         var response = await project.Execute();
         await Verify(response);
     }
-    
+
     [Fact]
     public async Task LambdaModuleInitializerGenerated()
     {

@@ -27,7 +27,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     {
         if (context.Node is not InvocationExpressionSyntax invocation ||
             invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.ValueText is not "Query" or "Mutation")
+            memberAccess.Name.Identifier.ValueText is not ("Query" or "Mutation"))
         {
             return;
         }
@@ -51,7 +51,8 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!lambda.Modifiers.Any(SyntaxKind.StaticKeyword))
+        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda
+            && !parenthesizedLambda.Modifiers.Any(SyntaxKind.StaticKeyword))
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 Descriptors.OnlyStaticLambda,

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,8 +39,9 @@ public static class GraphQLClientLambdaExtensions
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        return await client.Execute<Unit, TQuery, TResult>(
-            null,
+        var variables = GetVariables(query);
+        return await client.Execute<Dictionary<string, object?>, TQuery, TResult>(
+            variables,
             (_, q) => query(q),
             queryKey,
             cancellationToken);
@@ -50,8 +53,9 @@ public static class GraphQLClientLambdaExtensions
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        return await client.Execute<Unit, TQuery, TResult>(
-            null,
+        var variables = GetVariables(query);
+        return await client.Execute<Dictionary<string, object?>, TQuery, TResult>(
+            variables,
             (_, q) => query(q),
             queryKey,
             cancellationToken);
@@ -85,8 +89,9 @@ public static class GraphQLClientLambdaExtensions
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        return await client.Execute<Unit, TMutation, TResult>(
-            null,
+        var variables = GetVariables(query);
+        return await client.Execute<Dictionary<string, object?>, TMutation, TResult>(
+            variables,
             (_, q) => query(q),
             queryKey,
             cancellationToken);
@@ -98,9 +103,20 @@ public static class GraphQLClientLambdaExtensions
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression("query")] string queryKey = null!)
     {
-        return await client.Execute<Unit, TMutation, TResult>(
-            null,
+        var variables = GetVariables(query);
+        return await client.Execute<Dictionary<string, object?>, TMutation, TResult>(
+            variables,
             (_, q) => query(q), queryKey,
             cancellationToken);
+    }
+
+    private static Dictionary<string, object?> GetVariables<TQuery, TResult>(Func<TQuery?, TResult> query)
+    {
+        var fields = query.Target!.GetType().GetFields();
+        var variables = fields
+            .Where(o => !o.Name.StartsWith("<>"))
+            .ToDictionary(o => o.Name, o => o.GetValue(query.Target));
+        
+        return variables;
     }
 }

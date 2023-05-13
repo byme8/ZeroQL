@@ -34,7 +34,7 @@ namespace ZeroQL.TestApp
 
         public static async Task<GraphQLResult<global::GraphQL.TestServer.Query>> Execute(IGraphQLClient qlClient, string queryKey, object? variablesObject, CancellationToken cancellationToken)
         {
-            var variables = (global::ZeroQL.Unit)variablesObject!;
+            var variables = (global::System.Collections.Generic.Dictionary<string, object>)variablesObject!;
             var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<global::GraphQL.TestServer.Query>(qlClient.HttpClient, queryKey, variablesObject, cancellationToken, queryRequest => 
             {
                 

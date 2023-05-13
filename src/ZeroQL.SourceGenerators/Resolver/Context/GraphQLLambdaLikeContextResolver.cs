@@ -167,7 +167,12 @@ public class GraphQLLambdaLikeContextResolver
     {
         if (lambdaSymbol.Parameters.Length == 1)
         {
-            return compilation.GetTypeByMetadataName("ZeroQL.Unit")!;
+            var @string = compilation.GetTypeByMetadataName("System.String")!;
+            var @object = compilation.GetTypeByMetadataName("System.Object")!;
+            var dictionary = compilation.GetTypeByMetadataName("System.Collections.Generic.Dictionary`2")!
+                .Construct(@string, @object);
+
+            return dictionary;
         }
 
         return lambdaSymbol.Parameters.First().GetNamedTypeSymbol();

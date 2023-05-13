@@ -1,0 +1,6 @@
+﻿{
+  Query: query ($userIds: [Int!]!) { usersByIds(ids: $userIds) { firstName } },
+  Data: [
+    Jon
+  ]
+}
