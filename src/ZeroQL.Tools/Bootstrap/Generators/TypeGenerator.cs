@@ -96,7 +96,7 @@ public static class TypeGenerator
 
             var parameters = field.Arguments
                 .Select(o =>
-                    Parameter(Identifier(o.Name))
+                    Parameter(Identifier(o.Name.EnsureNotKeyword()))
                         .WithType(ParseTypeName(o.TypeName)))
                 .ToArray();
 
@@ -134,7 +134,7 @@ public static class TypeGenerator
 
         var genericMethodWithType = MethodDeclaration(
                 IdentifierName(returnType),
-                Identifier(name))
+                Identifier(name.EnsureNotKeyword()))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
             .WithParameterList(ParameterList(list));

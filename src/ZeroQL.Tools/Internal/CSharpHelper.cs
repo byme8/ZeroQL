@@ -113,4 +113,12 @@ internal static class CSharpHelper
                     .Select(o => Attribute(ParseName(o.Name), ParseAttributeArgumentList($"({o.Arguments})")))
                     .ToArray()));
     }
+
+    public static string EnsureNotKeyword(this string identifier)
+    {
+        if (SyntaxFacts.GetKeywordKind(identifier) is not SyntaxKind.None)
+            return $"@{identifier}";
+            
+        return identifier;
+    }
 }
