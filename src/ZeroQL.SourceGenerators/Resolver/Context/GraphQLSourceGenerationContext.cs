@@ -11,7 +11,6 @@ public class GraphQLSourceGenerationContext
         string? operationName,
         string operationType,
         string operationQuery,
-        string operationHash,
         string queryTypeName,
         INamedTypeSymbol graphQLMethodInputSymbol,
         INamedTypeSymbol requestExecutorInputSymbol,
@@ -19,11 +18,12 @@ public class GraphQLSourceGenerationContext
         UploadInfoByType[] uploadProperties)
     {
         Key = QueryKey.Normalize(key);
+        KeyHash = QueryKey.ComputeHash(Key);
         UploadType = uploadType;
         OperationName = operationName;
         OperationType = operationType;
         OperationQuery = operationQuery;
-        OperationHash = operationHash;
+        OperationHash = QueryKey.ComputeHash(operationQuery);
         QueryTypeName = queryTypeName;
         GraphQLMethodInputSymbol = graphQLMethodInputSymbol;
         RequestExecutorInputSymbol = requestExecutorInputSymbol;
@@ -31,6 +31,8 @@ public class GraphQLSourceGenerationContext
     }
 
     public string Key { get; }
+
+    public string KeyHash { get; set; }
 
     public INamedTypeSymbol UploadType { get; }
 

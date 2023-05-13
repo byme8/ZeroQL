@@ -62,4 +62,23 @@ public class MutationTests : IntegrationTest
 
         await Verify(result);
     }
+    
+    [Fact]
+    public async Task SupportedDifferentCSharpQueriesButIdenticalGraphQLQueries()
+    {
+        var csharpQuery = """
+                var variables = new { Id = UserKindPascal.SupperGood };
+                var response1 = await qlClient.Mutation(variables, static (i, q) => q.AddUserKindPascal(i.Id));
+
+                var id = UserKindPascal.SupperGood;
+                var response = await qlClient.Mutation(q => q.AddUserKindPascal(id));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
 }

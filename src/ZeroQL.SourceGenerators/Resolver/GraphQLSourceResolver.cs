@@ -32,7 +32,7 @@ using ZeroQL.Internal;
 namespace {semanticModel.Compilation.Assembly.Name}
 {{
     {SourceGeneratorInfo.CodeGenerationAttribute}
-    internal static class ZeroQLModuleInitializer_{context.OperationHash}
+    internal static class ZeroQLModuleInitializer_{context.KeyHash}
     {{
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()

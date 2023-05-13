@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -94,7 +92,6 @@ public class GraphQLLambdaLikeContextResolver
         }
 
         var query = $"{operationKind} {name ?? string.Empty}{queryBody}";
-        var hash = ComputeHash(query);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -106,7 +103,6 @@ public class GraphQLLambdaLikeContextResolver
             name,
             operationKind,
             query,
-            hash,
             queryTypeName,
             graphQLMethodInputType,
             requestExecutorInputArgumentSymbol,
@@ -135,21 +131,6 @@ public class GraphQLLambdaLikeContextResolver
         }
 
         return (string?)null;
-    }
-
-    public static string ComputeHash(string queryBody)
-    {
-        using var sha256 = SHA256.Create();
-        var body = Encoding.UTF8.GetBytes(queryBody);
-        var bytes = sha256.ComputeHash(body);
-
-        var builder = new StringBuilder();
-        foreach (var t in bytes)
-        {
-            builder.Append(t.ToString("x2"));
-        }
-
-        return builder.ToString();
     }
 
     public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties) FindAllUploadProperties(

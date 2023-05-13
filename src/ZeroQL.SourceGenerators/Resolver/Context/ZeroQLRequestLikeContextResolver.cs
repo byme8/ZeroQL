@@ -49,14 +49,11 @@ public class ZeroQLRequestLikeContextResolver
         }
 
         var operationQuery = $"{operationType.ToLower()} {operationName}{queryBody}";
-        var operationHash = GraphQLLambdaLikeContextResolver.ComputeHash(operationQuery);
-
         return new GraphQLSourceGenerationContext(
             key, 
             operationName,
             operationType,
             operationQuery,
-            operationHash,
             queryTypeName,
             recordType,
             recordType,

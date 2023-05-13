@@ -110,7 +110,7 @@ public static class GraphQLClientLambdaExtensions
             cancellationToken);
     }
 
-    private static Dictionary<string, object?> GetVariables<TQuery, TResult>(Func<TQuery?, TResult> query)
+    private static Dictionary<string, object?> GetVariables<TQuery, TResult>(Func<TQuery, TResult> query)
     {
         var fields = query.Target!.GetType().GetFields();
         var variables = fields
