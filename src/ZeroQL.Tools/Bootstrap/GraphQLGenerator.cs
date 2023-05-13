@@ -32,6 +32,7 @@ public static class GraphQLGenerator
         var schema = Parser.Parse(graphql);
         var enums = schema.Definitions
             .OfType<GraphQLEnumTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(o => new EnumDefinition(
                 o.Name.StringValue,
                 o.Values?
@@ -59,6 +60,7 @@ public static class GraphQLGenerator
         var enumsNames = new HashSet<string>(enums.Select(o => o.Name));
         var scalarTypes = schema.Definitions
             .OfType<GraphQLScalarTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(o => o.Name.StringValue)
             .ToArray();
 
@@ -67,16 +69,19 @@ public static class GraphQLGenerator
 
         var inputs = schema.Definitions
             .OfType<GraphQLInputObjectTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(o => CreateInputDefinition(context, o))
             .ToArray();
 
         var types = schema.Definitions
             .OfType<GraphQLObjectTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(o => CreateTypesDefinition(context, o))
             .ToArray();
 
         var interfaces = schema.Definitions
             .OfType<GraphQLInterfaceTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(o => CreateInterfaceDefinition(context, o))
             .ToList();
 
@@ -164,6 +169,7 @@ public static class GraphQLGenerator
     {
         var unions = schema.Definitions
             .OfType<GraphQLUnionTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
             .Select(CreateUnionDefinition)
             .ToArray();
 

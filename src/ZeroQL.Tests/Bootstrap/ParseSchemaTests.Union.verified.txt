@@ -29,8 +29,8 @@
     {
         public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
         {
-            "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
             "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
+            "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
             _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)};
     }
 ,

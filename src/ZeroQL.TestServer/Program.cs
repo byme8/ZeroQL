@@ -44,7 +44,8 @@ public class Program
             .AddTypeExtension<DateMutation>()
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>()
-            .AddTypeExtension<JSONQueryExtensions>();
+            .AddTypeExtension<JSONQueryExtensions>()
+            .AddTypeExtension<CSharpKeywordsQueryExtensions>();
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {

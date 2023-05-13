@@ -104,6 +104,8 @@ type Query {
   container: TypesContainer!
   jsonUsersElement: JSON!
   jsonUsersDocument: JsonDocument!
+  int(int: Int!): Int!
+  object(object: Int!): Int!
 }
 
 type Role {
