@@ -26,6 +26,7 @@ public class RawVsZeroQLBenchmark
     private readonly TestServerClient zeroQLClient;
     private readonly StrawberryShakeTestServerClient strawberryShake;
     private readonly Upload upload;
+    private readonly int id;
 
     public RawVsZeroQLBenchmark()
     {
@@ -35,40 +36,61 @@ public class RawVsZeroQLBenchmark
         zeroQLClient = new TestServerClient(httpClient);
         strawberryShake = StrawberryShakeTestServerClientCreator.Create(httpClient);
         upload = new Upload("image.png", new MemoryStream(new byte[42]));
+
+        id = 1;
     }
 
     [Benchmark]
     public async Task<string> Raw()
     {
-        var rawQuery = @"{ ""query"": ""query { me { firstName }}"" }";
+        var rawQuery = 
+            $$"""
+            {
+                "variables": { "id": {{id}} }, 
+                "query": "query GetUser($id: Int!){ user(id: $id) { id firstName lastName } }" 
+            }
+            """;
         var response = await httpClient.PostAsync("", new StringContent(rawQuery, Encoding.UTF8, "application/json"));
         var responseJson = await response.Content.ReadAsStreamAsync();
         var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-        return qlResponse!["data"]!["me"]!["firstName"]!.GetValue<string>();
+        return qlResponse!["data"]!["user"]!["firstName"]!.GetValue<string>();
     }
 
     [Benchmark]
     public async Task<string> StrawberryShake()
     {
-        var firstname = await strawberryShake.Me.ExecuteAsync();
-        return firstname.Data!.Me.FirstName;
+        var firstname = await strawberryShake.GetUser.ExecuteAsync(id);
+        return firstname.Data!.User.FirstName;
     }
 
     [Benchmark]
-    public async Task<string> ZeroQLLambda()
+    public async Task<string> ZeroQLLambdaWithoutClosure()
     {
-        var firstname = await zeroQLClient.Query(static q => q.Me(o => o.FirstName));
+        var variables = new { Id = id };
+        var firstname = await zeroQLClient.Query(
+            variables, static (i, q)
+                => q.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
 
-        return firstname.Data!;
+        return firstname.Data!.FirstName;
+    }
+    
+    [Benchmark]
+    public async Task<string> ZeroQLLambdaWithClosure()
+    {
+        var id  = this.id;
+        var firstname = await zeroQLClient.Query( q
+                => q.User(id, o => new { o.Id, o.FirstName, o.LastName }));
+
+        return firstname.Data!.FirstName;
     }
 
     [Benchmark]
     public async Task<string> ZeroQLRequest()
     {
-        var firstname = await zeroQLClient.Execute(new GetMeQuery());
+        var firstname = await zeroQLClient.Execute(new GetUserQuery(id));
 
-        return firstname.Data!;
+        return firstname.Data!.FirstName;
     }
 
     [Benchmark]
@@ -88,7 +110,6 @@ public class RawVsZeroQLBenchmark
         return size.Data;
     }
 }
-
 
 public static class StrawberryShakeTestServerClientCreator
 {

@@ -11,10 +11,11 @@ await ZeroQL.TestServer.Program.VerifyServiceIsRunning(serverContext);
 var benchmark = new RawVsZeroQLBenchmark();
 var raw = await benchmark.Raw();
 var strawberry = await benchmark.StrawberryShake();
-var zeroQLLambda = await benchmark.ZeroQLLambda();
+var zeroQLLambdaOld = await benchmark.ZeroQLLambdaWithoutClosure();
+var zeroQLLambdaNew = await benchmark.ZeroQLLambdaWithoutClosure();
 var zeroQLRequest = await benchmark.ZeroQLRequest();
 
-if (!(raw == strawberry && strawberry == zeroQLLambda && zeroQLLambda == zeroQLRequest))
+if (!(raw == strawberry && strawberry == zeroQLLambdaOld && zeroQLLambdaOld == zeroQLRequest && zeroQLRequest == zeroQLLambdaNew))
 {
     Console.WriteLine("Raw, StrawberryShake and ZeroQL are not equal");
     return;
@@ -39,11 +40,13 @@ switcher.Run(args);
 
 ZeroQL.TestServer.Program.StopServer(serverContext);
 
-public record GetMeQuery : GraphQL<Query, string>
+public record GetUserQuery(int id) : GraphQL<Query, User?>
 {
-    public override string Execute(Query query)
-        => query.Me(o => o.FirstName);
+    public override User? Execute(Query query)
+        => query.User(id, o => new User(o.Id, o.FirstName, o.LastName));
 }
+
+public record User(string Id, string FirstName, string LastName);
 
 public record AddAvatar(int Id, Upload File) : GraphQL<Mutation, int>
 {
