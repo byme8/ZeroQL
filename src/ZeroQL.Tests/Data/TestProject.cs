@@ -10,6 +10,7 @@ namespace ZeroQL.Tests.Data;
 public static class TestProject
 {
     public const string PlaceToReplace = "// place to replace";
+    public const string PlaceToReplaceInClassProgram = "// class Program place to replace in ";
     public const string MeQuery = @"static q => q.Me(o => o.FirstName)";
     public const string FullMeQuery = @"Query(static q => q.Me(o => o.FirstName))";
     public const string FullCall = "await qlClient.Query(static q => q.Me(o => o.FirstName));";

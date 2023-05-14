@@ -395,20 +395,40 @@ public static class GraphQLQueryResolver
         if (argument.Expression is IdentifierNameSyntax identifierName)
         {
             var symbol = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
-            if (symbol.Symbol is ILocalSymbol localSymbol)
+            switch (symbol.Symbol)
             {
-                var localSymbolName = localSymbol.Name;
-                var variableName = $"${localSymbolName}";
-                var variableType = localSymbol.Type.ToGraphQLType();
-                context.AvailableVariables.Add(localSymbolName, (variableName, variableType));
-                
-                return variableName;
-            }
+                case IPropertySymbol:
+                case IFieldSymbol:
+                {
+                    return Failed(identifierName, Descriptors.GraphQLVariableShouldBeLocal);
+                }
 
-            return Failed(argument);
+                case ILocalSymbol localSymbol:
+                {
+                    var localSymbolName = localSymbol.Name;
+                    var variableName = $"${localSymbolName}";
+                    var variableType = localSymbol.Type.ToGraphQLType();
+                    context.AvailableVariables.Add(localSymbolName, (variableName, variableType));
+
+                    return variableName;
+                }
+                
+                case IParameterSymbol parameterSymbol:
+                {
+                    var localSymbolName = parameterSymbol.Name;
+                    var variableName = $"${localSymbolName}";
+                    var variableType = parameterSymbol.Type.ToGraphQLType();
+                    context.AvailableVariables.Add(localSymbolName, (variableName, variableType));
+
+                    return variableName;
+                }
+
+                default:
+                    return Failed(argument, Descriptors.GraphQLVariableExpected);
+            }
         }
 
-        return Failed(argument);
+        return Failed(argument, Descriptors.GraphQLVariableExpected);
     }
 
     private static Result<string> HandlerSimpleLambda(GraphQLResolveContext context,
@@ -493,7 +513,8 @@ public static class GraphQLQueryResolver
         return Failed(node);
     }
 
-    private static Result<string> HandleMemberAccess(GraphQLResolveContext context, MemberAccessExpressionSyntax member)
+    private static Result<string> HandleMemberAccess(GraphQLResolveContext context,
+        MemberAccessExpressionSyntax member)
     {
         if (member.Expression is MemberAccessExpressionSyntax left)
         {
@@ -536,9 +557,13 @@ public static class GraphQLQueryResolver
         return attribute.ConstructorArguments.First().Value!.ToString();
     }
 
-    private static Result<string> HandleInvocation(GraphQLResolveContext context, InvocationExpressionSyntax invocation)
+    private static Result<string> HandleInvocation(GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation)
     {
-        if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName } &&
+        if (invocation.Expression is MemberAccessExpressionSyntax
+            {
+                Expression: IdentifierNameSyntax identifierName
+            } &&
             identifierName.Identifier.ValueText != context.QueryVariableName)
         {
             return Failed(identifierName, Descriptors.DontUseOutScopeValues);
@@ -622,7 +647,8 @@ public static class GraphQLQueryResolver
         return $"... on {method.TypeArguments[0].Name} {{ {selector} }}";
     }
 
-    private static Result<string> HandleFragment(GraphQLResolveContext context, InvocationExpressionSyntax invocation,
+    private static Result<string> HandleFragment(GraphQLResolveContext context,
+        InvocationExpressionSyntax invocation,
         IMethodSymbol method)
     {
         if (method.DeclaringSyntaxReferences.IsEmpty)
@@ -712,7 +738,8 @@ public static class GraphQLQueryResolver
     {
         var graphQLQueryTemplate = method
             .GetAttributes()
-            .FirstOrDefault(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.TemplateAttribute))?
+            .FirstOrDefault(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.TemplateAttribute))
+            ?
             .ConstructorArguments
             .FirstOrDefault()
             .Value?

@@ -1,0 +1,4 @@
+﻿{
+  Query: query ($idParam: Int!) { user(id: $idParam) { firstName } },
+  Data: Jon
+}

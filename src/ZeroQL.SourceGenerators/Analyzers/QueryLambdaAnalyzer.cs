@@ -127,5 +127,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             Descriptors.FailedToConvert,
             Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed,
             Descriptors.GraphQLQueryNameShouldBeLiteral,
-            Descriptors.GraphQLQueryPreview);
+            Descriptors.GraphQLQueryPreview,
+            Descriptors.GraphQLVariableShouldBeLocal,
+            Descriptors.GraphQLVariableExpected);
 }
