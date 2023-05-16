@@ -8,7 +8,7 @@ namespace ZeroQL.SourceGenerators.Resolver;
 
 public class GraphQLUploadResolver
 {
-    public static string GenerateUploadsSelectors(UploadInfoByType[] types, INamedTypeSymbol uploadType)
+    public static string GenerateUploadsSelectors(GraphQLQueryExecutionStrategy executionStrategy, UploadInfoByType[] types, INamedTypeSymbol uploadType)
     {
         if (!types.Any())
         {
@@ -16,17 +16,61 @@ public class GraphQLUploadResolver
         }
 
         var sb = new StringBuilder();
-
         foreach (var type in types.Where(o => o.Type is not IArrayTypeSymbol))
         {
             var name = GenerateTypeName(type.Type);
+            sb.AppendLine($$"""
 
-            sb.Append($@"
-        private static void Process_{type.Type.ToSafeGlobalName()}(MultipartFormDataContentContext context, {name} value, string path)
-        {{
-{type.UploadProperties.Select(o => GenerateAccessor(type, o, uploadType)).JoinWithNewLine()}
-        }}");
+                    private static void Process_{{type.SafeName}}(MultipartFormDataContentContext context, {{name}} value, string path)
+                    {
+                        {{type.UploadProperties.Select(o => GenerateAccessor(o, uploadType)).JoinWithNewLine()}}
+                    }
+            """);
 
+        }
+
+        if (executionStrategy == GraphQLQueryExecutionStrategy.LambdaWithClosure)
+        {
+            sb.AppendLine("""
+
+                    private static void Process(MultipartFormDataContentContext context, global::System.Collections.Generic.Dictionary<string, object> dictionary, string path)
+                    {
+                        foreach(var (key, value) in dictionary)
+                        {
+                            switch(value)
+                            {
+            """);
+
+            for (var i = 0; i < types.Length; i++)
+            {
+                var type = types[i];
+                if (type.Type is IArrayTypeSymbol arrayTypeSymbol)
+                {
+                    sb.AppendLine($$"""
+                                case {{arrayTypeSymbol.ToGlobalName()}} {{type.SafeName}}:
+                                    for(int i = 0; i < {{type.SafeName}}.Length; i++)
+                                    {
+                                        Process_{{arrayTypeSymbol.ElementType.ToSafeGlobalName()}}(context, {{type.SafeName}}[i], $"{path}.{key}.{i}"); 
+                                    }
+                                    break;
+            """);    
+                    continue;
+                }
+
+                sb.AppendLine($$"""
+                                case {{type.Type.ToGlobalName()}} {{type.SafeName}}:
+                                    Process_{{type.Type.ToSafeGlobalName()}}(context, {{type.SafeName}}, $"{path}.{key}"); 
+                                    break;
+            """);
+            }
+
+            sb.AppendLine("""
+                                default:
+                                    throw new global::System.InvalidOperationException("Unknown type");
+                            }
+                        }
+                    }
+            """);
         }
 
         return sb.ToString();
@@ -39,7 +83,7 @@ public class GraphQLUploadResolver
             : type.ToGlobalName();
     }
 
-    private static string GenerateAccessor(UploadInfoByType type, IPropertySymbol propertySymbol, INamedTypeSymbol uploadType)
+    private static string GenerateAccessor(IPropertySymbol propertySymbol, INamedTypeSymbol uploadType)
     {
         return propertySymbol.Type switch
         {
@@ -57,6 +101,16 @@ public class GraphQLUploadResolver
                         Getter = () => (ZeroQL.Upload)propertyValue,
                     }};
                     context.Uploads.Add(uploadEntry);
+                }}
+            }}
+",
+            INamedTypeSymbol namedType when namedType.SpecialType == SpecialType.System_Object =>
+                $@"         
+            {{
+                var propertyValue = {GenerateGetter(propertySymbol)};
+                if (propertyValue is not null)
+                {{
+                    ProcessObject(context, propertyValue, {GeneratePath(propertySymbol)});
                 }}
             }}
 ",
@@ -95,16 +149,22 @@ public class GraphQLUploadResolver
         };
     }
 
-    public static string GenerateRequestPreparations(string graphQLInputTypeName, Dictionary<string, UploadInfoByType> infoForTypes)
+    public static string GenerateRequestPreparations(string inputType, GraphQLQueryExecutionStrategy executionStrategy, Dictionary<string, UploadInfoByType> infoForTypes)
     {
-        if (!infoForTypes.TryGetValue(graphQLInputTypeName, out var root))
+        if (!infoForTypes.Any())
         {
             return RequestWithoutUpload();
         }
 
+        var processSource = executionStrategy switch
+        {
+            GraphQLQueryExecutionStrategy.LambdaWithClosure => $@"Process(context, variables, ""variables"");",
+            _ => $@"Process_{infoForTypes[inputType].Type.ToSafeGlobalName()}(context, variables, ""variables"");"
+        };
+
         return $@"
                 var context = new MultipartFormDataContentContext();
-                Process_{root.Type.ToSafeGlobalName()}(context, variables, ""variables"");
+                {processSource}
 
                 var content = new MultipartFormDataContent();
 

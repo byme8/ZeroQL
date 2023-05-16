@@ -12,7 +12,7 @@ var benchmark = new RawVsZeroQLBenchmark();
 var raw = await benchmark.Raw();
 var strawberry = await benchmark.StrawberryShake();
 var zeroQLLambdaOld = await benchmark.ZeroQLLambdaWithoutClosure();
-var zeroQLLambdaNew = await benchmark.ZeroQLLambdaWithoutClosure();
+var zeroQLLambdaNew = await benchmark.ZeroQLLambdaWithClosure();
 var zeroQLRequest = await benchmark.ZeroQLRequest();
 
 if (!(raw == strawberry && strawberry == zeroQLLambdaOld && zeroQLLambdaOld == zeroQLRequest && zeroQLRequest == zeroQLLambdaNew))

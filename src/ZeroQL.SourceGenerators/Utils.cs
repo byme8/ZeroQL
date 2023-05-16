@@ -219,17 +219,22 @@ public static class Utils
 
     public static void ErrorWrapper(SourceProductionContext context, CSharpSyntaxNode location, Action action)
     {
+#if !DEBUG
+
         try
         {
+#endif
             action();
+#if !DEBUG
         }
         catch (Exception e)
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(Descriptors.UnexpectedFail, location.GetLocation(), e.Format()));
         }
+#endif
     }
-    
+
     public static string Format(this Exception exception)
     {
         var sb = new StringBuilder();

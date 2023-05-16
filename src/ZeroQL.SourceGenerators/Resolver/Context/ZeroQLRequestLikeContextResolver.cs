@@ -41,16 +41,17 @@ public class ZeroQLRequestLikeContextResolver
             .OfType<MethodDeclarationSyntax>()
             .First(m => m.Identifier.Text == "Execute");
         
-        var (uploadType, uploadProperties) = GraphQLLambdaLikeContextResolver.FindAllUploadProperties(recordType, semanticModel);
         var (queryBody, queryError) = GraphQLQueryResolver.Resolve(semanticModel, executeMethod, cancellationToken).Unwrap();
         if (queryError)
         {
-            return error;
+            return queryError;
         }
 
-        var operationQuery = $"{operationType.ToLower()} {operationName}{queryBody}";
+        var (uploadType, uploadProperties) = GraphQLLambdaLikeContextResolver.FindAllUploadProperties(recordType, queryBody.Variables, semanticModel);
+        var operationQuery = $"{operationType.ToLower()} {operationName}{queryBody.Query}";
         return new GraphQLSourceGenerationContext(
             key, 
+            GraphQLQueryExecutionStrategy.RequestClass,
             operationName,
             operationType,
             operationQuery,
