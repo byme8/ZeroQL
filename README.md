@@ -44,7 +44,7 @@ dotnet tool install ZeroQL.CLI
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
 # fetch graphql schema from server(creates schema.graphql file)
-dotnet zeroql schema pull http://localhost:10000/graphql
+dotnet zeroql schema pull --url http://localhost:10000/graphql
 # to bootstrap schema.graphql file from graphql schema
 dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
