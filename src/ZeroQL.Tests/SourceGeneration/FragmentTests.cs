@@ -1,11 +1,11 @@
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
-using Xunit;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
+[UsesVerify]
 public class FragmentTests : IntegrationTest
 {
     [Fact]
@@ -72,12 +72,29 @@ public class FragmentTests : IntegrationTest
     public async Task CanApplyFragmentWithConstantArgument()
     {
         var csharpQuery = "static q => q.GetUserById(1)";
-        var graphqlQuery = @"query { user(id: 1) { firstName lastName role { name }  } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        await Validate(project, graphqlQuery);
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task CanApplyFragmentWithClosureLambda()
+    {
+        var csharpQuery = """
+            var userId = 1;
+            var response = await qlClient.Query(q => q.GetUserById(userId));
+        """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 
     [Fact]

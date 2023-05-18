@@ -15,8 +15,8 @@
         <ProjectReference Include="..\..\TestApp\ZeroQL.TestApp\ZeroQL.TestApp.csproj" />
         <ProjectReference Include="..\..\ZeroQL.CLI\ZeroQL.CLI.csproj" />
         <ProjectReference Include="..\..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
-        <ProjectReference Include="..\StrawberryShake.Client\StrawberryShake.Client.csproj" />
         <ProjectReference Include="..\..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\StrawberryShake.Client\StrawberryShake.Client.csproj" />
     </ItemGroup>
 
     <ItemGroup>

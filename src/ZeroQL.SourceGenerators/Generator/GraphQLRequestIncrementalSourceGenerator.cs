@@ -82,13 +82,13 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        if (processed.Contains(requestLikeContext.OperationHash))
+        if (processed.Contains(requestLikeContext.KeyHash))
         {
             return;
         }
 
-        processed.Add(requestLikeContext.OperationHash);
-        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.OperationHash}.g.cs", source);
+        processed.Add(requestLikeContext.KeyHash);
+        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.KeyHash}.g.cs", source);
     }
 
     private bool FindGraphQLRequests(SyntaxNode node, CancellationToken cancellationToken)

@@ -1,10 +1,13 @@
 ﻿using FluentAssertions;
 using Xunit;
+using ZeroQL.SourceGenerators;
+using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
+[UsesVerify]
 public class VariablesTests : IntegrationTest
 {
     [Fact]
@@ -40,7 +43,8 @@ public class VariablesTests : IntegrationTest
         var graphqlQuery = @"query TestQuery($id: Int!) { user(id: $id) { id } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "\"TestQuery\", new { Id = 1 }, " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.MeQuery, "\"TestQuery\", new { Id = 1 }, " + csharpQuery));
 
         var result = (GraphQLResult<ID>)await project.Validate(graphqlQuery);
 
@@ -54,13 +58,14 @@ public class VariablesTests : IntegrationTest
         var graphqlQuery = @"query TestQuery($ids: [Int!]!) { usersByIds(ids: $ids) { id } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "\"TestQuery\", new { Ids = new int [] { 1, 2 }  }, " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.MeQuery, "\"TestQuery\", new { Ids = new int [] { 1, 2 }  }, " + csharpQuery));
 
         var result = (GraphQLResult<ID[]>)await project.Validate(graphqlQuery);
 
         result.Data.Should().Contain(new ID[] { 1, 2 });
     }
-    
+
     [Fact]
     public async Task SupportsDifferentTypes()
     {
@@ -134,14 +139,13 @@ public class VariablesTests : IntegrationTest
                 i.Value30,
                 i.Value31,
                 i.Value32))";
-        var graphqlQuery = @"mutation ($text: String!, $value1: Byte!, $value2: Byte!, $value3: Short!, $value4: Short!, $value5: Int!, $value6: Int!, $value7: Long!, $value8: Long!, $value9: Float!, $value10: Float!, $value11: Float!, $value12: Float!, $value13: Decimal!, $value14: Decimal!, $value15: DateTime!, $value16: DateTime!, $value17: Date!, $value18: Date!, $value19: UUID!, $value20: UUID!, $value21: [UUID!]!, $value22: [UUID!]!, $value23: [UUID!]!, $value24: [UUID!]!, $value25: [UUID!]!, $value26: [UUID!]!, $value27: [KeyValuePairOfStringAndStringInput!]!, $value28: [KeyValuePairOfStringAndStringInput!]!, $value29: KeyValuePairOfStringAndStringInput!, $value30: KeyValuePairOfStringAndStringInput!, $value31: DateTime!, $value32: DateTime!) { addValues(text: $text, value1: $value1, value2: $value2, value3: $value3, value4: $value4, value5: $value5, value6: $value6, value7: $value7, value8: $value8, value9: $value9, value10: $value10, value11: $value11, value12: $value12, value13: $value13, value14: $value14, value15: $value15, value16: $value16, value17: $value17, value18: $value18, value19: $value19, value20: $value20, value21: $value21, value22: $value22, value23: $value23, value24: $value24, value25: $value25, value26: $value26, value27: $value27, value28: $value28, value29: $value29, value30: $value30, value31: $value31, value32: $value32)}";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        var result = (GraphQLResult<int>)await project.Execute();
 
-        result.Data.Should().Be(1);
+        await Verify(result);
     }
 
     [Fact]
@@ -164,9 +168,73 @@ public class VariablesTests : IntegrationTest
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
-                ("// place to replace", "var variables = new { Id = 1 };"),
+                (TestProject.PlaceToReplace, "var variables = new { Id = 1 };"),
                 (TestProject.MeQuery, csharpQuery));
 
         await project.Validate(graphqlQuery);
+    }
+
+    [Fact]
+    public async Task VariablesCanNotBeClassMembers()
+    {
+        var property = "public static int Id { get; set; } = 1;";
+        var csharpQuery = "q => q.User(Id, o => o.FirstName)";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplaceInClassProgram, property),
+                (TestProject.MeQuery, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+
+        diagnostics.Select(o => o.Id).Should().Contain(Descriptors.GraphQLVariableShouldBeLocal.Id);
+    }
+
+    [Fact]
+    public async Task VariablesCanNotBeNewInstanceCreation()
+    {
+        var csharpQuery = "var response = await qlClient.Query(q => q.User(new int(), o => o.FirstName))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+
+        diagnostics.Select(o => o.Id).Should().Contain(Descriptors.GraphQLVariableExpected.Id);
+    }
+
+    [Fact]
+    public async Task VariablesCanBeFunctionArgument()
+    {
+        var csharpQuery = """
+            var id = 1;
+            var response = await ExecuteLocal(id);
+            
+            async Task<GraphQLResult<string>> ExecuteLocal(int idParam) => await qlClient.Query(q => q.User(idParam, o => o.FirstName));
+            """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task UnusedVariablesAreIgnored()
+    {
+        var csharpQuery = """
+            var id = 1;
+            var filter = "test";
+            var response = await qlClient.Query(q => q.User(id, o => o.FirstName));
+            """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 }

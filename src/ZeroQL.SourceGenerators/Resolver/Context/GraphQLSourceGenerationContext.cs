@@ -3,15 +3,21 @@ using ZeroQL.Internal;
 
 namespace ZeroQL.SourceGenerators.Resolver.Context;
 
-#pragma warning disable CS8618
+public enum GraphQLQueryExecutionStrategy
+{
+    LambdaWithVariables,
+    LambdaWithClosure,
+    RequestClass,
+}
+
 public class GraphQLSourceGenerationContext
 {
     public GraphQLSourceGenerationContext(
         string key,
+        GraphQLQueryExecutionStrategy executionStrategy,
         string? operationName,
         string operationType,
         string operationQuery,
-        string operationHash,
         string queryTypeName,
         INamedTypeSymbol graphQLMethodInputSymbol,
         INamedTypeSymbol requestExecutorInputSymbol,
@@ -19,18 +25,24 @@ public class GraphQLSourceGenerationContext
         UploadInfoByType[] uploadProperties)
     {
         Key = QueryKey.Normalize(key);
+        KeyHash = QueryKey.ComputeHash(Key);
         UploadType = uploadType;
         OperationName = operationName;
         OperationType = operationType;
         OperationQuery = operationQuery;
-        OperationHash = operationHash;
+        OperationHash = QueryKey.ComputeHash(operationQuery);
         QueryTypeName = queryTypeName;
         GraphQLMethodInputSymbol = graphQLMethodInputSymbol;
         RequestExecutorInputSymbol = requestExecutorInputSymbol;
         UploadProperties = uploadProperties;
+        ExecutionStrategy = executionStrategy;
     }
 
     public string Key { get; }
+
+    public string KeyHash { get; set; }
+
+    public GraphQLQueryExecutionStrategy ExecutionStrategy { get; set; }
 
     public INamedTypeSymbol UploadType { get; }
 

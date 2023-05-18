@@ -11,12 +11,10 @@ public class FileUploadTests : IntegrationTest
     public async Task UploadFileAsClassInstance()
     {
         var csharpQuery = "Mutation(new AddProfileImage(1, new Upload(\"image.png\", new MemoryStream(new byte[42]))), static (i, m) => m.AddUserProfileImage(i.UserId, i.File))";
-        var graphqlQuery = @"mutation ($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
-
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        var result = (GraphQLResult<int>)await project.Execute();
         result.Data.Should().Be(42);
     }
     
@@ -64,6 +62,25 @@ public class FileUploadTests : IntegrationTest
                 (TestProject.FullMeQuery, csharpQuery));
 
         var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
+        result.Data.Should().Be(84);
+    }
+    
+    [Fact]
+    public async Task UploadFileAsDeepNestedAnonymousTypeWithClosureSyntax()
+    {
+        var usersVariable = @"var users = new UserInfoInput[]
+        {
+            new() { FirstName = ""John"", LastName = ""Smith"", Avatar = new Upload(""image.png"", new MemoryStream(new byte[42])) },
+            new() { FirstName = ""Ben"", LastName = ""Smith"", Avatar = new Upload(""image.png"", new MemoryStream(new byte[42])) }
+        };";
+        var csharpQuery = "Mutation(m => m.AddUsersInfo(users))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, usersVariable), 
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = (GraphQLResult<int>)await project.Execute();
         result.Data.Should().Be(84);
     }
 }

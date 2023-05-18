@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($id: UserKindPascal!) { addUserKindPascal(userKindPascal: $id)},
+  Data: 11
+}

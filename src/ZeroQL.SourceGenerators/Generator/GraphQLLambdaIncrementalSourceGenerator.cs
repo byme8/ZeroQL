@@ -79,13 +79,13 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        if (processed.Contains(lambdaContext.OperationHash))
+        if (processed.Contains(lambdaContext.KeyHash))
         {
             return;
         }
 
-        processed.Add(lambdaContext.OperationHash);
-        context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.OperationHash}.g.cs", source);
+        processed.Add(lambdaContext.KeyHash);
+        context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source);
     }
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)

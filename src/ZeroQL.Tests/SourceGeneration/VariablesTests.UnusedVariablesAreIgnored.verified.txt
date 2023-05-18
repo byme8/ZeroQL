@@ -1,0 +1,4 @@
+﻿{
+  Query: query ($id: Int!) { user(id: $id) { firstName } },
+  Data: Jon
+}

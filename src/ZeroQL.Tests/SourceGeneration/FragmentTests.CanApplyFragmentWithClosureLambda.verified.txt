@@ -1,0 +1,8 @@
+﻿{
+  Query: query ($userId: Int!) { user(id: $userId) { firstName lastName role { name }  } },
+  Data: {
+    FirstName: Jon,
+    LastName: Smith,
+    Role: Admin
+  }
+}

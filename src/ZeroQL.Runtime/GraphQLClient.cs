@@ -58,7 +58,14 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
             throw new InvalidOperationException("Query is not bootstrapped.");
         }
 
-        var result = await queryRunner.Invoke(this, normalizedQueryKey, variables, cancellationToken);
+        var context = new QueryExecuteContext
+        {
+            Client = this,
+            QueryKey = normalizedQueryKey,
+            Variables = variables,
+            CancellationToken = cancellationToken
+        };
+        var result = await queryRunner.Invoke(context);
         if (result.Errors?.Any() ?? false)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
