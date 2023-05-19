@@ -133,6 +133,7 @@ type User {
 }
 
 type Square implements IFigure {
+  id: Int
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
@@ -140,6 +141,7 @@ type Square implements IFigure {
 }
 
 type Circle implements IFigure {
+  id: Int
   center: Point!
   radius: Float!
   perimeter: Float!
@@ -147,6 +149,7 @@ type Circle implements IFigure {
 }
 
 interface IFigure {
+  id: Int
   perimeter: Float!
   creator: IPerson!
 }
@@ -224,6 +227,7 @@ interface IPerson {
 }
 
 type Point implements IFigure {
+  id: Int!
   x: Float!
   y: Float!
   perimeter: Float!

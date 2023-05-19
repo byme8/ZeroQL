@@ -23,6 +23,9 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Circle : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        public int? Id { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
         public Point __Center { get; set; }
 
@@ -243,6 +246,9 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Point : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        public int? Id { get; set; }
+
         [ZeroQL.GraphQLFieldSelector("x")]
         public double X { get; set; }
 
@@ -505,6 +511,9 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Square : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        public int? Id { get; set; }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
         public Point __TopLeft { get; set; }
 
@@ -710,6 +719,9 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public interface IFigure : global::ZeroQL.IUnionType
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        public int? Id { get; set; }
+
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 
@@ -726,6 +738,9 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class IFigureStub : IFigure
     {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        public int? Id { get; set; }
+
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         public double Perimeter { get; set; }
 

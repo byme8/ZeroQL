@@ -4,7 +4,7 @@ namespace ZeroQL.Schema;
 
 public record Definition(string Name);
 
-public record ClassDefinition(string Name, FieldDefinition[] Properties, List<string> Implements)
+public record ClassDefinition(string Name, FieldDefinition[] Properties, List<InterfaceDefinition> Implements)
     : Definition(Name);
 
 public record InterfaceDefinition(string Name, FieldDefinition[] Properties)

@@ -12,9 +12,9 @@ public static class JsonGenerators
 {
     public static ClassDeclarationSyntax GenerateJsonInitializers(
         this GraphQlGeneratorOptions options,
-        IReadOnlyList<ScalarDefinition> customScalars,
-        IReadOnlyList<EnumDefinition> enums,
-        IReadOnlyList<InterfaceDefinition> interfaces)
+        IReadOnlyCollection<ScalarDefinition> customScalars,
+        IReadOnlyCollection<EnumDefinition> enums,
+        IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
         var customScalarInitializers = CustomScalarInitializers(options, customScalars);
         var enumInitializers = EnumInitializers(options, enums);
@@ -44,7 +44,7 @@ public static class JsonGenerators
 
     private static StringBuilder InterfaceInitializers(
         GraphQlGeneratorOptions options,
-        IReadOnlyList<InterfaceDefinition> interfaces)
+        IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
         var sb = new StringBuilder();
         foreach (var interfaceDefinition in interfaces)
@@ -59,7 +59,7 @@ public static class JsonGenerators
 
     private static StringBuilder CustomScalarInitializers(
         GraphQlGeneratorOptions options,
-        IReadOnlyList<ScalarDefinition> customScalars)
+        IReadOnlyCollection<ScalarDefinition> customScalars)
     {
         var sb = new StringBuilder();
         foreach (var scalar in customScalars)
@@ -74,7 +74,7 @@ public static class JsonGenerators
 
     private static StringBuilder EnumInitializers(
         GraphQlGeneratorOptions options,
-        IReadOnlyList<EnumDefinition> enums)
+        IReadOnlyCollection<EnumDefinition> enums)
     {
         var enumInitializers = new StringBuilder();
         foreach (var @enum in enums)

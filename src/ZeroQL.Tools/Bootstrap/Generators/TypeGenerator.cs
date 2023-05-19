@@ -16,26 +16,49 @@ public static class TypeGenerator
     public static IEnumerable<MemberDeclarationSyntax> GenerateTypes(
         this GraphQlGeneratorOptions options,
         ClassDefinition[] definitions,
-        GraphQLNamedType? queryType, GraphQLNamedType? mutationType)
+        GraphQLNamedType? queryType,
+        GraphQLNamedType? mutationType)
     {
         var csharpDefinitions = definitions
             .Select(o =>
             {
-                var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
-                var @class = CSharpHelper.Class(o.Name, options.Visibility)
-                    .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
-                    .WithMembers(List(fields));
-
+                var @class = CSharpHelper.Class(o.Name, options.Visibility);
                 if (o.Implements.Any())
                 {
                     var bases = o.Implements
-                        .Select(baseType => SimpleBaseType(ParseTypeName(baseType)))
+                        .Select(baseType => SimpleBaseType(ParseTypeName(baseType.Name)))
                         .OfType<BaseTypeSyntax>()
                         .ToArray();
 
+                    var interfaceFields = o.Implements
+                        .SelectMany(oo => oo.Properties)
+                        .ToDictionary(oo => oo.Name);
+
+                    var fields = o.Properties
+                        .SelectMany(o =>
+                        {
+                            var interfaceField = interfaceFields.GetValueOrDefault(o.Name);
+                            if (interfaceField is not null)
+                            {
+                                return GeneratePropertiesDeclarations(interfaceField);
+                            }
+
+                            return GeneratePropertiesDeclarations(o);
+                        });
+
                     @class = @class
-                        .AddBaseListTypes(bases);
+                        .AddBaseListTypes(bases)
+                        .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                        .WithMembers(List(fields));
                 }
+                else
+                {
+                    var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
+                    @class = @class
+                        .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                        .WithMembers(List(fields));
+                }
+
 
                 if (o.Name == queryType?.Name.StringValue)
                 {
@@ -220,7 +243,8 @@ public static class TypeGenerator
         }
     }
 
-    private static string GetPropertyMethodBody(string fieldName, TypeDefinition typeDefinition,
+    private static string GetPropertyMethodBody(string fieldName,
+        TypeDefinition typeDefinition,
         string? parentFieldName = null)
     {
         var fieldNameToReport = (parentFieldName ?? fieldName).TrimStart('_');

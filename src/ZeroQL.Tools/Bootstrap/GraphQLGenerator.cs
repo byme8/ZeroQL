@@ -73,17 +73,18 @@ public static class GraphQLGenerator
             .Select(o => CreateInputDefinition(context, o))
             .ToArray();
 
-        var types = schema.Definitions
-            .OfType<GraphQLObjectTypeDefinition>()
-            .OrderBy(o => o.Name.StringValue)
-            .Select(o => CreateTypesDefinition(context, o))
-            .ToArray();
-
         var interfaces = schema.Definitions
             .OfType<GraphQLInterfaceTypeDefinition>()
             .OrderBy(o => o.Name.StringValue)
             .Select(o => CreateInterfaceDefinition(context, o))
-            .ToList();
+            .ToDictionary(o => o.Name);
+
+        var types = schema.Definitions
+            .OfType<GraphQLObjectTypeDefinition>()
+            .OrderBy(o => o.Name.StringValue)
+            .Select(o => CreateTypesDefinition(context, interfaces, o))
+            .ToArray();
+
 
         AddUnions(schema, interfaces, types);
 
@@ -94,7 +95,7 @@ public static class GraphQLGenerator
         var inputsDeclaration = options.GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(options, enums);
         var scalarDeclaration = options.GenerateScalars(customScalars);
-        var jsonInitializers = options.GenerateJsonInitializers(customScalars, enums, interfaces);
+        var jsonInitializers = options.GenerateJsonInitializers(customScalars, enums, interfaces.Values);
         var interfaceInitializers = interfaces.GenerateInterfaceInitializers(types);
 
         namespaceDeclaration = namespaceDeclaration
@@ -150,9 +151,17 @@ public static class GraphQLGenerator
         return formattedSource;
     }
 
-    private static ClassDefinition CreateTypesDefinition(TypeContext typeContext, GraphQLObjectTypeDefinition type)
-        => new(type.Name.StringValue, typeContext.CreatePropertyDefinition(type.Fields),
-            type.Interfaces?.Select(o => o.Name.StringValue).ToList() ?? new List<string>());
+    private static ClassDefinition CreateTypesDefinition(
+        TypeContext typeContext,
+        Dictionary<string, InterfaceDefinition> interfaces,
+        GraphQLObjectTypeDefinition type)
+    {
+        var typeInterfaces = type.Interfaces?
+            .Select(o => interfaces[o.Name.StringValue])
+            .ToList() ?? new List<InterfaceDefinition>();
+        
+        return new ClassDefinition(type.Name.StringValue, typeContext.CreatePropertyDefinition(type.Fields), typeInterfaces);
+    }
 
     private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
         GraphQLInterfaceTypeDefinition definition)
@@ -163,9 +172,9 @@ public static class GraphQLGenerator
             union.Types?.Select(o => o.Name.StringValue).ToArray() ?? Array.Empty<string>());
 
     private static ClassDefinition CreateInputDefinition(TypeContext typeContext, GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, typeContext.CreatePropertyDefinition(input), new List<string>());
-    
-    private static void AddUnions(GraphQLDocument schema, List<InterfaceDefinition> interfaces, ClassDefinition[] types)
+        => new(input.Name.StringValue, typeContext.CreatePropertyDefinition(input), new List<InterfaceDefinition>());
+
+    private static void AddUnions(GraphQLDocument schema, Dictionary<string, InterfaceDefinition> interfaces, ClassDefinition[] types)
     {
         var unions = schema.Definitions
             .OfType<GraphQLUnionTypeDefinition>()
@@ -175,17 +184,19 @@ public static class GraphQLGenerator
 
         foreach (var union in unions)
         {
-            interfaces.Add(new InterfaceDefinition(union.Name, Array.Empty<FieldDefinition>()));
+            var unionInterface = new InterfaceDefinition(union.Name, Array.Empty<FieldDefinition>());
+            interfaces.Add(union.Name, unionInterface);
             foreach (var unionType in union.Types)
             {
                 var type = types.FirstOrDefault(o => o.Name == unionType);
                 if (type is not null)
                 {
-                    type.Implements.Add(union.Name);
+                    type.Implements.Add(unionInterface);
                 }
             }
         }
     }
+
     private static EnumDeclarationSyntax[] GenerateEnums(
         GraphQlGeneratorOptions options,
         EnumDefinition[] enums)

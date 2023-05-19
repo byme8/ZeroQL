@@ -14,9 +14,9 @@ public static class InterfaceGenerator
 {
     public static IEnumerable<MemberDeclarationSyntax> GenerateInterfaces(
         this GraphQlGeneratorOptions options,
-        IReadOnlyCollection<InterfaceDefinition> interfaces)
+        IReadOnlyDictionary<string, InterfaceDefinition> interfaces)
     {
-        var csharpDefinitions = interfaces
+        var csharpDefinitions = interfaces.Values
             .SelectMany(o =>
             {
                 var fields = o.Properties
@@ -25,13 +25,13 @@ public static class InterfaceGenerator
 
                 var @interface = CSharpHelper.Interface(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
-                    .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName("global::ZeroQL.IUnionType")))
-                    .WithMembers(SyntaxFactory.List(fields));
+                    .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
+                    .WithMembers(List(fields));
 
                 var stub = CSharpHelper.Class(o.Name + "Stub", options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
-                    .AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(o.Name)))
-                    .WithMembers(SyntaxFactory.List(fields));
+                    .AddBaseListTypes(SimpleBaseType(ParseTypeName(o.Name)))
+                    .WithMembers(List(fields));
 
                 return new MemberDeclarationSyntax[] { @interface, stub };
             })
@@ -41,23 +41,23 @@ public static class InterfaceGenerator
     }
     
     public static ClassDeclarationSyntax[] GenerateInterfaceInitializers(
-        this List<InterfaceDefinition> interfaces,
+        this Dictionary<string, InterfaceDefinition> interfaces,
         ClassDefinition[] types)
     {
         var typesByInterface = types
             .Where(o => o.Implements.Any())
-            .SelectMany(o => o.Implements.Select(oo => (Interface: oo, Type: o)))
+            .SelectMany(o => o.Implements.Select(oo => (Interface: oo.Name, Type: o)))
             .GroupBy(o => o.Interface)
             .ToDictionary(o => o.Key, o => o.ToArray());
 
-        foreach (var @interface in interfaces)
+        foreach (var @interface in interfaces.Values.Select(o => o.Name))
         {
-            if (typesByInterface.ContainsKey(@interface.Name))
+            if (typesByInterface.ContainsKey(@interface))
             {
                 continue;
             }
 
-            typesByInterface.Add(@interface.Name, Array.Empty<(string Interface, ClassDefinition Type)>());
+            typesByInterface.Add(@interface, Array.Empty<(string Interface, ClassDefinition Type)>());
         }
 
         if (!typesByInterface.Any())

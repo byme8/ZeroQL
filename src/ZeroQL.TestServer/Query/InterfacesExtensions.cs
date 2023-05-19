@@ -36,6 +36,8 @@ public class Person : IPerson
 
 public interface IFigure
 {
+    public int? Id { get; set; }
+    
     float Perimeter { get; }
 
     IPerson Creator { get; set; }
@@ -43,6 +45,9 @@ public interface IFigure
 
 public class Point : IFigure
 {
+    [GraphQLType("Int!")]
+    public int? Id { get; set; }
+    
     public float X { get; set; }
     public float Y { get; set; }
 
@@ -53,6 +58,8 @@ public class Point : IFigure
 
 public class Square : IFigure
 {
+    public int? Id { get; set; }
+    
     public Point TopLeft { get; set; }
 
     public Point BottomRight { get; set; }
@@ -64,6 +71,9 @@ public class Square : IFigure
 
 public class Circle : IFigure
 {
+    
+    public int? Id { get; set; }
+    
     public Point Center { get; set; }
 
     public float Radius { get; set; }
