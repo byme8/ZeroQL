@@ -132,7 +132,7 @@ public static class TypeGenerator
         {
             ("global::System.ComponentModel.EditorBrowsable",
                 "global::System.ComponentModel.EditorBrowsableState.Never"),
-            ("JsonPropertyName", Literal(field.Name).Text)
+            ("JsonPropertyName", Literal(field.GraphQLName).Text)
         };
 
         return CSharpHelper

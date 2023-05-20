@@ -20,7 +20,7 @@
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("topLeft")]
         public Point __TopLeft { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("topLeft")]
@@ -29,7 +29,7 @@
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
         }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("BottomRight")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("bottomRight")]
         public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("bottomRight")]
@@ -51,7 +51,7 @@
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("center")]
         public Point __Center { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("center")]

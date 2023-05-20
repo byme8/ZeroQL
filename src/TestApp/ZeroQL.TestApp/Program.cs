@@ -48,7 +48,7 @@ public class AddProfileImage
     public AddProfileImage(int userId, Upload file)
     {
         UserId = userId;
-        File = file;
+        File = file;    
     }
 
     public int UserId { get; set; }

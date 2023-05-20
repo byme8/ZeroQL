@@ -1,9 +1,10 @@
 ﻿{
-  Query: query { figures { id perimeter ... on Circle { radius center { id x y __typename }  } ... on Square { topLeft { id x y __typename }  bottomRight { id x y __typename }  } __typename } },
+  Query: query { figures { id perimeter creator { id __typename }  ... on Circle { radius center { id x y __typename }  } ... on Square { topLeft { id x y __typename }  bottomRight { id x y __typename }  } __typename } },
   Data: [
     {
       Id: 21,
       Perimeter: 6.2831854820251465,
+      CreatorId: 1,
       Circle: {
         Radius: 1.0,
         Center: {
@@ -16,6 +17,7 @@
     {
       Id: 31,
       Perimeter: 40.0,
+      CreatorId: 1,
       Square: {
         TopLeft: {
           Id: 1,

@@ -17,6 +17,7 @@ public class OnSyntaxTests : IntegrationTest
                     {
                         o.Id,
                         o.Perimeter,
+                        CreatorId = o.Creator(oo => oo.Id),
                         Circle = o.On<Circle>()
                             .Select(oo => new { oo.Radius, Center = oo.Center(ooo => new { ooo.Id, ooo.X, ooo.Y }) }),
                         Square = o.On<Square>()

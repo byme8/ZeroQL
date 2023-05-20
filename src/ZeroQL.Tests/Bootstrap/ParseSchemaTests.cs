@@ -264,7 +264,7 @@ public class ParseSchemaTests
             .SelectMany(o => o.Attributes)
             .Should()
             .Contain(o => o.Name.ToString() == "JsonPropertyName" &&
-                          o.ArgumentList!.Arguments.First().Expression.ToString() == @"""User""");
+                          o.ArgumentList!.Arguments.First().Expression.ToString() == @"""user""");
     }
 
     [Fact]
