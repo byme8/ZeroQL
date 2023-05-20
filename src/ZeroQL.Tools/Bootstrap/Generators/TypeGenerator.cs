@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQLParser.AST;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
@@ -35,16 +36,7 @@ public static class TypeGenerator
                         .ToDictionary(oo => oo.Name);
 
                     var fields = o.Properties
-                        .SelectMany(o =>
-                        {
-                            var interfaceField = interfaceFields.GetValueOrDefault(o.Name);
-                            if (interfaceField is not null)
-                            {
-                                return GeneratePropertiesDeclarations(interfaceField);
-                            }
-
-                            return GeneratePropertiesDeclarations(o);
-                        });
+                        .SelectMany(o => GenerateFieldMembersWithAccountForInterface(o, interfaceFields));
 
                     @class = @class
                         .AddBaseListTypes(bases)
@@ -58,7 +50,6 @@ public static class TypeGenerator
                         .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                         .WithMembers(List(fields));
                 }
-
 
                 if (o.Name == queryType?.Name.StringValue)
                 {
@@ -78,6 +69,44 @@ public static class TypeGenerator
         return csharpDefinitions;
     }
 
+    private static IEnumerable<MemberDeclarationSyntax> GenerateFieldMembersWithAccountForInterface(
+        FieldDefinition field, Dictionary<string, FieldDefinition> interfaceFields)
+    {
+        var members = new List<MemberDeclarationSyntax>();
+        members.AddRange(GeneratePropertiesDeclarations(field));
+        var interfaceField = interfaceFields.GetValueOrDefault(field.Name);
+        if (interfaceField is null || interfaceField.TypeDefinition == field.TypeDefinition)
+        {
+            return members;
+        }
+
+        if (members.Count == 2)
+        {
+            // we have graphql selector and csharp property
+            // no need to generate nullable property
+            return members;
+        }
+
+        var interfaceFieldDeclarations = GeneratePropertiesDeclarations(interfaceField);
+        foreach (var interfaceFieldDeclaration in interfaceFieldDeclarations)
+        {
+            switch (interfaceFieldDeclaration)
+            {
+                case PropertyDeclarationSyntax property:
+                    members.Add(property
+                        .WithModifiers(new SyntaxTokenList())
+                        .WithAttributeLists(List<AttributeListSyntax>())
+                        .AddAttribute(ZeroQLGenerationInfo.JsonIgnoreAttribute)
+                        .WithExplicitInterfaceSpecifier(
+                            ExplicitInterfaceSpecifier(
+                                IdentifierName(interfaceField.Parent.Name))));
+                    break;
+            }
+        }
+
+        return members;
+    }
+
     public static ClassDeclarationSyntax[] GenerateInputs(
         this GraphQlGeneratorOptions options,
         ClassDefinition[] inputs)
@@ -88,7 +117,7 @@ public static class TypeGenerator
                 var fields = o.Properties
                     .Select(property =>
                         CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue)
-                            .AddAttribute(ZeroQLGenerationInfo.GraphQLJsonAttribute, property.GraphQLName));
+                            .AddAttribute(ZeroQLGenerationInfo.JsonPropertyNameAttribute, property.GraphQLName));
 
                 return CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
@@ -116,7 +145,6 @@ public static class TypeGenerator
         if (RequireSelector(field))
         {
             var backedField = BackedField(field);
-
             var parameters = field.Arguments
                 .Select(o =>
                     Parameter(Identifier(o.Name.EnsureNotKeyword()))
@@ -129,9 +157,10 @@ public static class TypeGenerator
             return new[] { backedField, selector };
         }
 
-        MemberDeclarationSyntax property = CSharpHelper
+        var property = CSharpHelper
             .Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
-            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName);
+            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
+            .AddAttribute(ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName);
 
         return new[]
         {
@@ -139,7 +168,8 @@ public static class TypeGenerator
         };
     }
 
-    private static MemberDeclarationSyntax GenerateQueryPropertyDeclaration(FieldDefinition field,
+    private static MemberDeclarationSyntax GenerateQueryPropertyDeclaration(
+        FieldDefinition field,
         ParameterSyntax[] parameters)
     {
         var returnType = GetPropertyReturnType(field.TypeDefinition);
@@ -298,9 +328,10 @@ public static class TypeGenerator
 
     public static FieldDefinition[] CreatePropertyDefinition(
         this TypeContext typeContext,
-        GraphQLInputObjectTypeDefinition inputType)
+        Definition parent,
+        GraphQLInputFieldsDefinition? fields)
     {
-        return inputType.Fields?
+        return fields?
             .Select(field =>
             {
                 var graphQLName = field.Name.StringValue;
@@ -313,6 +344,7 @@ public static class TypeGenerator
                 return new FieldDefinition(
                     csharpName,
                     graphQLName,
+                    parent,
                     type,
                     Array.Empty<ArgumentDefinition>(),
                     directives,
@@ -344,6 +376,7 @@ public static class TypeGenerator
 
     public static FieldDefinition[] CreatePropertyDefinition(
         this TypeContext typeContext,
+        Definition parent,
         GraphQLFieldsDefinition? fields)
     {
         return fields?.Select(field =>
@@ -365,6 +398,7 @@ public static class TypeGenerator
                 return new FieldDefinition(
                     csharpName,
                     graphQLName,
+                    parent,
                     type,
                     argumentDefinitions,
                     directives,

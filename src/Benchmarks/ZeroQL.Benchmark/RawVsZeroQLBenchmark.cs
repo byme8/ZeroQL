@@ -61,7 +61,7 @@ public class RawVsZeroQLBenchmark
     public async Task<string> StrawberryShake()
     {
         var firstname = await strawberryShake.GetUser.ExecuteAsync(id);
-        return firstname.Data!.User.FirstName;
+        return firstname.Data!.User!.FirstName;
     }
 
     [Benchmark]

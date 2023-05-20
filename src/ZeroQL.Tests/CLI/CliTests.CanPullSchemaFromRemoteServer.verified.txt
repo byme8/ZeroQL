@@ -137,7 +137,7 @@ type Square implements IFigure {
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 type Circle implements IFigure {
@@ -145,13 +145,13 @@ type Circle implements IFigure {
   center: Point!
   radius: Float!
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 interface IFigure {
   id: Int
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 type FigureContent {

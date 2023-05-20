@@ -4,10 +4,10 @@ namespace ZeroQL.Schema;
 
 public record Definition(string Name);
 
-public record ClassDefinition(string Name, FieldDefinition[] Properties, List<InterfaceDefinition> Implements)
+public record ClassDefinition(string Name, IReadOnlyList<FieldDefinition> Properties, List<InterfaceDefinition> Implements)
     : Definition(Name);
 
-public record InterfaceDefinition(string Name, FieldDefinition[] Properties)
+public record InterfaceDefinition(string Name, IReadOnlyList<FieldDefinition> Properties)
     : Definition(Name);
 
 public record UnionDefinition(string Name, string[] Types)

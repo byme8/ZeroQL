@@ -33,20 +33,26 @@ internal static class CSharpHelper
                     .ToArray()));
     }
 
-    public static T AddAttribute<T>(this T declarationSyntax, string name, params string[] attributes)
+    public static T AddAttribute<T>(this T declarationSyntax, string name, params string[] arguments)
         where T : MemberDeclarationSyntax
     {
+        var attribute = Attribute(ParseName(name));
+        if (arguments.Length > 0)
+        {
+            attribute = attribute
+                .WithArgumentList(AttributeArgumentList()
+                    .WithArguments(
+                        SeparatedList(arguments
+                            .Select(o => AttributeArgument(
+                                LiteralExpression(
+                                    SyntaxKind.StringLiteralExpression,
+                                    Literal(o))))
+                            .ToArray())));
+        }
+
         return (T)declarationSyntax
             .AddAttributeLists(AttributeList()
-                .AddAttributes(Attribute(ParseName(name))
-                    .WithArgumentList(AttributeArgumentList()
-                        .WithArguments(
-                            SeparatedList(attributes
-                                .Select(o => AttributeArgument(
-                                    LiteralExpression(
-                                        SyntaxKind.StringLiteralExpression,
-                                        Literal(o))))
-                                .ToArray())))));
+                .AddAttributes(attribute));
     }
 
     public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, bool withNullableAnnotation,
@@ -118,7 +124,7 @@ internal static class CSharpHelper
     {
         if (SyntaxFacts.GetKeywordKind(identifier) is not SyntaxKind.None)
             return $"@{identifier}";
-            
+
         return identifier;
     }
 }

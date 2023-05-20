@@ -24,6 +24,7 @@ namespace GraphQLClient
     internal class Circle : IFigure
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Center")]
@@ -36,18 +37,20 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("radius")]
+        [JsonPropertyName("radius")]
         public double Radius { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("creator")]
-        public T Creator<T>(Func<IPerson, T> selector)
+        public T? Creator<T>(Func<IPerson, T> selector)
         {
-            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+            return __Creator is null ? default : selector(__Creator);
         }
     }
 
@@ -55,6 +58,7 @@ namespace GraphQLClient
     internal class FigureContent : PostContent
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Figure")]
@@ -80,12 +84,15 @@ namespace GraphQLClient
     internal class ImageContent : PostContent
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("imageUrl")]
+        [JsonPropertyName("imageUrl")]
         public string ImageUrl { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("height")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
@@ -102,6 +109,7 @@ namespace GraphQLClient
     internal class JsonDocument
     {
         [ZeroQL.GraphQLFieldSelector("rootElement")]
+        [JsonPropertyName("rootElement")]
         public global::System.Text.Json.JsonElement RootElement { get; set; }
     }
 
@@ -109,9 +117,11 @@ namespace GraphQLClient
     internal class KeyValuePairOfStringAndString
     {
         [ZeroQL.GraphQLFieldSelector("key")]
+        [JsonPropertyName("key")]
         public string Key { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value")]
+        [JsonPropertyName("value")]
         public string Value { get; set; }
     }
 
@@ -182,6 +192,7 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("doError")]
+        [JsonPropertyName("doError")]
         public int DoError { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("AddUserProfileImage")]
@@ -234,12 +245,15 @@ namespace GraphQLClient
     internal class Person : IPerson
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("firstName")]
+        [JsonPropertyName("firstName")]
         public string FirstName { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("lastName")]
+        [JsonPropertyName("lastName")]
         public string LastName { get; set; }
     }
 
@@ -247,15 +261,22 @@ namespace GraphQLClient
     internal class Point : IFigure
     {
         [ZeroQL.GraphQLFieldSelector("id")]
-        public int? Id { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonIgnore]
+        int? IFigure.Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("x")]
+        [JsonPropertyName("x")]
         public double X { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("y")]
+        [JsonPropertyName("y")]
         public double Y { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
@@ -272,6 +293,7 @@ namespace GraphQLClient
     internal class Query : global::ZeroQL.Internal.IQuery
     {
         [ZeroQL.GraphQLFieldSelector("longOperation")]
+        [JsonPropertyName("longOperation")]
         public int LongOperation { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Posts")]
@@ -338,9 +360,11 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("instant")]
+        [JsonPropertyName("instant")]
         public global::GraphQLClient.Instant Instant { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("zonedDateTime")]
+        [JsonPropertyName("zonedDateTime")]
         public global::GraphQLClient.ZonedDateTime ZonedDateTime { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Me")]
@@ -390,9 +414,11 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("userKinds")]
+        [JsonPropertyName("userKinds")]
         public UserKind[] UserKinds { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("userKindPascals")]
+        [JsonPropertyName("userKindPascals")]
         public UserKindPascal[] UserKindPascals { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("UsersMatrix")]
@@ -468,6 +494,7 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("jsonUsersElement")]
+        [JsonPropertyName("jsonUsersElement")]
         public global::System.Text.Json.JsonElement JsonUsersElement { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("JsonUsersDocument")]
@@ -502,9 +529,11 @@ namespace GraphQLClient
     internal class Role
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
     }
 
@@ -512,6 +541,7 @@ namespace GraphQLClient
     internal class Square : IFigure
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("TopLeft")]
@@ -533,15 +563,16 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("creator")]
-        public T Creator<T>(Func<IPerson, T> selector)
+        public T? Creator<T>(Func<IPerson, T> selector)
         {
-            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+            return __Creator is null ? default : selector(__Creator);
         }
     }
 
@@ -549,9 +580,11 @@ namespace GraphQLClient
     internal class TextContent : PostContent
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Author")]
@@ -568,84 +601,111 @@ namespace GraphQLClient
     internal class TypesContainer
     {
         [ZeroQL.GraphQLFieldSelector("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value1")]
+        [JsonPropertyName("value1")]
         public byte Value1 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value2")]
+        [JsonPropertyName("value2")]
         public byte? Value2 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value3")]
+        [JsonPropertyName("value3")]
         public short Value3 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value4")]
+        [JsonPropertyName("value4")]
         public short? Value4 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value5")]
+        [JsonPropertyName("value5")]
         public int Value5 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value6")]
+        [JsonPropertyName("value6")]
         public int? Value6 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value7")]
+        [JsonPropertyName("value7")]
         public long Value7 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value8")]
+        [JsonPropertyName("value8")]
         public long? Value8 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value9")]
+        [JsonPropertyName("value9")]
         public double Value9 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value10")]
+        [JsonPropertyName("value10")]
         public double? Value10 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value11")]
+        [JsonPropertyName("value11")]
         public double Value11 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value12")]
+        [JsonPropertyName("value12")]
         public double? Value12 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value13")]
+        [JsonPropertyName("value13")]
         public decimal Value13 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value14")]
+        [JsonPropertyName("value14")]
         public decimal? Value14 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value15")]
+        [JsonPropertyName("value15")]
         public DateTimeOffset Value15 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value16")]
+        [JsonPropertyName("value16")]
         public DateTimeOffset? Value16 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value17")]
+        [JsonPropertyName("value17")]
         public DateOnly Value17 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value18")]
+        [JsonPropertyName("value18")]
         public DateOnly? Value18 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value19")]
+        [JsonPropertyName("value19")]
         public Guid Value19 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value20")]
+        [JsonPropertyName("value20")]
         public Guid? Value20 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value21")]
+        [JsonPropertyName("value21")]
         public Guid[] Value21 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value22")]
+        [JsonPropertyName("value22")]
         public Guid[]? Value22 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value23")]
+        [JsonPropertyName("value23")]
         public Guid[] Value23 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value24")]
+        [JsonPropertyName("value24")]
         public Guid[]? Value24 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value25")]
+        [JsonPropertyName("value25")]
         public Guid[] Value25 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value26")]
+        [JsonPropertyName("value26")]
         public Guid[]? Value26 { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Value27")]
@@ -685,9 +745,11 @@ namespace GraphQLClient
         }
 
         [ZeroQL.GraphQLFieldSelector("value31")]
+        [JsonPropertyName("value31")]
         public DateTimeOffset Value31 { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("value32")]
+        [JsonPropertyName("value32")]
         public DateTimeOffset? Value32 { get; set; }
     }
 
@@ -695,15 +757,19 @@ namespace GraphQLClient
     internal class User
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public ID Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("firstName")]
+        [JsonPropertyName("firstName")]
         public string FirstName { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("lastName")]
+        [JsonPropertyName("lastName")]
         public string LastName { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("userKind")]
+        [JsonPropertyName("userKind")]
         public UserKind UserKind { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Role")]
@@ -720,18 +786,20 @@ namespace GraphQLClient
     internal interface IFigure : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("creator")]
-        public T Creator<T>(Func<IPerson, T> selector)
+        public T? Creator<T>(Func<IPerson, T> selector)
         {
-            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+            return __Creator is null ? default : selector(__Creator);
         }
     }
 
@@ -739,18 +807,20 @@ namespace GraphQLClient
     internal class IFigureStub : IFigure
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("Creator")]
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("creator")]
-        public T Creator<T>(Func<IPerson, T> selector)
+        public T? Creator<T>(Func<IPerson, T> selector)
         {
-            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+            return __Creator is null ? default : selector(__Creator);
         }
     }
 
@@ -758,6 +828,7 @@ namespace GraphQLClient
     internal interface InterfaceThatNeverGetsUsed : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
     }
 
@@ -765,6 +836,7 @@ namespace GraphQLClient
     internal class InterfaceThatNeverGetsUsedStub : InterfaceThatNeverGetsUsed
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
     }
 
@@ -772,12 +844,15 @@ namespace GraphQLClient
     internal interface IPerson : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("firstName")]
+        [JsonPropertyName("firstName")]
         public string FirstName { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("lastName")]
+        [JsonPropertyName("lastName")]
         public string LastName { get; set; }
     }
 
@@ -785,12 +860,15 @@ namespace GraphQLClient
     internal class IPersonStub : IPerson
     {
         [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("firstName")]
+        [JsonPropertyName("firstName")]
         public string FirstName { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("lastName")]
+        [JsonPropertyName("lastName")]
         public string LastName { get; set; }
     }
 

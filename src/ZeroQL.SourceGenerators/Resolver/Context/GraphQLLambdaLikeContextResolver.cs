@@ -148,7 +148,7 @@ public class GraphQLLambdaLikeContextResolver
         var uploadPropertiesFromInputType = FindUploadPropertiesForType(inputType, uploadType, new HashSet<string>());
         var uploadPropertiesFromVariables = variables
             .Select(o => o.Value.TypeSymbol)
-            .SelectMany(o => FindUploadPropertiesForType(o, uploadType, new HashSet<string>()))
+            .SelectMany(o => FindUploadPropertiesForType(o!, uploadType, new HashSet<string>()))
             .ToArray();
 
         var uploadProperties = uploadPropertiesFromInputType

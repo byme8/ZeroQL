@@ -10,6 +10,7 @@
     public class TextContent : PostContent
     {
         [ZeroQL.GraphQLFieldSelector("text")]
+        [JsonPropertyName("text")]
         public string Text { get; set; }
     }
 ,
@@ -18,9 +19,11 @@
     public class ImageContent : PostContent
     {
         [ZeroQL.GraphQLFieldSelector("imageUrl")]
+        [JsonPropertyName("imageUrl")]
         public string ImageUrl { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("height")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
     }
 ,

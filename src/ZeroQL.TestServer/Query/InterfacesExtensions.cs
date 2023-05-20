@@ -40,7 +40,7 @@ public interface IFigure
     
     float Perimeter { get; }
 
-    IPerson Creator { get; set; }
+    IPerson? Creator { get; set; }
 }
 
 public class Point : IFigure
@@ -66,7 +66,7 @@ public class Square : IFigure
 
     public float Perimeter => Math.Abs(TopLeft.Y - BottomRight.Y) * 2 + Math.Abs(BottomRight.Y - TopLeft.Y) * 2;
 
-    public IPerson Creator { get; set; }
+    public IPerson? Creator { get; set; }
 }
 
 public class Circle : IFigure
@@ -80,7 +80,7 @@ public class Circle : IFigure
 
     public float Perimeter => (float)Math.PI * 2 * Radius;
 
-    public IPerson Creator { get; set; }
+    public IPerson? Creator { get; set; }
 }
 
 [ExtendObjectType(typeof(Query))]

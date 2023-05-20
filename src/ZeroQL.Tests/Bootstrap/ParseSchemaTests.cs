@@ -422,22 +422,26 @@ type Mutation {
             }
 
             interface IFigure {
+              id: Int
               perimeter: Float!
             }
 
             type Circle implements IFigure {
+              id: Int
               center: Point!
               radius: Float!
               perimeter: Float!
             }
 
             type Point implements IFigure {
+              id: Int!
               x: Float!
               y: Float!
               perimeter: Float!
             }
 
             type Square implements IFigure {
+              id: Int
               topLeft: Point!
               bottomRight: Point!
               perimeter: Float!

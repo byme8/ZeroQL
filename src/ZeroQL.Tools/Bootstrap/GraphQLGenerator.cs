@@ -159,22 +159,43 @@ public static class GraphQLGenerator
         var typeInterfaces = type.Interfaces?
             .Select(o => interfaces[o.Name.StringValue])
             .ToList() ?? new List<InterfaceDefinition>();
+
+        var classFields = new List<FieldDefinition>();;
+        var classDefinition = new ClassDefinition(type.Name.StringValue, classFields, typeInterfaces);
+        var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields);
+        classFields.AddRange(fields);
         
-        return new ClassDefinition(type.Name.StringValue, typeContext.CreatePropertyDefinition(type.Fields), typeInterfaces);
+        return classDefinition;
     }
 
     private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
         GraphQLInterfaceTypeDefinition definition)
-        => new(definition.Name.StringValue, typeContext.CreatePropertyDefinition(definition.Fields));
+    {
+        var interfaceFields = new List<FieldDefinition>();
+        var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
+        var fields = typeContext.CreatePropertyDefinition(interfaceDefinition, definition.Fields);
+        interfaceFields.AddRange(fields);
+
+        return interfaceDefinition;
+    }
 
     public static UnionDefinition CreateUnionDefinition(GraphQLUnionTypeDefinition union)
         => new(union.Name.StringValue,
             union.Types?.Select(o => o.Name.StringValue).ToArray() ?? Array.Empty<string>());
 
-    private static ClassDefinition CreateInputDefinition(TypeContext typeContext, GraphQLInputObjectTypeDefinition input)
-        => new(input.Name.StringValue, typeContext.CreatePropertyDefinition(input), new List<InterfaceDefinition>());
+    private static ClassDefinition CreateInputDefinition(TypeContext typeContext,
+        GraphQLInputObjectTypeDefinition input)
+    {
+        var classFields = new List<FieldDefinition>();
+        var classDefinition = new ClassDefinition(input.Name.StringValue, classFields, new List<InterfaceDefinition>());
+        var fields = typeContext.CreatePropertyDefinition(classDefinition, input.Fields);
+        classFields.AddRange(fields);
 
-    private static void AddUnions(GraphQLDocument schema, Dictionary<string, InterfaceDefinition> interfaces, ClassDefinition[] types)
+        return classDefinition;
+    }
+
+    private static void AddUnions(GraphQLDocument schema, Dictionary<string, InterfaceDefinition> interfaces,
+        ClassDefinition[] types)
     {
         var unions = schema.Definitions
             .OfType<GraphQLUnionTypeDefinition>()
@@ -224,5 +245,4 @@ public static class GraphQLGenerator
             })
             .ToArray();
     }
-
 }

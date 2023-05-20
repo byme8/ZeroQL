@@ -6,7 +6,7 @@ schema {
 interface IFigure {
   id: Int
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 interface IPerson {
@@ -24,7 +24,7 @@ type Circle implements IFigure {
   center: Point!
   radius: Float!
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 type FigureContent {
@@ -121,7 +121,7 @@ type Square implements IFigure {
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 type TextContent {
