@@ -37,7 +37,7 @@ public class Person : IPerson
 public interface IFigure
 {
     public int? Id { get; set; }
-    
+
     float Perimeter { get; }
 
     IPerson? Creator { get; set; }
@@ -47,7 +47,7 @@ public class Point : IFigure
 {
     [GraphQLType("Int!")]
     public int? Id { get; set; }
-    
+
     public float X { get; set; }
     public float Y { get; set; }
 
@@ -59,7 +59,7 @@ public class Point : IFigure
 public class Square : IFigure
 {
     public int? Id { get; set; }
-    
+
     public Point TopLeft { get; set; }
 
     public Point BottomRight { get; set; }
@@ -71,9 +71,9 @@ public class Square : IFigure
 
 public class Circle : IFigure
 {
-    
+
     public int? Id { get; set; }
-    
+
     public Point Center { get; set; }
 
     public float Radius { get; set; }
@@ -99,7 +99,8 @@ public class InterfacesExtensions
             .Range(0, 10)
             .Select(o => new Circle
             {
-                Center = new Point { X = o, Y = o },
+                Id = o + 20,
+                Center = new Point { Id = o, X = o, Y = o },
                 Radius = o,
                 Creator = Person.Create(),
             })
@@ -112,8 +113,9 @@ public class InterfacesExtensions
             .Range(0, 10)
             .Select(o => new Square
             {
-                TopLeft = new Point { X = o, Y = o },
-                BottomRight = new Point { X = o + 10, Y = o + 10 },
+                Id = o + 30,
+                TopLeft = new Point { Id = o, X = o, Y = o },
+                BottomRight = new Point { Id = o + 20, X = o + 10, Y = o + 10 },
                 Creator = Person.Create(),
             })
             .ToArray();

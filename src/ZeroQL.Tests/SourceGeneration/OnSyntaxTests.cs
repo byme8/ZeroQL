@@ -15,14 +15,15 @@ public class OnSyntaxTests : IntegrationTest
                 static q => q.Figures(
                     o => new
                     {
+                        o.Id,
                         o.Perimeter,
                         Circle = o.On<Circle>()
-                            .Select(oo => new { oo.Radius, Center = oo.Center(ooo => new { ooo.X, ooo.Y }) }),
+                            .Select(oo => new { oo.Radius, Center = oo.Center(ooo => new { ooo.Id, ooo.X, ooo.Y }) }),
                         Square = o.On<Square>()
                             .Select(oo => new 
                                 { 
-                                    TopLeft = oo.TopLeft(ooo => new { ooo.X, ooo.Y }), 
-                                    BottomRight = oo.BottomRight(ooo => new { ooo.X, ooo.Y }) 
+                                    TopLeft = oo.TopLeft(ooo => new { ooo.Id, ooo.X, ooo.Y }), 
+                                    BottomRight = oo.BottomRight(ooo => new { ooo.Id, ooo.X, ooo.Y }) 
                                 })
                     })
                 """;
