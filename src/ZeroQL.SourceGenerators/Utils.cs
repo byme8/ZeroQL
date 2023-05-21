@@ -143,7 +143,7 @@ public static class Utils
         };
     }
 
-    public static INamedTypeSymbol? GetNamedTypeSymbol(this ISymbol info)
+    public static INamedTypeSymbol? GetNamedTypeSymbol(this ISymbol? info)
     {
         switch (info)
         {

@@ -72,7 +72,7 @@ public class RequestTests : IntegrationTest
         var project = await Project
             .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryRequestAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
         diagnostics!.Select(o => o.Id)
             .Should().Contain(Descriptors.GraphQLQueryPreview.Id);
     }

@@ -60,25 +60,8 @@ public class ParseSchemaTests
     }
 
     [Fact]
-    public void QueryDetected()
+    public async Task QueryDetected()
     {
-        var methods = new[]
-        {
-            "T Me<T>(Func<User, T> selector)",
-            "T[] Users<T>(UserFilterInput filter, int page, int size, Func<User, T> selector)",
-            "T[][] UsersMatrix<T>(Func<User, T> selector)",
-            "T[] UsersByKind<T>(UserKind kind, int page, int size, Func<User, T> selector)",
-            "int[] UsersIds(UserKind kind, int page, int size)",
-            "T? User<T>(int id, Func<User, T> selector)",
-            "T? Admin<T>(int id, Func<User, T> selector)",
-            "T Container<T>(Func<TypesContainer, T> selector)"
-        };
-
-        var properties = new[]
-        {
-            "UserKind[] UserKinds"
-        };
-
         var query = SyntaxTree.GetClass("Query")!;
 
         query.Members
@@ -93,11 +76,9 @@ public class ParseSchemaTests
                 var genericArguments = o.TypeParameterList?.ToString();
                 var genericName = o.ParameterList.ToString();
                 return $@"{returnType} {methodName}{genericArguments}{genericName}";
-            })
-            .Should()
-            .Contain(methods);
+            });
 
-        query.Members
+        var members = query.Members
             .OfType<PropertyDeclarationSyntax>()
             .Where(o => !o.Identifier.ValueText.StartsWith("__"))
             .Select(o =>
@@ -105,9 +86,9 @@ public class ParseSchemaTests
                 var returnType = o.Type.ToString();
                 var name = o.Identifier.Text;
                 return $@"{returnType} {name}";
-            })
-            .Should()
-            .Contain(properties);
+            });
+
+        await Verify(members);
     }
 
     [Fact]
@@ -159,16 +140,11 @@ public class ParseSchemaTests
     }
 
     [Fact]
-    public void MutationDetected()
+    public async Task MutationDetected()
     {
-        var properties = new[]
-        {
-            "T AddUser<T>(string firstName, string lastName, Func<User, T> selector)"
-        };
-
         var query = SyntaxTree.GetClass("Mutation")!;
 
-        query.Members
+        var members = query.Members
             .OfType<MethodDeclarationSyntax>()
             .Select(o =>
             {
@@ -177,9 +153,9 @@ public class ParseSchemaTests
                 var genericArguments = o.TypeParameterList?.ToString();
                 var genericName = o.ParameterList.ToString();
                 return $@"{returnType} {methodName}{genericArguments}{genericName}";
-            })
-            .Should()
-            .Contain(properties);
+            });
+
+        await Verify(members);
     }
 
     [Fact]

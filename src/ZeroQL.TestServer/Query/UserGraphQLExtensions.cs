@@ -30,7 +30,7 @@ public class UserGraphQLExtensions
     [GraphQLName(nameof(MeWithPascalCasing))]
     public User MeWithPascalCasing() => Me();
 
-    public User[] GetUsers(UserFilterInput filter, int page, int size)
+    public User[] GetUsers(UserFilterInput? filter, int page, int size)
     {
         return Enumerable.Range(0, size)
             .Select(o => new User
@@ -76,9 +76,9 @@ public class UserGraphQLExtensions
             .ToArray();
     }
 
-    public int[] GetUsersIds(UserKind kind, int page, int size)
+    public int[] GetUsersIds(UserKind? kind, int page, int? size, string? filter = null, int[]? ids = null)
     {
-        return Enumerable.Range(0, size).ToArray();
+        return Enumerable.Range(0, size ?? 10).ToArray();
     }
 
     public User? GetUser(int id)

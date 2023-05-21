@@ -360,75 +360,80 @@ public static class GraphQLQueryResolver
         {
             return literal.ToString();
         }
-
+        
         var value = argument.Expression.ToString();
         if (context.AvailableVariables.TryGetValue(value, out var variable))
         {
             return variable.GraphQLValue;
         }
 
-        if (argument.Expression is MemberAccessExpressionSyntax memberAccess)
+        switch (argument.Expression)
         {
-            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Name, context.CancellationToken);
-            var namedType = symbol.GetTypeSymbol();
-            if (namedType is null)
+            case MemberAccessExpressionSyntax memberAccess:
             {
-                return Failed(memberAccess);
-            }
+                var symbol = context.SemanticModel.GetSymbolInfo(memberAccess.Name, context.CancellationToken);
+                var namedType = symbol.GetTypeSymbol();
+                if (namedType is null)
+                {
+                    return Failed(memberAccess);
+                }
 
-            if (namedType.EnumUnderlyingType != null && symbol.Symbol is IFieldSymbol fieldSymbol)
+                if (namedType.EnumUnderlyingType != null && symbol.Symbol is IFieldSymbol fieldSymbol)
+                {
+                    var fieldSelector = fieldSymbol
+                        .GetAttributes()
+                        .FirstOrDefault(o =>
+                            SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+
+                    var fieldName = memberAccess.Name.Identifier.Text.ToUpperCase();
+                    if (fieldSelector is null)
+                    {
+                        return fieldName;
+                    }
+
+                    var name = fieldSelector.ConstructorArguments.FirstOrDefault();
+                    if (name.Value is null)
+                    {
+                        return fieldName;
+                    }
+
+                    return name.Value.ToString();
+                }
+                break;
+            }
+            case IdentifierNameSyntax identifierName:
             {
-                var fieldSelector = fieldSymbol
-                    .GetAttributes()
-                    .FirstOrDefault(o =>
-                        SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
-
-                var fieldName = memberAccess.Name.Identifier.Text.ToUpperCase();
-                if (fieldSelector is null)
+                var symbol = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
+                switch (symbol.Symbol)
                 {
-                    return fieldName;
-                }
+                    case IPropertySymbol:
+                    case IFieldSymbol:
+                    {
+                        return Failed(identifierName, Descriptors.GraphQLVariableShouldBeLocal);
+                    }
 
-                var name = fieldSelector.ConstructorArguments.FirstOrDefault();
-                if (name.Value is null)
-                {
-                    return fieldName;
-                }
+                    case ILocalSymbol localSymbol:
+                    {
+                        var graphQLVariable = GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type);
+                        context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
 
-                return name.Value.ToString();
+                        return graphQLVariable.GraphQLValue;
+                    }
+
+                    case IParameterSymbol parameterSymbol:
+                    {
+                        var graphQLVariable = GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type);
+                        context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
+
+                        return graphQLVariable.GraphQLValue;
+                    }
+
+                    default:
+                        return Failed(argument, Descriptors.GraphQLVariableExpected);
+                }
             }
-        }
-
-        if (argument.Expression is IdentifierNameSyntax identifierName)
-        {
-            var symbol = context.SemanticModel.GetSymbolInfo(identifierName, context.CancellationToken);
-            switch (symbol.Symbol)
-            {
-                case IPropertySymbol:
-                case IFieldSymbol:
-                {
-                    return Failed(identifierName, Descriptors.GraphQLVariableShouldBeLocal);
-                }
-
-                case ILocalSymbol localSymbol:
-                {
-                    var graphQLVariable = GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type);
-                    context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
-
-                    return graphQLVariable.GraphQLValue;
-                }
-
-                case IParameterSymbol parameterSymbol:
-                {
-                    var graphQLVariable = GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type);
-                    context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
-
-                    return graphQLVariable.GraphQLValue;
-                }
-
-                default:
-                    return Failed(argument, Descriptors.GraphQLVariableExpected);
-            }
+            case SimpleLambdaExpressionSyntax:
+                return string.Empty;
         }
 
         return Failed(argument, Descriptors.GraphQLVariableExpected);
@@ -802,7 +807,7 @@ public static class GraphQLQueryResolver
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
         var argumentNames = method.Parameters
             .Take(method.Parameters.Length - parametersToIgnore)
-            .Select(o => $"{o.Name.FirstToLower()}: ")
+            .Select(o => o.Name.FirstToLower())
             .ToArray();
 
         var (selectorName, error) = ExtractSelectorName(context, invocation.Expression).Unwrap();
@@ -817,16 +822,22 @@ public static class GraphQLQueryResolver
         {
             var graphQLArguments = invocation.ArgumentList.Arguments
                 .Take(argumentNames.Length)
-                .Select(o => ResolveQuery(context.WithParent(o), o))
+                .Select(o =>
+                {
+                    var argumentName = o.NameColon?.Name.Identifier.Text;
+                    var argumentValue = ResolveQuery(context.WithParent(o), o);
+                    return (Name: argumentName, Value: argumentValue);
+                })
                 .ToArray();
 
-            if (graphQLArguments.Any(o => o.Error))
+            if (graphQLArguments.Any(o => o.Value.Error))
             {
-                return graphQLArguments.First(o => o.Error);
+                var firstError = graphQLArguments.First(o => o.Value.Error);
+                return firstError.Value;
             }
 
             var formattedArguments = graphQLArguments
-                .Select((o, i) => $"{argumentNames[i]}{o.Value}")
+                .Select((o, i) => $"{o.Name ?? argumentNames[i]}: {o.Value.Value}")
                 .Join()
                 .Wrap("(", ")");
 

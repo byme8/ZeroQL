@@ -107,4 +107,13 @@ public class Descriptors
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
+    
+    public static readonly DiagnosticDescriptor GraphQLQueryRequiredParameter = new(
+        "ZQL0014",
+        "Query requires parameter.",
+        "Query '{0}' requires parameter '{1}'.",
+        "ZeroQL",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
 }

@@ -96,7 +96,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.DontUseOutScopeValues.Id);
@@ -110,7 +110,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OpenLambdaIsNotAllowed.Id);
     }
@@ -123,7 +123,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyFieldSelectorsAndFragmentsAreAllowed.Id);
     }
@@ -136,7 +136,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics
             .Where(o => o.Severity == DiagnosticSeverity.Error)
@@ -152,7 +152,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Should()
             .Contain(o => o.Id == Descriptors.OnlyStaticLambda.Id);
@@ -167,10 +167,12 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
-        var queryPreview = diagnostics.First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
+        var diagnostics = await project.ApplyAnalyzers();
+        var queryPreview = diagnostics
+            .Where(o => o.Id == Descriptors.GraphQLQueryPreview.Id)
+            .Select(o => o.GetMessage());
 
-        queryPreview.GetMessage().Should().Be(graphqlQuery);
+        queryPreview.Should().Contain(graphqlQuery);
     }
 
     [Fact]
@@ -293,7 +295,7 @@ public class QueryTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(Execute), " + csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Should().Contain(o => o.Id == Descriptors.GraphQLQueryNameShouldBeLiteral.Id);
     }
@@ -312,6 +314,23 @@ public class QueryTests : IntegrationTest
         var value = response.Errors!.First().Extensions!.First();
         value.Key.Should().Be("message");
         value.Value.ToString().Should().Be("This is an error");
+    }
+    
+    [Fact]
+    public async Task SupportsOptionalArguments()
+    {
+        var csharpQuery = """
+                var page = 0;
+                var filter = "test"; 
+                var response = await qlClient.Query(q => q.UsersIds(page: page, filter: filter));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 
     [Fact]

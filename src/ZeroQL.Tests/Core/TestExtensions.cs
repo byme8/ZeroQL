@@ -11,6 +11,14 @@ namespace ZeroQL.Tests.Core;
 
 public static class TestExtensions
 {
+    public static ImmutableArray<DiagnosticAnalyzer> Analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(
+
+        new QueryLambdaAnalyzer(),
+        new OptionalParametersAnalyzer(),
+        new QueryRequestAnalyzer(),
+        new QueryOnSyntaxAnalyzer()
+    );
+
     public static async Task<Project> ReplacePartOfDocumentAsync(this Project project,
         string documentName,
         string textToReplace,
@@ -65,10 +73,7 @@ public static class TestExtensions
         var fixedProject = project.WithAssemblyName(newName);
         var compilation = await fixedProject.GetCompilationAsync();
         var analyzerResults = await compilation!
-            .WithAnalyzers(ImmutableArray.Create(new DiagnosticAnalyzer[]
-            {
-                new QueryLambdaAnalyzer()
-            }))
+            .WithAnalyzers(Analyzers)
             .GetAllDiagnosticsAsync();
 
         var error = compilation!.GetDiagnostics()
@@ -137,14 +142,11 @@ public static class TestExtensions
         return project;
     }
 
-    public static async Task<Diagnostic[]> ApplyAnalyzer(this Project project, DiagnosticAnalyzer analyzer)
+    public static async Task<Diagnostic[]> ApplyAnalyzers(this Project project)
     {
         var compilation = await project.GetCompilationAsync();
         var analyzerResults = await compilation!
-            .WithAnalyzers(ImmutableArray.Create(new[]
-            {
-                analyzer
-            }))
+            .WithAnalyzers(Analyzers)
             .GetAllDiagnosticsAsync();
 
         var error = compilation!.GetDiagnostics()
@@ -152,6 +154,7 @@ public static class TestExtensions
 
         return error.ToArray();
     }
+
     
     public static SettingsTask Track(this SettingsTask settingsTask, string value, [CallerArgumentExpression("value")]string name = null!)
     {

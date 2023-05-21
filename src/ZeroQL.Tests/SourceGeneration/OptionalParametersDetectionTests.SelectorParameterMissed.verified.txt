@@ -1,0 +1,12 @@
+[
+  {
+    Id: CS0411,
+    Highlighted: Me,
+    Message: The type arguments for method 'Query.Me<T>(Func<User, T>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
+  },
+  {
+    Id: CS0411,
+    Highlighted: Me,
+    Message: The type arguments for method 'Query.Me<T>(Func<User, T>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
+  }
+]

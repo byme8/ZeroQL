@@ -1,0 +1,8 @@
+[
+  int LongOperation,
+  global::GraphQLClient.Instant Instant,
+  global::GraphQLClient.ZonedDateTime ZonedDateTime,
+  UserKind[] UserKinds,
+  UserKindPascal[] UserKindPascals,
+  global::System.Text.Json.JsonElement JsonUsersElement
+]

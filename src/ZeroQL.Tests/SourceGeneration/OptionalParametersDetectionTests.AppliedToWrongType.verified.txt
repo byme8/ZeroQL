@@ -1,0 +1,7 @@
+﻿[
+  {
+    Id: ZQL0011,
+    Highlighted: On<ImageContent>,
+    Message: Type ImageContent has to implement IFigure interface.
+  }
+]

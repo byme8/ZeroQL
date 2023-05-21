@@ -76,7 +76,7 @@ public class OnSyntaxTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryOnSyntaxAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         await Verify(diagnostics
             .Where(o => o.Severity == DiagnosticSeverity.Error)

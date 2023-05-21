@@ -70,7 +70,8 @@ public static class TypeGenerator
     }
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateFieldMembersWithAccountForInterface(
-        FieldDefinition field, Dictionary<string, FieldDefinition> interfaceFields)
+        FieldDefinition field,
+        Dictionary<string, FieldDefinition> interfaceFields)
     {
         var members = new List<MemberDeclarationSyntax>();
         members.AddRange(GeneratePropertiesDeclarations(field));
@@ -146,9 +147,9 @@ public static class TypeGenerator
         {
             var backedField = BackedField(field);
             var parameters = field.Arguments
-                .Select(o =>
-                    Parameter(Identifier(o.Name.EnsureNotKeyword()))
-                        .WithType(ParseTypeName(o.TypeName)))
+                .Select(o => Parameter(Identifier(o.Name.EnsureNotKeyword()))
+                    .WithType(ParseTypeName(o.TypeName))
+                    .AddForcedDefault())
                 .ToArray();
 
             var selector = GenerateQueryPropertyDeclaration(field, parameters);
@@ -177,7 +178,9 @@ public static class TypeGenerator
         var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
 
         var funcType = GetPropertyFuncType(field.TypeDefinition, true);
-        var selectorParameter = Parameter(Identifier("selector")).WithType(ParseTypeName($"Func<{funcType}, T>"));
+        var selectorParameter = Parameter(Identifier("selector"))
+            .WithType(ParseTypeName($"Func<{funcType}, T>"))
+            .AddForcedDefault();
 
         var list = SeparatedList(parameters);
         if (RequireSelector(field.TypeDefinition))
@@ -387,10 +390,14 @@ public static class TypeGenerator
 
                 var argumentDefinitions = field.Arguments?
                     .Select(arg =>
-                        new ArgumentDefinition(
+                    {
+                        var argumentType = typeContext.GetTypeDefinition(arg.Type);
+                        var argument = new ArgumentDefinition(
                             arg.Name.StringValue,
-                            typeContext.GetTypeDefinition(arg.Type)
-                                .NameWithNullableAnnotation()))
+                            argumentType.NameWithNullableAnnotation());
+
+                        return argument;
+                    })
                     .ToArray() ?? Array.Empty<ArgumentDefinition>();
 
                 var directives = GetDirectiveDefinitions(field.Directives);

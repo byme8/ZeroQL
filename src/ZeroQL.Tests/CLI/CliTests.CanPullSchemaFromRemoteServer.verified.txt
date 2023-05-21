@@ -27,12 +27,12 @@ type Query {
   currentUser: User! @deprecated(reason: "Use Me instead")
   MEWITHSUPPERCASING: User!
   MeWithPascalCasing: User!
-  users(filter: UserFilterInput! page: Int! size: Int!): [User!]!
+  users(filter: UserFilterInput page: Int! size: Int!): [User!]!
   userKinds: [UserKind!]!
   userKindPascals: [UserKindPascal!]!
   usersMatrix: [[User!]!]!
   usersByKind(kind: UserKind! page: Int! size: Int!): [User!]!
-  usersIds(kind: UserKind! page: Int! size: Int!): [Int!]!
+  usersIds(kind: UserKind page: Int! size: Int filter: String ids: [Int!]): [Int!]!
   user(id: Int!): User
   usersByIds(ids: [Int!]!): [User!]!
   userKind(id: Int!): UserKind!

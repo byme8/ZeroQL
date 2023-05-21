@@ -185,7 +185,7 @@ public class VariablesTests : IntegrationTest
                 (TestProject.PlaceToReplaceInClassProgram, property),
                 (TestProject.MeQuery, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Select(o => o.Id).Should().Contain(Descriptors.GraphQLVariableShouldBeLocal.Id);
     }
@@ -198,7 +198,7 @@ public class VariablesTests : IntegrationTest
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
-        var diagnostics = await project.ApplyAnalyzer(new QueryLambdaAnalyzer());
+        var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Select(o => o.Id).Should().Contain(Descriptors.GraphQLVariableExpected.Id);
     }

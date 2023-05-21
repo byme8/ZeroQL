@@ -1,0 +1,7 @@
+[
+  {
+    Id: ZQL0014,
+    Highlighted: UsersIds,
+    Message: Query 'UsersIds' requires parameter 'page'.
+  }
+]

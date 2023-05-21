@@ -24,7 +24,7 @@
         public Point __TopLeft { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("topLeft")]
-        public T TopLeft<T>(Func<Point, T> selector)
+        public T TopLeft<T>(Func<Point, T> selector = default !)
         {
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
         }
@@ -33,7 +33,7 @@
         public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("bottomRight")]
-        public T BottomRight<T>(Func<Point, T> selector)
+        public T BottomRight<T>(Func<Point, T> selector = default !)
         {
             return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
@@ -55,7 +55,7 @@
         public Point __Center { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("center")]
-        public T Center<T>(Func<Point, T> selector)
+        public T Center<T>(Func<Point, T> selector = default !)
         {
             return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
