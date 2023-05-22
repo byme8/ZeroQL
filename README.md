@@ -121,19 +121,50 @@ httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
 
 var client = new TestServerGraphQLClient(httpClient);
 
-var response = await client.Query(static o => o.Me(o => new { o.Id, o.FirstName, o.LastName }));
+var response = await client.Query(o => o.Me(o => new { o.Id, o.FirstName, o.LastName }));
 
 Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query { me { id firstName lastName } }
 Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
 ```
 
-You can pass arguments if needed:
+You can pass arguments inside lambda if needed:
 ``` csharp
-var variables = new { Id = 1 };
-var response = await client.Query(variables, static (i, o) => o.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
+var userId = 1;
+var response = await client.Query(o => o.User(userId, o => new User(o.Id, o.FirstName, o.LastName)));
 
 Console.WriteLine($"GraphQL: {response.Query}"); // GraphQL: query ($id: Int!) { user(id: $id) { id firstName lastName } }
 Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data.LastName}"); // 1: Jon Smith
+```
+
+There is a limitation for lambda syntax. The variable should be a local variable or a parameter of the function.
+Otherwise, it will not be included in the lambda closure. As a result, ZeroQL would not be able to get a value.
+
+Here is an example of the function parameter:
+``` csharp
+public Task<User> GetUser(int userId)
+{
+    var response = await client.Query(o => o.User(userId, o => new User(o.Id, o.FirstName, o.LastName)));
+    return response.Data;
+}
+```
+To be clear, you don't need actively account for it. ZeroQL will analyze and report errors if something is wrong.
+
+For example the next sample will not work:
+``` csharp
+
+public int UserId { get; set; }
+
+public Task<User> GetUser()
+{
+    var response = await client.Query(o => o.User(UserId, o => new User(o.Id, o.FirstName, o.LastName))); // ZeroQL will report a compilation error here
+    return response.Data;
+}
+```
+
+Also, there is a way to avoid lambda closure:
+``` csharp
+var variables = new { Id = 1 };
+var response = await client.Query(variables, static (i, o) => o.User(i.Id, o => new User(o.Id, o.FirstName, o.LastName)));
 ```
 
 You can fetch attached fields:
