@@ -332,6 +332,21 @@ public class QueryTests : IntegrationTest
 
         await Verify(response);
     }
+    
+    [Fact]
+    public async Task SupportsOptionalArgumentsWithOnlySelector()
+    {
+        var csharpQuery = """
+                var response = await qlClient.Query(q => q.Users(selector: o => o.FirstName));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
 
     [Fact]
     public async Task SupportsLocalStaticFunctionAsFragment()

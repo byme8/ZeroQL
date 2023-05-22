@@ -30,9 +30,9 @@ public class UserGraphQLExtensions
     [GraphQLName(nameof(MeWithPascalCasing))]
     public User MeWithPascalCasing() => Me();
 
-    public User[] GetUsers(UserFilterInput? filter, int page, int size)
+    public User[] GetUsers(UserFilterInput? filter, int? page, int? size)
     {
-        return Enumerable.Range(0, size)
+        return Enumerable.Range(0, size ?? 10)
             .Select(o => new User
             {
                 FirstName = Guid.NewGuid().ToString(),

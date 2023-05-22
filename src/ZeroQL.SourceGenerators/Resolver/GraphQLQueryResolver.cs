@@ -837,6 +837,7 @@ public static class GraphQLQueryResolver
             }
 
             var formattedArguments = graphQLArguments
+                .Where(o => !string.IsNullOrEmpty(o.Value.Value))
                 .Select((o, i) => $"{o.Name ?? argumentNames[i]}: {o.Value.Value}")
                 .Join()
                 .Wrap("(", ")");

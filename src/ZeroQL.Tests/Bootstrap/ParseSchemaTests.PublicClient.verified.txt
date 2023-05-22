@@ -408,7 +408,7 @@ namespace GraphQLClient
         public User[] __Users { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("users")]
-        public T[] Users<T>(UserFilterInput? filter = default !, int page = default !, int size = default !, Func<User, T> selector = default !)
+        public T[] Users<T>(UserFilterInput? filter = default !, int? page = default !, int? size = default !, Func<User, T> selector = default !)
         {
             return __Users is null ? throw new NullReferenceException("Users is null but it should not be null. Schema can be outdated.") : __Users.Select(o => o is null ? throw new NullReferenceException("Users is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
