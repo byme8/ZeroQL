@@ -126,7 +126,9 @@ public static class GraphQLQueryResolver
         var parameters = methodDeclaration.ParameterList.Parameters;
         var queryName = parameters.First().Identifier.Text;
         var variables = parameters.Skip(1)
-            .Select(o => GraphQLQueryVariable.Variable(o.Identifier.ValueText, semanticModel.GetTypeInfo(o.Type!).Type!))
+            .Select(o => GraphQLQueryVariable.Variable(
+                o.Identifier.ValueText,
+                semanticModel.GetTypeInfo(o.Type!).Type!))
             .ToArray();
 
         var availableVariables = !variables.Any()
@@ -360,7 +362,7 @@ public static class GraphQLQueryResolver
         {
             return literal.ToString();
         }
-        
+
         var value = argument.Expression.ToString();
         if (context.AvailableVariables.TryGetValue(value, out var variable))
         {
@@ -399,6 +401,7 @@ public static class GraphQLQueryResolver
 
                     return name.Value.ToString();
                 }
+
                 break;
             }
             case IdentifierNameSyntax identifierName:
@@ -839,10 +842,15 @@ public static class GraphQLQueryResolver
             var formattedArguments = graphQLArguments
                 .Where(o => !string.IsNullOrEmpty(o.Value.Value))
                 .Select((o, i) => $"{o.Name ?? argumentNames[i]}: {o.Value.Value}")
-                .Join()
-                .Wrap("(", ")");
+                .ToArray();
 
-            stringBuilder.Append(formattedArguments);
+            var formattedArgumentsString = formattedArguments.Any()
+                ? formattedArguments
+                    .Join()
+                    .Wrap("(", ")")
+                : string.Empty;
+
+            stringBuilder.Append(formattedArgumentsString);
         }
 
         if (ignoreLastParameter)

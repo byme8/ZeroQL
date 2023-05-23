@@ -1,5 +1,5 @@
 ﻿{
-  Query: query { users() { firstName } },
+  Query: query { users { firstName } },
   Data: [
     Guid_1,
     Guid_2,
