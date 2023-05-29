@@ -25,7 +25,7 @@ public class Program
     {
         await Execute();
     }
-    
+
     // class Program place to replace in 
 
     public static async Task<IGraphQLResult> Execute(CancellationToken cancellationToken = default)
@@ -48,7 +48,7 @@ public class AddProfileImage
     public AddProfileImage(int userId, Upload file)
     {
         UserId = userId;
-        File = file;    
+        File = file;
     }
 
     public int UserId { get; set; }

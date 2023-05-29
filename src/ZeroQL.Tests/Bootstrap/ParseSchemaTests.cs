@@ -18,7 +18,11 @@ public class ParseSchemaTests
     {
         var options = new GraphQlGeneratorOptions("GraphQLClient", ClientVisibility.Public)
         {
-            ClientName = "TestApp"
+            ClientName = "TestApp",
+            Scalars = new Dictionary<string, string>()
+            {
+                { "Instant", "ZeroQL.Instant" }
+            }
         };
 
         Csharp = GraphQLGenerator.ToCSharp(TestSchema.RawSchema, options);
@@ -43,7 +47,7 @@ public class ParseSchemaTests
         await Verify(graphql)
             .Track(hashCodeLine);
     }
-    
+
     [Fact]
     public async Task InternalClient()
     {
@@ -64,7 +68,7 @@ public class ParseSchemaTests
     {
         var query = SyntaxTree.GetClass("Query")!;
 
-        query.Members
+        var methods = query.Members
             .OfType<MethodDeclarationSyntax>()
             .Where(o => o.AttributeLists
                 .SelectMany(list => list.Attributes)
@@ -88,7 +92,7 @@ public class ParseSchemaTests
                 return $@"{returnType} {name}";
             });
 
-        await Verify(members);
+        await Verify(methods.Concat(members));
     }
 
     [Fact]
@@ -250,7 +254,7 @@ public class ParseSchemaTests
 
         initializer.Should().NotBeNull();
     }
-    
+
     [Fact]
     public async Task EnumWithCustomNaming()
     {

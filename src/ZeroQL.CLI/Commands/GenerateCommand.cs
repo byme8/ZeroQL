@@ -3,6 +3,7 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using Newtonsoft.Json;
 using ZeroQL.Bootstrap;
+using ZeroQL.CLI.Converters;
 using ZeroQL.Internal;
 using ZeroQL.Internal.Enums;
 
@@ -39,6 +40,12 @@ public class GenerateCommand : ICommand
     [CommandOption("visibility", 'v', Description = "The visibility within the assembly for the generated client")]
     public ClientVisibility? Visibility { get; set; }
 
+    [CommandOption(
+        "scalars",
+        Description = "Custom scalars to use when generating the client. Example: --scalars Point=Geometry.Point --scalars Rect=Geometry.Rect",
+        Converter = typeof(HeaderConverter))]
+    public KeyValuePair<string, string>[]? CustomScalars { get; set; }
+    
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]
     public bool Force { get; set; }
 
@@ -70,9 +77,12 @@ public class GenerateCommand : ICommand
             return;
         }
 
+        var scalars = CustomScalars?
+            .ToDictionary(o => o.Key, o => o.Value);
         var options = new GraphQlGeneratorOptions(Namespace, Visibility ?? ClientVisibility.Public)
         {
-            ClientName = ClientName
+            ClientName = ClientName,
+            Scalars = scalars
         };
 
         if (!Force && File.Exists(Output))
@@ -157,6 +167,11 @@ public class GenerateCommand : ICommand
         if (string.IsNullOrEmpty(ClientName))
         {
             ClientName = config.ClientName;
+        }
+
+        if (CustomScalars is null)
+        {
+            CustomScalars = config.CustomScalars;
         }
 
         if (!Visibility.HasValue)

@@ -58,13 +58,15 @@ public static class GraphQLGenerator
             .Type;
 
         var enumsNames = new HashSet<string>(enums.Select(o => o.Name));
-        var scalarTypes = schema.Definitions
+
+        var scalarTypesFromSchema = schema.Definitions
             .OfType<GraphQLScalarTypeDefinition>()
             .OrderBy(o => o.Name.StringValue)
             .Select(o => o.Name.StringValue)
             .ToArray();
 
-        var context = new TypeContext(options, enumsNames, scalarTypes);
+        var scalarsToOverride = options.Scalars ?? new Dictionary<string, string>();
+        var context = new TypeContext(options, enumsNames, scalarTypesFromSchema, scalarsToOverride);
         var customScalars = context.CustomScalars;
 
         var inputs = schema.Definitions

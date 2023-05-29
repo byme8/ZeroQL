@@ -41,6 +41,11 @@ public class ZeroQLFileConfig
     public ClientVisibility? Visibility { get; set; }
 
     /// <summary>
+    /// The custom scalars to use when generating the client
+    /// </summary>
+    public KeyValuePair<string, string>[]? CustomScalars { get; set; }
+    
+    /// <summary>
     /// The path to the output file
     /// </summary>
     /// <example>

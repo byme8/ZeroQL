@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ZeroQL.Internal.Enums;
 using ZeroQL.Schema;
 
@@ -7,6 +8,8 @@ namespace ZeroQL.Bootstrap;
 public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility Visibility)
 {
     public string? ClientName { get; set; }
+
+    public Dictionary<string, string>? Scalars { get; init; }
 
     public string AccessLevel => Visibility switch
     {
@@ -17,4 +20,7 @@ public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility V
 
     public string GetDefinitionFullTypeName(Definition definition)
         => $"global::{ClientNamespace}.{definition.Name}";
+    
+    public string GetDefinitionFullTypeName(string definition)
+        => $"global::{definition}";
 }

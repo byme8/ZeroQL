@@ -39,6 +39,16 @@
         }
       ]
     },
+    "customScalars": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "The custom scalars to use when generating the client",
+      "items": {
+        "$ref": "#/definitions/KeyValuePairOfStringAndString"
+      }
+    },
     "output": {
       "type": "string",
       "description": "The path to the output file",
@@ -57,6 +67,18 @@
         "Public",
         "Internal"
       ]
+    },
+    "KeyValuePairOfStringAndString": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
     }
   }
 }

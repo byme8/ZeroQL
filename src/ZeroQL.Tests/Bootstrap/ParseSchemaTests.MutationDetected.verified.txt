@@ -1,5 +1,5 @@
 [
-  global::GraphQLClient.Instant CreateInstant(global::GraphQLClient.Instant instant = default !),
+  global::ZeroQL.Instant CreateInstant(global::ZeroQL.Instant instant = default !),
   DateTimeOffset DateTime(DateTimeOffset dateTime = default !),
   DateTimeOffset DateTimeOffset(DateTimeOffset dateTimeOffset = default !),
   TimeSpan TimeSpan(TimeSpan timeSpan = default !),
