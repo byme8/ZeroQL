@@ -17,13 +17,12 @@ public static class ScalarGenerator
                 var source = $$"""
                     {{options.AccessLevel}} sealed record {{scalarDefinition.Name}} : ZeroQLScalar
                     {
-                        public {{scalarDefinition.Name}}()
+                        public {{scalarDefinition.Name}}() : base("")
                         {
                         }
 
-                        public {{scalarDefinition.Name}}(string value)
+                        public {{scalarDefinition.Name}}(string Value) : base(Value)
                         {
-                            Value = value;
                         }
 
                         public static implicit operator {{scalarDefinition.Name}}(string value) => new {{scalarDefinition.Name}}(value);

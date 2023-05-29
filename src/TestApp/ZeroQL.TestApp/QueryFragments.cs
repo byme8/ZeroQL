@@ -9,7 +9,7 @@ namespace ZeroQL.TestApp;
 public static partial class QueryFragments
 {
     [GraphQLFragment]
-    public static partial UserModel ExposedFragmentUserWithRole(this User user)
+    public static UserModel ExposedFragmentUserWithRole(this User user)
     {
         return new UserModel(user.FirstName, user.LastName, user.Role(o => o.Name));
     }

@@ -27,7 +27,11 @@ public static class ChecksumHelper
 
     public static string Checksum(byte[] bytes)
     {
+#if NETSTANDARD
+        var hash = new MD5CryptoServiceProvider().ComputeHash(bytes);
+#else
         var hash = MD5.HashData(bytes);
+#endif
         var checksum = BitConverter.ToString(hash)
             .Replace("-", String.Empty)
             .ToLower();

@@ -23,7 +23,7 @@ public class RawVsZeroQLBenchmark
     };
 
     private readonly HttpClient httpClient;
-    private readonly TestServerClient zeroQLClient;
+    private readonly TestServerGraphQLClient zeroQLClient;
     private readonly StrawberryShakeTestServerClient strawberryShake;
     private readonly Upload upload;
     private readonly int id;
@@ -33,7 +33,7 @@ public class RawVsZeroQLBenchmark
         httpClient = new ImmortalHttpClientForStrawberryShake();
         httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
 
-        zeroQLClient = new TestServerClient(httpClient);
+        zeroQLClient = new TestServerGraphQLClient(httpClient);
         strawberryShake = StrawberryShakeTestServerClientCreator.Create(httpClient);
         upload = new Upload("image.png", new MemoryStream(new byte[42]));
 
