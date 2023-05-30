@@ -43,7 +43,7 @@ public class ZeroQLFileConfig
     /// <summary>
     /// The custom scalars to use when generating the client
     /// </summary>
-    public KeyValuePair<string, string>[]? CustomScalars { get; set; }
+    public Dictionary<string, string>? Scalars { get; set; }
     
     /// <summary>
     /// The path to the output file
