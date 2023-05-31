@@ -25,16 +25,12 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
         var content = contentCreator(qlRequest);
         var response = await httpClient.PostAsync("", content, cancellationToken);
         GraphQLResponse<TQuery> qlResponse = null;
+        if (!cancellationToken.IsCancellationRequested)
+        {
 #if DEBUG
-#if NETSTANDARD
-        if(!cancellationToken.IsCancellationRequested) {
             var responseJson = await response.Content.ReadAsStringAsync();
             qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
-        }
-#else
-        var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
-        qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
-#endif
+
 #else
         var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
         var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
@@ -42,11 +38,12 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
                 ZeroQLJsonOptions.Options,
                 cancellationToken);
 #endif
-
-        if (qlResponse is not null)
-        {
-            qlResponse.Query = query;
         }
+
+            if (qlResponse is not null)
+            {
+                qlResponse.Query = query;
+            }
 
         return qlResponse!;
     }
