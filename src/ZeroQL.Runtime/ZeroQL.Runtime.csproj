@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1</TargetFrameworks>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <RootNamespace>ZeroQL</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Portable.System.DateTimeOnly" Version="7.0.1" />
       <PackageReference Include="System.Text.Json" Version="7.0.2" />
     </ItemGroup>
 

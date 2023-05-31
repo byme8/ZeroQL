@@ -1,4 +1,5 @@
-﻿using ZeroQL.Tests.Core;
+﻿using FluentAssertions.Extensions;
+using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;

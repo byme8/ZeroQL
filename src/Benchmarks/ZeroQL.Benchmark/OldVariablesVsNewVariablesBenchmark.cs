@@ -7,14 +7,14 @@ namespace ZeroQL.Benchmark;
 public class OldVariablesVsNewVariablesBenchmark
 {
     private readonly HttpClient httpClient;
-    private readonly TestServerGraphQLClient zeroQLClient;
+    private readonly TestServerClient zeroQLClient;
 
     public OldVariablesVsNewVariablesBenchmark()
     {
         httpClient = new HttpClient();
         httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
 
-        zeroQLClient = new TestServerGraphQLClient(httpClient);
+        zeroQLClient = new TestServerClient(httpClient);
     }
 
     [Benchmark]
