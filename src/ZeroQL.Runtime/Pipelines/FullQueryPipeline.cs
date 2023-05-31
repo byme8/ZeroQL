@@ -32,8 +32,8 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
             qlResponse = JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
 
 #else
-        var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
+        var responseJson = await response.Content.ReadAsStreamAsync();
+        qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
                 responseJson,
                 ZeroQLJsonOptions.Options,
                 cancellationToken);

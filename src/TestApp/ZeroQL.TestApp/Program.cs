@@ -24,6 +24,8 @@ public class Program
     public static async Task Main()
     {
         await Execute();
+        Console.WriteLine("Completed. Press any key to exit...");
+        Console.ReadKey();
     }
     
     // class Program place to replace in 

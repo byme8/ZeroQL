@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD
-namespace System.Runtime.CompilerServices
+﻿namespace System.Runtime.CompilerServices
 {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     internal sealed class CallerArgumentExpressionAttribute : Attribute
@@ -12,4 +11,3 @@ namespace System.Runtime.CompilerServices
         public string ParameterName { get; }
     }
 }
-#endif
