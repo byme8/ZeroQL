@@ -23,7 +23,7 @@ public class InstantJsonConverter : JsonConverter<Instant?>
 
     public override void Write(Utf8JsonWriter writer, Instant? value, JsonSerializerOptions options)
     {
-        var text = value?.DateTimeOffset.ToString("O");
+        var text = value?.DateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ssZ");
         writer.WriteStringValue(text);
     }
 }

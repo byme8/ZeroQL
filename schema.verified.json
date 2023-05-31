@@ -39,6 +39,16 @@
         }
       ]
     },
+    "scalars": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "description": "The custom scalars to use when generating the client",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "output": {
       "type": "string",
       "description": "The path to the output file",

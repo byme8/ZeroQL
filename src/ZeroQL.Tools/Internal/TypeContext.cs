@@ -27,13 +27,17 @@ public class TypeContext
         { "JSON", "global::System.Text.Json.JsonElement" },
     };
 
-    public TypeContext(GraphQlGeneratorOptions options, HashSet<string> enums, string[] customScalars)
+    public TypeContext(
+        GraphQlGeneratorOptions options,
+        HashSet<string> enums,
+        string[] customScalarsFromSchema,
+        Dictionary<string, string> scalarsToOverride)
     {
         Enums = enums;
         CustomScalars = new List<ScalarDefinition>();
-        foreach (var scalar in customScalars)
+        foreach (var scalar in customScalarsFromSchema)
         {
-            if (GraphQLToCsharpScalarTypes.ContainsKey(scalar))
+            if (GraphQLToCsharpScalarTypes.ContainsKey(scalar) || scalarsToOverride.ContainsKey(scalar))
             {
                 continue;
             }
@@ -41,6 +45,11 @@ public class TypeContext
             var scalarDefinition = new ScalarDefinition(scalar);
             CustomScalars.Add(scalarDefinition);
             GraphQLToCsharpScalarTypes[scalar] = options.GetDefinitionFullTypeName(scalarDefinition);
+        }
+        
+        foreach (var (key, value) in scalarsToOverride)
+        {
+            GraphQLToCsharpScalarTypes[key] = options.GetDefinitionFullTypeName(value);
         }
     }
 

@@ -129,10 +129,10 @@ namespace GraphQL.TestServer
     public class Mutation : global::ZeroQL.Internal.IMutation
     {
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("createInstant")]
-        public global::GraphQL.TestServer.Instant __CreateInstant { get; set; }
+        public global::ZeroQL.Instant __CreateInstant { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("createInstant")]
-        public global::GraphQL.TestServer.Instant CreateInstant(global::GraphQL.TestServer.Instant instant = default !)
+        public global::ZeroQL.Instant CreateInstant(global::ZeroQL.Instant instant = default !)
         {
             return __CreateInstant;
         }
@@ -361,7 +361,7 @@ namespace GraphQL.TestServer
 
         [ZeroQL.GraphQLFieldSelector("instant")]
         [JsonPropertyName("instant")]
-        public global::GraphQL.TestServer.Instant Instant { get; set; }
+        public global::ZeroQL.Instant Instant { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("zonedDateTime")]
         [JsonPropertyName("zonedDateTime")]
@@ -1017,7 +1017,6 @@ namespace GraphQL.TestServer
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQL.TestServer.Instant)] = new ZeroQLScalarJsonConverter<global::GraphQL.TestServer.Instant>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQL.TestServer.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQL.TestServer.ZonedDateTime>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQL.TestServer.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQL.TestServer.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQL.TestServer.UserKind>{{"SUPPER_GOOD", global::GraphQL.TestServer.UserKind.SupperGood}, {"GOOD", global::GraphQL.TestServer.UserKind.Good}, {"BAD", global::GraphQL.TestServer.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQL.TestServer.UserKind, string>{{global::GraphQL.TestServer.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQL.TestServer.UserKind.Good, "GOOD"}, {global::GraphQL.TestServer.UserKind.Bad, "BAD"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQL.TestServer.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQL.TestServer.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQL.TestServer.UserKindPascal>{{"default", global::GraphQL.TestServer.UserKindPascal.Default}, {"SupperGood", global::GraphQL.TestServer.UserKindPascal.SupperGood}, {"Good", global::GraphQL.TestServer.UserKindPascal.Good}, {"Bad", global::GraphQL.TestServer.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQL.TestServer.UserKindPascal, string>{{global::GraphQL.TestServer.UserKindPascal.Default, "default"}, {global::GraphQL.TestServer.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQL.TestServer.UserKindPascal.Good, "Good"}, {global::GraphQL.TestServer.UserKindPascal.Bad, "Bad"}, });
