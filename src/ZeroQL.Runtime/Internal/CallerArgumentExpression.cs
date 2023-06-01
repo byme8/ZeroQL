@@ -2,15 +2,17 @@ using System;
 
 #if NETSTANDARD
 // ReSharper disable once CheckNamespace
-namespace System.Runtime.CompilerServices;
-
-internal class CallerArgumentExpression : Attribute
+namespace System.Runtime.CompilerServices
 {
-    public CallerArgumentExpression(string expression)
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
+    internal sealed class CallerArgumentExpressionAttribute : Attribute
     {
-        Expression = expression;
-    }
+        public CallerArgumentExpressionAttribute(string parameterName)
+        {
+            ParameterName = parameterName;
+        }
 
-    public string Expression { get; }
+        public string ParameterName { get; }
+    }
 }
 #endif
