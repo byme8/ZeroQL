@@ -19,19 +19,23 @@ public static class InterfaceGenerator
         var csharpDefinitions = interfaces.Values
             .SelectMany(o =>
             {
-                var fields = o.Properties
-                    .SelectMany(TypeGenerator.GeneratePropertiesDeclarations)
+                var interfaceFields = o.Properties
+                    .SelectMany(p => p.GeneratePropertiesDeclarations(true))
+                    .ToArray();
+
+                var stubFields = o.Properties
+                    .SelectMany(p => p.GeneratePropertiesDeclarations())
                     .ToArray();
 
                 var @interface = CSharpHelper.Interface(o.Name, options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .AddBaseListTypes(SimpleBaseType(ParseTypeName("global::ZeroQL.IUnionType")))
-                    .WithMembers(List(fields));
+                    .WithMembers(List(interfaceFields));
 
                 var stub = CSharpHelper.Class(o.Name + "Stub", options.Visibility)
                     .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                     .AddBaseListTypes(SimpleBaseType(ParseTypeName(o.Name)))
-                    .WithMembers(List(fields));
+                    .WithMembers(List(stubFields));
 
                 return new MemberDeclarationSyntax[] { @interface, stub };
             })

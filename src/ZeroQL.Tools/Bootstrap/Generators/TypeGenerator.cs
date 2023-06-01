@@ -45,7 +45,7 @@ public static class TypeGenerator
                 }
                 else
                 {
-                    var fields = o.Properties.SelectMany(GeneratePropertiesDeclarations);
+                    var fields = o.Properties.SelectMany(p => GeneratePropertiesDeclarations(p));
                     @class = @class
                         .AddAttributes(ZeroQLGenerationInfo.CodeGenerationAttribute)
                         .WithMembers(List(fields));
@@ -141,7 +141,7 @@ public static class TypeGenerator
             .AddAttributes(jsonNameAttributes);
     }
 
-    public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field)
+    public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field, bool interfaceField = false)
     {
         if (RequireSelector(field))
         {
@@ -152,7 +152,7 @@ public static class TypeGenerator
                     .AddForcedDefault())
                 .ToArray();
 
-            var selector = GenerateQueryPropertyDeclaration(field, parameters);
+            var selector = GenerateQueryPropertyDeclaration(field, parameters, interfaceField);
             selector = selector.CopyDirectives(field);
 
             return new[] { backedField, selector };
@@ -171,11 +171,11 @@ public static class TypeGenerator
 
     private static MemberDeclarationSyntax GenerateQueryPropertyDeclaration(
         FieldDefinition field,
-        ParameterSyntax[] parameters)
+        ParameterSyntax[] parameters,
+        bool interfaceField = false)
     {
         var returnType = GetPropertyReturnType(field.TypeDefinition);
         var name = GetPropertyName(field.Name, field.TypeDefinition);
-        var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
 
         var funcType = GetPropertyFuncType(field.TypeDefinition, true);
         var selectorParameter = Parameter(Identifier("selector"))
@@ -195,6 +195,13 @@ public static class TypeGenerator
             .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, field.GraphQLName)
             .WithParameterList(ParameterList(list));
 
+        if (interfaceField)
+        {
+            return genericMethodWithType
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+        }
+        
+        var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
         var body = Block(
             ParseStatement(methodBody));
 

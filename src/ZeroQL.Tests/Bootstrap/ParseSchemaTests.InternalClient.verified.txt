@@ -797,10 +797,7 @@ namespace GraphQLClient
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("creator")]
-        public T? Creator<T>(Func<IPerson, T> selector = default !)
-        {
-            return __Creator is null ? default : selector(__Creator);
-        }
+        public T? Creator<T>(Func<IPerson, T> selector = default !);
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

@@ -396,14 +396,20 @@ type Mutation {
     [Fact]
     public async Task Interfaces()
     {
-        var rawSchema = @"
+        var rawSchema = """
             schema {
               query: Query
+            }
+
+            type User {
+              id: ID!
+              name: String!
             }
 
             interface IFigure {
               id: Int
               perimeter: Float!
+              creator: User!
             }
 
             type Circle implements IFigure {
@@ -411,6 +417,7 @@ type Mutation {
               center: Point!
               radius: Float!
               perimeter: Float!
+              creator: User!
             }
 
             type Point implements IFigure {
@@ -418,6 +425,7 @@ type Mutation {
               x: Float!
               y: Float!
               perimeter: Float!
+              creator: User!
             }
 
             type Square implements IFigure {
@@ -425,19 +433,21 @@ type Mutation {
               topLeft: Point!
               bottomRight: Point!
               perimeter: Float!
+              creator: User!
             }
 
             type Query {
               figures: [IFigure!]!
               circles: [Circle!]!
               squares: [Square!]!
-            }
-        ";
+            }     
+            """;
 
         var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
         var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
 
         var figureInterface = syntaxTree.GetInterface("IFigure")?.ToFullString();
+        var figureStubInterface = syntaxTree.GetClass("IFigureStub")?.ToFullString();
         var squareClass = syntaxTree.GetClass("Square")?.ToFullString();
         var circleClass = syntaxTree.GetClass("Circle")?.ToFullString();
         var point = syntaxTree.GetClass("Point")?.ToFullString();
@@ -447,6 +457,7 @@ type Mutation {
         await Verify(new
         {
             figureInterface,
+            figureStubInterface,
             squareClass,
             circleClass,
             point,

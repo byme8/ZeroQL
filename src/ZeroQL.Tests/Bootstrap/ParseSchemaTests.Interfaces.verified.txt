@@ -10,6 +10,34 @@
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("creator")]
+        public T Creator<T>(Func<User, T> selector = default !);
+    }
+,
+  figureStubInterface:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class IFigureStub : IFigure
+    {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
+        public int? Id { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [JsonPropertyName("perimeter")]
+        public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("creator")]
+        public T Creator<T>(Func<User, T> selector = default !)
+        {
+            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+        }
     }
 ,
   squareClass:
@@ -41,6 +69,15 @@
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("creator")]
+        public T Creator<T>(Func<User, T> selector = default !)
+        {
+            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+        }
     }
 ,
   circleClass:
@@ -67,6 +104,15 @@
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("creator")]
+        public T Creator<T>(Func<User, T> selector = default !)
+        {
+            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+        }
     }
 ,
   point:
@@ -91,6 +137,15 @@
         [ZeroQL.GraphQLFieldSelector("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
+        public User __Creator { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("creator")]
+        public T Creator<T>(Func<User, T> selector = default !)
+        {
+            return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
+        }
     }
 ,
   converter:
