@@ -20,7 +20,7 @@ public class Tools : IntegrationTest
             Namespace = "GraphQL.TestServer",
             ClientName = "TestServerClient",
             Output = "../../../../TestApp/ZeroQL.TestApp/Generated/GraphQL.g.cs",
-            CustomScalars = new []
+            Scalars = new []
             {
                 new KeyValuePair<string, string>("Instant", "ZeroQL.Instant"),
             },

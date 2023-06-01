@@ -63,7 +63,11 @@ public class ConfigCliTests
               "namespace": "Service.ZeroQL.Client",
               "clientName": "ServiceZeroQLClient",
               "visibility": "Internal",
-              "output": "QL.g.cs"
+              "output": "QL.g.cs",
+              "scalars": {
+                "Point": "Geometry.Point",
+                "Rect": "Geometry.Rect"
+              }
             }
             """;
 
