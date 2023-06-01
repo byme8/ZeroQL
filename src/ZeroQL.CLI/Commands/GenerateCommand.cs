@@ -45,6 +45,11 @@ public class GenerateCommand : ICommand
         Description = "Custom scalars to use when generating the client. Example: --scalars Point=Geometry.Point --scalars Rect=Geometry.Rect",
         Converter = typeof(HeaderConverter))]
     public KeyValuePair<string, string>[]? CustomScalars { get; set; }
+
+    [CommandOption(
+        "netstandard-compatibility",
+        Description = "Enables netstandard compatibility during generation.")]
+    public bool? NetstandardCompatibility { get; set; } = null;
     
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]
     public bool Force { get; set; }
@@ -82,6 +87,7 @@ public class GenerateCommand : ICommand
         var options = new GraphQlGeneratorOptions(Namespace, Visibility ?? ClientVisibility.Public)
         {
             ClientName = ClientName,
+            NetstandardCompatibility = NetstandardCompatibility,
             Scalars = scalars
         };
 
@@ -172,6 +178,11 @@ public class GenerateCommand : ICommand
         if (CustomScalars is null)
         {
             CustomScalars = config.CustomScalars;
+        }
+        
+        if (!NetstandardCompatibility.HasValue)
+        {
+            NetstandardCompatibility = config.NetstandardCompatibility;
         }
 
         if (!Visibility.HasValue)

@@ -53,6 +53,13 @@
       "type": "string",
       "description": "The path to the output file",
       "x-example": "./Generated/GraphQL.g.cs"
+    },
+    "netstandardCompatibility": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Enables netstandard compatibility during generation"
     }
   },
   "definitions": {

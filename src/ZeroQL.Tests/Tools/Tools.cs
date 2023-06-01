@@ -28,5 +28,17 @@ public class Tools : IntegrationTest
         };
 
         await generateCommand.ExecuteAsync(console);
+        
+        var generateForNetstandardCommand = new GenerateCommand
+        {
+            Schema = "../../../../TestApp/ZeroQL.TestApp/schema.graphql",
+            Namespace = "GraphQL.TestServer",
+            ClientName = "TestServerClient",
+            Output = "../../../../TestApp/TestStandardLibrary/Generated/GraphQL.g.cs",
+            NetstandardCompatibility = true,
+            Force = true
+        };
+
+        await generateForNetstandardCommand.ExecuteAsync(console);
     }
 }

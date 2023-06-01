@@ -100,15 +100,17 @@ public static class GraphQLGenerator
         var jsonInitializers = options.GenerateJsonInitializers(customScalars, enums, interfaces.Values);
         var interfaceInitializers = interfaces.GenerateInterfaceInitializers(types);
 
+        var members = List<MemberDeclarationSyntax>(clientDeclaration)
+            .AddRange(typesDeclaration)
+            .AddRange(interfacesDeclaration)
+            .AddRange(inputsDeclaration)
+            .AddRange(scalarDeclaration)
+            .AddRange(enumsDeclaration)
+            .AddRange(interfaceInitializers)
+            .Add(jsonInitializers);
+        
         namespaceDeclaration = namespaceDeclaration
-            .WithMembers(List<MemberDeclarationSyntax>(clientDeclaration)
-                .AddRange(typesDeclaration)
-                .AddRange(interfacesDeclaration)
-                .AddRange(inputsDeclaration)
-                .AddRange(scalarDeclaration)
-                .AddRange(enumsDeclaration)
-                .AddRange(interfaceInitializers)
-                .Add(jsonInitializers));
+            .WithMembers(members);
 
         var disableWarning = PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)
             .WithErrorCodes(
@@ -146,11 +148,39 @@ public static class GraphQLGenerator
             .WithTrailingTrivia(
                 Trivia(restoreWarning));
 
-        var formattedSource = namespaceDeclaration
+        var unit = CompilationUnit()
+            .WithMembers(SingletonList<MemberDeclarationSyntax>(namespaceDeclaration));
+        
+        if (options.NetstandardCompatibility is true)
+        {
+            unit = unit.AddMembers(GenerateNetstandardCompatibility());
+        }
+        
+        var formattedSource = unit
             .NormalizeWhitespace()
             .ToFullString();
-
+        
         return formattedSource;
+    }
+
+    private static MemberDeclarationSyntax GenerateNetstandardCompatibility()
+    {
+        var moduleInitializer = """
+            namespace System.Runtime.CompilerServices
+            {
+                [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+                internal sealed class ModuleInitializerAttribute : Attribute
+                {
+                }
+            }
+           """;
+        
+        var moduleInitializerSyntax = ParseCompilationUnit(moduleInitializer)
+            .WithLeadingTrivia(Comment("// Netstandard compatibility"))
+            .WithTrailingTrivia(CarriageReturnLineFeed)
+            .Members[0];
+        
+        return moduleInitializerSyntax;
     }
 
     private static ClassDefinition CreateTypesDefinition(

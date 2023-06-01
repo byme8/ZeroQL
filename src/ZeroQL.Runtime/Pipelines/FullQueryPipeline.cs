@@ -24,10 +24,16 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
 
         var content = contentCreator(qlRequest);
         var response = await httpClient.PostAsync("", content, cancellationToken);
-#if DEBUG
+#if DEBUG && !NETSTANDARD
         var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
         var qlResponse =
             JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+#elif NETSTANDARD
+        var responseJson = await response.Content.ReadAsStreamAsync();
+        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
+            responseJson,
+            ZeroQLJsonOptions.Options,
+            cancellationToken);
 #else
         var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
         var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(

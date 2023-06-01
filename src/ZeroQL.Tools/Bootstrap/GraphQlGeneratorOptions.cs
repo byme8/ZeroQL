@@ -18,6 +18,8 @@ public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility V
         _ => throw new ArgumentOutOfRangeException()
     };
 
+    public bool? NetstandardCompatibility { get; set; }
+
     public string GetDefinitionFullTypeName(Definition definition)
         => $"global::{ClientNamespace}.{definition.Name}";
     

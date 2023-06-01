@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+#if !NETSTANDARD
 namespace ZeroQL.Json;
 
 public class ZeroQLDateOnlyConverter : JsonConverter<DateOnly>
@@ -24,3 +25,4 @@ public class ZeroQLDateOnlyConverter : JsonConverter<DateOnly>
         writer.WriteStringValue(text);
     }
 }
+#endif

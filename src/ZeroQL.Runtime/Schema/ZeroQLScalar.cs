@@ -6,25 +6,9 @@ namespace ZeroQL;
 
 public record ZeroQLScalar
 {
-    public string Value { get; init; }
+    public string Value { get; set; }
 
     public override string ToString() => Value;
-}
-
-public sealed record InstantScalar : ZeroQLScalar
-{
-    public InstantScalar()
-    {
-    }
-
-    public InstantScalar(string value)
-    {
-        Value = value;
-    }
-
-    public static implicit operator InstantScalar(string value) => new InstantScalar(value);
-
-    public static implicit operator string(InstantScalar scalar) => scalar.Value;
 }
 
 public class ZeroQLScalarJsonConverter<TScalar> : JsonConverter<TScalar>
