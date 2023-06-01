@@ -23,11 +23,25 @@ public interface IGraphQLClient
         CancellationToken cancellationToken = default);
 }
 
-public record ClientOperations
-(
-    Dictionary<string, QueryInfo>? Queries,
-    Dictionary<string, QueryInfo>? Mutations
-);
+public class ClientOperations
+{
+    public ClientOperations(
+        Dictionary<string, QueryInfo>? queries,
+        Dictionary<string, QueryInfo>? mutations)
+    {
+        this.Queries = queries;
+        this.Mutations = mutations;
+    }
+
+    public Dictionary<string, QueryInfo>? Queries { get; }
+    public Dictionary<string, QueryInfo>? Mutations { get; }
+
+    public void Deconstruct(out Dictionary<string, QueryInfo>? queries, out Dictionary<string, QueryInfo>? mutations)
+    {
+        queries = this.Queries;
+        mutations = this.Mutations;
+    }
+}
 
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 {

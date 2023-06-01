@@ -20,7 +20,9 @@ public static class ZeroQLJsonOptions
             new ZeroQLConverter(),
             new ZeroQLUploadJsonConverter(),
             new ZeroQLTimeSpanConverter(),
+#if !NETSTANDARD
             new ZeroQLDateOnlyConverter(),
+#endif
             new ZeroQLIDJsonConverter()
         },
         PropertyNameCaseInsensitive = true,
