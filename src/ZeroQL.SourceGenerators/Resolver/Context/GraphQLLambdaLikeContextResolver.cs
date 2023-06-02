@@ -21,6 +21,8 @@ public class UploadInfoByType
 
 public class GraphQLLambdaLikeContextResolver
 {
+    public Error WrongMethod = new Error("Could not find query method");
+
     public Result<GraphQLSourceGenerationContext> Resolve(
         InvocationExpressionSyntax invocation,
         SemanticModel semanticModel,
@@ -29,7 +31,7 @@ public class GraphQLLambdaLikeContextResolver
         var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation);
         if (queryMethod is null)
         {
-            return new Error("Could not find query method");
+            return WrongMethod;
         }
 
         if (cancellationToken.IsCancellationRequested)

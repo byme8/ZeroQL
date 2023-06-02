@@ -53,6 +53,11 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
                 return;
             }
 
+            if (error == resolver.WrongMethod)
+            {
+                return;
+            }
+
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     Descriptors.FailedToConvertPartOfTheQuery,

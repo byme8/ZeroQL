@@ -12,9 +12,11 @@ public class QueryAnalyzerHelper
         {
             return null;
         }
+
+        var lambdaExtensions = compilation.GetTypeByMetadataName("GraphQLClientLambdaExtensions");
         var possibleMethod = semanticModel.GetSymbolInfo(memberAccess.Name);
         if (possibleMethod.Symbol is not IMethodSymbol { ContainingSymbol: INamedTypeSymbol containingType } method ||
-            containingType.ConstructedFrom.ToString() != "GraphQLClientLambdaExtensions")
+            !SymbolEqualityComparer.Default.Equals(containingType,  lambdaExtensions))
         {
             return null;
         }
