@@ -66,6 +66,16 @@ public class UserGraphQLMutations
         return sum;
     }
     
+    public class AddUsersInput
+    {
+        public UserInfo? User { get; set; }
+    }
+    
+    public async Task<int> AddUsersInfoWithEmails(AddUsersInput input)
+    {
+        return 10;
+    }
+    
     public int AddUserKindPascal(UserKindPascal userKindPascal)
     {
         return (int)userKindPascal + 10;

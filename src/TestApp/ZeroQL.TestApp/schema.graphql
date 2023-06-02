@@ -61,6 +61,7 @@ type Mutation {
   addUserProfileImage(userId: Int! file: Upload!): Int!
   addMyProfileImage(file: Upload!): Int!
   addUsersInfo(users: [UserInfoInput!]!): Int!
+  addUsersInfoWithEmails(input: AddUsersInput!): Int!
   addUserKindPascal(userKindPascal: UserKindPascal!): Int!
   addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
 }
@@ -175,6 +176,10 @@ type User {
 }
 
 union PostContent = FigureContent | TextContent | ImageContent
+
+input AddUsersInput {
+  user: UserInfoInput
+}
 
 input KeyValuePairOfStringAndStringInput {
   key: String!

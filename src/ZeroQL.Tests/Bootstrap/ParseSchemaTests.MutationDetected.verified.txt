@@ -1,4 +1,4 @@
-[
+﻿[
   global::ZeroQL.Instant CreateInstant(global::ZeroQL.Instant instant = default !),
   DateTimeOffset DateTime(DateTimeOffset dateTime = default !),
   DateTimeOffset DateTimeOffset(DateTimeOffset dateTimeOffset = default !),
@@ -9,6 +9,7 @@
   int AddUserProfileImage(int userId = default !, global::ZeroQL.Upload file = default !),
   int AddMyProfileImage(global::ZeroQL.Upload file = default !),
   int AddUsersInfo(UserInfoInput[] users = default !),
+  int AddUsersInfoWithEmails(AddUsersInput input = default !),
   int AddUserKindPascal(UserKindPascal userKindPascal = default !),
   int AddValues(string text = default !, byte value1 = default !, byte? value2 = default !, short value3 = default !, short? value4 = default !, int value5 = default !, int? value6 = default !, long value7 = default !, long? value8 = default !, double value9 = default !, double? value10 = default !, double value11 = default !, double? value12 = default !, decimal value13 = default !, decimal? value14 = default !, DateTimeOffset value15 = default !, DateTimeOffset? value16 = default !, DateOnly value17 = default !, DateOnly? value18 = default !, Guid value19 = default !, Guid? value20 = default !, Guid[] value21 = default !, Guid[]? value22 = default !, Guid[] value23 = default !, Guid[]? value24 = default !, Guid[] value25 = default !, Guid[]? value26 = default !, KeyValuePairOfStringAndStringInput[] value27 = default !, KeyValuePairOfStringAndStringInput[]? value28 = default !, KeyValuePairOfStringAndStringInput value29 = default !, KeyValuePairOfStringAndStringInput? value30 = default !, DateTimeOffset value31 = default !, DateTimeOffset? value32 = default !)
 ]

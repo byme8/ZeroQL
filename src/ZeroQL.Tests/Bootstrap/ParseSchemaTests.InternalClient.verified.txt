@@ -222,6 +222,15 @@ namespace GraphQLClient
             return __AddUsersInfo;
         }
 
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("addUsersInfoWithEmails")]
+        public int __AddUsersInfoWithEmails { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("addUsersInfoWithEmails")]
+        public int AddUsersInfoWithEmails(AddUsersInput input = default !)
+        {
+            return __AddUsersInfoWithEmails;
+        }
+
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("addUserKindPascal")]
         public int __AddUserKindPascal { get; set; }
 
@@ -877,6 +886,13 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class PostContentStub : PostContent
     {
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class AddUsersInput
+    {
+        [JsonPropertyName("user")]
+        public UserInfoInput? User { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

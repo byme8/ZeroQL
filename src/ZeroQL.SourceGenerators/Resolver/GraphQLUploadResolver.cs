@@ -23,6 +23,10 @@ public class GraphQLUploadResolver
 
                     private static void Process_{{type.SafeName}}(MultipartFormDataContentContext context, {{name}} value, string path)
                     {
+                        if (value == null)
+                        {
+                            return;
+                        }
                         {{type.UploadProperties.Select(o => GenerateAccessor(o, uploadType)).JoinWithNewLine()}}
                     }
             """);
@@ -53,7 +57,7 @@ public class GraphQLUploadResolver
                                         Process_{{arrayTypeSymbol.ElementType.ToSafeGlobalName()}}(context, {{type.SafeName}}[i], $"{path}.{key}.{i}"); 
                                     }
                                     break;
-            """);    
+            """);
                     continue;
                 }
 
