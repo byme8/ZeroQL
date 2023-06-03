@@ -16,6 +16,7 @@ Here's a quick rundown of what ZeroQL can do at the moment:
 - [x] [Support for fragments](https://github.com/byme8/ZeroQL/wiki/Fragments)
 - [x] [Support for interfaces](https://github.com/byme8/ZeroQL/wiki/Interfaces)
 - [x] [Support for unions](https://github.com/byme8/ZeroQL/wiki/Unions)
+- [x] [Support for scalars](https://github.com/byme8/ZeroQL/wiki/User-scalars)
 - [x] [Support for file uploads](https://github.com/byme8/ZeroQL/wiki/File-upload)
 - [x] [Support for persisted queries](https://github.com/byme8/ZeroQL/wiki/Persisted-queries)
 - [ ] Support for @defer
