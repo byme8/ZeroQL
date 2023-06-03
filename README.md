@@ -33,10 +33,7 @@ Check out our articles to learn more about ZeroQL:
 # How to setup
 
 > Here you can find setup for net6.0+ projects. 
-> 
-> If you want to setup netstandard or .Net Framework check [here](https://github.com/byme8/ZeroQL/wiki/netstandard-setup)
-> 
-> If you want to setup Unity project check [here](https://github.com/byme8/ZeroQL/wiki/Unity-setup)
+> You can find [netstandard or .Net Framework](https://github.com/byme8/ZeroQL/wiki/netstandard-setup) and [Unity](https://github.com/byme8/ZeroQL/wiki/Unity-setup) setup in [wiki](https://github.com/byme8/ZeroQL/wiki).
 
 The initial setup:
 ``` bash
