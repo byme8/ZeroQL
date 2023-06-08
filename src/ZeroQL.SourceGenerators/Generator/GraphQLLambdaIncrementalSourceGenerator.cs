@@ -100,8 +100,19 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return false;
         }
 
-        if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-            memberAccess.Name.ToString() is "Query" or "Mutation")
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        {
+            return false;
+        }
+        
+        if(memberAccess.Name is IdentifierNameSyntax identifierName &&
+           identifierName.Identifier.Text is ("Query" or "Mutation"))
+        {
+            return true;
+        }
+
+        if (memberAccess.Name is GenericNameSyntax genericName &&
+            genericName.Identifier.Text is "Materialize")
         {
             return true;
         }

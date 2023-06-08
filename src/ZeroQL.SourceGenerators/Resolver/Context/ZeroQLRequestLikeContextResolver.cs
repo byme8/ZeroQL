@@ -55,6 +55,7 @@ public class ZeroQLRequestLikeContextResolver
             operationName,
             operationType,
             operationQuery,
+            queryBody.Query,
             queryTypeName,
             recordType,
             recordType,

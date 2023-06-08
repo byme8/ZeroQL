@@ -59,7 +59,10 @@ public class GraphQLLambdaLikeContextResolver
             return new Error("Could not find member access");
         }
 
-        var operationKind = memberAccess.Name.Identifier.Text.ToLower();
+        var queryType = graphQLMethodSymbol.Parameters.Last().Type;
+        var operationKind = queryType.AllInterfaces.Any(o => o.Name == "IQuery")
+            ? "query"
+            : "mutation";
 
         var possibleMethodSymbol = semanticModel.GetSymbolInfo(invocation);
         if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
@@ -73,7 +76,8 @@ public class GraphQLLambdaLikeContextResolver
             return nameError;
         }
 
-        var (graphQLMethodInputType, executionStrategy) = GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
+        var (graphQLMethodInputType, executionStrategy) =
+            GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
         if (graphQLMethodInputType is null)
         {
             return new Error("Could not find input type");
@@ -82,7 +86,6 @@ public class GraphQLLambdaLikeContextResolver
         var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType
             ? graphQLMethodInputType.BaseType!
             : graphQLMethodInputType;
-        var queryTypeName = graphQLMethodSymbol.Parameters.Last().ToGlobalName();
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -98,7 +101,8 @@ public class GraphQLLambdaLikeContextResolver
             return error;
         }
 
-        var (uploadType, uploadProperties) = FindAllUploadProperties(graphQLMethodInputType, result.Variables, semanticModel);
+        var (uploadType, uploadProperties) =
+            FindAllUploadProperties(graphQLMethodInputType, result.Variables, semanticModel);
         var query = $"{operationKind} {name ?? string.Empty}{result.Query}";
         if (cancellationToken.IsCancellationRequested)
         {
@@ -111,7 +115,8 @@ public class GraphQLLambdaLikeContextResolver
             name,
             operationKind,
             query,
-            queryTypeName,
+            result.Query,
+            queryType.ToGlobalName(),
             graphQLMethodInputType,
             requestExecutorInputArgumentSymbol,
             uploadType,
@@ -162,14 +167,16 @@ public class GraphQLLambdaLikeContextResolver
         return (uploadType, uploadProperties);
     }
 
-    private static (INamedTypeSymbol? InputSymbol, GraphQLQueryExecutionStrategy ExecutionStrategy) GetInputSymbol(IMethodSymbol lambdaSymbol, Compilation compilation)
+    private static (INamedTypeSymbol? InputSymbol, GraphQLQueryExecutionStrategy ExecutionStrategy) GetInputSymbol(
+        IMethodSymbol lambdaSymbol, Compilation compilation)
     {
         if (lambdaSymbol.Parameters.Length == 1)
         {
             return (GetLambdaEntry(compilation), GraphQLQueryExecutionStrategy.LambdaWithClosure);
         }
 
-        return (lambdaSymbol.Parameters.First().GetNamedTypeSymbol(), GraphQLQueryExecutionStrategy.LambdaWithVariables);
+        return (lambdaSymbol.Parameters.First().GetNamedTypeSymbol(),
+            GraphQLQueryExecutionStrategy.LambdaWithVariables);
     }
 
     private static INamedTypeSymbol GetLambdaEntry(Compilation compilation)

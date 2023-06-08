@@ -27,6 +27,7 @@ namespace ZeroQL.TestApp
             GraphQLQueryStore<global::GraphQL.TestServer.Mutation>.Query["static (i, m) => m.AddUsersInfo(i.Users)"] = new QueryInfo 
             {
                 Query = "mutation ($users: [UserInfoInput!]!) { addUsersInfo(users: $users)}",
+                QueryBody = "($users: [UserInfoInput!]!) { addUsersInfo(users: $users)}",
                 OperationType = "mutation",
                 Hash = "21d84e505fc57d8b3b4cbd21e879e625c8c4589d317ea1a8c34937d1c32b7e26",
             };

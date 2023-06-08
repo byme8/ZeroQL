@@ -29,21 +29,23 @@ public static class TestProject
 
     public static AdhocWorkspace Workspace { get; }
 
-    public static async Task<IGraphQLResult> ExecuteRequest(this Assembly assembly, CancellationToken token = default)
+    public static async Task<object> Execute(this Assembly assembly, CancellationToken token = default)
     {
         var method = (assembly.GetType("ZeroQL.TestApp.Program")!
                 .GetMethod("Execute", BindingFlags.Static | BindingFlags.Public)!
-                .CreateDelegate(typeof(Func<CancellationToken, Task<IGraphQLResult>>)) as
-            Func<CancellationToken, Task<IGraphQLResult>>)!;
+                .CreateDelegate(typeof(Func<CancellationToken, Task<object>>)) as
+            Func<CancellationToken, Task<object>>)!;
 
-        return await method.Invoke(token);
+        var response = await method.Invoke(token);
+
+        return response;
     }
 
-    public static async Task<IGraphQLResult> Execute(this Project project, CancellationToken token = default)
+    public static async Task<object> Execute(this Project project, CancellationToken token = default)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
         var assembly = await project.CompileToRealAssembly();
-        var response = await assembly.ExecuteRequest(token);
+        var response = await assembly.Execute(token);
 
         return response;
     }
@@ -53,15 +55,16 @@ public static class TestProject
     {
         project = await project.RemoveSyntaxTreesFromReferences();
         var assembly = await project.CompileToRealAssembly();
-        var response = await assembly.ExecuteRequest();
+        var response = await assembly.Execute();
+        var queryResponse = (IGraphQLResult)response;
 
-        response.Query.Should().Be(graphqlQuery);
+        queryResponse.Query.Should().Be(graphqlQuery);
 
         if (checkError)
         {
-            response.Errors.Should().BeNull();
+            queryResponse.Errors.Should().BeNull();
         }
 
-        return response;
+        return queryResponse;
     }
 }

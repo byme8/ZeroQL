@@ -22,12 +22,3 @@ public class QueryExecuteContext
 
     public CancellationToken CancellationToken { get; set; }
 }
-
-public class QueryInfo
-{
-    public string Query { get; set; }
-
-    public string OperationType { get; set; }
-
-    public string Hash { get; set; }
-}

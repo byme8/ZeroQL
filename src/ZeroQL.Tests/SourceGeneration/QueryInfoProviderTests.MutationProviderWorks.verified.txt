@@ -1,0 +1,6 @@
+﻿{
+  Query: mutation ($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { firstName } },
+  QueryBody: ($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { firstName } },
+  OperationType: mutation,
+  Hash: acf53c66b2a4f51b5237a0e873039331217b4872d646d1826c24d3edad6801d8
+}

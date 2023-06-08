@@ -8,6 +8,7 @@ using GraphQL.TestServer;
 using ZeroQL;
 using ZeroQL.Json; // do not remove this
 using ZeroQL.Pipelines; // do not remove this
+using ZeroQL.Stores; // do not remove this
 using ZeroQL.TestApp.Models;
 
 namespace ZeroQL.TestApp;
@@ -28,7 +29,7 @@ public class Program
 
     // class Program place to replace in 
 
-    public static async Task<IGraphQLResult> Execute(CancellationToken cancellationToken = default)
+    public static async Task<object> Execute(CancellationToken cancellationToken = default)
     {
         var httpClient = new HttpClient
         {

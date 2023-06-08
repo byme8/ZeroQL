@@ -41,6 +41,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
             GraphQLQueryStore<{context.QueryTypeName}>.Query[{SyntaxFactory.Literal(context.Key).Text}] = new QueryInfo 
             {{
                 Query = {SyntaxFactory.Literal(context.OperationQuery).Text},
+                QueryBody = {SyntaxFactory.Literal(context.OperationQueryBody).Text},
                 OperationType = {SyntaxFactory.Literal(context.OperationType).Text},
                 Hash = {SyntaxFactory.Literal(context.OperationHash).Text},
             }};

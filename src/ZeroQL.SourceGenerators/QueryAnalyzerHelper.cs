@@ -13,15 +13,25 @@ public class QueryAnalyzerHelper
             return null;
         }
 
-        var lambdaExtensions = compilation.GetTypeByMetadataName("GraphQLClientLambdaExtensions");
         var possibleMethod = semanticModel.GetSymbolInfo(memberAccess.Name);
-        if (possibleMethod.Symbol is not IMethodSymbol { ContainingSymbol: INamedTypeSymbol containingType } method ||
-            !SymbolEqualityComparer.Default.Equals(containingType,  lambdaExtensions))
+        if (possibleMethod.Symbol is not IMethodSymbol { ContainingSymbol: INamedTypeSymbol containingType } method)
         {
             return null;
         }
 
-        return method;
+        var lambdaExtensions = compilation.GetTypeByMetadataName("GraphQLClientLambdaExtensions");
+        if (SymbolEqualityComparer.Default.Equals(containingType,  lambdaExtensions))
+        {
+            return method;
+        }
+        
+        var queryInfoProvider = compilation.GetTypeByMetadataName("ZeroQL.Stores.QueryInfoProvider");
+        if (SymbolEqualityComparer.Default.Equals(containingType,  queryInfoProvider))
+        {
+            return method;
+        }
+
+        return null;
     }
 
     public static bool IsOpenLambda(LambdaExpressionSyntax lambda)

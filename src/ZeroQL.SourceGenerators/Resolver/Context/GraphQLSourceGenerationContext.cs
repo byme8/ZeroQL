@@ -18,6 +18,7 @@ public class GraphQLSourceGenerationContext
         string? operationName,
         string operationType,
         string operationQuery,
+        string operationQueryBody,
         string queryTypeName,
         INamedTypeSymbol graphQLMethodInputSymbol,
         INamedTypeSymbol requestExecutorInputSymbol,
@@ -30,6 +31,7 @@ public class GraphQLSourceGenerationContext
         OperationName = operationName;
         OperationType = operationType;
         OperationQuery = operationQuery;
+        OperationQueryBody = operationQueryBody;
         OperationHash = QueryKey.ComputeHash(operationQuery);
         QueryTypeName = queryTypeName;
         GraphQLMethodInputSymbol = graphQLMethodInputSymbol;
@@ -51,6 +53,7 @@ public class GraphQLSourceGenerationContext
     public string OperationType { get; }
 
     public string OperationQuery { get; }
+    public string OperationQueryBody { get; }
 
     public string OperationHash { get; }
 

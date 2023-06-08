@@ -27,7 +27,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     {
         if (context.Node is not InvocationExpressionSyntax invocation ||
             invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.ValueText is not ("Query" or "Mutation"))
+            memberAccess.Name.Identifier.ValueText is not ("Query" or "Mutation" or "Materialize"))
         {
             return;
         }
