@@ -3,6 +3,10 @@ schema {
   mutation: Mutation
 }
 
+interface IEntity {
+  id: Int
+}
+
 interface IFigure {
   id: Int
   perimeter: Float!
@@ -19,7 +23,7 @@ interface InterfaceThatNeverGetsUsed {
   id: Int!
 }
 
-type Circle implements IFigure {
+type Circle implements IFigure & IEntity {
   id: Int
   center: Point!
   radius: Float!
@@ -72,7 +76,7 @@ type Person implements IPerson {
   lastName: String!
 }
 
-type Point implements IFigure {
+type Point implements IFigure & IEntity {
   id: Int!
   x: Float!
   y: Float!
@@ -86,6 +90,7 @@ type Query {
   image: ImageContent!
   text: TextContent!
   figure: FigureContent!
+  entities: [IEntity!]!
   figures: [IFigure!]!
   circles: [Circle!]!
   squares: [Square!]!
@@ -117,7 +122,7 @@ type Role {
   name: String!
 }
 
-type Square implements IFigure {
+type Square implements IFigure & IEntity {
   id: Int
   topLeft: Point!
   bottomRight: Point!

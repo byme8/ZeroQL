@@ -8,6 +8,11 @@ public interface IInterfaceThatNeverGetsUsed
     public int Id { get; set; }
 }
 
+public interface IEntity
+{
+    public int? Id { get; set; }
+}
+
 [InterfaceType("IPerson")]
 public interface IPerson
 {
@@ -43,7 +48,7 @@ public interface IFigure
     IPerson? Creator { get; set; }
 }
 
-public class Point : IFigure
+public class Point : IFigure, IEntity
 {
     [GraphQLType("Int!")]
     public int? Id { get; set; }
@@ -56,7 +61,7 @@ public class Point : IFigure
     public IPerson Creator { get; set; }
 }
 
-public class Square : IFigure
+public class Square : IFigure, IEntity
 {
     public int? Id { get; set; }
 
@@ -69,7 +74,7 @@ public class Square : IFigure
     public IPerson? Creator { get; set; }
 }
 
-public class Circle : IFigure
+public class Circle : IFigure, IEntity
 {
 
     public int? Id { get; set; }
@@ -86,6 +91,13 @@ public class Circle : IFigure
 [ExtendObjectType(typeof(Query))]
 public class InterfacesExtensions
 {
+    public IEntity[] GetEntities()
+    {
+        return GetCircles().Skip(1).Take(1).Concat(
+                GetSquares().Skip(1).Take(1).OfType<IEntity>())
+            .ToArray();
+    }
+    
     public IFigure[] GetFigures()
     {
         return GetCircles().Skip(1).Take(1).Concat(

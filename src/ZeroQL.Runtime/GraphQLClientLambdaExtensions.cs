@@ -17,7 +17,7 @@ public static class GraphQLClientLambdaExtensions
         TVariables variables,
         Func<TVariables, TQuery, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         return await client.Execute(variables, query!, queryKey, cancellationToken);
     }
@@ -27,7 +27,7 @@ public static class GraphQLClientLambdaExtensions
         TVariables variables,
         Func<TVariables, TQuery, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         return await client.Execute(variables, query!, queryKey, cancellationToken);
     }
@@ -37,7 +37,7 @@ public static class GraphQLClientLambdaExtensions
         string name,
         Func<TQuery?, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         var variables = GetVariables(query);
         return await client.Execute<Dictionary<string, object?>, TQuery, TResult>(
@@ -51,7 +51,7 @@ public static class GraphQLClientLambdaExtensions
         this GraphQLClient<TQuery, TMutation> client,
         Func<TQuery, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         var variables = GetVariables(query);
         return await client.Execute<Dictionary<string, object?>, TQuery, TResult>(
@@ -67,7 +67,7 @@ public static class GraphQLClientLambdaExtensions
         TVariables variables,
         Func<TVariables, TMutation, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         return await client.Execute(variables, query!, queryKey, cancellationToken);
     }
@@ -77,7 +77,7 @@ public static class GraphQLClientLambdaExtensions
         TVariables variables,
         Func<TVariables, TMutation, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         return await client.Execute(variables, query!, queryKey, cancellationToken);
     }
@@ -87,7 +87,7 @@ public static class GraphQLClientLambdaExtensions
         string name,
         Func<TMutation?, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         var variables = GetVariables(query);
         return await client.Execute<Dictionary<string, object?>, TMutation, TResult>(
@@ -101,7 +101,7 @@ public static class GraphQLClientLambdaExtensions
         this GraphQLClient<TQuery, TMutation> client,
         Func<TMutation, TResult> query,
         CancellationToken cancellationToken = default,
-        [CallerArgumentExpression("query")] string queryKey = null!)
+        [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
         var variables = GetVariables(query);
         return await client.Execute<Dictionary<string, object?>, TMutation, TResult>(

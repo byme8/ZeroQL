@@ -21,7 +21,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    internal class Circle : IFigure
+    internal class Circle : IFigure, IEntity
     {
         [ZeroQL.GraphQLFieldSelector("id")]
         [JsonPropertyName("id")]
@@ -267,7 +267,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    internal class Point : IFigure
+    internal class Point : IFigure, IEntity
     {
         [ZeroQL.GraphQLFieldSelector("id")]
         [JsonPropertyName("id")]
@@ -275,6 +275,9 @@ namespace GraphQLClient
 
         [JsonIgnore]
         int? IFigure.Id { get; set; }
+
+        [JsonIgnore]
+        int? IEntity.Id { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("x")]
         [JsonPropertyName("x")]
@@ -339,6 +342,15 @@ namespace GraphQLClient
         public T Figure<T>(Func<FigureContent, T> selector = default !)
         {
             return __Figure is null ? throw new NullReferenceException("Figure is null but it should not be null. Schema can be outdated.") : selector(__Figure);
+        }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("entities")]
+        public IEntity[] __Entities { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("entities")]
+        public T[] Entities<T>(Func<IEntity, T> selector = default !)
+        {
+            return __Entities is null ? throw new NullReferenceException("Entities is null but it should not be null. Schema can be outdated.") : __Entities.Select(o => o is null ? throw new NullReferenceException("Entities is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("figures")]
@@ -547,7 +559,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    internal class Square : IFigure
+    internal class Square : IFigure, IEntity
     {
         [ZeroQL.GraphQLFieldSelector("id")]
         [JsonPropertyName("id")]
@@ -792,6 +804,22 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal interface IEntity : global::ZeroQL.IUnionType
+    {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
+        public int? Id { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class IEntityStub : IEntity
+    {
+        [ZeroQL.GraphQLFieldSelector("id")]
+        [JsonPropertyName("id")]
+        public int? Id { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal interface IFigure : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLFieldSelector("id")]
@@ -1002,6 +1030,16 @@ namespace GraphQLClient
             _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)};
     }
 
+    internal class ZeroQLIEntityConverter : InterfaceJsonConverter<IEntity?>
+    {
+        public override IEntity? Deserialize(string typeName, JsonObject json) => typeName switch
+        {
+            "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
+            "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
+            "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
+            _ => json.Deserialize<IEntityStub>(ZeroQLJsonOptions.Options)};
+    }
+
     internal class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
     {
         public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
@@ -1036,6 +1074,7 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind>{{"SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood}, {"GOOD", global::GraphQLClient.UserKind.Good}, {"BAD", global::GraphQLClient.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string>{{global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQLClient.UserKind.Good, "GOOD"}, {global::GraphQLClient.UserKind.Bad, "BAD"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal>{{"default", global::GraphQLClient.UserKindPascal.Default}, {"SupperGood", global::GraphQLClient.UserKindPascal.SupperGood}, {"Good", global::GraphQLClient.UserKindPascal.Good}, {"Bad", global::GraphQLClient.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string>{{global::GraphQLClient.UserKindPascal.Default, "default"}, {global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQLClient.UserKindPascal.Good, "Good"}, {global::GraphQLClient.UserKindPascal.Bad, "Bad"}, });
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IEntity)] = new ZeroQLIEntityConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IFigure)] = new ZeroQLIFigureConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.InterfaceThatNeverGetsUsed)] = new ZeroQLInterfaceThatNeverGetsUsedConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IPerson)] = new ZeroQLIPersonConverter();

@@ -18,6 +18,7 @@ type Query {
   image: ImageContent!
   text: TextContent!
   figure: FigureContent!
+  entities: [IEntity!]!
   figures: [IFigure!]!
   circles: [Circle!]!
   squares: [Square!]!
@@ -71,6 +72,79 @@ type Person implements IPerson {
   lastName: String!
 }
 
+enum UserKind {
+  SUPPER_GOOD
+  GOOD
+  BAD
+}
+
+enum UserKindPascal {
+  default
+  SupperGood
+  Good
+  Bad
+}
+
+input UserFilterInput {
+  userKind: UserKind!
+  page: PageInput
+}
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  userKind: UserKind!
+  role: Role
+}
+
+type Square implements IFigure & IEntity {
+  id: Int
+  topLeft: Point!
+  bottomRight: Point!
+  perimeter: Float!
+  creator: IPerson
+}
+
+type Circle implements IFigure & IEntity {
+  id: Int
+  center: Point!
+  radius: Float!
+  perimeter: Float!
+  creator: IPerson
+}
+
+interface IFigure {
+  id: Int
+  perimeter: Float!
+  creator: IPerson
+}
+
+interface IEntity {
+  id: Int
+}
+
+type FigureContent {
+  id: Int!
+  figure: IFigure!
+  author: User!
+}
+
+type TextContent {
+  id: Int!
+  text: String!
+  author: User!
+}
+
+type ImageContent {
+  id: Int!
+  imageUrl: String!
+  height: Int!
+  author: User!
+}
+
+union PostContent = FigureContent | TextContent | ImageContent
+
 type TypesContainer {
   text: String!
   value1: Byte!
@@ -106,75 +180,6 @@ type TypesContainer {
   value31: DateTime!
   value32: DateTime
 }
-
-enum UserKind {
-  SUPPER_GOOD
-  GOOD
-  BAD
-}
-
-enum UserKindPascal {
-  default
-  SupperGood
-  Good
-  Bad
-}
-
-input UserFilterInput {
-  userKind: UserKind!
-  page: PageInput
-}
-
-type User {
-  id: ID!
-  firstName: String!
-  lastName: String!
-  userKind: UserKind!
-  role: Role
-}
-
-type Square implements IFigure {
-  id: Int
-  topLeft: Point!
-  bottomRight: Point!
-  perimeter: Float!
-  creator: IPerson
-}
-
-type Circle implements IFigure {
-  id: Int
-  center: Point!
-  radius: Float!
-  perimeter: Float!
-  creator: IPerson
-}
-
-interface IFigure {
-  id: Int
-  perimeter: Float!
-  creator: IPerson
-}
-
-type FigureContent {
-  id: Int!
-  figure: IFigure!
-  author: User!
-}
-
-type TextContent {
-  id: Int!
-  text: String!
-  author: User!
-}
-
-type ImageContent {
-  id: Int!
-  imageUrl: String!
-  height: Int!
-  author: User!
-}
-
-union PostContent = FigureContent | TextContent | ImageContent
 
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime
@@ -225,13 +230,18 @@ type JsonDocument {
   rootElement: JSON!
 }
 
+type KeyValuePairOfStringAndString {
+  key: String!
+  value: String!
+}
+
 interface IPerson {
   id: Int!
   firstName: String!
   lastName: String!
 }
 
-type Point implements IFigure {
+type Point implements IFigure & IEntity {
   id: Int!
   x: Float!
   y: Float!
@@ -242,9 +252,4 @@ type Point implements IFigure {
 input PageInput {
   count: Int!
   size: Int!
-}
-
-type KeyValuePairOfStringAndString {
-  key: String!
-  value: String!
 }

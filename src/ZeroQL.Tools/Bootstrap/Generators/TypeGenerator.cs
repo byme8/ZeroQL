@@ -33,7 +33,8 @@ public static class TypeGenerator
 
                     var interfaceFields = o.Implements
                         .SelectMany(oo => oo.Properties)
-                        .ToDictionary(oo => oo.Name);
+                        .GroupBy(oo => oo.Name)
+                        .ToDictionary(oo => oo.Key, oo => oo.ToArray());
 
                     var fields = o.Properties
                         .SelectMany(o => GenerateFieldMembersWithAccountForInterface(o, interfaceFields));
@@ -71,37 +72,46 @@ public static class TypeGenerator
 
     private static IEnumerable<MemberDeclarationSyntax> GenerateFieldMembersWithAccountForInterface(
         FieldDefinition field,
-        Dictionary<string, FieldDefinition> interfaceFields)
+        Dictionary<string, FieldDefinition[]> interfaceFieldsByName)
     {
         var members = new List<MemberDeclarationSyntax>();
         members.AddRange(GeneratePropertiesDeclarations(field));
-        var interfaceField = interfaceFields.GetValueOrDefault(field.Name);
-        if (interfaceField is null || interfaceField.TypeDefinition == field.TypeDefinition)
-        {
-            return members;
-        }
-
+        
         if (members.Count == 2)
         {
             // we have graphql selector and csharp property
             // no need to generate nullable property
             return members;
         }
-
-        var interfaceFieldDeclarations = GeneratePropertiesDeclarations(interfaceField);
-        foreach (var interfaceFieldDeclaration in interfaceFieldDeclarations)
+        
+        var interfaceFields = interfaceFieldsByName.GetValueOrDefault(field.Name);
+        if (interfaceFields is null)
         {
-            switch (interfaceFieldDeclaration)
+            return members;
+        }
+        
+        foreach (var interfaceField in interfaceFields)
+        {
+            if (interfaceField.TypeDefinition == field.TypeDefinition)
             {
-                case PropertyDeclarationSyntax property:
-                    members.Add(property
-                        .WithModifiers(new SyntaxTokenList())
-                        .WithAttributeLists(List<AttributeListSyntax>())
-                        .AddAttribute(ZeroQLGenerationInfo.JsonIgnoreAttribute)
-                        .WithExplicitInterfaceSpecifier(
-                            ExplicitInterfaceSpecifier(
-                                IdentifierName(interfaceField.Parent.Name))));
-                    break;
+                continue;
+            }
+
+            var interfaceFieldDeclarations = GeneratePropertiesDeclarations(interfaceField);
+            foreach (var interfaceFieldDeclaration in interfaceFieldDeclarations)
+            {
+                switch (interfaceFieldDeclaration)
+                {
+                    case PropertyDeclarationSyntax property:
+                        members.Add(property
+                            .WithModifiers(new SyntaxTokenList())
+                            .WithAttributeLists(List<AttributeListSyntax>())
+                            .AddAttribute(ZeroQLGenerationInfo.JsonIgnoreAttribute)
+                            .WithExplicitInterfaceSpecifier(
+                                ExplicitInterfaceSpecifier(
+                                    IdentifierName(interfaceField.Parent.Name))));
+                        break;
+                }
             }
         }
 
@@ -200,7 +210,7 @@ public static class TypeGenerator
             return genericMethodWithType
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
         }
-        
+
         var methodBody = $"return {GetPropertyMethodBody("__" + field.Name, field.TypeDefinition)};";
         var body = Block(
             ParseStatement(methodBody));

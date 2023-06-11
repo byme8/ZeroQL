@@ -1,8 +1,9 @@
-[
+﻿[
   T[] Posts<T>(Func<PostContent, T> selector = default !),
   T Image<T>(Func<ImageContent, T> selector = default !),
   T Text<T>(Func<TextContent, T> selector = default !),
   T Figure<T>(Func<FigureContent, T> selector = default !),
+  T[] Entities<T>(Func<IEntity, T> selector = default !),
   T[] Figures<T>(Func<IFigure, T> selector = default !),
   T[] Circles<T>(Func<Circle, T> selector = default !),
   T[] Squares<T>(Func<Square, T> selector = default !),
