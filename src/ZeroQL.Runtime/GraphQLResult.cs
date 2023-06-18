@@ -4,6 +4,7 @@ namespace ZeroQL;
 
 public class Unit
 {
+    public static Unit Default { get; } = new();
 }
 
 public interface IGraphQLResult

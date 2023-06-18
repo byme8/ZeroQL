@@ -18,7 +18,7 @@ public class GenerateCommand : ICommand
         Description =
             "The generation config file. For example, './zeroql.json'. Use `zeroql config init` to bootstrap.")]
     public string? Config { get; set; }
-    
+
     [CommandOption(
         "schema",
         's',
@@ -50,7 +50,7 @@ public class GenerateCommand : ICommand
         "netstandard-compatibility",
         Description = "Enables netstandard compatibility during generation.")]
     public bool? NetstandardCompatibility { get; set; } = null;
-    
+
     [CommandOption("force", 'f', Description = "Ignore checksum check and generate source code")]
     public bool Force { get; set; }
 
@@ -61,7 +61,7 @@ public class GenerateCommand : ICommand
         {
             return;
         }
-        
+
         var validationSuccessful = await Validate(console);
         if (!validationSuccessful)
         {
@@ -152,7 +152,22 @@ public class GenerateCommand : ICommand
             return false;
         }
 
+        var schema = ZeroQLSchema.GetJsonSchema();
         var json = await File.ReadAllTextAsync(Config);
+        var errors = schema.Validate(json);
+
+        if (errors.Count > 0)
+        {
+            await console.Error.WriteLineAsync("Config file is not valid.");
+            await console.Error.WriteLineAsync("Errors:");
+            foreach (var error in errors)
+            {
+                var humanReadableError = ZeroQLSchema.GetHumanReadableErrorMessage(error.Kind);
+                await console.Error.WriteLineAsync($"    {Config} [{error.LineNumber}:{error.LinePosition}]: {humanReadableError} at {error.Path}");
+            }
+            return false;
+        }
+        
         var config = JsonConvert.DeserializeObject<ZeroQLFileConfig>(json);
         if (config is null)
         {
@@ -179,7 +194,7 @@ public class GenerateCommand : ICommand
         {
             Scalars = config.Scalars?.ToArray();
         }
-        
+
         if (!NetstandardCompatibility.HasValue)
         {
             NetstandardCompatibility = config.NetstandardCompatibility;

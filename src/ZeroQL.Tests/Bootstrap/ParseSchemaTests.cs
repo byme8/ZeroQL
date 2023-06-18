@@ -508,6 +508,96 @@ type Mutation {
             initializers
         });
     }
+    
+    [Fact]
+    public async Task ClassNameIdenticalToPropertyName()
+    {
+        var rawSchema = @"
+            schema {
+              query: Query
+            }
+              
+            type Query {
+              perVariant: Limit!
+            }
+
+            type Limit {
+              limit: Long
+            }
+        ";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var clases = (await syntaxTree.GetRootAsync())
+            .DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .Where(o => o.Identifier.ValueText.Contains("Limit"))
+            .Select(o => o.Identifier.ValueText)
+            .ToArray();
+
+        await Verify(clases);
+    }
+    
+    [Fact]
+    public async Task InterfaceNameIdenticalToPropertyName()
+    {
+        var rawSchema = @"
+            schema {
+              query: Query
+            }
+              
+            type Query {
+              perVariant: Limit!
+            }
+
+            interface Limit {
+              limit: Long
+            }
+        ";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var clases = (await syntaxTree.GetRootAsync())
+            .DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .Where(o => o.Identifier.ValueText.Contains("Limit"))
+            .Select(o => o.Identifier.ValueText)
+            .ToArray();
+
+        await Verify(clases);
+    }
+    
+    [Fact]
+    public async Task InputTypeNameIdenticalToPropertyName()
+    {
+        var rawSchema = @"
+            schema {
+              mutation: Mutation
+            }
+              
+            type Mutation {
+              ids(limit: Limit!) : [Long!]!
+            }
+
+            input Limit {
+              limit: Long
+            }
+        ";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var clases = (await syntaxTree.GetRootAsync())
+            .DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .Where(o => o.Identifier.ValueText.Contains("Limit"))
+            .Select(o => o.Identifier.ValueText)
+            .ToArray();
+
+        await Verify(clases);
+    }
 
     private void VerifyProperty(PropertyDeclarationSyntax property, SyntaxKind syntaxKind, object exprectedDefaultValue)
     {

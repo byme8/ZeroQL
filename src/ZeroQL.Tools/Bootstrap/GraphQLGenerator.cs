@@ -108,7 +108,7 @@ public static class GraphQLGenerator
             .AddRange(enumsDeclaration)
             .AddRange(interfaceInitializers)
             .Add(jsonInitializers);
-        
+
         namespaceDeclaration = namespaceDeclaration
             .WithMembers(members);
 
@@ -150,16 +150,16 @@ public static class GraphQLGenerator
 
         var unit = CompilationUnit()
             .WithMembers(SingletonList<MemberDeclarationSyntax>(namespaceDeclaration));
-        
+
         if (options.NetstandardCompatibility is true)
         {
             unit = unit.AddMembers(GenerateNetstandardCompatibility());
         }
-        
+
         var formattedSource = unit
             .NormalizeWhitespace()
             .ToFullString();
-        
+
         return formattedSource;
     }
 
@@ -174,12 +174,12 @@ public static class GraphQLGenerator
                 }
             }
            """;
-        
+
         var moduleInitializerSyntax = ParseCompilationUnit(moduleInitializer)
             .WithLeadingTrivia(Comment("// Netstandard compatibility"))
             .WithTrailingTrivia(CarriageReturnLineFeed)
             .Members[0];
-        
+
         return moduleInitializerSyntax;
     }
 
@@ -192,12 +192,24 @@ public static class GraphQLGenerator
             .Select(o => interfaces[o.Name.StringValue])
             .ToList() ?? new List<InterfaceDefinition>();
 
-        var classFields = new List<FieldDefinition>();;
+        var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(type.Name.StringValue, classFields, typeInterfaces);
         var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields);
+        classDefinition = VerifyDefinition(fields, classDefinition);
         classFields.AddRange(fields);
-        
+
         return classDefinition;
+    }
+
+    private static TDefinition VerifyDefinition<TDefinition>(FieldDefinition[] fields, TDefinition definition)
+        where TDefinition : Definition
+    {
+        if (fields.Any(o => o.Name == definition.Name))
+        {
+            definition = definition with { Name = $"{definition.Name}_ZeroQL" };
+        }
+
+        return definition;
     }
 
     private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
@@ -206,6 +218,7 @@ public static class GraphQLGenerator
         var interfaceFields = new List<FieldDefinition>();
         var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
         var fields = typeContext.CreatePropertyDefinition(interfaceDefinition, definition.Fields);
+        interfaceDefinition = VerifyDefinition(fields, interfaceDefinition);
         interfaceFields.AddRange(fields);
 
         return interfaceDefinition;
@@ -221,12 +234,14 @@ public static class GraphQLGenerator
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(input.Name.StringValue, classFields, new List<InterfaceDefinition>());
         var fields = typeContext.CreatePropertyDefinition(classDefinition, input.Fields);
+        classDefinition = VerifyDefinition(fields, classDefinition);
         classFields.AddRange(fields);
 
         return classDefinition;
     }
 
-    private static void AddUnions(GraphQLDocument schema, Dictionary<string, InterfaceDefinition> interfaces,
+    private static void AddUnions(GraphQLDocument schema,
+        Dictionary<string, InterfaceDefinition> interfaces,
         ClassDefinition[] types)
     {
         var unions = schema.Definitions
