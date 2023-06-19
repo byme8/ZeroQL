@@ -62,7 +62,7 @@ public class MutationTests : IntegrationTest
 
         await Verify(result);
     }
-    
+
     [Fact]
     public async Task SupportedDifferentCSharpQueriesButIdenticalGraphQLQueries()
     {
@@ -72,6 +72,22 @@ public class MutationTests : IntegrationTest
 
                 var id = UserKindPascal.SupperGood;
                 var response = await qlClient.Mutation(q => q.AddUserKindPascal(id));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+
+    [Fact]
+    public async Task ReplacementTypeWorks()
+    {
+        var csharpQuery = """
+                var limit = new LimitInput { Limit = 10 };
+                var response = await qlClient.Mutation(m => m.AddLimit(limit, o => o.Limit));
                 """;
 
         var project = await TestProject.Project

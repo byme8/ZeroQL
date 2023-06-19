@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using GraphQLParser.AST;
 using ZeroQL.Bootstrap;
 using ZeroQL.Schema;
@@ -27,6 +28,8 @@ public class TypeContext
         { "JSON", "global::System.Text.Json.JsonElement" },
     };
 
+    public Dictionary<string, string> TypesReplacements = new();
+
     public TypeContext(
         GraphQlGeneratorOptions options,
         HashSet<string> enums,
@@ -46,7 +49,7 @@ public class TypeContext
             CustomScalars.Add(scalarDefinition);
             GraphQLToCsharpScalarTypes[scalar] = options.GetDefinitionFullTypeName(scalarDefinition);
         }
-        
+
         foreach (var (key, value) in scalarsToOverride)
         {
             GraphQLToCsharpScalarTypes[key] = options.GetDefinitionFullTypeName(value);
@@ -64,7 +67,7 @@ public class TypeContext
             case GraphQLNonNullType { Type: GraphQLNamedType nonNullType }:
             {
                 var typeDefinition = GetTypeDefinition(nonNullType);
-                return typeDefinition;
+                return typeDefinition with { CanBeNull = false };
             }
             case GraphQLNonNullType { Type: GraphQLListType listType }:
             {
@@ -79,6 +82,7 @@ public class TypeContext
             case GraphQLNamedType namedType:
             {
                 var typeDefinition = GetTypeDefinition(namedType);
+
                 return typeDefinition with
                 {
                     CanBeNull = true
@@ -97,8 +101,16 @@ public class TypeContext
             return new EnumTypeDefinition(namedType.Name.StringValue);
         }
 
-        return GraphQLToCsharpScalarTypes.ContainsKey(namedType.Name.StringValue)
-            ? new ScalarTypeDefinition(GraphQLToCsharpScalarTypes[namedType.Name.StringValue])
-            : new ObjectTypeDefinition(namedType.Name.StringValue);
+        if (GraphQLToCsharpScalarTypes.TryGetValue(namedType.Name.StringValue, out var type))
+        {
+            return new ScalarTypeDefinition(type);
+        }
+
+        if (TypesReplacements.TryGetValue(namedType.Name.StringValue, out var replacement))
+        {
+            namedType.Name = new GraphQLName(replacement);
+        }
+        
+        return new ObjectTypeDefinition(namedType.Name.StringValue);
     }
 }

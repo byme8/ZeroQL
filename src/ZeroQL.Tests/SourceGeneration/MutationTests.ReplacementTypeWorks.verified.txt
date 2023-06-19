@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($limit: LimitInput!) { addLimit(limit: $limit) { limit } },
+  Data: 10
+}

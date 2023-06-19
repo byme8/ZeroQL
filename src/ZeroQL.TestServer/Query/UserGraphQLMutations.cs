@@ -80,6 +80,11 @@ public class UserGraphQLMutations
     {
         return (int)userKindPascal + 10;
     }
+    
+    public Limit_1 AddLimit(Limit_1 limit)
+    {
+        return limit;
+    }
 
     public Task<int> AddValues(
         string text,

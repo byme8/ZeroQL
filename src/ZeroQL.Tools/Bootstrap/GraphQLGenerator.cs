@@ -195,18 +195,23 @@ public static class GraphQLGenerator
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(type.Name.StringValue, classFields, typeInterfaces);
         var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields);
-        classDefinition = VerifyDefinition(fields, classDefinition);
+        classDefinition = VerifyDefinition(typeContext, fields, classDefinition);
         classFields.AddRange(fields);
 
         return classDefinition;
     }
 
-    private static TDefinition VerifyDefinition<TDefinition>(FieldDefinition[] fields, TDefinition definition)
+    private static TDefinition VerifyDefinition<TDefinition>(
+        TypeContext typeContext,
+        FieldDefinition[] fields,
+        TDefinition definition)
         where TDefinition : Definition
     {
         if (fields.Any(o => o.Name == definition.Name))
         {
-            definition = definition with { Name = $"{definition.Name}_ZeroQL" };
+            var newName = $"{definition.Name}_ReplacementType";
+            typeContext.TypesReplacements[definition.Name] = newName;
+            definition = definition with { Name = newName};
         }
 
         return definition;
@@ -218,7 +223,7 @@ public static class GraphQLGenerator
         var interfaceFields = new List<FieldDefinition>();
         var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
         var fields = typeContext.CreatePropertyDefinition(interfaceDefinition, definition.Fields);
-        interfaceDefinition = VerifyDefinition(fields, interfaceDefinition);
+        interfaceDefinition = VerifyDefinition(typeContext, fields, interfaceDefinition);
         interfaceFields.AddRange(fields);
 
         return interfaceDefinition;
@@ -234,7 +239,7 @@ public static class GraphQLGenerator
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(input.Name.StringValue, classFields, new List<InterfaceDefinition>());
         var fields = typeContext.CreatePropertyDefinition(classDefinition, input.Fields);
-        classDefinition = VerifyDefinition(fields, classDefinition);
+        classDefinition = VerifyDefinition(typeContext, fields, classDefinition);
         classFields.AddRange(fields);
 
         return classDefinition;
