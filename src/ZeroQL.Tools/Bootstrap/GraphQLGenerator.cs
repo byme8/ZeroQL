@@ -156,11 +156,87 @@ public static class GraphQLGenerator
             unit = unit.AddMembers(GenerateNetstandardCompatibility());
         }
 
+        unit = FixTypeNamingWhenNameEqualsMemberName(unit);
+
         var formattedSource = unit
             .NormalizeWhitespace()
             .ToFullString();
 
         return formattedSource;
+    }
+
+    private static CompilationUnitSyntax FixTypeNamingWhenNameEqualsMemberName(
+        CompilationUnitSyntax unit)
+    {
+        var classesWhenClassNameEqualsToPropertyName = unit.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .Where(o => o.Members
+                            .OfType<PropertyDeclarationSyntax>()
+                            .Any(p => p.Identifier.Text == o.Identifier.Text) ||
+                        o.Members
+                            .OfType<MethodDeclarationSyntax>()
+                            .Any(m => SubstringGenericName(m.Identifier.Text) == o.Identifier.Text))
+            .ToArray();
+
+        var changedClasses = classesWhenClassNameEqualsToPropertyName
+            .Select(o => (o.Identifier.Text, New: o.WithIdentifier(Identifier($"{o.Identifier.Text}ZeroQL"))))
+            .ToDictionary(o => o.Text, o => o.New);
+
+        unit = unit.ReplaceNodes(classesWhenClassNameEqualsToPropertyName,
+            (oldNode, _) => changedClasses[oldNode.Identifier.Text]);
+
+        var propertyTypes = unit.DescendantNodes()
+            .OfType<PropertyDeclarationSyntax>()
+            .Select(o => o.Type)
+            .ToArray();
+
+        var methodTypes = unit.DescendantNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .Select(o => o.ReturnType)
+            .ToArray();
+
+        var methodParameters = unit.DescendantNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .SelectMany(o => o.ParameterList.Parameters)
+            .Select(o => o.Type)
+            .ToArray();
+
+        var genericTypes = unit.DescendantNodes()
+            .OfType<GenericNameSyntax>()
+            .Select(o => o.TypeArgumentList.Arguments)
+            .SelectMany(o => o)
+            .ToArray();
+
+        var types = propertyTypes
+            .Concat(methodTypes)
+            .Concat(methodParameters)
+            .Concat(genericTypes)
+            .ToArray();
+
+        var identifiers = types
+            .OfType<IdentifierNameSyntax>()
+            .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
+            .ToArray();
+
+        var changedIdentifiers = identifiers
+            .Select(o => (Key: o, New: o.WithIdentifier(Identifier($"{o.Identifier.Text}ZeroQL"))))
+            .ToDictionary(o => o.Key, o => o.New);
+
+        unit = unit.ReplaceNodes(identifiers,
+            (oldNode, _) => changedIdentifiers[oldNode]);
+
+        return unit;
+    }
+    
+    private static string SubstringGenericName(string name)
+    {
+        var index = name.IndexOf('<');
+        if (index == -1)
+        {
+            return name;
+        }
+
+        return name.Substring(0, index);
     }
 
     private static MemberDeclarationSyntax GenerateNetstandardCompatibility()
@@ -195,26 +271,9 @@ public static class GraphQLGenerator
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(type.Name.StringValue, classFields, typeInterfaces);
         var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields);
-        classDefinition = VerifyDefinition(typeContext, fields, classDefinition);
         classFields.AddRange(fields);
 
         return classDefinition;
-    }
-
-    private static TDefinition VerifyDefinition<TDefinition>(
-        TypeContext typeContext,
-        FieldDefinition[] fields,
-        TDefinition definition)
-        where TDefinition : Definition
-    {
-        if (fields.Any(o => o.Name == definition.Name))
-        {
-            var newName = $"{definition.Name}_ReplacementType";
-            typeContext.TypesReplacements[definition.Name] = newName;
-            definition = definition with { Name = newName};
-        }
-
-        return definition;
     }
 
     private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
@@ -223,7 +282,6 @@ public static class GraphQLGenerator
         var interfaceFields = new List<FieldDefinition>();
         var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
         var fields = typeContext.CreatePropertyDefinition(interfaceDefinition, definition.Fields);
-        interfaceDefinition = VerifyDefinition(typeContext, fields, interfaceDefinition);
         interfaceFields.AddRange(fields);
 
         return interfaceDefinition;
@@ -239,7 +297,6 @@ public static class GraphQLGenerator
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(input.Name.StringValue, classFields, new List<InterfaceDefinition>());
         var fields = typeContext.CreatePropertyDefinition(classDefinition, input.Fields);
-        classDefinition = VerifyDefinition(typeContext, fields, classDefinition);
         classFields.AddRange(fields);
 
         return classDefinition;

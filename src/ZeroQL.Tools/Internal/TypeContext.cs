@@ -28,8 +28,6 @@ public class TypeContext
         { "JSON", "global::System.Text.Json.JsonElement" },
     };
 
-    public Dictionary<string, string> TypesReplacements = new();
-
     public TypeContext(
         GraphQlGeneratorOptions options,
         HashSet<string> enums,
@@ -104,11 +102,6 @@ public class TypeContext
         if (GraphQLToCsharpScalarTypes.TryGetValue(namedType.Name.StringValue, out var type))
         {
             return new ScalarTypeDefinition(type);
-        }
-
-        if (TypesReplacements.TryGetValue(namedType.Name.StringValue, out var replacement))
-        {
-            namedType.Name = new GraphQLName(replacement);
         }
         
         return new ObjectTypeDefinition(namedType.Name.StringValue);

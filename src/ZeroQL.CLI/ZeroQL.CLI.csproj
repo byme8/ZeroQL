@@ -16,7 +16,7 @@
     <ItemGroup>
         <PackageReference Include="CliFx" Version="2.3.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="NJsonSchema" Version="10.8.0" />
+        <PackageReference Include="NJsonSchema" Version="10.9.0" />
         <PackageReference Include="HotChocolate.Utilities.Introspection" Version="13.0.5" />
     </ItemGroup>
 

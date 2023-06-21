@@ -126,11 +126,28 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    internal class Limit_ReplacementType
+    internal class LimitZeroQL
     {
         [ZeroQL.GraphQLFieldSelector("limit")]
         [JsonPropertyName("limit")]
         public int Limit { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class Limit2ZeroQL
+    {
+        [ZeroQL.GraphQLFieldSelector("value")]
+        [JsonPropertyName("value")]
+        public int Value { get; set; }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("limit2")]
+        public Limit2ZeroQL __Limit2 { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("limit2")]
+        public T Limit2<T>(Func<Limit2ZeroQL, T> selector = default !)
+        {
+            return __Limit2 is null ? throw new NullReferenceException("Limit2 is null but it should not be null. Schema can be outdated.") : selector(__Limit2);
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -249,12 +266,21 @@ namespace GraphQLClient
         }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("addLimit")]
-        public Limit_ReplacementType __AddLimit { get; set; }
+        public LimitZeroQL __AddLimit { get; set; }
 
         [ZeroQL.GraphQLFieldSelector("addLimit")]
-        public T AddLimit<T>(LimitInput limit = default !, Func<Limit_ReplacementType, T> selector = default !)
+        public T AddLimit<T>(LimitInput limit = default !, Func<LimitZeroQL, T> selector = default !)
         {
             return __AddLimit is null ? throw new NullReferenceException("AddLimit is null but it should not be null. Schema can be outdated.") : selector(__AddLimit);
+        }
+
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("addLimit2")]
+        public Limit2ZeroQL __AddLimit2 { get; set; }
+
+        [ZeroQL.GraphQLFieldSelector("addLimit2")]
+        public T AddLimit2<T>(Limit2Input limit = default !, Func<Limit2ZeroQL, T> selector = default !)
+        {
+            return __AddLimit2 is null ? throw new NullReferenceException("AddLimit2 is null but it should not be null. Schema can be outdated.") : selector(__AddLimit2);
         }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("addValues")]
@@ -948,6 +974,16 @@ namespace GraphQLClient
 
         [JsonPropertyName("value")]
         public string Value { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class Limit2Input
+    {
+        [JsonPropertyName("value")]
+        public int Value { get; set; }
+
+        [JsonPropertyName("limit2")]
+        public Limit2Input Limit2 { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

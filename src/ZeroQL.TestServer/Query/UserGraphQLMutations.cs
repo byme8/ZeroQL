@@ -85,6 +85,11 @@ public class UserGraphQLMutations
     {
         return limit;
     }
+    
+    public Limit_2 AddLimit2(Limit_2 limit)
+    {
+        return limit;
+    }
 
     public Task<int> AddValues(
         string text,
