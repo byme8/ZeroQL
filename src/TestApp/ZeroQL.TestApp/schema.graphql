@@ -55,11 +55,16 @@ type KeyValuePairOfStringAndString {
 
 type Limit {
   limit: Int!
+  limitInput: Int!
 }
 
 type Limit2 {
   value: Int!
   limit2: Limit2!
+}
+
+type Limit3 {
+  limit3Input: Int!
 }
 
 type Mutation {
@@ -78,6 +83,10 @@ type Mutation {
   addUserKindPascal(userKindPascal: UserKindPascal!): Int!
   addLimit(limit: LimitInput!): Limit!
   addLimit2(limit: Limit2Input!): Limit2!
+  addLimit2Nullable(limit: Limit2Input): Limit2
+  addLimit3(limit: Limit3Input): Limit3
+  addLimits(limit: [Limit2Input!]!): [Limit2!]!
+  addLowerCaseTypeName(value: lower_case_type_nameInput!): lower_case_type_name!
   addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
 }
 
@@ -191,6 +200,10 @@ type User {
   role: Role
 }
 
+type lower_case_type_name {
+  value: Int!
+}
+
 union PostContent = FigureContent | TextContent | ImageContent
 
 input AddUsersInput {
@@ -207,8 +220,13 @@ input Limit2Input {
   limit2: Limit2Input!
 }
 
+input Limit3Input {
+  limit3Input: Int!
+}
+
 input LimitInput {
   limit: Int!
+  limitInput: Int!
 }
 
 input PageInput {
@@ -225,6 +243,10 @@ input UserInfoInput {
   firstName: String!
   lastName: String!
   avatar: Upload!
+}
+
+input lower_case_type_nameInput {
+  value: Int!
 }
 
 enum UserKind {

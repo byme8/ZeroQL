@@ -90,6 +90,26 @@ public class UserGraphQLMutations
     {
         return limit;
     }
+    
+    public Limit_2? AddLimit2Nullable(Limit_2? limit)
+    {
+        return limit;
+    }
+    
+    public Limit_3? AddLimit3(Limit_3? limit)
+    {
+        return limit;
+    }
+    
+    public Limit_2[] AddLimits(Limit_2[] limit)
+    {
+        return limit;
+    }
+    
+    public LowerCaseTypeName AddLowerCaseTypeName(LowerCaseTypeName value)
+    {
+        return value;
+    }
 
     public Task<int> AddValues(
         string text,

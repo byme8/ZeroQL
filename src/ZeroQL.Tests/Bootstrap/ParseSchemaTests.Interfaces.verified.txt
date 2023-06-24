@@ -3,18 +3,18 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public interface IFigure : global::ZeroQL.IUnionType
     {
-        [ZeroQL.GraphQLFieldSelector("id")]
+        [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [ZeroQL.GraphQLName("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
         public User __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("creator")]
+        [ZeroQL.GraphQLName("creator")]
         public T Creator<T>(Func<User, T> selector = default !);
     }
 ,
@@ -22,18 +22,18 @@
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class IFigureStub : IFigure
     {
-        [ZeroQL.GraphQLFieldSelector("id")]
+        [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [ZeroQL.GraphQLName("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
         public User __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("creator")]
+        [ZeroQL.GraphQLName("creator")]
         public T Creator<T>(Func<User, T> selector = default !)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -41,17 +41,18 @@
     }
 ,
   squareClass:
+    [ZeroQL.GraphQLType("Square")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Square : IFigure
     {
-        [ZeroQL.GraphQLFieldSelector("id")]
+        [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("topLeft")]
         public Point __TopLeft { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("topLeft")]
+        [ZeroQL.GraphQLName("topLeft")]
         public T TopLeft<T>(Func<Point, T> selector = default !)
         {
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
@@ -60,20 +61,20 @@
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("bottomRight")]
         public Point __BottomRight { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("bottomRight")]
+        [ZeroQL.GraphQLName("bottomRight")]
         public T BottomRight<T>(Func<Point, T> selector = default !)
         {
             return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
 
-        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [ZeroQL.GraphQLName("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
         public User __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("creator")]
+        [ZeroQL.GraphQLName("creator")]
         public T Creator<T>(Func<User, T> selector = default !)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -81,34 +82,35 @@
     }
 ,
   circleClass:
+    [ZeroQL.GraphQLType("Circle")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Circle : IFigure
     {
-        [ZeroQL.GraphQLFieldSelector("id")]
+        [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int? Id { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("center")]
         public Point __Center { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("center")]
+        [ZeroQL.GraphQLName("center")]
         public T Center<T>(Func<Point, T> selector = default !)
         {
             return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
 
-        [ZeroQL.GraphQLFieldSelector("radius")]
+        [ZeroQL.GraphQLName("radius")]
         [JsonPropertyName("radius")]
         public double Radius { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [ZeroQL.GraphQLName("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
         public User __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("creator")]
+        [ZeroQL.GraphQLName("creator")]
         public T Creator<T>(Func<User, T> selector = default !)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -116,32 +118,33 @@
     }
 ,
   point:
+    [ZeroQL.GraphQLType("Point")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Point : IFigure
     {
-        [ZeroQL.GraphQLFieldSelector("id")]
+        [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [JsonIgnore]
         int? IFigure.Id { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("x")]
+        [ZeroQL.GraphQLName("x")]
         [JsonPropertyName("x")]
         public double X { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("y")]
+        [ZeroQL.GraphQLName("y")]
         [JsonPropertyName("y")]
         public double Y { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("perimeter")]
+        [ZeroQL.GraphQLName("perimeter")]
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never), JsonPropertyName("creator")]
         public User __Creator { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("creator")]
+        [ZeroQL.GraphQLName("creator")]
         public T Creator<T>(Func<User, T> selector = default !)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);

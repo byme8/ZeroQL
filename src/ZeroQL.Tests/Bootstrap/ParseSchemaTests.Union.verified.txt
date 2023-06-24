@@ -6,23 +6,25 @@
     }
 ,
   textContentClass:
+    [ZeroQL.GraphQLType("TextContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TextContent : PostContent
     {
-        [ZeroQL.GraphQLFieldSelector("text")]
+        [ZeroQL.GraphQLName("text")]
         [JsonPropertyName("text")]
         public string Text { get; set; }
     }
 ,
   imageClass:
+    [ZeroQL.GraphQLType("ImageContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class ImageContent : PostContent
     {
-        [ZeroQL.GraphQLFieldSelector("imageUrl")]
+        [ZeroQL.GraphQLName("imageUrl")]
         [JsonPropertyName("imageUrl")]
         public string ImageUrl { get; set; }
 
-        [ZeroQL.GraphQLFieldSelector("height")]
+        [ZeroQL.GraphQLName("height")]
         [JsonPropertyName("height")]
         public int Height { get; set; }
     }

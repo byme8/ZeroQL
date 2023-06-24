@@ -213,16 +213,34 @@ public static class GraphQLGenerator
             .Concat(genericTypes)
             .ToArray();
 
-        var identifiers = types
+        var identifiersFromIdentifiers = types
             .OfType<IdentifierNameSyntax>()
             .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
             .ToArray();
+        
+        var identifiersFromArray = types
+            .OfType<ArrayTypeSyntax>()
+            .Select(o => o.ElementType)
+            .OfType<IdentifierNameSyntax>()
+            .ToArray();
+        
+        var identifiersFromNullable = types
+            .OfType<NullableTypeSyntax>()
+            .Select(o => o.ElementType)
+            .OfType<IdentifierNameSyntax>()
+            .ToArray();
+        
+        var identifies = identifiersFromIdentifiers
+            .Concat(identifiersFromArray)
+            .Concat(identifiersFromNullable)
+            .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
+            .ToArray();
 
-        var changedIdentifiers = identifiers
+        var changedIdentifiers = identifies
             .Select(o => (Key: o, New: o.WithIdentifier(Identifier($"{o.Identifier.Text}ZeroQL"))))
             .ToDictionary(o => o.Key, o => o.New);
 
-        unit = unit.ReplaceNodes(identifiers,
+        unit = unit.ReplaceNodes(identifies,
             (oldNode, _) => changedIdentifiers[oldNode]);
 
         return unit;
@@ -337,7 +355,7 @@ public static class GraphQLGenerator
                     {
                         var name = o.ToPascalCase();
                         return EnumMemberDeclaration(Identifier(name))
-                            .AddAttribute(ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute, o);
+                            .AddAttribute(ZeroQLGenerationInfo.GraphQLNameAttribute, o);
                     })
                     .ToArray() ?? Array.Empty<EnumMemberDeclarationSyntax>();
 

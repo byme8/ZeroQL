@@ -31,7 +31,7 @@ public record struct GraphQLResolveContext(
 
     public INamedTypeSymbol FieldSelectorAttribute
     {
-        get => fieldSelectorAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLFieldSelectorAttribute)!;
+        get => fieldSelectorAttribute ??= SemanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLNameAttribute)!;
     }
     
     public INamedTypeSymbol SyntaxAttribute

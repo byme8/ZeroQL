@@ -72,7 +72,7 @@ public class ParseSchemaTests
             .OfType<MethodDeclarationSyntax>()
             .Where(o => o.AttributeLists
                 .SelectMany(list => list.Attributes)
-                .Any(attribute => attribute.Name.ToString() == ZeroQLGenerationInfo.GraphQLFieldSelectorAttribute))
+                .Any(attribute => attribute.Name.ToString() == ZeroQLGenerationInfo.GraphQLNameAttribute))
             .Select(o =>
             {
                 var returnType = o.ReturnType.ToString();

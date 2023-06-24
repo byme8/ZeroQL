@@ -10,7 +10,7 @@ public class SourceGeneratorInfo
 
     public static string GraphQLSyntaxAttribute { get; } = "ZeroQL.GraphQLSyntax";
 
-    public static string GraphQLFieldSelectorAttribute { get; } = "ZeroQL.GraphQLFieldSelector";
+    public static string GraphQLNameAttribute { get; } = "ZeroQL.GraphQLNameAttribute";
 
     public static string GraphQLFragmentAttributeFullName { get; } = "ZeroQL.GraphQLFragment";
     

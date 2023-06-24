@@ -6,7 +6,9 @@ public class ZeroQLGenerationInfo
     
     public static string CodeGenerationAttribute { get; } = $@"System.CodeDom.Compiler.GeneratedCode(""ZeroQL"", ""{Version}"")";
     
-    public static string GraphQLFieldSelectorAttribute => "ZeroQL.GraphQLFieldSelector";
+    public static string GraphQLNameAttribute => "ZeroQL.GraphQLName";
+
+    public static string GraphQLTypeAttribute => "ZeroQL.GraphQLType";
     
     public static string JsonPropertyNameAttribute => "JsonPropertyName";
 

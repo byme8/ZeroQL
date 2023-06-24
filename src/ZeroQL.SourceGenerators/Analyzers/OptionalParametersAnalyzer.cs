@@ -40,8 +40,8 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var selectorAttribute = context.Compilation.GetTypeByMetadataName("ZeroQL.GraphQLFieldSelector")!;
-        if (!method.GetAttributes().Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, selectorAttribute)))
+        var nameAttribute = context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLNameAttribute)!;
+        if (!method.GetAttributes().Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, nameAttribute)))
         {
             return;
         }

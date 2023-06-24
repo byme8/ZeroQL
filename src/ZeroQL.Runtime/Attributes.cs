@@ -3,9 +3,17 @@ using System;
 namespace ZeroQL;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
-public class GraphQLFieldSelector : Attribute
+public class GraphQLNameAttribute : Attribute
 {
-    public GraphQLFieldSelector(string name)
+    public GraphQLNameAttribute(string name)
+    {
+    }
+}
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public class GraphQLTypeAttribute : Attribute
+{
+    public GraphQLTypeAttribute(string name)
     {
     }
 }

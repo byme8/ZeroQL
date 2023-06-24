@@ -11,17 +11,17 @@ public static class Utils
 {
     public static readonly Dictionary<string, string> CSharpToGraphQL = new()
     {
-        { "string", "String" },
+        { "String", "String" },
         { "byte", "Byte" },
-        { "Int16", "Short" },
-        { "Int32", "Int" },
-        { "Int64", "Long" },
-        { "Single", "Float" },
-        { "Double", "Float" },
-        { "Decimal", "Decimal" },
-        { "DateTimeOffset", "DateTime" },
-        { "DateOnly", "Date" },
-        { "Guid", "UUID" },
+        { "short", "Short" },
+        { "int", "Int" },
+        { "long", "Long" },
+        { "float", "Float" },
+        { "double", "Float" },
+        { "decimal", "Decimal" },
+        { "global::System.DateTimeOffset", "DateTime" },
+        { "global::System.DateOnly", "Date" },
+        { "global::System.Guid", "UUID" },
         { "bool", "Boolean" },
         { "global::ZeroQL.Upload", "Upload" },
     };
@@ -129,7 +129,20 @@ public static class Utils
 
     private static string Map(ITypeSymbol typeSymbol)
     {
-        return CSharpToGraphQL.ContainsKey(typeSymbol.Name) ? CSharpToGraphQL[typeSymbol.Name] : typeSymbol.Name;
+        var globalName = typeSymbol.ToGlobalName();
+        if (CSharpToGraphQL.TryGetValue(globalName, out var value))
+        {
+            return value;
+        }
+
+        var typeSymbolName = typeSymbol.GetAttributes()
+            .FirstOrDefault(o => o.AttributeClass?.Name == "GraphQLTypeAttribute")?
+            .ConstructorArguments
+            .FirstOrDefault()
+            .Value?
+            .ToString();
+
+        return typeSymbolName ?? typeSymbol.Name;
     }
 
     public static string Nullable(this ITypeSymbol typeSymbol)
@@ -220,11 +233,10 @@ public static class Utils
     public static void ErrorWrapper(SourceProductionContext context, CSharpSyntaxNode location, Action action)
     {
 #if !DEBUG
-
         try
         {
 #endif
-            action();
+        action();
 #if !DEBUG
         }
         catch (Exception e)
