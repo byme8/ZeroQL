@@ -24,7 +24,7 @@ public static class TypeGenerator
             .Select(o =>
             {
                 var @class = CSharpHelper.Class(o.Name, options.Visibility)
-                    .AddAttribute(ZeroQLGenerationInfo.GraphQLTypeAttribute, o.Name);
+                    .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLTypeAttribute, o.Name);
 
                 if (o.Implements.Any())
                 {
@@ -79,13 +79,6 @@ public static class TypeGenerator
         var members = new List<MemberDeclarationSyntax>();
         members.AddRange(GeneratePropertiesDeclarations(field));
 
-        if (members.Count == 2)
-        {
-            // we have graphql selector and csharp property
-            // no need to generate nullable property
-            return members;
-        }
-
         var interfaceFields = interfaceFieldsByName.GetValueOrDefault(field.Name);
         if (interfaceFields is null)
         {
@@ -108,7 +101,25 @@ public static class TypeGenerator
                         members.Add(property
                             .WithModifiers(new SyntaxTokenList())
                             .WithAttributeLists(List<AttributeListSyntax>())
-                            .AddAttribute(ZeroQLGenerationInfo.JsonIgnoreAttribute)
+                            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonIgnoreAttribute)
+                            .AddAttributeWithRawParameters(ZeroQLGenerationInfo.EditorBrowsableAttribute,
+                                ZeroQLGenerationInfo.EditorBrowsableNeverParameter)
+                            .WithExplicitInterfaceSpecifier(
+                                ExplicitInterfaceSpecifier(
+                                    IdentifierName(interfaceField.Parent.Name)))
+                            .WithComment(Constants.WarningAboutCovariantTypes));
+                        break;
+
+                    case MethodDeclarationSyntax method:
+                        members.Add(method
+                            .WithModifiers(new SyntaxTokenList())
+                            .WithAttributeLists(List<AttributeListSyntax>())
+                            .AddAttributeWithRawParameters(ZeroQLGenerationInfo.EditorBrowsableAttribute,
+                                ZeroQLGenerationInfo.EditorBrowsableNeverParameter)
+                            .AddConstraintClauses(
+                                TypeParameterConstraintClause(
+                                        IdentifierName("T"))
+                                    .AddConstraints(DefaultConstraint()))
                             .WithExplicitInterfaceSpecifier(
                                 ExplicitInterfaceSpecifier(
                                     IdentifierName(interfaceField.Parent.Name))));
@@ -130,12 +141,14 @@ public static class TypeGenerator
                 var fields = o.Properties
                     .Select(property =>
                         CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue)
-                            .AddAttribute(ZeroQLGenerationInfo.JsonPropertyNameAttribute, property.GraphQLName)
-                            .AddAttribute(ZeroQLGenerationInfo.GraphQLNameAttribute, property.GraphQLName));
+                            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonPropertyNameAttribute,
+                                property.GraphQLName)
+                            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute,
+                                property.GraphQLName));
 
                 return CSharpHelper.Class(o.Name, options.Visibility)
-                    .AddAttribute(ZeroQLGenerationInfo.CodeGenerationAttribute)
-                    .AddAttribute(ZeroQLGenerationInfo.GraphQLTypeAttribute, o.Name)
+                    .AddAttributeWithStringParameter(ZeroQLGenerationInfo.CodeGenerationAttribute)
+                    .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLTypeAttribute, o.Name)
                     .WithMembers(List<MemberDeclarationSyntax>(fields));
             })
             .ToArray();
@@ -143,19 +156,17 @@ public static class TypeGenerator
 
     private static PropertyDeclarationSyntax BackedField(FieldDefinition field)
     {
-        var jsonNameAttributes = new[]
-        {
-            ("global::System.ComponentModel.EditorBrowsable",
-                "global::System.ComponentModel.EditorBrowsableState.Never"),
-            ("JsonPropertyName", Literal(field.GraphQLName).Text)
-        };
-
         return CSharpHelper
             .Property("__" + field.Name, field.TypeDefinition, false, null)
-            .AddAttributes(jsonNameAttributes);
+            .AddAttributeWithStringParameter(
+                ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName)
+            .AddAttributeWithRawParameters(
+                ZeroQLGenerationInfo.EditorBrowsableAttribute,
+                ZeroQLGenerationInfo.EditorBrowsableNeverParameter);
     }
 
-    public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field, bool interfaceField = false)
+    public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field,
+        bool interfaceField = false)
     {
         if (RequireSelector(field))
         {
@@ -174,8 +185,9 @@ public static class TypeGenerator
 
         var property = CSharpHelper
             .Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
-            .AddAttribute(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
-            .AddAttribute(ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName);
+            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
+            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonPropertyNameAttribute,
+                field.GraphQLName);
 
         return new[]
         {
@@ -206,7 +218,7 @@ public static class TypeGenerator
                 IdentifierName(returnType),
                 Identifier(name.EnsureNotKeyword()))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttribute(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
+            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
             .WithParameterList(ParameterList(list));
 
         if (interfaceField)

@@ -85,6 +85,7 @@ public class Circle : IFigure, IEntity
 
     public float Perimeter => (float)Math.PI * 2 * Radius;
 
+    [GraphQLType("Person")]
     public IPerson? Creator { get; set; }
 }
 

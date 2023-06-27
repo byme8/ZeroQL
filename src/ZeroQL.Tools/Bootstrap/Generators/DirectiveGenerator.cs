@@ -16,11 +16,11 @@ public static class DirectiveGenerator
             var reason = directive.Arguments?.GetValueOrDefault("reason");
             if (reason is not null)
             {
-                selector = selector.AddAttribute(ZeroQLGenerationInfo.DeprecatedAttribute, reason);
+                selector = selector.AddAttributeWithStringParameter(ZeroQLGenerationInfo.DeprecatedAttribute, reason);
             }
             else
             {
-                selector = selector.AddAttribute(ZeroQLGenerationInfo.DeprecatedAttribute);
+                selector = selector.AddAttributeWithStringParameter(ZeroQLGenerationInfo.DeprecatedAttribute);
             }
         }
 

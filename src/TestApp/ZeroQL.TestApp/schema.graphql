@@ -28,7 +28,7 @@ type Circle implements IFigure & IEntity {
   center: Point!
   radius: Float!
   perimeter: Float!
-  creator: IPerson
+  creator: Person
 }
 
 type FigureContent {

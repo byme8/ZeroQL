@@ -355,7 +355,7 @@ public static class GraphQLGenerator
                     {
                         var name = o.ToPascalCase();
                         return EnumMemberDeclaration(Identifier(name))
-                            .AddAttribute(ZeroQLGenerationInfo.GraphQLNameAttribute, o);
+                            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, o);
                     })
                     .ToArray() ?? Array.Empty<EnumMemberDeclarationSyntax>();
 

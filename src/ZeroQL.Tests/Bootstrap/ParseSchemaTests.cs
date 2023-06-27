@@ -401,7 +401,12 @@ type Mutation {
               query: Query
             }
 
-            type User {
+            interface IUser {
+              id: ID!
+              name: String!
+            }
+
+            type User implements IUser {
               id: ID!
               name: String!
             }
@@ -409,7 +414,7 @@ type Mutation {
             interface IFigure {
               id: Int
               perimeter: Float!
-              creator: User!
+              creator: IUser!
             }
 
             type Circle implements IFigure {
@@ -425,7 +430,7 @@ type Mutation {
               x: Float!
               y: Float!
               perimeter: Float!
-              creator: User!
+              creator: IUser!
             }
 
             type Square implements IFigure {
@@ -433,7 +438,7 @@ type Mutation {
               topLeft: Point!
               bottomRight: Point!
               perimeter: Float!
-              creator: User!
+              creator: IUser!
             }
 
             type Query {

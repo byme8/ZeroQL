@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Internal.Enums;
@@ -33,7 +34,7 @@ internal static class CSharpHelper
                     .ToArray()));
     }
 
-    public static T AddAttribute<T>(this T declarationSyntax, string name, params string[] arguments)
+    public static T AddAttributeWithStringParameter<T>(this T declarationSyntax, string name, params string[] arguments)
         where T : MemberDeclarationSyntax
     {
         var attribute = Attribute(ParseName(name));
@@ -109,15 +110,13 @@ internal static class CSharpHelper
         _ => null
     };
 
-
-    public static PropertyDeclarationSyntax AddAttributes(this PropertyDeclarationSyntax classDeclarationSyntax,
-        params (string Name, string Arguments)[] attributes)
+    public static T AddAttributeWithRawParameters<T>(
+        this T member, string name, string arguments)
+        where T : MemberDeclarationSyntax
     {
-        return classDeclarationSyntax
+        return (T)member
             .AddAttributeLists(AttributeList()
-                .AddAttributes(attributes
-                    .Select(o => Attribute(ParseName(o.Name), ParseAttributeArgumentList($"({o.Arguments})")))
-                    .ToArray()));
+                .AddAttributes(Attribute(ParseName(name), ParseAttributeArgumentList($"({arguments})"))));
     }
 
     public static string EnsureNotKeyword(this string identifier)
@@ -126,5 +125,12 @@ internal static class CSharpHelper
             return $"@{identifier}";
 
         return identifier;
+    }
+    
+    public static T WithComment<T>(this T member, string comment)
+        where T : CSharpSyntaxNode
+    {
+        return member.WithLeadingTrivia(
+            ParseLeadingTrivia(comment));
     }
 }
