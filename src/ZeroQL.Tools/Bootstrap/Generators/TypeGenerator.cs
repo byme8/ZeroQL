@@ -17,8 +17,8 @@ public static class TypeGenerator
     public static IEnumerable<MemberDeclarationSyntax> GenerateTypes(
         this GraphQlGeneratorOptions options,
         ClassDefinition[] definitions,
-        GraphQLNamedType? queryType,
-        GraphQLNamedType? mutationType)
+        string? queryType,
+        string? mutationType)
     {
         var csharpDefinitions = definitions
             .Select(o =>
@@ -54,12 +54,12 @@ public static class TypeGenerator
                         .WithMembers(List(fields));
                 }
 
-                if (o.Name == queryType?.Name.StringValue)
+                if (o.Name == queryType)
                 {
                     @class = @class.AddBaseListTypes(SimpleBaseType(IdentifierName("global::ZeroQL.Internal.IQuery")));
                 }
 
-                if (o.Name == mutationType?.Name.StringValue)
+                if (o.Name == mutationType)
                 {
                     @class = @class.AddBaseListTypes(
                         SimpleBaseType(IdentifierName("global::ZeroQL.Internal.IMutation")));

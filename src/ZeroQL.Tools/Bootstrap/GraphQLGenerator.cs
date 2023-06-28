@@ -40,23 +40,7 @@ public static class GraphQLGenerator
                     .ToArray()))
             .ToArray();
 
-        var schemaDefinition = schema.Definitions
-            .OfType<GraphQLSchemaDefinition>()
-            .FirstOrDefault();
-
-        if (schemaDefinition is null)
-        {
-            return "// Schema definition not found";
-        }
-
-        var queryType = schemaDefinition.OperationTypes
-            .FirstOrDefault(x => x.Operation == OperationType.Query)?
-            .Type;
-
-        var mutationType = schemaDefinition.OperationTypes
-            .FirstOrDefault(x => x.Operation == OperationType.Mutation)?
-            .Type;
-
+        var (queryType, mutationType) = GetQueryAndMutation(schema);
         var enumsNames = new HashSet<string>(enums.Select(o => o.Name));
 
         var scalarTypesFromSchema = schema.Definitions
@@ -163,6 +147,40 @@ public static class GraphQLGenerator
             .ToFullString();
 
         return formattedSource;
+    }
+
+    private static (string? Query, string? Mutation) GetQueryAndMutation(GraphQLDocument document)
+    {
+        var schemaDefinition = document.Definitions
+            .OfType<GraphQLSchemaDefinition>()
+            .FirstOrDefault();
+
+        if (schemaDefinition is not null)
+        {
+            var queryTypeFromSchema = schemaDefinition.OperationTypes
+                .FirstOrDefault(x => x.Operation == OperationType.Query)?
+                .Type?
+                .Name
+                .StringValue;
+
+            var mutationTypeFromSchema = schemaDefinition.OperationTypes
+                .FirstOrDefault(x => x.Operation == OperationType.Mutation)?
+                .Type?
+                .Name
+                .StringValue;;
+
+            return (queryTypeFromSchema, mutationTypeFromSchema);
+        }
+        
+        var queryType = document.Definitions
+            .OfType<GraphQLObjectTypeDefinition>()
+            .FirstOrDefault(x => x.Name.StringValue == "Query");
+
+        var mutationType = document.Definitions
+            .OfType<GraphQLObjectTypeDefinition>()
+            .FirstOrDefault(x => x.Name.StringValue == "Mutation");
+
+        return (queryType?.Name.StringValue, mutationType?.Name.StringValue);
     }
 
     private static CompilationUnitSyntax FixTypeNamingWhenNameEqualsMemberName(

@@ -1,0 +1,11 @@
+﻿{
+  client:
+GraphQLClient : global::ZeroQL.GraphQLClient<Query, Mutation>
+,
+  query:
+Query : global::ZeroQL.Internal.IQuery
+,
+  mutation:
+Mutation : global::ZeroQL.Internal.IMutation
+
+}

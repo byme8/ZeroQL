@@ -8,12 +8,14 @@ namespace ZeroQL.Bootstrap.Generators;
 
 public static class GraphQLClientGenerator
 {
-    public static ClassDeclarationSyntax GenerateClient(this GraphQlGeneratorOptions options, GraphQLNamedType? queryType,
-        GraphQLNamedType? mutationType)
+    public static ClassDeclarationSyntax GenerateClient(
+        this GraphQlGeneratorOptions options,
+        string? queryType,
+        string? mutationType)
     {
         var clientName = options.ClientName;
-        var queryTypeName = queryType?.Name.StringValue ?? "ZeroQL.Unit";
-        var mutationTypeName = mutationType?.Name.StringValue ?? "ZeroQL.Unit";
+        var queryTypeName = queryType ?? "ZeroQL.Unit";
+        var mutationTypeName = mutationType ?? "ZeroQL.Unit";
 
         return CSharpHelper.Class(clientName ?? "GraphQLClient", options.Visibility)
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(
