@@ -18,6 +18,10 @@ namespace GraphQLClient
         public TestApp(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
         {
         }
+
+        public TestApp(global::ZeroQL.HttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
+        {
+        }
     }
 
     [ZeroQL.GraphQLType("Circle")]

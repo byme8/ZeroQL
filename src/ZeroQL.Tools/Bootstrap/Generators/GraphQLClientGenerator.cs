@@ -20,7 +20,7 @@ public static class GraphQLClientGenerator
         return CSharpHelper.Class(clientName ?? "GraphQLClient", options.Visibility)
             .WithBaseList(BaseList(SingletonSeparatedList<BaseTypeSyntax>(
                 SimpleBaseType(IdentifierName($"global::ZeroQL.GraphQLClient<{queryTypeName}, {mutationTypeName}>")))))
-            .WithMembers(SingletonList<MemberDeclarationSyntax>(
+            .WithMembers(List<MemberDeclarationSyntax>(new []{
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
                     .WithParameterList(ParseParameterList(
                         "(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
@@ -31,6 +31,18 @@ public static class GraphQLClientGenerator
                             .Add(Argument(IdentifierName("queryPipeline")))
                         )))
                     .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                    .WithBody(Block())));
+                    .WithBody(Block()),
+                ConstructorDeclaration(clientName ?? "GraphQLClient")
+                    .WithParameterList(ParseParameterList(
+                        "(global::ZeroQL.HttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
+                    // call base constructor
+                    .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
+                        ArgumentList(SeparatedList<ArgumentSyntax>()
+                            .Add(Argument(IdentifierName("client")))
+                            .Add(Argument(IdentifierName("queryPipeline")))
+                        )))
+                    .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
+                    .WithBody(Block())
+            }));
     }
 }
