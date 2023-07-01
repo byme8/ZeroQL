@@ -37,7 +37,7 @@ namespace ZeroQL.TestApp
         {
             var qlClient = context.Client; 
             var variables = (object?)context.Variables!;
-            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<global::GraphQL.TestServer.Mutation>(qlClient.HttpClient, context.QueryKey, context.Variables, context.CancellationToken, queryRequest => 
+            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<global::GraphQL.TestServer.Mutation>(qlClient.HttpHandler, context.QueryKey, context.Variables, context.CancellationToken, queryRequest => 
             {
                 
                 var context = new MultipartFormDataContentContext();

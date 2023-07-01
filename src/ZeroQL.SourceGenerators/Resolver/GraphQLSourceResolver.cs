@@ -51,7 +51,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
         {{
             var qlClient = context.Client; 
             var variables = ({context.RequestExecutorInputSymbol.ToGlobalName()})context.Variables!;
-            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{context.QueryTypeName}>(qlClient.HttpClient, context.QueryKey, context.Variables, context.CancellationToken, queryRequest => 
+            var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<{context.QueryTypeName}>(qlClient.HttpHandler, context.QueryKey, context.Variables, context.CancellationToken, queryRequest => 
             {{
                 {GraphQLUploadResolver.GenerateRequestPreparations(inputTypeName, context.ExecutionStrategy, typeInfo)}
                 return content;
