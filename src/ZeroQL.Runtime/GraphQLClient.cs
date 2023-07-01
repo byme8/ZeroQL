@@ -12,7 +12,7 @@ namespace ZeroQL;
 
 public interface IGraphQLClient
 {
-    HttpClient HttpClient { get; }
+    HttpHandler HttpClient { get; }
 
     IGraphQLQueryPipeline QueryPipeline { get; }
 
@@ -21,6 +21,31 @@ public interface IGraphQLClient
         Func<TVariables?, TOperationType, TResult?> queryMapper,
         string queryKey,
         CancellationToken cancellationToken = default);
+}
+
+public interface HttpHandler : IDisposable
+{
+    public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken);
+}
+
+public class HttpClientHandler : HttpHandler
+{
+    private HttpClient _client;
+
+    public HttpClientHandler(HttpClient client)
+    {
+        _client = client;
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+
+    public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        return _client.SendAsync(request, cancellationToken);
+    }
 }
 
 public class ClientOperations
@@ -52,11 +77,17 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 
     public GraphQLClient(HttpClient httpClient, IGraphQLQueryPipeline? queryPipeline = null)
     {
+        HttpClient = new HttpClientHandler(httpClient);
+        QueryPipeline = queryPipeline ?? new FullQueryPipeline();
+    }
+    
+    public GraphQLClient(HttpHandler httpClient, IGraphQLQueryPipeline? queryPipeline = null)
+    {
         HttpClient = httpClient;
         QueryPipeline = queryPipeline ?? new FullQueryPipeline();
     }
 
-    public HttpClient HttpClient { get; }
+    public HttpHandler HttpClient { get; }
 
     public IGraphQLQueryPipeline QueryPipeline { get; }
 

@@ -19,7 +19,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
 
     public bool TryToAddPersistedQueryOnFail { get; }
 
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpHandler httpClient, string queryKey, object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
         var qlRequest = new GraphQLRequest
@@ -36,7 +36,9 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
         };
 
         var content = contentCreator(qlRequest);
-        var response = await httpClient.PostAsync("", content, cancellationToken);
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
+        request.Content = content;
+        var response = await httpClient.SendAsync(request, cancellationToken);
         var qlResponse = await ReadResponse<TQuery>(response);
 
         if (qlResponse.Errors is null)
@@ -56,7 +58,9 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
 
         qlRequest.Query = queryInfo.Query;
         content = contentCreator(qlRequest);
-        response = await httpClient.PostAsync("", content, cancellationToken);
+        request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
+        request.Content = content;
+        response = await httpClient.SendAsync(request, cancellationToken);
         qlResponse = await ReadResponse<TQuery>(response);
 
         return qlResponse with { Query = FormatPersistedQuery(queryInfo) };

@@ -8,5 +8,5 @@ namespace ZeroQL.Pipelines;
 
 public interface IGraphQLQueryPipeline
 {
-    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpClient httpClient, string queryKey, object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator);
+    Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(HttpHandler httpClient, string queryKey, object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator);
 }
