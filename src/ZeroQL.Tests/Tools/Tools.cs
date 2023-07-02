@@ -23,6 +23,7 @@ public class Tools : IntegrationTest
             Scalars = new []
             {
                 new KeyValuePair<string, string>("Instant", "ZeroQL.Instant"),
+                new KeyValuePair<string, string>("uuid", "System.Guid"),
             },
             Force = true
         };

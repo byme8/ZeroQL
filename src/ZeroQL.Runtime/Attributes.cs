@@ -2,7 +2,11 @@ using System;
 
 namespace ZeroQL;
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
+[AttributeUsage(
+    AttributeTargets.Method |
+    AttributeTargets.Property |
+    AttributeTargets.Field,
+    Inherited = false)]
 public class GraphQLNameAttribute : Attribute
 {
     public GraphQLNameAttribute(string name)
@@ -10,7 +14,7 @@ public class GraphQLNameAttribute : Attribute
     }
 }
 
-[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = false)]
 public class GraphQLTypeAttribute : Attribute
 {
     public GraphQLTypeAttribute(string name)
@@ -21,13 +25,11 @@ public class GraphQLTypeAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class GraphQLSyntax : Attribute
 {
-    
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public class GraphQLFragment : Attribute
 {
-    
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]

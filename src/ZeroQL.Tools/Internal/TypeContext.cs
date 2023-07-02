@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using GraphQLParser.AST;
 using ZeroQL.Bootstrap;
 using ZeroQL.Schema;
@@ -90,8 +89,7 @@ public class TypeContext
                 throw new NotSupportedException($"Type '{type}' is not supported");
         }
     }
-
-
+    
     private TypeDefinition GetTypeDefinition(GraphQLNamedType namedType)
     {
         if (Enums.Contains(namedType.Name.StringValue))

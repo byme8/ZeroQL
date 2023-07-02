@@ -98,4 +98,19 @@ public class MutationTests : IntegrationTest
         await Verify(response);
     }
     
+    [Fact]
+    public async Task OverrideScalarsAccounted()
+    {
+        var csharpQuery = """
+                var guid = Guid.NewGuid();
+                var response = await qlClient.Mutation(m => m.CreateUserId(guid));
+                """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
 }

@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($guid: uuid!) { createUserId(id: $guid)},
+  Data: Guid_1
+}

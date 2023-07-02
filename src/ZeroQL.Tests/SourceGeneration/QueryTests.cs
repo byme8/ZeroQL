@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using ZeroQL.SourceGenerators;
-using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.SourceGenerators.Generator;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
@@ -254,13 +253,13 @@ public class QueryTests : IntegrationTest
     {
         var arguments = "new { Filter = new UserFilterInput { UserKind = UserKind.Good } }";
         var csharpQuery = "static (i, q) => q.Users(i.Filter, 0,  10, o => o.FirstName)";
-        var graphqlQuery =
-            @"query ($filter: UserFilterInput!) { users(filter: $filter, page: 0, size: 10) { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, $"{arguments}, {csharpQuery}"));
 
-        await project.Validate(graphqlQuery);
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 
     [Fact]

@@ -4,14 +4,14 @@ namespace ZeroQL.SourceGenerators.Resolver;
 
 public class GraphQLQueryVariable
 {
-    public static GraphQLQueryVariable Variable(string name, ITypeSymbol? typeSymbol = null)
+    public static GraphQLQueryVariable Variable(string name, ITypeSymbol? typeSymbol = null, string? graphQLType = null, bool verifyNullability = false)
     {
         var variable = new GraphQLQueryVariable
         {
             Name = name,
             GraphQLValue = $"${name.FirstToLower()}",
             TypeSymbol = typeSymbol,
-            GraphQLType = typeSymbol?.ToGraphQLType(),
+            GraphQLType = graphQLType ?? typeSymbol?.ToGraphQLType(verifyNullability),
         };
 
         return variable;

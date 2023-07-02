@@ -3,6 +3,7 @@ using HotChocolate.Language;
 using HotChocolate.Types.NodaTime;
 using ZeroQL.TestServer.Query;
 using ZeroQL.TestServer.Query.Models;
+using UuidType = ZeroQL.TestServer.Query.Models.UuidType;
 
 namespace ZeroQL.TestServer;
 
@@ -22,6 +23,13 @@ public class Program
     public static async Task StartServer(ServerContext context)
     {
         var builder = WebApplication.CreateBuilder(context.Arguments);
+        var app = CreateApp(context, builder);
+
+        await app.RunAsync(context.CancellationTokenSource.Token);
+    }
+
+    public static WebApplication CreateApp(ServerContext context, WebApplicationBuilder builder)
+    {
         builder.WebHost.ConfigureKestrel(o => o.ListenAnyIP(context.Port));
 
         builder.Services.AddMemoryCache()
@@ -32,6 +40,7 @@ public class Program
             .AddMutationType<Mutation>()
             .AddType<UploadType>()
             .AddType<InstantType>()
+            .BindRuntimeType<Uuid, UuidType>()
             .AddType<ZonedDateTimeType>()
             .AddType<IInterfaceThatNeverGetsUsed>()
             .AddType<Person>()
@@ -45,7 +54,8 @@ public class Program
             .AddTypeExtension<UserGraphQLMutations>()
             .AddTypeExtension<RoleGraphQLExtension>()
             .AddTypeExtension<JSONQueryExtensions>()
-            .AddTypeExtension<CSharpKeywordsQueryExtensions>();
+            .AddTypeExtension<CSharpKeywordsQueryExtensions>()
+            .AddTypeExtension<CustomScalarsMutations>();
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {
@@ -59,12 +69,12 @@ public class Program
                 .UsePersistedQueryPipeline()
                 .AddFileSystemQueryStorage(context.QueriesPath);
         }
-
+        
         var app = builder.Build();
 
         app.MapGraphQL();
 
-        await app.RunAsync(context.CancellationTokenSource.Token);
+        return app;
     }
 
     public static async Task<bool> VerifyServiceIsRunning(ServerContext context)

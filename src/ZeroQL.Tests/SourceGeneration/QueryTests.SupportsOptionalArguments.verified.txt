@@ -1,5 +1,5 @@
 ﻿{
-  Query: query ($page: Int!, $filter: String!) { usersIds(page: $page, filter: $filter)},
+  Query: query ($page: Int!, $filter: String) { usersIds(page: $page, filter: $filter)},
   Data: [
     0,
     1,

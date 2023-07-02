@@ -116,18 +116,37 @@ public static class Utils
         return string.Join($"{separator}{Environment.NewLine}", values);
     }
 
-    public static string ToGraphQLType(this ITypeSymbol typeSymbol)
+    public static string ToGraphQLType(this ISymbol symbol, bool verifyNullability = false)
     {
-        return typeSymbol switch
+        var typeSymbolName = ExtractTypeFromAttribute(symbol);
+        if (typeSymbolName is not null)
         {
-            IArrayTypeSymbol arrayTypeSymbol =>
-                $"[{arrayTypeSymbol.ElementType.ToGraphQLType()}]{typeSymbol.Nullable()}",
-            INamedTypeSymbol { Name: "Nullable" } namedType => namedType.TypeArguments[0].ToGraphQLType(),
-            _ => Map(typeSymbol) + typeSymbol.Nullable(),
-        };
+            var nullable = verifyNullability ? ((ITypeSymbol)symbol).Nullable() : string.Empty;
+            return $"{typeSymbolName}{nullable}";
+        }
+        
+        return ToGraphQLTypeInternal(symbol);
+
+        static string ToGraphQLTypeInternal(ISymbol localSymbol) =>
+            localSymbol switch
+            {
+                IArrayTypeSymbol arrayTypeSymbol =>
+                    $"[{ToGraphQLTypeInternal(arrayTypeSymbol.ElementType)}]{arrayTypeSymbol.Nullable()}",
+                INamedTypeSymbol { Name: "Nullable" } namedType => ToGraphQLTypeInternal(namedType.TypeArguments[0]),
+                ITypeSymbol typeSymbol => MapGraphQLType(localSymbol) + typeSymbol.Nullable(),
+                _ => MapGraphQLType(localSymbol) + "!"
+            };
     }
 
-    private static string Map(ITypeSymbol typeSymbol)
+    private static string? ExtractTypeFromAttribute(ISymbol symbol) =>
+        symbol.GetAttributes()
+            .FirstOrDefault(o => o.AttributeClass?.Name == "GraphQLTypeAttribute")?
+            .ConstructorArguments
+            .FirstOrDefault()
+            .Value?
+            .ToString();
+
+    private static string MapGraphQLType(ISymbol typeSymbol)
     {
         var globalName = typeSymbol.ToGlobalName();
         if (CSharpToGraphQL.TryGetValue(globalName, out var value))
@@ -135,14 +154,7 @@ public static class Utils
             return value;
         }
 
-        var typeSymbolName = typeSymbol.GetAttributes()
-            .FirstOrDefault(o => o.AttributeClass?.Name == "GraphQLTypeAttribute")?
-            .ConstructorArguments
-            .FirstOrDefault()
-            .Value?
-            .ToString();
-
-        return typeSymbolName ?? typeSymbol.Name;
+        return typeSymbol.Name;
     }
 
     public static string Nullable(this ITypeSymbol typeSymbol)

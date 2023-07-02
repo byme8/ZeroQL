@@ -142,7 +142,6 @@ public static class GraphQLQueryResolver
             semanticModel,
             cancellationToken);
 
-
         var (body, error) = HandleMethod(context, methodDeclaration, methodDeclaration).Unwrap();
         if (error)
         {
@@ -199,7 +198,7 @@ public static class GraphQLQueryResolver
 
         return type.GetMembers()
             .OfType<IPropertySymbol>()
-            .Select(o => GraphQLQueryVariable.Variable(o.Name, o.Type))
+            .Select(o => GraphQLQueryVariable.Variable(o.Name, o.Type, verifyNullability: true))
             .ToArray();
     }
 
@@ -368,6 +367,18 @@ public static class GraphQLQueryResolver
         {
             return variable.GraphQLValue;
         }
+        
+        var possibleMethodSymbol = context.SemanticModel.GetSymbolInfo(argument.Parent!.Parent!, context.CancellationToken);
+        if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
+        {
+            return Failed(argument);
+        }
+        
+        var parameter = GetParameterSymbol(methodSymbol, argument);
+        if (parameter is null)
+        {
+            return Failed(argument);
+        }
 
         switch (argument.Expression)
         {
@@ -385,7 +396,7 @@ public static class GraphQLQueryResolver
                     var fieldSelector = fieldSymbol
                         .GetAttributes()
                         .FirstOrDefault(o =>
-                            SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+                            SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.GraphQLNameAttribute));
 
                     var fieldName = memberAccess.Name.Identifier.Text.ToUpperCase();
                     if (fieldSelector is null)
@@ -417,7 +428,8 @@ public static class GraphQLQueryResolver
 
                     case ILocalSymbol localSymbol:
                     {
-                        var graphQLVariable = GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type);
+                        var graphQLType = parameter.ToGraphQLType();
+                        var graphQLVariable = GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type, graphQLType);
                         context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
 
                         return graphQLVariable.GraphQLValue;
@@ -425,7 +437,8 @@ public static class GraphQLQueryResolver
 
                     case IParameterSymbol parameterSymbol:
                     {
-                        var graphQLVariable = GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type);
+                        var graphQLType = parameter.ToGraphQLType();
+                        var graphQLVariable = GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type, graphQLType);
                         context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
 
                         return graphQLVariable.GraphQLValue;
@@ -454,6 +467,28 @@ public static class GraphQLQueryResolver
         var childContext = context with { QueryVariableName = parameter };
 
         return ResolveQuery(childContext.WithParent(simpleLambda), simpleLambda.Body);
+    }
+    
+    private static IParameterSymbol? GetParameterSymbol(IMethodSymbol methodSymbol, ArgumentSyntax argumentSyntax)
+    {
+        var parameter = methodSymbol.Parameters.FirstOrDefault(o => o.Name == argumentSyntax.NameColon?.Name.Identifier.Text);
+        if (parameter is not null)
+        {
+            return parameter;
+        }
+
+        if (argumentSyntax.Parent is not ArgumentListSyntax argumentList)
+        {
+            return null;
+        }
+        
+        var argumentIndex = argumentList.Arguments.IndexOf(argumentSyntax);
+        if (argumentIndex < 0 || argumentIndex >= methodSymbol.Parameters.Length)
+        {
+            return null;
+        }
+
+        return methodSymbol.Parameters[argumentIndex];
     }
 
     private static Result<string> HanleIndentifier(
@@ -560,7 +595,7 @@ public static class GraphQLQueryResolver
         var attribute = nameSymbol.Symbol
             .GetAttributes()
             .FirstOrDefault(o =>
-                SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+                SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.GraphQLNameAttribute));
 
         if (attribute is null)
         {
@@ -618,7 +653,7 @@ public static class GraphQLQueryResolver
         }
 
         var hasFieldSelector = attributes
-            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.FieldSelectorAttribute));
+            .Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, context.GraphQLNameAttribute));
         if (hasFieldSelector)
         {
             return HandleFieldSelector(context, invocation, method);

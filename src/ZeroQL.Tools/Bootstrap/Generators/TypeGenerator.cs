@@ -174,6 +174,9 @@ public static class TypeGenerator
             var parameters = field.Arguments
                 .Select(o => Parameter(Identifier(o.Name.EnsureNotKeyword()))
                     .WithType(ParseTypeName(o.TypeName))
+                    .AddAttributeLists(AttributeList()
+                        .AddAttributes(Attribute(IdentifierName(ZeroQLGenerationInfo.GraphQLTypeAttribute))
+                            .WithArgumentList(ParseAttributeArgumentList($@"(""{o.GraphQLName}"")"))))
                     .AddForcedDefault())
                 .ToArray();
 
@@ -425,9 +428,11 @@ public static class TypeGenerator
                     .Select(arg =>
                     {
                         var argumentType = typeContext.GetTypeDefinition(arg.Type);
+                        var graphQLType = arg.Type.ToFullString()!;
                         var argument = new ArgumentDefinition(
                             arg.Name.StringValue,
-                            argumentType.NameWithNullableAnnotation());
+                            argumentType.NameWithNullableAnnotation(),
+                            graphQLType);
 
                         return argument;
                     })

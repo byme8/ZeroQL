@@ -75,15 +75,14 @@ public class FileUploadTests : IntegrationTest
         };";
         var csharpQuery = "Mutation(new { Users = users }, static (i, m) => m.AddUsersInfo(i.Users))";
 
-        var graphqlQuery = @"mutation ($users: [UserInfoInput!]!) { addUsersInfo(users: $users)}";
-
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
                 (TestProject.PlaceToReplace, usersVariable), 
                 (TestProject.FullMeQuery, csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
-        result.Data.Should().Be(84);
+        var response = await project.Execute();
+
+        await Verify(response);
     }
     
     [Fact]
