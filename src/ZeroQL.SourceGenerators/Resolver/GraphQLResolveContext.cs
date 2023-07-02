@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -8,7 +9,8 @@ namespace ZeroQL.SourceGenerators.Resolver;
 public record struct GraphQLResolveContext(
     string QueryVariableName,
     CSharpSyntaxNode Parent,
-    Dictionary<string, GraphQLQueryVariable> AvailableVariables,
+    Dictionary<string, GraphQLQueryVariable> PredefinedVariables,
+    Dictionary<string, GraphQLQueryVariable> DiscoveredVariables,
     SemanticModel SemanticModel,
     CancellationToken CancellationToken)
 {
@@ -70,6 +72,9 @@ public record struct GraphQLResolveContext(
         }
     }
 
+    public GraphQLQueryVariable[] Variables
+        => PredefinedVariables.Values.Concat(DiscoveredVariables.Values).ToArray();
+
     public GraphQLResolveContext WithParent(CSharpSyntaxNode parent)
     {
         return this with { Parent = parent };
@@ -78,5 +83,22 @@ public record struct GraphQLResolveContext(
     public GraphQLResolveContext WithVariableName(string name)
     {
         return this with { QueryVariableName = name };
+    }
+
+    public void AddVariable(GraphQLQueryVariable variable)
+    {
+        var existingVariable = DiscoveredVariables.GetValueOrDefault(variable.Name);
+        if (existingVariable is not null)
+        {
+            if (existingVariable.GraphQLType != variable.GraphQLType &&
+                variable.GraphQLType!.EndsWith("!"))
+            {
+                DiscoveredVariables[variable.Name] = variable;
+            }
+        }
+        else
+        {
+            DiscoveredVariables.Add(variable.Name, variable);
+        }
     }
 }

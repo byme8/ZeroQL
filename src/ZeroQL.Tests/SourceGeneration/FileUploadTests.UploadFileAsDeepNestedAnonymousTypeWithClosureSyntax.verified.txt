@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($users: [UserInfoInput!]!) { addUsersInfo(users: $users)},
+  Data: 84
+}

@@ -339,6 +339,16 @@ namespace GraphQLClient
             return __AddLimit is null ? throw new NullReferenceException("AddLimit is null but it should not be null. Schema can be outdated.") : selector(__AddLimit);
         }
 
+        [JsonPropertyName("addLimitNullable")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public LimitZeroQL __AddLimitNullable { get; set; }
+
+        [ZeroQL.GraphQLName("addLimitNullable")]
+        public T? AddLimitNullable<T>([ZeroQL.GraphQLType("LimitInput")] LimitInputZeroQL? limit = default !, Func<LimitZeroQL, T> selector = default !)
+        {
+            return __AddLimitNullable is null ? default : selector(__AddLimitNullable);
+        }
+
         [JsonPropertyName("addLimit2")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit2ZeroQL __AddLimit2 { get; set; }

@@ -12,6 +12,7 @@
   int AddUsersInfoWithEmails([ZeroQL.GraphQLType("AddUsersInput!")] AddUsersInput input = default !),
   int AddUserKindPascal([ZeroQL.GraphQLType("UserKindPascal!")] UserKindPascal userKindPascal = default !),
   T AddLimit<T>([ZeroQL.GraphQLType("LimitInput!")] LimitInputZeroQL limit = default !, Func<LimitZeroQL, T> selector = default !),
+  T? AddLimitNullable<T>([ZeroQL.GraphQLType("LimitInput")] LimitInputZeroQL? limit = default !, Func<LimitZeroQL, T> selector = default !),
   T AddLimit2<T>([ZeroQL.GraphQLType("Limit2Input!")] Limit2Input limit = default !, Func<Limit2ZeroQL, T> selector = default !),
   T? AddLimit2Nullable<T>([ZeroQL.GraphQLType("Limit2Input")] Limit2Input? limit = default !, Func<Limit2ZeroQL, T> selector = default !),
   T? AddLimit3<T>([ZeroQL.GraphQLType("Limit3Input")] Limit3InputZeroQL? limit = default !, Func<Limit3, T> selector = default !),

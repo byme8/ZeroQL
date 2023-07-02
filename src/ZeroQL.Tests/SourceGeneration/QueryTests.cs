@@ -393,6 +393,44 @@ public class QueryTests : IntegrationTest
         var response = await project.Execute();
         await Verify(response);
     }
+    
+    [Fact]
+    public async Task CombinationNullableAndNonNullable()
+    {
+        var csharpQuery = """
+            var limit = new LimitInputZeroQL(); 
+            var response = await qlClient.Mutation(m => new 
+            {
+                Limit2 = m.AddLimitNullable(limit, o => o.Limit),
+                Limit = m.AddLimit(limit, o => o.Limit)
+            });
+        """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+        
+        var csharpQuery2 = """
+            var limit = new LimitInputZeroQL(); 
+            var response = await qlClient.Mutation(m => new 
+            {
+                Limit = m.AddLimit(limit, o => o.Limit),
+                Limit2 = m.AddLimitNullable(limit, o => o.Limit)
+            });
+        """;
+
+        var project2 = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery2));
+
+        var response2 = await project2.Execute();
+        
+        await Verify(new
+        {
+            response,
+            response2
+        });
+    }
 
     [Fact]
     public async Task LambdaModuleInitializerGenerated()

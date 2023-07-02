@@ -121,19 +121,19 @@ public static class Utils
         var typeSymbolName = ExtractTypeFromAttribute(symbol);
         if (typeSymbolName is not null)
         {
-            var nullable = verifyNullability ? ((ITypeSymbol)symbol).Nullable() : string.Empty;
+            var nullable = verifyNullability ? ((ITypeSymbol)symbol).GraphQLNullable() : string.Empty;
             return $"{typeSymbolName}{nullable}";
         }
-        
+
         return ToGraphQLTypeInternal(symbol);
 
         static string ToGraphQLTypeInternal(ISymbol localSymbol) =>
             localSymbol switch
             {
                 IArrayTypeSymbol arrayTypeSymbol =>
-                    $"[{ToGraphQLTypeInternal(arrayTypeSymbol.ElementType)}]{arrayTypeSymbol.Nullable()}",
+                    $"[{ToGraphQLTypeInternal(arrayTypeSymbol.ElementType)}]{arrayTypeSymbol.GraphQLNullable()}",
                 INamedTypeSymbol { Name: "Nullable" } namedType => ToGraphQLTypeInternal(namedType.TypeArguments[0]),
-                ITypeSymbol typeSymbol => MapGraphQLType(localSymbol) + typeSymbol.Nullable(),
+                ITypeSymbol typeSymbol => MapGraphQLType(localSymbol) + typeSymbol.GraphQLNullable(),
                 _ => MapGraphQLType(localSymbol) + "!"
             };
     }
@@ -157,13 +157,16 @@ public static class Utils
         return typeSymbol.Name;
     }
 
-    public static string Nullable(this ITypeSymbol typeSymbol)
+    public static string GraphQLNullable(this ITypeSymbol typeSymbol)
+        => typeSymbol.CanBeNull() ? "" : "!";
+
+    public static bool CanBeNull(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.NullableAnnotation switch
         {
-            NullableAnnotation.None => "!",
-            NullableAnnotation.NotAnnotated => "!",
-            NullableAnnotation.Annotated => "",
+            NullableAnnotation.None => false,
+            NullableAnnotation.NotAnnotated => false,
+            NullableAnnotation.Annotated => true,
             _ => throw new ArgumentOutOfRangeException()
         };
     }

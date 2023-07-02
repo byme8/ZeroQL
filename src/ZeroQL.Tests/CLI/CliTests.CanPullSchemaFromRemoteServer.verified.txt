@@ -62,6 +62,7 @@ type Mutation {
   addUsersInfoWithEmails(input: AddUsersInput!): Int!
   addUserKindPascal(userKindPascal: UserKindPascal!): Int!
   addLimit(limit: LimitInput!): Limit!
+  addLimitNullable(limit: LimitInput): Limit
   addLimit2(limit: Limit2Input!): Limit2!
   addLimit2Nullable(limit: Limit2Input): Limit2
   addLimit3(limit: Limit3Input): Limit3

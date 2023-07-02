@@ -1,0 +1,10 @@
+﻿{
+  response: {
+    Query: mutation ($limit: LimitInput!) { addLimitNullable(limit: $limit) { limit }  addLimit(limit: $limit) { limit } },
+    Data: {}
+  },
+  response2: {
+    Query: mutation ($limit: LimitInput!) { addLimit(limit: $limit) { limit }  addLimitNullable(limit: $limit) { limit } },
+    Data: {}
+  }
+}

@@ -100,8 +100,9 @@ public class FileUploadTests : IntegrationTest
                 (TestProject.PlaceToReplace, usersVariable), 
                 (TestProject.FullMeQuery, csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Execute();
-        result.Data.Should().Be(84);
+        var result = await project.Execute();
+
+        await Verify(result);
     }
     
     [Fact]

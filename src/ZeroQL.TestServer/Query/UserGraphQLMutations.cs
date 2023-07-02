@@ -86,6 +86,11 @@ public class UserGraphQLMutations
         return limit;
     }
     
+    public Limit_1? AddLimitNullable(Limit_1? limit)
+    {
+        return limit;
+    }
+    
     public Limit_2 AddLimit2(Limit_2 limit)
     {
         return limit;

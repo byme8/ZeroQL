@@ -25,14 +25,15 @@ public static class GraphQLQueryResolver
 
         var inputs = GetQueryInputs(lambda);
         var variables = GetVariablesFromLambda(semanticModel, lambda, cancellationToken);
-        var availableCSharpVariables = inputs.VariablesName is null
+        var predefinedVariables = inputs.VariablesName is null
             ? new Dictionary<string, GraphQLQueryVariable>()
             : variables.ToDictionary(o => $"{inputs.VariablesName}.{o.Name}");
 
         var context = new GraphQLResolveContext(
             inputs.QueryName,
             lambda,
-            availableCSharpVariables,
+            predefinedVariables,
+            new Dictionary<string, GraphQLQueryVariable>(),
             semanticModel,
             cancellationToken);
 
@@ -48,10 +49,10 @@ public static class GraphQLQueryResolver
         }
 
         var stringBuilder = new StringBuilder();
-        if (context.AvailableVariables.Any())
+        if (context.Variables.Any())
         {
-            var variablesBody = context.AvailableVariables
-                .Select(o => $"{o.Value.GraphQLValue}: {o.Value.GraphQLType}")
+            var variablesBody = context.Variables
+                .Select(o => $"{o.GraphQLValue}: {o.GraphQLType}")
                 .Join()
                 .Wrap("(", ") ");
 
@@ -65,7 +66,7 @@ public static class GraphQLQueryResolver
         return new GraphQLQueryResolverResult
         {
             Query = stringBuilder.ToString(),
-            Variables = availableCSharpVariables
+            Variables = context.Variables.ToDictionary(o => o.Name)
         };
     }
 
@@ -82,6 +83,7 @@ public static class GraphQLQueryResolver
             inputs.QueryName,
             method,
             availableVariables,
+            new Dictionary<string, GraphQLQueryVariable>(),
             semanticModel,
             cancellationToken);
 
@@ -139,6 +141,7 @@ public static class GraphQLQueryResolver
             queryName,
             methodDeclaration,
             availableVariables,
+            new Dictionary<string, GraphQLQueryVariable>(),
             semanticModel,
             cancellationToken);
 
@@ -363,7 +366,7 @@ public static class GraphQLQueryResolver
         }
 
         var value = argument.Expression.ToString();
-        if (context.AvailableVariables.TryGetValue(value, out var variable))
+        if (context.PredefinedVariables.TryGetValue(value, out var variable))
         {
             return variable.GraphQLValue;
         }
@@ -373,7 +376,7 @@ public static class GraphQLQueryResolver
         {
             return Failed(argument);
         }
-        
+
         var parameter = GetParameterSymbol(methodSymbol, argument);
         if (parameter is null)
         {
@@ -429,8 +432,9 @@ public static class GraphQLQueryResolver
                     case ILocalSymbol localSymbol:
                     {
                         var graphQLType = parameter.ToGraphQLType();
-                        var graphQLVariable = GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type, graphQLType);
-                        context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
+                        var graphQLVariable =
+                            GraphQLQueryVariable.Variable(localSymbol.Name, localSymbol.Type, graphQLType);
+                        context.AddVariable(graphQLVariable);
 
                         return graphQLVariable.GraphQLValue;
                     }
@@ -438,8 +442,9 @@ public static class GraphQLQueryResolver
                     case IParameterSymbol parameterSymbol:
                     {
                         var graphQLType = parameter.ToGraphQLType();
-                        var graphQLVariable = GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type, graphQLType);
-                        context.AvailableVariables.Add(graphQLVariable.Name, graphQLVariable);
+                        var graphQLVariable =
+                            GraphQLQueryVariable.Variable(parameterSymbol.Name, parameterSymbol.Type, graphQLType);
+                        context.AddVariable(graphQLVariable);
 
                         return graphQLVariable.GraphQLValue;
                     }
@@ -468,10 +473,11 @@ public static class GraphQLQueryResolver
 
         return ResolveQuery(childContext.WithParent(simpleLambda), simpleLambda.Body);
     }
-    
+
     private static IParameterSymbol? GetParameterSymbol(IMethodSymbol methodSymbol, ArgumentSyntax argumentSyntax)
     {
-        var parameter = methodSymbol.Parameters.FirstOrDefault(o => o.Name == argumentSyntax.NameColon?.Name.Identifier.Text);
+        var parameter =
+            methodSymbol.Parameters.FirstOrDefault(o => o.Name == argumentSyntax.NameColon?.Name.Identifier.Text);
         if (parameter is not null)
         {
             return parameter;
@@ -481,7 +487,7 @@ public static class GraphQLQueryResolver
         {
             return null;
         }
-        
+
         var argumentIndex = argumentList.Arguments.IndexOf(argumentSyntax);
         if (argumentIndex < 0 || argumentIndex >= methodSymbol.Parameters.Length)
         {
@@ -757,7 +763,7 @@ public static class GraphQLQueryResolver
         context = context.WithVariableName(name) with
         {
             SemanticModel = newSemanticModel,
-            AvailableVariables = variables.ToDictionary(o => o.Key, o => GraphQLQueryVariable.Constant(o.Value.Value!))
+            PredefinedVariables = variables.ToDictionary(o => o.Key, o => GraphQLQueryVariable.Constant(o.Value.Value!))
         };
 
         return HandleMethod(context, invocation, methodDeclaration);
