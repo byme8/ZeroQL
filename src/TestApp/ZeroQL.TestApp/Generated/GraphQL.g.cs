@@ -19,7 +19,7 @@ namespace GraphQL.TestServer
         {
         }
 
-        public TestServerClient(global::ZeroQL.HttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
+        public TestServerClient(global::ZeroQL.IHttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
         {
         }
     }
