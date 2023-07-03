@@ -34,7 +34,7 @@ public static class GraphQLClientGenerator
                     .WithBody(Block()),
                 ConstructorDeclaration(clientName ?? "GraphQLClient")
                     .WithParameterList(ParseParameterList(
-                        "(global::ZeroQL.HttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
+                        "(global::ZeroQL.IHttpHandler client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null)"))
                     // call base constructor
                     .WithInitializer(ConstructorInitializer(SyntaxKind.BaseConstructorInitializer,
                         ArgumentList(SeparatedList<ArgumentSyntax>()
