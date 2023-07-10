@@ -10,7 +10,7 @@ namespace ZeroQL.CLI.Commands;
 public class InitConfigCommand : ICommand
 {
     [CommandOption("output", 'o', Description = "Output file path, ./zeroql.json by default")]
-    public string Output { get; set; } = "./zeroql.json";
+    public string Output { get; set; } = "./config.zeroql.json";
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
@@ -36,20 +36,12 @@ public class InitConfigCommand : ICommand
             className = "ZeroQLClient";
         }
 
-        await console.Output.WriteAsync("Input path to output file(default ./Generated/GraphQL.g.cs):");
-        var generationOutput = await console.Input.ReadLineAsync();
-        if (string.IsNullOrEmpty(generationOutput))
-        {
-            generationOutput = "./Generated/GraphQL.g.cs";
-        }
-
         var config = new ZeroQLFileConfig()
         {
             Schema = "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
             GraphQL = graphql,
             Namespace = @namespace,
-            ClientName = className,
-            Output = generationOutput
+            ClientName = className
         };
 
         var json = JsonConvert.SerializeObject(config, new JsonSerializerSettings()

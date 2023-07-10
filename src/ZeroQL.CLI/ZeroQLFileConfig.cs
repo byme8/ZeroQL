@@ -54,8 +54,7 @@ public class ZeroQLFileConfig
     /// <example>
     /// ./Generated/GraphQL.g.cs
     /// </example>
-    [JsonRequired]
-    public string Output { get; set; }
+    public string? Output { get; set; }
 
     /// <summary>
     /// Enables netstandard compatibility during generation

@@ -6,8 +6,7 @@
   "required": [
     "graphql",
     "namespace",
-    "clientName",
-    "output"
+    "clientName"
   ],
   "properties": {
     "$schema": {
@@ -50,7 +49,10 @@
       }
     },
     "output": {
-      "type": "string",
+      "type": [
+        "null",
+        "string"
+      ],
       "description": "The path to the output file",
       "x-example": "./Generated/GraphQL.g.cs"
     },

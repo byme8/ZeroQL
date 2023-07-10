@@ -1,0 +1,17 @@
+﻿<Project>
+    <ItemGroup Condition="$(ZeroQLOnBuildTriggerEnabled) != 'False'">
+        <ZeroQLConfig Include="**/*.zeroql.json"/>
+        <ZeroQLConfig Include="*.zeroql.json"/>
+    </ItemGroup>
+
+    <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile" Condition="$(ZeroQLOnBuildTriggerEnabled) != 'False'">
+        <Exec Command="dotnet zeroql generate -c %(ZeroQLConfig.Identity) -o obj/ZeroQL/%(ZeroQLConfig.Identity).g.cs" Outputs="obj/ZeroQL/%(ZeroQLConfig.Identity).g.cs">
+            <Output ItemName="Generated" TaskParameter="Outputs" />
+        </Exec>
+        <ItemGroup>
+            <Compile Remove="@(Generated)" />
+            <Compile Include="@(Generated)" />
+            <FileWrites Include="@(Generated)" />
+        </ItemGroup>
+    </Target>
+</Project>

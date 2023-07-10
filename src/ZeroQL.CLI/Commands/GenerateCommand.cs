@@ -42,7 +42,8 @@ public class GenerateCommand : ICommand
 
     [CommandOption(
         "scalars",
-        Description = "Custom scalars to use when generating the client. Example: --scalars Point=Geometry.Point --scalars Rect=Geometry.Rect",
+        Description =
+            "Custom scalars to use when generating the client. Example: --scalars Point=Geometry.Point --scalars Rect=Geometry.Rect",
         Converter = typeof(HeaderConverter))]
     public KeyValuePair<string, string>[]? Scalars { get; set; }
 
@@ -163,11 +164,13 @@ public class GenerateCommand : ICommand
             foreach (var error in errors)
             {
                 var humanReadableError = ZeroQLSchema.GetHumanReadableErrorMessage(error.Kind);
-                await console.Error.WriteLineAsync($"    {Config} [{error.LineNumber}:{error.LinePosition}]: {humanReadableError} at {error.Path}");
+                await console.Error.WriteLineAsync(
+                    $"    {Config} [{error.LineNumber}:{error.LinePosition}]: {humanReadableError} at {error.Path}");
             }
+
             return false;
         }
-        
+
         var config = JsonConvert.DeserializeObject<ZeroQLFileConfig>(json);
         if (config is null)
         {
@@ -205,7 +208,7 @@ public class GenerateCommand : ICommand
             Visibility = config.Visibility;
         }
 
-        if (string.IsNullOrEmpty(Output))
+        if (string.IsNullOrEmpty(Output) && !string.IsNullOrEmpty(config.Output))
         {
             Output = config.Output;
         }

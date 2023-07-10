@@ -2,6 +2,5 @@
   "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
   "graphql": "./service.graphql",
   "namespace": "Service.ZeroQL.Client",
-  "clientName": "ServiceZeroQLClient",
-  "output": "QL.g.cs"
+  "clientName": "ServiceZeroQLClient"
 }

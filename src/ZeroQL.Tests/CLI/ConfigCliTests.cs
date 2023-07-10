@@ -36,7 +36,6 @@ public class ConfigCliTests
                     ./service.graphql
                     Service.ZeroQL.Client
                     ServiceZeroQLClient
-                    QL.g.cs
                     """);
 
         var tempFile = Path.GetTempFileName();
