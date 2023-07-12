@@ -49,13 +49,17 @@ dotnet tool install ZeroQL.CLI
 dotnet add package ZeroQL 
 # fetch graphql schema from server(creates schema.graphql file)
 dotnet zeroql schema pull --url http://localhost:10000/graphql
-# to bootstrap schema.graphql file from graphql schema
-dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
+# to create ZeroQL config.zeroql.json
+dotnet zeroql config init
+# build the project to initiate the generation ZeroQL client with options specified inside config.zeroql.json
+dotnet build
 ```
+
+The build should be successful, and now we can use the generated client.
 
 ## Config
 
-However, there is a better way to simplify the setup. The command `` dotnet zeroql config init `` creates the `` config.zeroql.json ``. It may look like that:
+The command `` dotnet zeroql config init `` creates the `` config.zeroql.json ``. By itself it looks like that:
 ``` json
 {
   "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
@@ -70,7 +74,7 @@ Now if you have `` ZeroQL `` package installed to your `` csproj ``, it will aut
     <ZeroQLConfig Include="you.custom.config.name.json"/>
 </ItemGroup>
 ```
-If you want to disable automatic generation on every build, it is possible to disable it:
+If you want to turn off automatic generation on every build, it is possible to disable it:
 ``` xml
 <PropertyGroup>
    <ZeroQLOnBuildTriggerEnabled>False</ZeroQLOnBuildTriggerEnabled>
