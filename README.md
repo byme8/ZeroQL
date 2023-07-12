@@ -49,9 +49,9 @@ dotnet tool install ZeroQL.CLI
 dotnet add package ZeroQL 
 # fetch graphql schema from server(creates schema.graphql file)
 dotnet zeroql schema pull --url http://localhost:10000/graphql
-# to create ZeroQL config.zeroql.json
+# to create ZeroQL config file: ./config.zeroql.json
 dotnet zeroql config init
-# build the project to initiate the generation ZeroQL client with options specified inside config.zeroql.json
+# build the project to initiate the ZeroQL client generation with options specified inside config.zeroql.json
 dotnet build
 ```
 
