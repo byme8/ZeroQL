@@ -74,6 +74,8 @@ Now if you have `` ZeroQL `` package installed to your `` csproj ``, it will aut
     <ZeroQLConfig Include="you.custom.config.name.json"/>
 </ItemGroup>
 ```
+The generated client would be stored inside ``./obj/ZeroQL `` folder. So it will never appear in the solution. However, you still have access to generated classes in your source code.
+
 If you want to turn off automatic generation on every build, it is possible to disable it:
 ``` xml
 <PropertyGroup>
