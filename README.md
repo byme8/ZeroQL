@@ -53,30 +53,28 @@ dotnet zeroql schema pull --url http://localhost:10000/graphql
 dotnet zeroql generate --schema ./schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs
 ```
 
-It is possible to add next target to csproj to keep generated client in sync with schema.graphql:
-``` xml
-<Target Name="GenerateQLClient" BeforeTargets="BeforeCompile">
-    <Exec Command="dotnet zeroql generate --schema .\schema.graphql --namespace TestServer.Client --client-name TestServerGraphQLClient --output Generated/GraphQL.g.cs" />
-</Target>
-```
-As a result, the graphql client will be generated on every build.
-
 ## Config
 
-There is a way to simplify the CLI command. The command `` dotnet zeroql config init `` creates the `` zeroql.json ``. It may look like that:
+However, there is a better way to simplify the setup. The command `` dotnet zeroql config init `` creates the `` config.zeroql.json ``. It may look like that:
 ``` json
 {
   "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
   "graphql": "./schema.graphql",
   "namespace": "ZeroQL.Client",
-  "clientName": "ZeroQLClient",
-  "output": "./Generated/GraphQL.g.cs"
+  "clientName": "ZeroQLClient"
 }
 ```
-
-Then we can use it like that:
-``` bash
-dotnet zeroql generate -c ./zeroql.json
+Now if you have `` ZeroQL `` package installed to your `` csproj ``, it will automatically detect and execute CLI based on this configuration file on every build. To make sure that it works, the config file should follow the `` *.zeroql.json ``pattern, or you can add a custom definition in your `` csproj `` like that:
+``` xml
+<ItemGroup>
+    <ZeroQLConfig Include="you.custom.config.name.json"/>
+</ItemGroup>
+```
+If you want to disable automatic generation on every build, it is possible to disable it:
+``` xml
+<PropertyGroup>
+   <ZeroQLOnBuildTriggerEnabled>False</ZeroQLOnBuildTriggerEnabled>
+</PropertyGroup>
 ```
 
 # How to use
