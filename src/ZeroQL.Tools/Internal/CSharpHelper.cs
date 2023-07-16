@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -56,10 +57,9 @@ internal static class CSharpHelper
                 .AddAttributes(attribute));
     }
 
-    public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, bool withNullableAnnotation,
-        string? defaultValue)
+    public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, string? defaultValue)
     {
-        var fullTypeName = withNullableAnnotation ? type.NameWithNullableAnnotation() : type.Name;
+        var fullTypeName = GetPropertyType(type, false);
 
         var propertyDeclarationSyntax = PropertyDeclaration(ParseTypeName(fullTypeName), Identifier(name))
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
@@ -82,7 +82,24 @@ internal static class CSharpHelper
 
         return propertyDeclarationSyntax;
     }
-
+    
+    public static string GetPropertyType(TypeDefinition typeDefinition, bool generic)
+    {
+        switch (typeDefinition)
+        {
+            case ObjectTypeDefinition type:
+                var typeName = generic ? "T" : type.Name;
+                return typeName + type.NullableAnnotation();
+            case ScalarTypeDefinition type:
+                return type.NameWithNullableAnnotation();
+            case EnumTypeDefinition type:
+                return type.NameWithNullableAnnotation();
+            case ListTypeDefinition type:
+                return $"{GetPropertyType(type.ElementTypeDefinition, generic)}[]{type.NullableAnnotation()}";
+            default:
+                throw new NotImplementedException();
+        }
+    }
 
     private static ExpressionSyntax? GetInitializerExpression(TypeDefinition type, string? strValue) => type.Name switch
     {

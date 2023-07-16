@@ -1,6 +1,7 @@
 ﻿[
   global::ZeroQL.Instant CreateInstant([ZeroQL.GraphQLType("Instant!")] global::ZeroQL.Instant instant = default !),
   DateTimeOffset DateTime([ZeroQL.GraphQLType("DateTime!")] DateTimeOffset dateTime = default !),
+  DateTimeOffset?[]? DateTimes([ZeroQL.GraphQLType("[DateTime]")] DateTimeOffset[]? dateTime = default !),
   DateTimeOffset DateTimeOffset([ZeroQL.GraphQLType("DateTime!")] DateTimeOffset dateTimeOffset = default !),
   TimeSpan TimeSpan([ZeroQL.GraphQLType("TimeSpan!")] TimeSpan timeSpan = default !),
   DateOnly DateOnly([ZeroQL.GraphQLType("Date!")] DateOnly dateOnly = default !),

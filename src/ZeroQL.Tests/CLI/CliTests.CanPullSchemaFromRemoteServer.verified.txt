@@ -50,6 +50,7 @@ type Query {
 type Mutation {
   createInstant(instant: Instant!): Instant!
   dateTime(dateTime: DateTime!): DateTime!
+  dateTimes(dateTime: [DateTime]): [DateTime]
   dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
   timeSpan(timeSpan: TimeSpan!): TimeSpan!
   dateOnly(dateOnly: Date!): Date!

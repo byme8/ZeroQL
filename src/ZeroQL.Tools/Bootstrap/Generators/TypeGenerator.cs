@@ -140,7 +140,7 @@ public static class TypeGenerator
             {
                 var fields = o.Properties
                     .Select(property =>
-                        CSharpHelper.Property(property.Name, property.TypeDefinition, true, property.DefaultValue)
+                        CSharpHelper.Property(property.Name, property.TypeDefinition, property.DefaultValue)
                             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonPropertyNameAttribute,
                                 property.GraphQLName)
                             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute,
@@ -157,7 +157,7 @@ public static class TypeGenerator
     private static PropertyDeclarationSyntax BackedField(FieldDefinition field)
     {
         return CSharpHelper
-            .Property("__" + field.Name, field.TypeDefinition, false, null)
+            .Property("__" + field.Name, field.TypeDefinition, null)
             .AddAttributeWithStringParameter(
                 ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName)
             .AddAttributeWithRawParameters(
@@ -187,7 +187,7 @@ public static class TypeGenerator
         }
 
         var property = CSharpHelper
-            .Property(field.Name, field.TypeDefinition, true, field.DefaultValue)
+            .Property(field.Name, field.TypeDefinition, field.DefaultValue)
             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonPropertyNameAttribute,
                 field.GraphQLName);
@@ -203,7 +203,7 @@ public static class TypeGenerator
         ParameterSyntax[] parameters,
         bool interfaceField = false)
     {
-        var returnType = GetPropertyReturnType(field.TypeDefinition);
+        var returnType = CSharpHelper.GetPropertyType(field.TypeDefinition, true);
         var name = GetPropertyName(field.Name, field.TypeDefinition);
 
         var funcType = GetPropertyFuncType(field.TypeDefinition, true);
@@ -340,22 +340,7 @@ public static class TypeGenerator
         }
     }
 
-    private static string GetPropertyReturnType(TypeDefinition typeDefinition)
-    {
-        switch (typeDefinition)
-        {
-            case ObjectTypeDefinition type:
-                return "T" + type.NullableAnnotation();
-            case ScalarTypeDefinition type:
-                return type.NameWithNullableAnnotation();
-            case EnumTypeDefinition type:
-                return type.NameWithNullableAnnotation();
-            case ListTypeDefinition type:
-                return $"{GetPropertyReturnType(type.ElementTypeDefinition)}[]{type.NullableAnnotation()}";
-            default:
-                throw new NotImplementedException();
-        }
-    }
+ 
 
     private static string? GetDefaultValue(GraphQLInputValueDefinition field)
     {
