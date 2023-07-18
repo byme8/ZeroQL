@@ -275,4 +275,4 @@ It will have little effect on performance.
 
 # Credits
 
-Initially, the project was inspired by https://github.com/Giorgi/GraphQLinq
+The initial inspiration for this project came from the work done at https://github.com/Giorgi/GraphQLinq
