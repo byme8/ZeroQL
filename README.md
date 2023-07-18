@@ -27,8 +27,9 @@ You can find the full wiki [here](https://github.com/byme8/ZeroQL/wiki) or just 
 Check out our articles to learn more about ZeroQL:
 - [ZeroQL - C# friendly graphql client](https://dev.to/byme8/zeroql-c-friendly-graphql-4134)
 - [ZeroQL - C# GraphQL client adds fragments support](https://dev.to/byme8/zeroql-c-graphql-client-adds-fragments-support-1lcf)
-- [ZeroQL V2 - C# GraphQL client](https://dev.to/byme8/zeroql-v2-c-graphql-client-1o8d)
-- [ZeroQL V3 - C# GraphQL client](https://dev.to/byme8/zeroql-v3-c-friendly-graphql-client-4b8n)
+- [ZeroQL V2](https://dev.to/byme8/zeroql-v2-c-graphql-client-1o8d)
+- [ZeroQL V3](https://dev.to/byme8/zeroql-v3-c-friendly-graphql-client-4b8n)
+- [ZeroQL V6](https://dev.to/byme8/zeroql-linq-graphql-client-updates-2akn)
 
 # How to setup
 
