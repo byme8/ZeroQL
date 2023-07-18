@@ -32,7 +32,7 @@ Check out our articles to learn more about ZeroQL:
 
 # How to setup
 
-> Here you can find setup for net6.0+ projects. 
+> Here, you can find the setup for net6.0+ projects. 
 > You can find [netstandard or .Net Framework](https://github.com/byme8/ZeroQL/wiki/netstandard-setup) and [Unity](https://github.com/byme8/ZeroQL/wiki/Unity-setup) setup in [wiki](https://github.com/byme8/ZeroQL/wiki).
 
 The initial setup:
@@ -122,7 +122,7 @@ query { me { id firstName lastName } }
 
 ## GraphQL lambda syntax
 
-Here how we can achieve it with ZeroQL "lambda" syntax:
+Here is how we can achieve it with ZeroQL "lambda" syntax:
 ``` csharp
 var httpClient = new HttpClient();
 httpClient.BaseAddress = new Uri("http://localhost:10000/graphql");
@@ -157,7 +157,7 @@ public Task<User> GetUser(int userId)
 ```
 To be clear, you don't need actively account for it. ZeroQL will analyze and report errors if something is wrong.
 
-For example the next sample will not work:
+For example, the next sample will not work:
 ``` csharp
 
 public int UserId { get; set; }
@@ -214,7 +214,7 @@ Console.WriteLine(response.Data); // UserModel { Id = 2, FirstName = Ben, LastNa
 
 ```
 
-You need to create a record from the base record `` GraphQL<TOperationType, TResult> ``. Where the `` TOperationType `` is a root query type(`` Query ``, `` Mutation ``) that associated with the `` GraphQLClient<TQuery, TMutataion> `` instance.
+You need to create a record from the base record `` GraphQL<TOperationType, TResult> ``. Where the `` TOperationType `` is a root query type(`` Query ``, `` Mutation ``) that is associated with the `` GraphQLClient<TQuery, TMutataion> `` instance.
 
 # Benchmarks
 
@@ -270,5 +270,9 @@ As you can see, the ``Raw`` method is the fastest.
 The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 
 But in absolute terms, all of them are pretty much the same.
 
-So, with the `` ZeroQL `` you can forget about the graphql and just use the Linq-like interface. 
-It will have little effect on performace.
+So, with the `` ZeroQL ``, you can forget about the graphql and just use the Linq-like interface. 
+It will have little effect on performance.
+
+# Credits
+
+Initially, the project was inspired by https://github.com/Giorgi/GraphQLinq
