@@ -92,22 +92,24 @@ public class GenerateCommand : ICommand
             Scalars = scalars
         };
 
-        if (!Force && File.Exists(Output))
+        var outputPath = Path.IsPathRooted(Output) ? Output : Path.GetFullPath(Output);
+        await console.Output.WriteLineAsync($"Output path: {outputPath}");
+        if (!Force && File.Exists(outputPath))
         {
             var checksumFile = ChecksumHelper.GenerateChecksumFromSchemaFile(Schema, options);
-            var checksumSourceCode = ChecksumHelper.ExtractChecksumFromSourceCode(Output);
+            var checksumSourceCode = ChecksumHelper.ExtractChecksumFromSourceCode(outputPath);
 
             if (checksumFile == checksumSourceCode)
             {
                 await console.Output.WriteLineAsync(
                     "The source code is up-to-date with graphql schema. Skipping code generation.");
+
                 return;
             }
         }
 
         var graphql = await File.ReadAllTextAsync(Schema);
         var csharpClient = GraphQLGenerator.ToCSharp(graphql, options);
-        var outputPath = Path.IsPathRooted(Output) ? Output : Path.GetFullPath(Output);
         var outputFolder = Path.GetDirectoryName(outputPath)!;
         if (!Directory.Exists(outputFolder))
         {
@@ -144,38 +146,17 @@ public class GenerateCommand : ICommand
     {
         if (Config is null)
         {
+            return false;
+        }
+
+        var (config, error) = ZeroQLConfigReader.ReadConfig(Config).Unwrap();
+        if (error)
+        {
+            using var redColor = console.WithForegroundColor(ConsoleColor.Red);
+            await console.Error.WriteLineAsync("Error reading config file.");
+            await console.Error.WriteLineAsync(error.Message);
+
             return true;
-        }
-
-        if (!File.Exists(Config))
-        {
-            await console.Error.WriteLineAsync($"Config file '{Config}' does not exist. Check that file exist.");
-            return false;
-        }
-
-        var schema = ZeroQLSchema.GetJsonSchema();
-        var json = await File.ReadAllTextAsync(Config);
-        var errors = schema.Validate(json);
-
-        if (errors.Count > 0)
-        {
-            await console.Error.WriteLineAsync("Config file is not valid.");
-            await console.Error.WriteLineAsync("Errors:");
-            foreach (var error in errors)
-            {
-                var humanReadableError = ZeroQLSchema.GetHumanReadableErrorMessage(error.Kind);
-                await console.Error.WriteLineAsync(
-                    $"    {Config} [{error.LineNumber}:{error.LinePosition}]: {humanReadableError} at {error.Path}");
-            }
-
-            return false;
-        }
-
-        var config = JsonConvert.DeserializeObject<ZeroQLFileConfig>(json);
-        if (config is null)
-        {
-            await console.Error.WriteLineAsync("Config file is not valid. Check that file is valid.");
-            return false;
         }
 
         if (string.IsNullOrEmpty(Schema))

@@ -15,6 +15,7 @@
     <ItemGroup>
         <ProjectReference Include="..\ZeroQL.Runtime\ZeroQL.Runtime.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
+        <ProjectReference Include="..\ZeroQL.Tools\ZeroQL.Tools.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -26,6 +27,7 @@
             <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Runtime.dll" PackagePath="lib/$(TargetFramework)" />
             <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
             <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)/../ZeroQL.SourceGenerators/ZeroQL.props" PackagePath="build/$(TargetFramework)/$(PackageId).props" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Tools.dll" PackagePath="build/$(TargetFramework)/ZeroQL.Tools.dll" />
         </ItemGroup>
     </Target>
 </Project>

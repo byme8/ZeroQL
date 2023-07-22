@@ -4,6 +4,7 @@
         <ZeroQLConfig Include="*.zeroql.json"/>
     </ItemGroup>
 
+    <UsingTask TaskName="ZeroQLBuildTask" AssemblyFile="$(MSBuildThisFileDirectory)ZeroQL.Tools.dll" />
     <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile" Condition="$(ZeroQLOnBuildTriggerEnabled) != 'False'">
         <Exec Command="dotnet zeroql generate -c %(ZeroQLConfig.Identity) -o obj/ZeroQL/%(ZeroQLConfig.Identity).g.cs" Outputs="obj/ZeroQL/%(ZeroQLConfig.Identity).g.cs">
             <Output ItemName="Generated" TaskParameter="Outputs" />
