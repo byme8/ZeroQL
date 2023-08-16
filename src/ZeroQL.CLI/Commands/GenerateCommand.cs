@@ -1,11 +1,11 @@
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
-using Newtonsoft.Json;
 using ZeroQL.Bootstrap;
 using ZeroQL.CLI.Converters;
+using ZeroQL.Core.Config;
+using ZeroQL.Core.Enums;
 using ZeroQL.Internal;
-using ZeroQL.Internal.Enums;
 
 namespace ZeroQL.CLI.Commands;
 
@@ -146,7 +146,7 @@ public class GenerateCommand : ICommand
     {
         if (Config is null)
         {
-            return false;
+            return true;
         }
 
         var (config, error) = ZeroQLConfigReader.ReadConfig(Config).Unwrap();

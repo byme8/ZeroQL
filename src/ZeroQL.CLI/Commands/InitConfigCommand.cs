@@ -3,6 +3,7 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ZeroQL.Core.Config;
 
 namespace ZeroQL.CLI.Commands;
 

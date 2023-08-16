@@ -1,3 +1,5 @@
-﻿Config file is not valid.
+﻿Error reading config file.
+Config file is not valid.
 Errors:
     tempFile [5:14]: No Additional Properties Allowed at #/something
+

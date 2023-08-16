@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
-namespace ZeroQL.CLI;
+namespace ZeroQL.Core.Config;
 
 public class ZeroQLSchema
 {

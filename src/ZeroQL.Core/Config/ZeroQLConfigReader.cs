@@ -1,10 +1,7 @@
-using System;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace ZeroQL.CLI;
+namespace ZeroQL.Core.Config;
 
 public static class ZeroQLConfigReader
 {

@@ -1,8 +1,6 @@
-
-// ReSharper disable once CheckNamespace
-
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace System;
 
 public class Result<TValue>

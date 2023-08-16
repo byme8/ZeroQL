@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ZeroQL.Internal.Enums;
+using ZeroQL.Core.Enums;
 using ZeroQL.Schema;
 
 namespace ZeroQL.Bootstrap;
