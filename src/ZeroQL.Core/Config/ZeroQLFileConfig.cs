@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
-using ZeroQL.Internal.Enums;
+using ZeroQL.Core.Enums;
 
 #pragma warning disable CS8618
 
-namespace ZeroQL.CLI;
+namespace ZeroQL.Core.Config;
 
 public class ZeroQLFileConfig
 {

@@ -4,8 +4,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Bootstrap;
+using ZeroQL.Core.Enums;
 using ZeroQL.Extensions;
-using ZeroQL.Internal.Enums;
 using ZeroQL.Tests.Core;
 using Task = System.Threading.Tasks.Task;
 

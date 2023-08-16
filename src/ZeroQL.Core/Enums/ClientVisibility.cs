@@ -1,4 +1,4 @@
-﻿namespace ZeroQL.Internal.Enums;
+﻿namespace ZeroQL.Core.Enums;
 
 public enum ClientVisibility
 {

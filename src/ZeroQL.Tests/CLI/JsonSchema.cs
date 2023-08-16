@@ -1,4 +1,5 @@
 using ZeroQL.CLI;
+using ZeroQL.Core.Config;
 
 namespace ZeroQL.Tests.CLI;
 

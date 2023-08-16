@@ -5,7 +5,7 @@ using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
-namespace ZeroQL.CLI;
+namespace ZeroQL.Core.Config;
 
 public class ZeroQLSchema
 {

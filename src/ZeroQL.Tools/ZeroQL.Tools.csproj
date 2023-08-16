@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ZeroQL.Core\ZeroQL.Core.csproj" />
       <ProjectReference Include="..\ZeroQL.Runtime\ZeroQL.Runtime.csproj" />
     </ItemGroup>
 

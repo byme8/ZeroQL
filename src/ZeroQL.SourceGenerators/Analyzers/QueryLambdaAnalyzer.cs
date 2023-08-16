@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -107,7 +108,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
                 .Create(
                     Descriptors.FailedToConvert,
                     memberAccess.Name.GetLocation(),
-                    resolveError.Code));
+                    resolveError.Message));
             return;
         }
 

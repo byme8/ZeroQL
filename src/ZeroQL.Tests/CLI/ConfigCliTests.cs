@@ -1,9 +1,5 @@
-using System.Text.Json;
 using CliFx.Infrastructure;
-using ZeroQL.CLI;
 using ZeroQL.CLI.Commands;
-using ZeroQL.Internal.Enums;
-using ZeroQL.Json;
 using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.CLI;

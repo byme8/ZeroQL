@@ -4,6 +4,7 @@
         <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -13,8 +14,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ZeroQL.MSBuild\ZeroQL.MSBuild.csproj" />
         <ProjectReference Include="..\ZeroQL.Runtime\ZeroQL.Runtime.csproj" />
         <ProjectReference Include="..\ZeroQL.SourceGenerators\ZeroQL.SourceGenerators.csproj" />
+
+
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="NJsonSchema" Version="10.9.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,7 +31,12 @@
         <ItemGroup>
             <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Runtime.dll" PackagePath="lib/$(TargetFramework)" />
             <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
-            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)/../ZeroQL.SourceGenerators/ZeroQL.props" PackagePath="build/$(TargetFramework)/$(PackageId).props" />
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)/../ZeroQL.MSBuild/ZeroQL.props" PackagePath="build/$(TargetFramework)/$(PackageId).props" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.MSBuild.dll" PackagePath="build/$(TargetFramework)/ZeroQL.MSBuild.dll" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\ZeroQL.Core.dll" PackagePath="build/$(TargetFramework)/ZeroQL.Core.dll" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\Newtonsoft.Json.dll" PackagePath="build/$(TargetFramework)/Newtonsoft.Json.dll" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\NJsonSchema.dll" PackagePath="build/$(TargetFramework)/NJsonSchema.dll" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\Namotion.Reflection.dll" PackagePath="build/$(TargetFramework)/Namotion.Reflection.dll" />
         </ItemGroup>
     </Target>
 </Project>

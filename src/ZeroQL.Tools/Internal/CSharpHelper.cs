@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using ZeroQL.Internal.Enums;
+using ZeroQL.Core.Enums;
 using ZeroQL.Schema;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using TypeDefinition = ZeroQL.Schema.TypeDefinition;

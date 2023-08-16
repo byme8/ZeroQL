@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -89,7 +90,7 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
                 .Create(
                     Descriptors.FailedToConvert,
                     record.Identifier.GetLocation(),
-                    resolveError.Code));
+                    resolveError.Message));
             return;
         }
 
