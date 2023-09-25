@@ -294,7 +294,7 @@ namespace GraphQLClient
         public int __AddUserProfileImage { get; set; }
 
         [ZeroQL.GraphQLName("addUserProfileImage")]
-        public int AddUserProfileImage([ZeroQL.GraphQLType("Int!")] int userId = default !, [ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !)
+        public int AddUserProfileImage([ZeroQL.GraphQLType("Int!")] int USER_ID = default !, [ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !)
         {
             return __AddUserProfileImage;
         }

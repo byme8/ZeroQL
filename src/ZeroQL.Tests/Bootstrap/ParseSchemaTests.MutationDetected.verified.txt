@@ -7,7 +7,7 @@
   DateOnly DateOnly([ZeroQL.GraphQLType("Date!")] DateOnly dateOnly = default !),
   TimeSpan TimeOnly([ZeroQL.GraphQLType("TimeSpan!")] TimeSpan timeOnly = default !),
   T AddUser<T>([ZeroQL.GraphQLType("String!")] string firstName = default !, [ZeroQL.GraphQLType("String!")] string lastName = default !, Func<User, T> selector = default !),
-  int AddUserProfileImage([ZeroQL.GraphQLType("Int!")] int userId = default !, [ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !),
+  int AddUserProfileImage([ZeroQL.GraphQLType("Int!")] int USER_ID = default !, [ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !),
   int AddMyProfileImage([ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !),
   int AddUsersInfo([ZeroQL.GraphQLType("[UserInfoInput!]!")] UserInfoInput[] users = default !),
   int AddUsersInfoWithEmails([ZeroQL.GraphQLType("AddUsersInput!")] AddUsersInput input = default !),

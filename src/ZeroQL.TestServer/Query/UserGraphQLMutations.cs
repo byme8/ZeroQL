@@ -26,7 +26,7 @@ public class UserGraphQLMutations
         }));
     }
 
-    public async Task<int> AddUserProfileImage(int userId, IFile file)
+    public async Task<int> AddUserProfileImage([GraphQLName("USER_ID")]int userId, IFile file)
     {
         var stream = file.OpenReadStream();
         var streamReader = new StreamReader(stream);

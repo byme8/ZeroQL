@@ -57,7 +57,7 @@ type Mutation {
   timeOnly(timeOnly: TimeSpan!): TimeSpan!
   addUser(firstName: String! lastName: String!): User!
   doError: Int!
-  addUserProfileImage(userId: Int! file: Upload!): Int!
+  addUserProfileImage(USER_ID: Int! file: Upload!): Int!
   addMyProfileImage(file: Upload!): Int!
   addUsersInfo(users: [UserInfoInput!]!): Int!
   addUsersInfoWithEmails(input: AddUsersInput!): Int!

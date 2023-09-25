@@ -851,7 +851,7 @@ public static class GraphQLQueryResolver
         var parametersToIgnore = ignoreLastParameter ? 1 : 0;
         var argumentNames = method.Parameters
             .Take(method.Parameters.Length - parametersToIgnore)
-            .Select(o => o.Name.FirstToLower())
+            .Select(o => o.Name)
             .ToArray();
 
         var (selectorName, error) = ExtractSelectorName(context, invocation.Expression).Unwrap();

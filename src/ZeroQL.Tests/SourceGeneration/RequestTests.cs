@@ -53,15 +53,13 @@ public class RequestTests : IntegrationTest
     public async Task CanSendRequestLikeMutationWithUpload()
     {
         var csharpQuery = "await qlClient.Execute(new AddAvatar(1, new Upload(\"image.png\", new MemoryStream(new byte[42]))));";
-        var graphqlQuery = "mutation AddAvatar($userId: Int!, $file: Upload!) { addUserProfileImage(userId: $userId, file: $file)}";
 
         var project = await Project
             .ReplacePartOfDocumentAsync("Program.cs", (FullCall, csharpQuery));
 
-        dynamic response = await project.Validate(graphqlQuery);
-        int id = response.Data;
+        var response = await project.Execute();
 
-        id.Should().Be(42);
+        await Verify(response);
     }
     
     [Fact]

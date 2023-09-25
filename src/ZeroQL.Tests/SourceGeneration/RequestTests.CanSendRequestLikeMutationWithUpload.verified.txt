@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation AddAvatar($userId: Int!, $file: Upload!) { addUserProfileImage(USER_ID: $userId, file: $file)},
+  Data: 42
+}
