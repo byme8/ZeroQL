@@ -2,9 +2,10 @@
 using ZeroQL.CLI.Commands;
 
 await new CliApplicationBuilder()
+    .AddCommand<ConfigInitCommand>()
+    .AddCommand<ConfigEchoOutputCommand>()
     .AddCommand<GenerateCommand>()
     .AddCommand<ExtractQueriesCommand>()
-    .AddCommand<InitConfigCommand>()
     .AddCommand<PullSchemaCommand>()
     .Build()
     .RunAsync();

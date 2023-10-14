@@ -19,7 +19,7 @@
             <Output TaskParameter="FileToIncludeInProject" ItemName="ZeroQLFileToIncludeInProject"/>
         </ZeroQLBuildTask>
 
-        <Message Text="Generating %(ZeroQLOutput.Identity)..." Importance="high"/>
+        <Message Text="Generating %(ZeroQLOutput.Identity)" Importance="high"/>
         <Exec Command="dotnet zeroql %(ZeroQLCommandToExecute.Identity)" ConsoleToMSBuild="true"/>
 
         <ItemGroup>

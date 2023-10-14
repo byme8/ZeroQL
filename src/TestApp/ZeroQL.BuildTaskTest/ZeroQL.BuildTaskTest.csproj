@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-<!--      <PackageReference Include="ZeroQL" Version="999.2308.1622.4513" />-->
+<!--      <PackageReference Include="ZeroQL" Version="999.2310.1417.326" />-->
     </ItemGroup>
     
 </Project>

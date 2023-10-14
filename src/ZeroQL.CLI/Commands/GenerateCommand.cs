@@ -3,6 +3,7 @@ using CliFx.Attributes;
 using CliFx.Infrastructure;
 using ZeroQL.Bootstrap;
 using ZeroQL.CLI.Converters;
+using ZeroQL.Config;
 using ZeroQL.Core.Config;
 using ZeroQL.Core.Enums;
 using ZeroQL.Internal;

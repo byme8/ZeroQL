@@ -1,7 +1,10 @@
+using System;
+using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using ZeroQL.Core.Config;
 
-namespace ZeroQL.Core.Config;
+namespace ZeroQL.Config;
 
 public static class ZeroQLConfigReader
 {

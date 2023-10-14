@@ -12,7 +12,7 @@ public class ConfigCliTests
     {
         using var console = new FakeInMemoryConsole();
         var tempFile = Path.GetTempFileName();
-        var command = new InitConfigCommand()
+        var command = new ConfigInitCommand()
         {
             Output = tempFile
         };
@@ -35,7 +35,7 @@ public class ConfigCliTests
                     """);
 
         var tempFile = Path.GetTempFileName();
-        var command = new InitConfigCommand()
+        var command = new ConfigInitCommand()
         {
             Output = tempFile
         };
@@ -78,7 +78,7 @@ public class ConfigCliTests
         await Verify(generateCommand)
             .Track(tempFile);
     }
-    
+
     [Fact]
     public async Task ConfigWithUnrecognizedFieldFails()
     {
@@ -109,6 +109,33 @@ public class ConfigCliTests
         await generateCommand.ReadConfig(console);
 
         await Verify(console.ReadErrorString())
+            .Track(tempFile);
+    }
+
+    [Fact]
+    public async Task EchoOutput()
+    {
+        using var console = new FakeInMemoryConsole();
+        var tempFile = Path.GetTempFileName();
+        var config = """
+                     {
+                       "graphql": "./service.graphql",
+                       "namespace": "Service.ZeroQL.Client",
+                       "clientName": "ServiceZeroQLClient",
+                       "output": "QL.g.cs",
+                     }
+                     """;
+
+        await File.WriteAllTextAsync(tempFile, config);
+
+        var generateCommand = new ConfigEchoOutputCommand
+        {
+            Config = tempFile
+        };
+
+        await generateCommand.ExecuteAsync(console);
+
+        await Verify(console.ReadOutputString())
             .Track(tempFile);
     }
 }

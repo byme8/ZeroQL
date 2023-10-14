@@ -1,14 +1,16 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using ZeroQL.Config;
 using ZeroQL.Core.Config;
 
 namespace ZeroQL.CLI.Commands;
 
 [Command("config init", Description = "Initialize a new configuration file")]
-public class InitConfigCommand : ICommand
+public class ConfigInitCommand : ICommand
 {
     [CommandOption("output", 'o', Description = "Output file path, ./zeroql.json by default")]
     public string Output { get; set; } = "./config.zeroql.json";
@@ -45,12 +47,7 @@ public class InitConfigCommand : ICommand
             ClientName = className
         };
 
-        var json = JsonConvert.SerializeObject(config, new JsonSerializerSettings()
-        {
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        });
+        var json = JsonConvert.SerializeObject(config, ZeroQLSchema.GetJsonSerializerSettings());
 
         await File.WriteAllTextAsync(Output, json);
     }
