@@ -4,27 +4,32 @@
         <ZeroQLConfig Include="*.zeroql.json"/>
     </ItemGroup>
 
-    <UsingTask TaskName="ZeroQLBuildTask" AssemblyFile="$(MSBuildThisFileDirectory)ZeroQL.MSBuild.dll"/>
-    <Target Name="GenerateQLClient" BeforeTargets="BeforeCompile" Condition="$(ZeroQLOnBuildTriggerEnabled) != 'False'">
-        <Exec Command="dotnet zeroql --version" ContinueOnError="true" ConsoleToMSBuild="true" Condition="$(ZeroQLCLIValidation) != 'False'">
+    <UsingTask Condition="$(ZeroQLDebug) != 'True'" TaskName="ZeroQLBuildTask" AssemblyFile="$(MSBuildThisFileDirectory)ZeroQL.MSBuild.dll"/>
+    <UsingTask Condition="$(ZeroQLDebug) == 'True'" TaskName="ZeroQLBuildTask" AssemblyFile="$(OutputPath)ZeroQL.MSBuild.dll"/>
+    <Target Name="GenerateQLClient"
+            BeforeTargets="BeforeCompile"
+            Condition="$(ZeroQLOnBuildTriggerEnabled) != 'False'">
+
+        <Exec Command="dotnet zeroql --version"
+              ContinueOnError="true"
+              ConsoleToMSBuild="true"
+              Condition="$(ZeroQLCLIValidation) != 'False'">
             <Output TaskParameter="ExitCode" PropertyName="ZeroQLErrorCode"/>
             <Output TaskParameter="ConsoleOutput" PropertyName="ZeroQLCLIVersion"/>
         </Exec>
+
         <Error Condition="'$(ZeroQLErrorCode)' != '0' And $(ZeroQLCLIValidation) != 'False'"
                Text="ZeroQL CLI could not be found. Please install it before proceeding."/>
 
-        <ZeroQLBuildTask ConfigFile="%(ZeroQLConfig.Identity)">
-            <Output TaskParameter="CommandToExecute" ItemName="ZeroQLCommandToExecute"/>
-            <Output TaskParameter="OutputFile" ItemName="ZeroQLOutput"/>
-            <Output TaskParameter="FileToIncludeInProject" ItemName="ZeroQLFileToIncludeInProject"/>
-        </ZeroQLBuildTask>
+        <Exec Command="dotnet zeroql config output -c ./%(ZeroQLConfig.Identity)" ConsoleToMSBuild="true">
+            <Output ItemName="ZeroQLOutput" TaskParameter="ConsoleOutput"/>
+        </Exec>
 
-        <Message Text="Generating %(ZeroQLOutput.Identity)" Importance="high"/>
-        <Exec Command="dotnet zeroql %(ZeroQLCommandToExecute.Identity)" ConsoleToMSBuild="true"/>
+        <Exec Command="dotnet zeroql generate -c %(ZeroQLConfig.Identity)" Outputs="@(ZeroQLOutput)"/>
 
         <ItemGroup>
-            <Compile Remove="@(ZeroQLFileToIncludeInProject)"/>
-            <Compile Include="@(ZeroQLFileToIncludeInProject)"/>
+            <Compile Remove="@(ZeroQLOutput)"/>
+            <Compile Include="@(ZeroQLOutput)"/>
             <FileWrites Include="@(ZeroQLOutput)"/>
         </ItemGroup>
     </Target>
