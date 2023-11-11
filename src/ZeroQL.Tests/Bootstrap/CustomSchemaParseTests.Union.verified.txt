@@ -6,12 +6,12 @@
     }
 ,
   textContentClass:
-    [ZeroQL.GraphQLType("TextContent")]
+    [MessagePackObject][ZeroQL.GraphQLType("TextContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class TextContent : PostContent
     {
         [ZeroQL.GraphQLName("text")]
-        [JsonPropertyName("text")]
+        [JsonPropertyName("text")][Key("text")][Key("text")]
         public string Text { get; set; }
     }
 ,
@@ -21,11 +21,11 @@
     public class ImageContent : PostContent
     {
         [ZeroQL.GraphQLName("imageUrl")]
-        [JsonPropertyName("imageUrl")]
+        [JsonPropertyName("imageUrl")][Key("imageUrl")][Key("imageUrl")]
         public string ImageUrl { get; set; }
 
         [ZeroQL.GraphQLName("height")]
-        [JsonPropertyName("height")]
+        [JsonPropertyName("height")][Key("height")][Key("height")]
         public int Height { get; set; }
     }
 ,

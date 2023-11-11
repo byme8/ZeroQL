@@ -38,7 +38,13 @@ public class Program
 
         var qlClient = new TestServerClient(httpClient);
         // place to replace
-        var response = await qlClient.Query(static q => q.Me(o => o.FirstName));
+        var response = await qlClient
+            .Query(static q => q
+                .Me(o => new
+                {
+                    o.Id,
+                    o.FirstName
+                }));
 
         return response;
     }

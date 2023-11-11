@@ -4,14 +4,14 @@
     public interface IFigure : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLName("id")]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id")][Key("id")]
         public int? Id { get; set; }
 
         [ZeroQL.GraphQLName("perimeter")]
-        [JsonPropertyName("perimeter")]
+        [JsonPropertyName("perimeter")][Key("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
+        [JsonPropertyName("creator")][Key("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -24,14 +24,14 @@
     public class IFigureStub : IFigure
     {
         [ZeroQL.GraphQLName("id")]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id")][Key("id")]
         public int? Id { get; set; }
 
         [ZeroQL.GraphQLName("perimeter")]
-        [JsonPropertyName("perimeter")]
+        [JsonPropertyName("perimeter")][Key("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
+        [JsonPropertyName("creator")][Key("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -43,15 +43,15 @@
     }
 ,
   squareClass:
-    [ZeroQL.GraphQLType("Square")]
+    [MessagePackObject][ZeroQL.GraphQLType("Square")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Square : IFigure
     {
         [ZeroQL.GraphQLName("id")]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id")][Key("id")]
         public int? Id { get; set; }
 
-        [JsonPropertyName("topLeft")]
+        [JsonPropertyName("topLeft")][Key("topLeft")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __TopLeft { get; set; }
 
@@ -61,7 +61,7 @@
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
         }
 
-        [JsonPropertyName("bottomRight")]
+        [JsonPropertyName("bottomRight")][Key("bottomRight")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __BottomRight { get; set; }
 
@@ -72,10 +72,10 @@
         }
 
         [ZeroQL.GraphQLName("perimeter")]
-        [JsonPropertyName("perimeter")]
+        [JsonPropertyName("perimeter")][Key("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
+        [JsonPropertyName("creator")][Key("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -87,15 +87,15 @@
     }
 ,
   circleClass:
-    [ZeroQL.GraphQLType("Circle")]
+    [MessagePackObject][ZeroQL.GraphQLType("Circle")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Circle : IFigure
     {
         [ZeroQL.GraphQLName("id")]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id")][Key("id")]
         public int? Id { get; set; }
 
-        [JsonPropertyName("center")]
+        [JsonPropertyName("center")][Key("center")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __Center { get; set; }
 
@@ -106,14 +106,14 @@
         }
 
         [ZeroQL.GraphQLName("radius")]
-        [JsonPropertyName("radius")]
+        [JsonPropertyName("radius")][Key("radius")]
         public double Radius { get; set; }
 
         [ZeroQL.GraphQLName("perimeter")]
-        [JsonPropertyName("perimeter")]
+        [JsonPropertyName("perimeter")][Key("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
+        [JsonPropertyName("creator")][Key("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Creator { get; set; }
 
@@ -137,12 +137,12 @@
     }
 ,
   point:
-    [ZeroQL.GraphQLType("Point")]
+    [MessagePackObject][ZeroQL.GraphQLType("Point")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public class Point : IFigure
     {
         [ZeroQL.GraphQLName("id")]
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id")][Key("id")]
         public int Id { get; set; }
 
         // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
@@ -151,18 +151,18 @@
         int? IFigure.Id { get; set; }
 
         [ZeroQL.GraphQLName("x")]
-        [JsonPropertyName("x")]
+        [JsonPropertyName("x")][Key("x")]
         public double X { get; set; }
 
         [ZeroQL.GraphQLName("y")]
-        [JsonPropertyName("y")]
+        [JsonPropertyName("y")][Key("y")]
         public double Y { get; set; }
 
         [ZeroQL.GraphQLName("perimeter")]
-        [JsonPropertyName("perimeter")]
+        [JsonPropertyName("perimeter")][Key("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
+        [JsonPropertyName("creator")][Key("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 

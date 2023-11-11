@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MessagePack;
 
 namespace ZeroQL;
 
@@ -40,22 +41,31 @@ public class GraphQLResult<TData> : IGraphQLResult
     public Dictionary<string, object>? Extensions { get; set; }
 }
 
+[MessagePackObject]
 public record GraphQLResponse<TData>
 {
+    [IgnoreMember]
     public string Query { get; set; }
-    
+ 
+    [Key("data")]
     public TData? Data { get; set; }
 
+    [Key("errors")]
     public GraphQueryError[]? Errors { get; set; }
     
+    [Key("extensions")]
     public Dictionary<string, object>? Extensions { get; set; }
 }
 
+[MessagePackObject]
 public class GraphQueryError
 {
+    [Key("message")]
     public string Message { get; set; }
 
+    [Key("locations")]
     public object[] Path { get; set; }
     
+    [Key("path")]
     public Dictionary<string, object>? Extensions { get; set; }
 }
