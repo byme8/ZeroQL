@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MessagePack;
 
 namespace ZeroQL;
 
+[MessagePackObject]
 public record ZeroQLScalar
 {
+    [Key(0)]
     public string Value { get; set; }
 
     public override string ToString() => Value;

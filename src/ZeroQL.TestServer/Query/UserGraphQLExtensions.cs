@@ -11,6 +11,8 @@ public class UserGraphQLExtensions
         { 2, new User() { Id = 2, FirstName = "Ben", LastName = "Smith", UserKind = UserKind.Bad } },
     };
 
+    private static User[]? users;
+
     public User Me()
     {
         return new User
@@ -23,7 +25,7 @@ public class UserGraphQLExtensions
 
     [GraphQLDeprecated("Use Me instead")]
     public User CurrentUser() => Me();
-    
+
     [GraphQLName(nameof(MEWITHSUPPERCASING))]
     public User MEWITHSUPPERCASING() => Me();
 
@@ -45,10 +47,10 @@ public class UserGraphQLExtensions
     {
         return Users.Select(o => o.Value.UserKind).ToArray();
     }
-    
+
     public UserKindPascal[] GetUserKindPascals()
     {
-        return new []{ UserKindPascal.Good, UserKindPascal.SupperGood, UserKindPascal.Bad };
+        return new[] { UserKindPascal.Good, UserKindPascal.SupperGood, UserKindPascal.Bad };
     }
 
     public User[][] GetUsersMatrix()
@@ -67,7 +69,7 @@ public class UserGraphQLExtensions
 
     public User[] GetUsersByKind(UserKind kind, int page, int size)
     {
-        return Enumerable.Range(0, size)
+        return users ??= Enumerable.Range(0, size)
             .Select(o => new User
             {
                 FirstName = Guid.NewGuid().ToString(),
@@ -85,12 +87,11 @@ public class UserGraphQLExtensions
     {
         return Users.GetValueOrDefault(id);
     }
-    
+
     public User[] GetUsersByIds(int[] ids)
     {
-        return Users
-            .Where(o => ids.Contains(o.Key))
-            .Select(o => o.Value)
+        return ids
+            .Select(o => new User() { Id = o, FirstName = $"FirstName {o}", LastName = $"LastName {o}" })
             .ToArray();
     }
 

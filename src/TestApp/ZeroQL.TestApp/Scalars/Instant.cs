@@ -1,11 +1,14 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MessagePack;
 
 namespace ZeroQL;
 
+[MessagePackObject]
 public class Instant
 {
+    [Key(0)]
     public DateTimeOffset DateTimeOffset { get; set; }
 }
 

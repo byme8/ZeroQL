@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using MessagePack;
 
 namespace ZeroQL;
 
+[MessagePackObject]
 public class Upload
 {
     public Upload(string fileName, Stream stream)

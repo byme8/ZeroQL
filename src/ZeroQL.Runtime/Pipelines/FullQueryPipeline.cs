@@ -14,7 +14,7 @@ namespace ZeroQL.Pipelines;
 
 public class FullQueryPipeline : IGraphQLQueryPipeline
 {
-    static MessagePackSerializerOptions _options = MessagePackSerializerOptions.Standard.WithResolver(
+    public static MessagePackSerializerOptions _options = MessagePackSerializerOptions.Standard.WithResolver(
         CompositeResolver.Create(
             new IMessagePackFormatter[] { new StringInterningFormatter() },
             new IFormatterResolver[]

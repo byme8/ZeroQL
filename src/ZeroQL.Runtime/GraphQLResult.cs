@@ -47,25 +47,25 @@ public record GraphQLResponse<TData>
     [IgnoreMember]
     public string Query { get; set; }
  
-    [Key("data")]
+    [Key(0)]
     public TData? Data { get; set; }
 
-    [Key("errors")]
+    [Key(1)]
     public GraphQueryError[]? Errors { get; set; }
     
-    [Key("extensions")]
+    [Key(2)]
     public Dictionary<string, object>? Extensions { get; set; }
 }
 
 [MessagePackObject]
 public class GraphQueryError
 {
-    [Key("message")]
+    
     public string Message { get; set; }
 
-    [Key("locations")]
+    
     public object[] Path { get; set; }
     
-    [Key("path")]
+    
     public Dictionary<string, object>? Extensions { get; set; }
 }

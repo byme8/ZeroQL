@@ -10,6 +10,7 @@ await ZeroQL.TestServer.Program.VerifyServiceIsRunning(serverContext);
 
 var benchmark = new RawVsZeroQLBenchmark();
 var raw = await benchmark.Raw();
+var rawMessagePack = await benchmark.RawMessagePack();
 // var strawberry = await benchmark.StrawberryShake();
 // var zeroQLLambdaOld = await benchmark.ZeroQLLambdaWithoutClosure();
 var zeroQLLambdaNew = await benchmark.ZeroQLLambdaWithClosure();

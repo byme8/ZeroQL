@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>ZeroQL.Benchmark.RawVsZeroQLBenchmark-20231111-155317</title>
+<title>ZeroQL.Benchmark.RawVsZeroQLBenchmark-20231111-180407</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -22,11 +22,12 @@ Apple M1, 1 CPU, 8 logical and 8 physical cores
 <pre><code></code></pre>
 
 <table>
-<thead><tr><th>           Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Allocated</th>
+<thead><tr><th>           Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Gen1</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>Noop</td><td>84.45 &mu;s</td><td>0.685 &mu;s</td><td>0.572 &mu;s</td><td>0.4883</td><td>3.05 KB</td>
-</tr><tr><td>Raw</td><td>128.60 &mu;s</td><td>2.370 &mu;s</td><td>2.217 &mu;s</td><td>0.9766</td><td>5.98 KB</td>
-</tr><tr><td>ZeroQLLambdaWithClosure</td><td>129.64 &mu;s</td><td>1.599 &mu;s</td><td>1.496 &mu;s</td><td>0.9766</td><td>7.03 KB</td>
+</thead><tbody><tr><td>Noop</td><td>80.39 &mu;s</td><td>1.455 &mu;s</td><td>1.290 &mu;s</td><td>0.4883</td><td>-</td><td>3.05 KB</td>
+</tr><tr><td>Raw</td><td>217.66 &mu;s</td><td>1.219 &mu;s</td><td>1.141 &mu;s</td><td>8.3008</td><td>0.4883</td><td>50.56 KB</td>
+</tr><tr><td>RawMessagePack</td><td>210.67 &mu;s</td><td>0.722 &mu;s</td><td>0.640 &mu;s</td><td>3.4180</td><td>-</td><td>19.89 KB</td>
+</tr><tr><td>ZeroQLLambdaWithClosure</td><td>216.32 &mu;s</td><td>2.182 &mu;s</td><td>1.935 &mu;s</td><td>3.9063</td><td>-</td><td>23.95 KB</td>
 </tr></tbody></table>
 </body>
 </html>

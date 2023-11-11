@@ -219,42 +219,39 @@ public class QueryResultMessagePackFormatter : IMessagePackFormatter<QueryResult
 {
     public void Serialize(ref MessagePackWriter writer, QueryResult value, MessagePackSerializerOptions options)
     {
-        var size = 0;
+        var size = 3;
+        writer.WriteArrayHeader(size);
         if (value.Data is not null)
         {
-            size++;
-        }
-
-        if (value.Errors is not null)
-        {
-            size++;
-        }
-
-        if (value.Extensions is not null)
-        {
-            size++;
-        }
-
-        writer.WriteMapHeader(size);
-        if (value.Data is not null)
-        {
-            writer.Write("data");
+            // writer.Write("data");
             var formatter = options.Resolver.GetFormatter<object>();
             formatter?.Serialize(ref writer, value.Data, options);
         }
+        else
+        {
+            writer.WriteNil();
+        }
 
         if (value.Errors is not null)
         {
-            writer.Write("errors");
+            // writer.Write("errors");
             var formatter = options.Resolver.GetFormatter<object>();
             formatter?.Serialize(ref writer, value.Errors, options);
+        }
+        else
+        {
+            writer.WriteNil();
         }
 
         if (value.Extensions is not null)
         {
-            writer.Write("extensions");
+            // writer.Write("extensions");
             var formatter = options.Resolver.GetFormatter<object>();
             formatter?.Serialize(ref writer, value.Extensions, options);
+        }
+        else
+        {
+            writer.WriteNil();
         }
     }
 
@@ -293,10 +290,10 @@ public class ObjectResultMessagePackFormatter : IMessagePackFormatter<ObjectResu
     {
         var enumerable = value as IEnumerable<KeyValuePair<string, object>>;
         var count = enumerable?.Count() ?? 0;
-        writer.WriteMapHeader(count);
+        writer.WriteArrayHeader(count);
         foreach (var field in value)
         {
-            writer.Write(field.Name);
+            // writer.Write(field.Name);
             var formatter = options.Resolver.GetFormatter<object>();
             formatter?.Serialize(ref writer, field.Value, options);
         }

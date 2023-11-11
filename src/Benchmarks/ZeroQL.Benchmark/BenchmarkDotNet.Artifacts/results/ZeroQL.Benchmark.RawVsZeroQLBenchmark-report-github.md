@@ -8,8 +8,9 @@ Apple M1, 1 CPU, 8 logical and 8 physical cores
 
 
 ```
-|                  Method |      Mean |    Error |   StdDev |   Gen0 | Allocated |
-|------------------------ |----------:|---------:|---------:|-------:|----------:|
-|                    Noop |  84.45 μs | 0.685 μs | 0.572 μs | 0.4883 |   3.05 KB |
-|                     Raw | 128.60 μs | 2.370 μs | 2.217 μs | 0.9766 |   5.98 KB |
-| ZeroQLLambdaWithClosure | 129.64 μs | 1.599 μs | 1.496 μs | 0.9766 |   7.03 KB |
+|                  Method |      Mean |    Error |   StdDev |   Gen0 |   Gen1 | Allocated |
+|------------------------ |----------:|---------:|---------:|-------:|-------:|----------:|
+|                    Noop |  80.39 μs | 1.455 μs | 1.290 μs | 0.4883 |      - |   3.05 KB |
+|                     Raw | 217.66 μs | 1.219 μs | 1.141 μs | 8.3008 | 0.4883 |  50.56 KB |
+|          RawMessagePack | 210.67 μs | 0.722 μs | 0.640 μs | 3.4180 |      - |  19.89 KB |
+| ZeroQLLambdaWithClosure | 216.32 μs | 2.182 μs | 1.935 μs | 3.9063 |      - |  23.95 KB |

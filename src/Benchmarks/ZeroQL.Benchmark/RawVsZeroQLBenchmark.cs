@@ -4,7 +4,10 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using BenchmarkDotNet.Attributes;
 using GraphQL.TestServer;
+using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
+using ZeroQL.Pipelines;
+using ZeroQL.TestApp;
 
 // using StrawberryShake.TestServerClient;
 
@@ -29,7 +32,7 @@ public class RawVsZeroQLBenchmark
 
     // private readonly StrawberryShakeTestServerClient strawberryShake;
     private readonly Upload upload;
-    private readonly int id;
+    private readonly int[] ids;
 
     public RawVsZeroQLBenchmark()
     {
@@ -40,7 +43,7 @@ public class RawVsZeroQLBenchmark
         // strawberryShake = StrawberryShakeTestServerClientCreator.Create(httpClient);
         upload = new Upload("image.png", new MemoryStream(new byte[42]));
 
-        id = 1;
+        ids = Enumerable.Range(0, 100).ToArray();
     }
 
     [Benchmark]
@@ -48,15 +51,15 @@ public class RawVsZeroQLBenchmark
     {
         await httpClient.GetAsync("startup");
     }
-    
+
     [Benchmark]
     public async Task<string> Raw()
     {
         var rawQuery =
             $$"""
               {
-                  "variables": { "id": {{id}} },
-                  "query": "query GetUser($id: Int!){ user(id: $id) { id firstName lastName } }"
+                  "variables": { "ids": [{{string.Join(", ", ids)}}] },
+                  "query": "query GetUsersByIds($ids: [Int!]!){ usersByIds(ids: $ids) { id firstName lastName } }"
               }
               """;
         var stringContent = new StringContent(rawQuery, Encoding.UTF8, "application/json");
@@ -64,10 +67,46 @@ public class RawVsZeroQLBenchmark
         request.Content = stringContent;
         request.Headers.Add("Accept", "application/json");
         var response = await httpClient.SendAsync(request);
-        var responseJson = await response.Content.ReadAsStreamAsync();
+        var responseJson = await response.Content.ReadAsByteArrayAsync();
         var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-        return qlResponse!["data"]!["user"]!["firstName"]!.GetValue<string>();
+        return qlResponse!["data"]!["usersByIds"]![0]!["firstName"]!.GetValue<string>();
+    }
+
+    [Benchmark]
+    public async Task<string> RawMessagePack()
+    {
+        var rawQuery =
+            $$"""
+              {
+                  "variables": { "ids": [{{string.Join(", ", ids)}}] },
+                  "query": "query GetUsersByIds($ids: [Int!]!){ usersByIds(ids: $ids) { id firstName lastName } }"
+              }
+              """;
+        var stringContent = new StringContent(rawQuery, Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
+        request.Content = stringContent;
+        request.Headers.Add("Accept", "application/msgpack");
+        var response = await httpClient.SendAsync(request);
+        var responseJson = await response.Content.ReadAsByteArrayAsync();
+        var qlResponse =
+            MessagePackSerializer.Deserialize<GraphQLResponse<Data>>(responseJson, FullQueryPipeline._options);
+
+        return qlResponse.Data!.Users[0].FirstName;
+    }
+
+    [MessagePackObject]
+    public class Data
+    {
+        [Key(0)] public User[] Users { get; init; }
+    }
+
+    [MessagePackObject]
+    public class User
+    {
+        [Key(0)] public int Id { get; init; }
+        [Key(1)] public string FirstName { get; init; }
+        [Key(2)] public string LastName { get; init; }
     }
 
     // [Benchmark]
@@ -91,11 +130,11 @@ public class RawVsZeroQLBenchmark
     [Benchmark]
     public async Task<string> ZeroQLLambdaWithClosure()
     {
-        var id = this.id;
+        var ids = this.ids;
         var firstname = await zeroQLClient.Query(q
-            => q.User(id, o => new { o.Id, o.FirstName, o.LastName }));
+            => q.UsersByIds(ids, o => new { o.Id, o.FirstName, o.LastName }));
 
-        return firstname.Data!.FirstName;
+        return firstname.Data![0]!.FirstName;
     }
 
     // [Benchmark]
