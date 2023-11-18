@@ -117,7 +117,23 @@ public class GenerateCommand : ICommand
             Directory.CreateDirectory(outputFolder);
         }
 
-        await File.WriteAllTextAsync(outputPath, csharpClient);
+        var count = 10;
+        for (int i = 0; i < count; i++)
+        {
+            try
+            {
+                using var file = File.Open(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                using var writer = new StreamWriter(file);
+                await writer.WriteAsync(csharpClient);
+                break;
+            }
+            catch (Exception e)
+            {
+                await console.Error.WriteLineAsync($"Failed write to '{outputPath}'");
+                await console.Error.WriteLineAsync($"Attempting in 1 second. {i + 1} / {count}");
+                await Task.Delay(1000);
+            }
+        }
     }
 
     private async Task<bool> Validate(IConsole console)
