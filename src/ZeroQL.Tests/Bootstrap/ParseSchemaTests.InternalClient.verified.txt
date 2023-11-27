@@ -73,6 +73,34 @@ namespace GraphQLClient
         }
     }
 
+    [ZeroQL.GraphQLType("ContainerWithError")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class ContainerWithError
+    {
+        [ZeroQL.GraphQLName("value")]
+        [JsonPropertyName("value")]
+        public string Value { get; set; }
+    }
+
+    [ZeroQL.GraphQLType("ContainerWithoutError")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal class ContainerWithoutError
+    {
+        [ZeroQL.GraphQLName("value")]
+        [JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [JsonPropertyName("containerWithError")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public ContainerWithError? __ContainerWithError { get; set; }
+
+        [ZeroQL.GraphQLName("containerWithError")]
+        public T? ContainerWithError<T>(Func<ContainerWithError, T> selector = default !)
+        {
+            return __ContainerWithError is null ? default : selector(__ContainerWithError);
+        }
+    }
+
     [ZeroQL.GraphQLType("FigureContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class FigureContent : PostContent
@@ -767,6 +795,16 @@ namespace GraphQLClient
         public int Object([ZeroQL.GraphQLType("Int!")] int @object = default !)
         {
             return __Object;
+        }
+
+        [JsonPropertyName("containerWithoutError")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public ContainerWithoutError? __ContainerWithoutError { get; set; }
+
+        [ZeroQL.GraphQLName("containerWithoutError")]
+        public T? ContainerWithoutError<T>(Func<ContainerWithoutError, T> selector = default !)
+        {
+            return __ContainerWithoutError is null ? default : selector(__ContainerWithoutError);
         }
     }
 

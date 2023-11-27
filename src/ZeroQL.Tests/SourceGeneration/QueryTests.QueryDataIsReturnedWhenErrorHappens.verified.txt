@@ -1,0 +1,11 @@
+﻿{
+  Query: query { containerWithoutError { value containerWithError { value }  } },
+  Data: {
+    Value: Hello
+  },
+  Errors: [
+    {
+      Message: Error
+    }
+  ]
+}
