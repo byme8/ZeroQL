@@ -3,8 +3,6 @@
   mutation: Mutation
 }
 
-scalar uuid
-
 "The `Upload` scalar type represents a file upload."
 scalar Upload
 
@@ -82,6 +80,9 @@ type Person implements IPerson {
   firstName: String!
   lastName: String!
 }
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
 
 type TypesContainer {
   text: String!
@@ -192,9 +193,6 @@ type ImageContent {
 
 union PostContent = FigureContent | TextContent | ImageContent
 
-"The `DateTime` scalar represents an ISO-8601 compliant date time type."
-scalar DateTime
-
 "The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
 scalar TimeSpan
 
@@ -277,6 +275,8 @@ type JsonDocument {
   rootElement: JSON!
 }
 
+scalar uuid
+
 interface IPerson {
   id: Int!
   firstName: String!
@@ -300,3 +300,5 @@ type KeyValuePairOfStringAndString {
   key: String!
   value: String!
 }
+
+directive @tag(name: String!) repeatable on SCHEMA | SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION

@@ -1,5 +1,5 @@
 ﻿
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public enum UserKindPascal
     {
         [ZeroQL.GraphQLName("default")]

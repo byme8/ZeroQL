@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.5" />
-        <PackageReference Include="HotChocolate.PersistedQueries.FileSystem" Version="13.0.5" />
-        <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="13.0.5" />
-        <PackageReference Include="HotChocolate.Types.NodaTime" Version="13.0.5" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="13.7.0" />
+        <PackageReference Include="HotChocolate.PersistedQueries.FileSystem" Version="13.7.0" />
+        <PackageReference Include="HotChocolate.PersistedQueries.InMemory" Version="13.7.0" />
+        <PackageReference Include="HotChocolate.Types.NodaTime" Version="13.7.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 

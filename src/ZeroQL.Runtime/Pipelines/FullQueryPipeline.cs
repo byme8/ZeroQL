@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ZeroQL.Internal;
-using ZeroQL.Json;
 using ZeroQL.Stores;
 
 namespace ZeroQL.Pipelines;
 
-public class FullQueryPipeline : IGraphQLQueryPipeline
+public class FullQueryPipeline(IZeroQLSerializer serialization) : IGraphQLQueryPipeline
 {
     public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(IHttpHandler httpHandler, string queryKey,
         object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
@@ -28,19 +26,17 @@ public class FullQueryPipeline : IGraphQLQueryPipeline
         var response = await httpHandler.SendAsync(request, cancellationToken);
 #if DEBUG
         var responseJson = await response.Content.ReadAsStringAsync();
-        var qlResponse =
-            JsonSerializer.Deserialize<GraphQLResponse<TQuery>>(responseJson, ZeroQLJsonOptions.Options);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(responseJson);
+        var qlResponse = serialization.Deserialize<GraphQLResponse<TQuery>>(bytes);
 #elif NETSTANDARD
         var responseJson = await response.Content.ReadAsStreamAsync();
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
+        var qlResponse = await serialization.Deserialize<GraphQLResponse<TQuery>>(
             responseJson,
-            ZeroQLJsonOptions.Options,
             cancellationToken);
 #else
         var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var qlResponse = await JsonSerializer.DeserializeAsync<GraphQLResponse<TQuery>>(
+        var qlResponse = await serialization.Deserialize<GraphQLResponse<TQuery>>(
                 responseJson,
-                ZeroQLJsonOptions.Options,
                 cancellationToken);
 #endif
 

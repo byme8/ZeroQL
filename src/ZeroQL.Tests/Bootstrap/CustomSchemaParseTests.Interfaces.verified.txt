@@ -1,6 +1,6 @@
 ﻿{
   figureInterface:
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public interface IFigure : global::ZeroQL.IUnionType
     {
         [ZeroQL.GraphQLName("id")]
@@ -16,11 +16,11 @@
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T Creator<T>(Func<IUser, T> selector = default !);
+        public T Creator<T>(Func<IUser, T> selector = default!);
     }
 ,
   figureStubInterface:
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class IFigureStub : IFigure
     {
         [ZeroQL.GraphQLName("id")]
@@ -36,7 +36,7 @@
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T Creator<T>(Func<IUser, T> selector = default !)
+        public T Creator<T>(Func<IUser, T> selector = default!)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
@@ -44,7 +44,7 @@
 ,
   squareClass:
     [ZeroQL.GraphQLType("Square")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class Square : IFigure
     {
         [ZeroQL.GraphQLName("id")]
@@ -56,7 +56,7 @@
         public Point __TopLeft { get; set; }
 
         [ZeroQL.GraphQLName("topLeft")]
-        public T TopLeft<T>(Func<Point, T> selector = default !)
+        public T TopLeft<T>(Func<Point, T> selector = default!)
         {
             return __TopLeft is null ? throw new NullReferenceException("TopLeft is null but it should not be null. Schema can be outdated.") : selector(__TopLeft);
         }
@@ -66,7 +66,7 @@
         public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLName("bottomRight")]
-        public T BottomRight<T>(Func<Point, T> selector = default !)
+        public T BottomRight<T>(Func<Point, T> selector = default!)
         {
             return __BottomRight is null ? throw new NullReferenceException("BottomRight is null but it should not be null. Schema can be outdated.") : selector(__BottomRight);
         }
@@ -80,7 +80,7 @@
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T Creator<T>(Func<IUser, T> selector = default !)
+        public T Creator<T>(Func<IUser, T> selector = default!)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
@@ -88,7 +88,7 @@
 ,
   circleClass:
     [ZeroQL.GraphQLType("Circle")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class Circle : IFigure
     {
         [ZeroQL.GraphQLName("id")]
@@ -100,7 +100,7 @@
         public Point __Center { get; set; }
 
         [ZeroQL.GraphQLName("center")]
-        public T Center<T>(Func<Point, T> selector = default !)
+        public T Center<T>(Func<Point, T> selector = default!)
         {
             return __Center is null ? throw new NullReferenceException("Center is null but it should not be null. Schema can be outdated.") : selector(__Center);
         }
@@ -118,7 +118,7 @@
         public User __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T Creator<T>(Func<User, T> selector = default !)
+        public T Creator<T>(Func<User, T> selector = default!)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
@@ -129,7 +129,7 @@
         IUser IFigure.__Creator { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        T IFigure.Creator<T>(Func<IUser, T> selector = default !)
+        T IFigure.Creator<T>(Func<IUser, T> selector = default!)
             where T : default
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
@@ -138,7 +138,7 @@
 ,
   point:
     [ZeroQL.GraphQLType("Point")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class Point : IFigure
     {
         [ZeroQL.GraphQLName("id")]
@@ -167,7 +167,7 @@
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T Creator<T>(Func<IUser, T> selector = default !)
+        public T Creator<T>(Func<IUser, T> selector = default!)
         {
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
@@ -181,17 +181,25 @@
             "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
             "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
             "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
-            _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)};
+            _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)
+        };
     }
 ,
   initializers:
+
     internal static class JsonConvertersInitializers
     {
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {
+#if NET8_0
+                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
+#endif
+
+
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.IFigure)] = new ZeroQLIFigureConverter();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.IUser)] = new ZeroQLIUserConverter();
+
         }
     }
 

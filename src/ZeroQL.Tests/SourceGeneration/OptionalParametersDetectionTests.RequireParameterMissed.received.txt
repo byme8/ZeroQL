@@ -1,0 +1,73 @@
+﻿[
+  {
+    Id: CS0534,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: 'ZeroQLJsonSerializationContext' does not implement inherited abstract member 'JsonSerializerContext.GeneratedSerializerOptions.get'
+  },
+  {
+    Id: CS0534,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: 'ZeroQLJsonSerializationContext' does not implement inherited abstract member 'JsonSerializerContext.GetTypeInfo(Type)'
+  },
+  {
+    Id: CS7036,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: There is no argument given that corresponds to the required parameter 'options' of 'JsonSerializerContext.JsonSerializerContext(JsonSerializerOptions?)'
+  },
+  {
+    Id: CS0534,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: 'ZeroQLJsonSerializationContext' does not implement inherited abstract member 'JsonSerializerContext.GeneratedSerializerOptions.get'
+  },
+  {
+    Id: CS0534,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: 'ZeroQLJsonSerializationContext' does not implement inherited abstract member 'JsonSerializerContext.GetTypeInfo(Type)'
+  },
+  {
+    Id: CS7036,
+    Highlighted:
+[global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Query))]
+            [global:System.Text.Json.Serialization.Metadata.JsonSerializable(typeof(Mutation))]
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {
+                
+            },
+    Message: There is no argument given that corresponds to the required parameter 'options' of 'JsonSerializerContext.JsonSerializerContext(JsonSerializerOptions?)'
+  },
+  {
+    Id: ZQL0014,
+    Highlighted: UsersIds,
+    Message: Query 'UsersIds' requires parameter 'page'.
+  }
+]

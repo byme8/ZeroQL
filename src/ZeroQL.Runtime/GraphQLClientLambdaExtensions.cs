@@ -35,7 +35,7 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Query<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         string name,
-        Func<TQuery?, TResult> query,
+        Func<TQuery, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
@@ -85,7 +85,7 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Mutation<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         string name,
-        Func<TMutation?, TResult> query,
+        Func<TMutation, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {

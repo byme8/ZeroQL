@@ -1,17 +1,16 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
 using ZeroQL.Schema;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace ZeroQL.Bootstrap.Generators;
 
 public static class JsonGenerators
 {
-    public static ClassDeclarationSyntax GenerateJsonInitializers(
+    public static string GenerateJsonInitializers(
         this GraphQlGeneratorOptions options,
+        string? queryType,
+        string? mutationType,
         IReadOnlyCollection<ScalarDefinition> customScalars,
         IReadOnlyCollection<EnumDefinition> enums,
         IReadOnlyCollection<InterfaceDefinition> interfaces)
@@ -26,20 +25,30 @@ public static class JsonGenerators
                 [global::System.Runtime.CompilerServices.ModuleInitializer]
                 public static void Init()
                 {{
+            #if NET8_0
+                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
+            #endif 
                     {customScalarInitializers}
                     {enumInitializers}
                     {interfaceInitializers}
                 }} 
             }}
-            ";
 
-        var classDeclarationSyntax = ParseSyntaxTree(source)
-            .GetRoot()
-            .DescendantNodes()
-            .OfType<ClassDeclarationSyntax>()
-            .First();
+            #if NET8_0
+            {(!string.IsNullOrEmpty(queryType)
+                ? $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({queryType}))]"
+                : string.Empty)}
+            {(!string.IsNullOrEmpty(mutationType)
+                ? $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({mutationType}))]"
+                : string.Empty)}
+            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+            {{
+                
+            }}
+            #endif
+        ";
 
-        return classDeclarationSyntax;
+        return source;
     }
 
     private static StringBuilder InterfaceInitializers(

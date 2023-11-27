@@ -10,17 +10,8 @@ public interface IHttpHandler : IDisposable
     public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken);
 }
 
-public class HttpHandler : IHttpHandler
+public class HttpHandler(HttpClient client, bool disposeClient = false) : IHttpHandler
 {
-    private readonly HttpClient client;
-    private readonly bool disposeClient;
-    
-    public HttpHandler(HttpClient client, bool disposeClient = false)
-    {
-        this.client = client;
-        this.disposeClient = disposeClient;
-    }
-
     public void Dispose()
     {
         if (disposeClient)

@@ -1,13 +1,13 @@
 ﻿{
   postContentUnionInterface:
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public interface PostContent : global::ZeroQL.IUnionType
     {
     }
 ,
   textContentClass:
     [ZeroQL.GraphQLType("TextContent")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class TextContent : PostContent
     {
         [ZeroQL.GraphQLName("text")]
@@ -17,7 +17,7 @@
 ,
   imageClass:
     [ZeroQL.GraphQLType("ImageContent")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     public class ImageContent : PostContent
     {
         [ZeroQL.GraphQLName("imageUrl")]
@@ -36,16 +36,24 @@
         {
             "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
             "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
-            _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)};
+            _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)
+        };
     }
 ,
   initializers:
+
     internal static class JsonConvertersInitializers
     {
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         public static void Init()
         {
+#if NET8_0
+                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
+#endif
+
+
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.PostContent)] = new ZeroQLPostContentConverter();
+
         }
     }
 

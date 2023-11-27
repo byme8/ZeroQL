@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -16,6 +17,8 @@ public interface IGraphQLClient
 
     IGraphQLQueryPipeline QueryPipeline { get; }
 
+    IZeroQLSerializer Serialization { get; set; }
+
     Task<GraphQLResult<TResult>> Execute<TVariables, TOperationType, TResult>(
         TVariables? variables,
         Func<TVariables?, TOperationType, TResult?> queryMapper,
@@ -23,24 +26,30 @@ public interface IGraphQLClient
         CancellationToken cancellationToken = default);
 }
 
-public class ClientOperations
+public class ClientOperations(
+    Dictionary<string, QueryInfo>? queries,
+    Dictionary<string, QueryInfo>? mutations)
 {
-    public ClientOperations(
-        Dictionary<string, QueryInfo>? queries,
-        Dictionary<string, QueryInfo>? mutations)
-    {
-        Queries = queries;
-        Mutations = mutations;
-    }
+    public Dictionary<string, QueryInfo>? Queries { get; } = queries;
+    public Dictionary<string, QueryInfo>? Mutations { get; } = mutations;
+}
 
-    public Dictionary<string, QueryInfo>? Queries { get; }
-    public Dictionary<string, QueryInfo>? Mutations { get; }
+public enum PipelineType
+{
+    Full,
+    PersistedManual,
+    PersistedAuto,
+}
 
-    public void Deconstruct(out Dictionary<string, QueryInfo>? queries, out Dictionary<string, QueryInfo>? mutations)
-    {
-        queries = Queries;
-        mutations = Mutations;
-    }
+public interface IZeroQLSerializer
+{
+    byte[] Serialize<T>(T value);
+
+    Task Serialize<T>(Stream stream, T value, CancellationToken cancellationToken = default);
+
+    T? Deserialize<T>(byte[] bytes);
+
+    Task<T?> Deserialize<T>(Stream stream, CancellationToken cancellationToken = default);
 }
 
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
@@ -50,17 +59,31 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
         return new ClientOperations(GraphQLQueryStore<TQuery>.Query, GraphQLQueryStore<TMutation>.Query);
     }
 
-    public GraphQLClient(HttpClient httpClient, IGraphQLQueryPipeline? queryPipeline = null)
+    public GraphQLClient(
+        HttpClient httpClient,
+        IZeroQLSerializer serializer,
+        PipelineType pipelineType = PipelineType.Full)
+        : this(new HttpHandler(httpClient), serializer, pipelineType)
     {
-        HttpHandler = new HttpHandler(httpClient);
-        QueryPipeline = queryPipeline ?? new FullQueryPipeline();
     }
 
-    public GraphQLClient(IHttpHandler httpClient, IGraphQLQueryPipeline? queryPipeline = null)
+    public GraphQLClient(
+        IHttpHandler httpClient,
+        IZeroQLSerializer serializer,
+        PipelineType pipelineType = PipelineType.Full)
     {
         HttpHandler = httpClient;
-        QueryPipeline = queryPipeline ?? new FullQueryPipeline();
+        Serialization = serializer;
+        QueryPipeline = pipelineType switch
+        {
+            PipelineType.Full => new FullQueryPipeline(Serialization),
+            PipelineType.PersistedManual => new PersistedQueryPipeline(Serialization, false),
+            PipelineType.PersistedAuto => new PersistedQueryPipeline(Serialization),
+            _ => throw new ArgumentOutOfRangeException(nameof(pipelineType))
+        };
     }
+
+    public IZeroQLSerializer Serialization { get; set; }
 
     public IHttpHandler HttpHandler { get; }
 

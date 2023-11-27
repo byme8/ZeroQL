@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using HotChocolate.Language.Utilities;
 using HotChocolate.Utilities.Introspection;
 using ZeroQL.CLI.Commands;
 
@@ -16,7 +17,8 @@ public static class DownloadHelper
     {
         var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
         await using var stream = File.OpenWrite(output);
-        await IntrospectionClient.Default.DownloadSchemaAsync(client, stream, cancellationToken);
+        var document = await IntrospectionClient.IntrospectServerAsync(client,  cancellationToken);
+        await document.PrintToAsync(stream, cancellationToken: cancellationToken, indented: true);
     }
 
     private static HttpClient CreateHttpClient(
