@@ -1,0 +1,13 @@
+﻿{
+  Query: mutation { doError},
+  Errors: [
+    {
+      Message: Error,
+      Extensions: {
+        message: {
+          ValueKind: String
+        }
+      }
+    }
+  ]
+}

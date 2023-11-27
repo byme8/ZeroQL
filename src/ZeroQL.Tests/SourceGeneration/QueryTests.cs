@@ -303,16 +303,11 @@ public class QueryTests : IntegrationTest
     public async Task SupportsExtensionsInsideError()
     {
         var csharpQuery = "Mutation(static m => m.DoError)";
-        var graphqlQuery = @"mutation { doError}";
-
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
-        var response = await project.Validate(graphqlQuery, false);
-
-        var value = response.Errors!.First().Extensions!.First();
-        value.Key.Should().Be("message");
-        value.Value.ToString().Should().Be("This is an error");
+        var response = await project.Execute();
+        await Verify(response);
     }
     
     [Fact]
@@ -430,6 +425,26 @@ public class QueryTests : IntegrationTest
             response,
             response2
         });
+    }
+    
+    [Fact]
+    public async Task QueryDataIsReturnedWhenErrorHappens()
+    {
+        var csharpQuery = """
+                          var response = await qlClient.Query(q => q
+                            .ContainerWithoutError(o => new
+                                {
+                                    o.Value,
+                                    Error = o.ContainerWithError(oo => oo.Value)
+                                }));
+                          """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
     }
 
     [Fact]

@@ -86,13 +86,14 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
             CancellationToken = cancellationToken
         };
         var result = await queryRunner.Invoke(context);
-        if (result.Errors?.Any() ?? false)
+
+        if (result.Data is null)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
         }
-
-        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data!), result.Errors,
-            result.Extensions);
+        
+        var mappedData = queryMapper(variables, result.Data);
+        return new GraphQLResult<TResult>(result.Query, mappedData, result.Errors, result.Extensions);
     }
 
     public void Dispose()

@@ -71,20 +71,11 @@ namespace ZeroQL.TestApp
                 };
             }
 
-            if (qlResponse.Errors?.Length > 0)
-            {
-                return new GraphQLResult<global::GraphQL.TestServer.Mutation>
-                {
-                    Query = qlResponse.Query,
-                    Errors = qlResponse.Errors,
-                    Extensions = qlResponse.Extensions
-                };
-            }
-
             return new GraphQLResult<global::GraphQL.TestServer.Mutation>
             {
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
+                Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,
                 Extensions = qlResponse.Extensions
             };
         }
