@@ -118,7 +118,7 @@ public class CustomSchemaParseTests
         var circleClass = syntaxTree.GetClass("Circle")?.ToFullString();
         var point = syntaxTree.GetClass("Point")?.ToFullString();
         var converter = syntaxTree.GetClass("ZeroQLIFigureConverter")?.ToFullString();
-        var initializers = syntaxTree.GetClass("JsonConvertersInitializers")?.ToFullString();
+        var initializers = syntaxTree.GetClass("GraphQLClientJsonInitializer")?.ToFullString();
 
         await Verify(new
         {
@@ -163,7 +163,7 @@ public class CustomSchemaParseTests
         var textContentClass = syntaxTree.GetClass("TextContent")?.ToFullString();
         var imageClass = syntaxTree.GetClass("ImageContent")?.ToFullString();
         var converter = syntaxTree.GetClass("ZeroQLPostContentConverter")?.ToFullString();
-        var initializers = syntaxTree.GetClass("JsonConvertersInitializers")?.ToFullString();
+        var initializers = syntaxTree.GetClass("GraphQLClientJsonInitializer")?.ToFullString();
 
         await Verify(new
         {

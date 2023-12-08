@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.CodeAnalysis.Host.Mef;
 using ZeroQL.Bootstrap.Generators;
 using ZeroQL.Core.Enums;
 using ZeroQL.Extensions;
@@ -75,19 +76,29 @@ public static class GraphQLGenerator
 
         AddUnions(schema, interfaces, types);
 
-        var clientDeclaration = new[] { options.GenerateClient(queryType, mutationType) };
+        var clientDeclaration = options.GenerateClient(queryType, mutationType);
         var typesDeclaration = options.GenerateTypes(types, queryType, mutationType);
         var interfacesDeclaration = options.GenerateInterfaces(interfaces);
         var inputsDeclaration = options.GenerateInputs(inputs);
         var enumsDeclaration = GenerateEnums(options, enums);
         var scalarDeclaration = options.GenerateScalars(customScalars);
-        var jsonInitializers =
-            options.GenerateJsonInitializers(queryType, mutationType, customScalars, enums, interfaces.Values);
-        var interfaceInitializers = interfaces.GenerateInterfaceInitializers(types);
+        var (interfaceInitializers, interfacesForSerialization) = interfaces.GenerateInterfaceInitializers(options, types);
 
+        var typesForJsonContext = interfacesForSerialization
+            .Concat(new []
+            {
+                "ZeroQL.Internal.GraphQLRequest",
+                $"ZeroQL.GraphQLResponse<{queryType}>",
+                $"ZeroQL.GraphQLResponse<{mutationType}>",
+                "Dictionary<string, object>"
+            })
+            .ToArray();
+        
+        var jsonInitializers = options
+            .GenerateJsonInitializers(customScalars, enums, interfaces.Values, typesForJsonContext);
         var members = new[]
         {
-            clientDeclaration.Select(o => o.NormalizeWhitespace().ToFullString()),
+            new[] { clientDeclaration },
             typesDeclaration.Select(o => o.NormalizeWhitespace().ToFullString()),
             interfacesDeclaration.Select(o => o.NormalizeWhitespace().ToFullString()),
             inputsDeclaration.Select(o => o.NormalizeWhitespace().ToFullString()),
@@ -108,6 +119,7 @@ public static class GraphQLGenerator
                                       namespace {{options.ClientNamespace}}
                                       {
                                         using System;
+                                        using System.Collections.Generic;
                                         using System.Linq;
                                         using System.Text.Json.Serialization;
                                         using System.Text.Json.Nodes;

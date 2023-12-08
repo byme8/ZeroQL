@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -39,17 +38,6 @@ public enum PipelineType
     Full,
     PersistedManual,
     PersistedAuto,
-}
-
-public interface IZeroQLSerializer
-{
-    byte[] Serialize<T>(T value);
-
-    Task Serialize<T>(Stream stream, T value, CancellationToken cancellationToken = default);
-
-    T? Deserialize<T>(byte[] bytes);
-
-    Task<T?> Deserialize<T>(Stream stream, CancellationToken cancellationToken = default);
 }
 
 public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
@@ -109,13 +97,14 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
             CancellationToken = cancellationToken
         };
         var result = await queryRunner.Invoke(context);
-        if (result.Errors?.Any() ?? false)
+
+        if (result.Data is null)
         {
             return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
         }
-
-        return new GraphQLResult<TResult>(result.Query, queryMapper(variables, result.Data!), result.Errors,
-            result.Extensions);
+        
+        var mappedData = queryMapper(variables, result.Data);
+        return new GraphQLResult<TResult>(result.Query, mappedData, result.Errors, result.Extensions);
     }
 
     public void Dispose()

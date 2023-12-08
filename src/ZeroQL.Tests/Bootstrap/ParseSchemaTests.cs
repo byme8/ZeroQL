@@ -250,7 +250,7 @@ public class ParseSchemaTests
     [Fact]
     public void EnumJsonConvertersGenerated()
     {
-        var initializer = SyntaxTree.GetClass("JsonConvertersInitializers")!;
+        var initializer = SyntaxTree.GetClass("TestAppJsonInitializer")!;
 
         initializer.Should().NotBeNull();
     }

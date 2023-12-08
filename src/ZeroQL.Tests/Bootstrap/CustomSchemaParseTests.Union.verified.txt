@@ -30,31 +30,47 @@
     }
 ,
   converter:
-    internal class ZeroQLPostContentConverter : InterfaceJsonConverter<PostContent?>
+    internal class ZeroQLPostContentConverter(JsonSerializerOptions options) : InterfaceJsonConverter<PostContent?>
     {
         public override PostContent? Deserialize(string typeName, JsonObject json) => typeName switch
         {
-            "ImageContent" => json.Deserialize<ImageContent>(ZeroQLJsonOptions.Options),
-            "TextContent" => json.Deserialize<TextContent>(ZeroQLJsonOptions.Options),
-            _ => json.Deserialize<PostContentStub>(ZeroQLJsonOptions.Options)
+            "ImageContent" => json.Deserialize<ImageContent>(options),
+            "TextContent" => json.Deserialize<TextContent>(options),
+            _ => json.Deserialize<PostContentStub>(options)
         };
     }
 ,
   initializers:
-
-    internal static class JsonConvertersInitializers
+    internal static class GraphQLClientJsonInitializer
     {
-        [global::System.Runtime.CompilerServices.ModuleInitializer]
-        public static void Init()
+        public static IZeroQLSerializer Configure(Action<JsonSerializerOptions> optionsFactory)
         {
-#if NET8_0
-                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
-#endif
+            var options = CreateOptions();
+            optionsFactory(options);
 
-
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.PostContent)] = new ZeroQLPostContentConverter();
-
+            return new ZeroQLSystemJsonSerializer(options);
         }
+
+        public static IZeroQLSerializer CreateSerializer(JsonSerializerOptions? options = null)
+        {
+            return new ZeroQLSystemJsonSerializer(options ?? CreateOptions());
+        }
+
+        public static JsonSerializerOptions CreateOptions()
+        {
+            var options = ZeroQLJsonOptions.Create();
+            options.TypeInfoResolver = new ZeroQLJsonSerializationContext();
+            var converters = new Dictionary<Type, JsonConverter>
+            {
+
+
+                { typeof(global::TestApp.PostContent), new ZeroQLPostContentConverter(options) },
+            };
+
+            options.Converters.Insert(0, new ZeroQLConverter(converters));
+            return options;
+        }
+
     }
 
 }

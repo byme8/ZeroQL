@@ -22,7 +22,7 @@ public class PersistentQueryTest
                 ),
                 (
                     "var qlClient = new TestServerClient(httpClient);",
-                    "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline());"
+                    "var qlClient = new TestServerClient(httpClient, pipelineType: PipelineType.PersistedAuto);"
                 ));
 
         await project.Validate(query);
@@ -44,7 +44,7 @@ public class PersistentQueryTest
                 ),
                 (
                     "var qlClient = new TestServerClient(httpClient);",
-                    "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline(false));"
+                    "var qlClient = new TestServerClient(httpClient, pipelineType: PipelineType.PersistedManual);"
                 ));
 
         var result = await project.Validate(query, false);
@@ -72,7 +72,7 @@ public class PersistentQueryTest
                 ),
                 (
                     "var qlClient = new TestServerClient(httpClient);",
-                    "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline(false));"
+                    "var qlClient = new TestServerClient(httpClient, pipelineType: PipelineType.PersistedManual);"
                 ));
 
         await project.Validate(query);

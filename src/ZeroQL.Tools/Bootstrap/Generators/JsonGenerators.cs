@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ZeroQL.Extensions;
 using ZeroQL.Schema;
@@ -7,51 +8,66 @@ namespace ZeroQL.Bootstrap.Generators;
 
 public static class JsonGenerators
 {
-    public static string GenerateJsonInitializers(
-        this GraphQlGeneratorOptions options,
-        string? queryType,
-        string? mutationType,
+    public static string GenerateJsonInitializers(this GraphQlGeneratorOptions options,
         IReadOnlyCollection<ScalarDefinition> customScalars,
         IReadOnlyCollection<EnumDefinition> enums,
-        IReadOnlyCollection<InterfaceDefinition> interfaces)
+        IReadOnlyCollection<InterfaceDefinition> interfaces, 
+        string[] typesForJsonContext)
     {
         var customScalarInitializers = CustomScalarInitializers(options, customScalars);
         var enumInitializers = EnumInitializers(options, enums);
         var interfaceInitializers = InterfaceInitializers(options, interfaces);
 
-        var source = @$"
-            internal static class JsonConvertersInitializers
-            {{
-                [global::System.Runtime.CompilerServices.ModuleInitializer]
-                public static void Init()
-                {{
-            #if NET8_0
-                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
-            #endif 
-                    {customScalarInitializers}
-                    {enumInitializers}
-                    {interfaceInitializers}
-                }} 
-            }}
-
-            #if NET8_0
-            {(!string.IsNullOrEmpty(queryType)
-                ? $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({queryType}))]"
-                : string.Empty)}
-            {(!string.IsNullOrEmpty(mutationType)
-                ? $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({mutationType}))]"
-                : string.Empty)}
-            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
-            {{
-                
-            }}
-            #endif
-        ";
+        var source = $$"""
+                           internal static class {{options.JsonInitializerName}}
+                           {
+                               public static IZeroQLSerializer Configure(Action<JsonSerializerOptions> optionsFactory)
+                               {
+                                   var options = CreateOptions();
+                                   optionsFactory(options);
+                       
+                                   return new ZeroQLSystemJsonSerializer(options);
+                               }
+                       
+                               public static IZeroQLSerializer CreateSerializer(JsonSerializerOptions? options = null)
+                               {
+                                   return new ZeroQLSystemJsonSerializer(options ?? CreateOptions());
+                               }
+                       
+                               public static JsonSerializerOptions CreateOptions()
+                               {
+                                   var options = ZeroQLJsonOptions.Create();
+                                   options.TypeInfoResolver = new ZeroQLJsonSerializationContext();
+                                   var converters = new Dictionary<Type, JsonConverter>
+                                   {
+                       {{customScalarInitializers.SpaceLeft(4)}}
+                       {{enumInitializers.SpaceLeft(4)}}
+                       {{interfaceInitializers.SpaceLeft(4)}}
+                                   };
+                       
+                                   options.Converters.Insert(0, new ZeroQLConverter(converters));
+                                   return options;
+                               }
+                              
+                           }
+                       
+                           #if NET8_0
+                       {{typesForJsonContext
+                               .Select(o => $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({o}))]")
+                               .JoinWithNewLine()
+                               .SpaceLeft(2)
+                       }}
+                           internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
+                           {
+                               
+                           }
+                           #endif
+                       """;
 
         return source;
     }
 
-    private static StringBuilder InterfaceInitializers(
+    private static string InterfaceInitializers(
         GraphQlGeneratorOptions options,
         IReadOnlyCollection<InterfaceDefinition> interfaces)
     {
@@ -59,14 +75,13 @@ public static class JsonGenerators
         foreach (var interfaceDefinition in interfaces)
         {
             var typeName = options.GetDefinitionFullTypeName(interfaceDefinition);
-            sb.AppendLine(
-                $"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({typeName})] = new ZeroQL{interfaceDefinition.Name}Converter();");
+            sb.AppendLine($"{{ typeof({typeName}), new ZeroQL{interfaceDefinition.Name}Converter(options) }},");
         }
 
-        return sb;
+        return sb.ToString();
     }
 
-    private static StringBuilder CustomScalarInitializers(
+    private static string CustomScalarInitializers(
         GraphQlGeneratorOptions options,
         IReadOnlyCollection<ScalarDefinition> customScalars)
     {
@@ -74,53 +89,47 @@ public static class JsonGenerators
         foreach (var scalar in customScalars)
         {
             var fullTypeName = options.GetDefinitionFullTypeName(scalar);
-            sb.AppendLine(
-                $"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({fullTypeName})] = new ZeroQLScalarJsonConverter<{fullTypeName}>();");
+            sb.AppendLine($"{{ typeof({fullTypeName}), new ZeroQLScalarJsonConverter<{fullTypeName}>() }},");
         }
 
-        return sb;
+        return sb.ToString();
     }
 
-    private static StringBuilder EnumInitializers(
+    private static string EnumInitializers(
         GraphQlGeneratorOptions options,
         IReadOnlyCollection<EnumDefinition> enums)
     {
-        var enumInitializers = new StringBuilder();
-        foreach (var @enum in enums)
-        {
-            var enumName = options.GetDefinitionFullTypeName(@enum);
-            enumInitializers.AppendLine(
-                @$"global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof({enumName})] =");
-            enumInitializers.AppendLine(@$"
-                new global::ZeroQL.Json.ZeroQLEnumConverter<{enumName}>(
-                    new global::System.Collections.Generic.Dictionary<string, {enumName}>
-                    {{");
-
-            if (@enum.Values is not null)
+        var enumInitializers = enums
+            .Select(o =>
             {
-                foreach (var value in @enum.Values)
-                {
-                    enumInitializers.AppendLine(
-                        @$"{{ ""{value}"", {enumName}.{value.ToPascalCase()} }}, ");
-                }
-            }
+                var enumName = options.GetDefinitionFullTypeName(o);
+                var textToEnum = o.Values?
+                    .Select(v => $$"""{ "{{v}}", {{enumName}}.{{v.ToPascalCase()}} },""")
+                    .JoinWithNewLine()
+                    .SpaceLeft(3);
 
-            enumInitializers.AppendLine(@$"
-                }},
-                new global::System.Collections.Generic.Dictionary<{enumName}, string>
-                {{");
+                var enumToText = o.Values?
+                    .Select(v => $$"""{ {{enumName}}.{{v.ToPascalCase()}}, "{{v}}" },""")
+                    .JoinWithNewLine()
+                    .SpaceLeft(3);
 
-            if (@enum.Values is not null)
-            {
-                foreach (var value in @enum.Values)
-                {
-                    enumInitializers.AppendLine(
-                        @$"{{ {enumName}.{value.ToPascalCase()}, ""{value}"" }},");
-                }
-            }
-
-            enumInitializers.AppendLine("});");
-        }
+                return $$"""
+                         {
+                            typeof({{enumName}}),
+                            new global::ZeroQL.Json.ZeroQLEnumConverter<{{enumName}}>(
+                                new global::System.Collections.Generic.Dictionary<string, {{enumName}}>
+                                {
+                         {{textToEnum}}
+                                },
+                                new global::System.Collections.Generic.Dictionary<{{enumName}}, string>
+                                {
+                         {{enumToText}}
+                                }
+                            )
+                          },
+                         """;
+            })
+            .JoinWithNewLine();
 
         return enumInitializers;
     }

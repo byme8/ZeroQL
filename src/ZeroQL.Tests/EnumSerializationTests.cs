@@ -7,9 +7,12 @@ namespace ZeroQL.Tests;
 
 public class EnumSerializationTests
 {
+    private readonly JsonSerializerOptions options;
+
     public EnumSerializationTests()
     {
-        ZeroQLJsonSerializersStore.Converters[typeof(Kinds)] =
+        options = ZeroQLJsonOptions.Create();
+        options.Converters.Add(
             new ZeroQLEnumConverter<Kinds>(
                 new Dictionary<string, Kinds>
                 {
@@ -24,7 +27,7 @@ public class EnumSerializationTests
                     { Kinds.SuperGood, "SUPER_GOOD" },
                     { Kinds.Bad, "BAD" },
                     { Kinds.Bad1, "BAD1" },
-                });
+                }));
     }
 
     public static IEnumerable<object[]> SerializationData =>
@@ -40,7 +43,7 @@ public class EnumSerializationTests
     [MemberData(nameof(SerializationData))]
     public void SerializationWorks(EnumContainer container, string expected)
     {
-        var json = JsonSerializer.Serialize(container, ZeroQLJsonOptions.Options);
+        var json = JsonSerializer.Serialize(container, options);
         json.Should().Be(expected);
     }
 
@@ -57,7 +60,7 @@ public class EnumSerializationTests
     [MemberData(nameof(DeserializationData))]
     public void DeserializationWorks(string json, EnumContainer expected)
     {
-        var value = JsonSerializer.Deserialize<EnumContainer>(json, ZeroQLJsonOptions.Options);
+        var value = JsonSerializer.Deserialize<EnumContainer>(json, options);
         value.Should().Be(expected);
     }
 

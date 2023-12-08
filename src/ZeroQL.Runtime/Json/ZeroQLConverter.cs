@@ -11,6 +11,6 @@ public class ZeroQLConverter(Dictionary<Type, JsonConverter> converters) : JsonC
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        return converters.GetValueOrDefault(typeToConvert);
+        return converters.TryGetValue(typeToConvert, out var converter) ? converter : null;
     }
 }

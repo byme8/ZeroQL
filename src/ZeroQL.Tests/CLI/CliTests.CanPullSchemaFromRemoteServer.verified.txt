@@ -43,6 +43,7 @@ type Query {
   jsonUsersDocument: JsonDocument!
   int(int: Int!): Int!
   object(object: Int!): Int!
+  containerWithoutError: ContainerWithoutError
 }
 
 type Mutation {
@@ -276,6 +277,15 @@ type JsonDocument {
 }
 
 scalar uuid
+
+type ContainerWithoutError {
+  value: String!
+  containerWithError: ContainerWithError
+}
+
+type ContainerWithError {
+  value: String!
+}
 
 interface IPerson {
   id: Int!

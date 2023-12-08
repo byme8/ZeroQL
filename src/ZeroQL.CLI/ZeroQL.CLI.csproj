@@ -2,14 +2,14 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>ZeroQL.Cli</PackageId>
         <PackAsTool>true</PackAsTool>
         <Description>The ZeroQL CLI to generate C# classes from *.graphql files.</Description>
         <AssemblyName>zeroql</AssemblyName>
-        <LangVersion>Latest</LangVersion>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

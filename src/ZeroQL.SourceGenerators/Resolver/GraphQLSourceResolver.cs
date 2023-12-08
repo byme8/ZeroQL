@@ -68,20 +68,11 @@ namespace {semanticModel.Compilation.Assembly.Name}
                 }};
             }}
 
-            if (qlResponse.Errors?.Length > 0)
-            {{
-                return new GraphQLResult<{context.QueryTypeName}>
-                {{
-                    Query = qlResponse.Query,
-                    Errors = qlResponse.Errors,
-                    Extensions = qlResponse.Extensions
-                }};
-            }}
-
             return new GraphQLResult<{context.QueryTypeName}>
             {{
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
+                Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,
                 Extensions = qlResponse.Extensions
             }};
         }}

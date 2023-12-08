@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
 using ZeroQL.Internal;
@@ -44,8 +43,9 @@ public static class InterfaceGenerator
         return csharpDefinitions;
     }
     
-    public static ClassDeclarationSyntax[] GenerateInterfaceInitializers(
+    public static (ClassDeclarationSyntax[] Converters, string[] TypesForSerialization) GenerateInterfaceInitializers(
         this Dictionary<string, InterfaceDefinition> interfaces,
+        GraphQlGeneratorOptions options,
         ClassDefinition[] types)
     {
         var typesByInterface = types
@@ -66,22 +66,26 @@ public static class InterfaceGenerator
 
         if (!typesByInterface.Any())
         {
-            return Array.Empty<ClassDeclarationSyntax>();
+            return (Array.Empty<ClassDeclarationSyntax>(), Array.Empty<string>());
         }
 
+        var typesToReturn = new List<string>();
         var classes = typesByInterface.Select(group =>
             {
                 var typeName = group.Key;
+                var typeStubName = typeName + "Stub";
+                typesToReturn.Add(typeStubName);
+                typesToReturn.AddRange(group.Value.Select(o => o.Type.Name));
                 var source = $$"""
-                    internal class ZeroQL{{typeName}}Converter : InterfaceJsonConverter<{{typeName}}?>
+                    internal class ZeroQL{{typeName}}Converter(JsonSerializerOptions options) : InterfaceJsonConverter<{{typeName}}?>
                     {
                         public override {{typeName}}? Deserialize(string typeName, JsonObject json) =>
                             typeName switch
                             {
                                 {{group.Value
-                                    .Select(o => $@"""{o.Type.Name}"" => json.Deserialize<{o.Type.Name}>(ZeroQLJsonOptions.Options),")
+                                    .Select(o => $@"""{o.Type.Name}"" => json.Deserialize<{o.Type.Name}>(options),")
                                     .JoinWithNewLine()}}
-                                _ => json.Deserialize<{{typeName}}Stub>(ZeroQLJsonOptions.Options)
+                                _ => json.Deserialize<{{typeStubName}}>(options)
                             };
                     }
 
@@ -97,7 +101,7 @@ public static class InterfaceGenerator
             .OfType<ClassDeclarationSyntax>()
             .ToArray();
 
-        return syntaxTree;
+        return (syntaxTree, typesToReturn.ToArray());
     }
 
 }

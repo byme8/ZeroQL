@@ -23,6 +23,7 @@
   T JsonUsersDocument<T>(Func<JsonDocument, T> selector = default!),
   int Int([ZeroQL.GraphQLType("Int!")] int @int = default!),
   int Object([ZeroQL.GraphQLType("Int!")] int @object = default!),
+  T? ContainerWithoutError<T>(Func<ContainerWithoutError, T> selector = default!),
   int LongOperation,
   global::ZeroQL.Instant Instant,
   global::GraphQLClient.ZonedDateTime ZonedDateTime,

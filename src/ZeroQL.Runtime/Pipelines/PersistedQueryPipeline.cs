@@ -71,7 +71,7 @@ public class PersistedQueryPipeline(IZeroQLSerializer serializer, bool tryToAddP
 #endif
 #if !DEBUG
         var responseJson = await response.Content.ReadAsStreamAsync();
-        var qlResponse = await serializer.DeserializeAsync<GraphQLResponse<TQuery>>(responseJson);
+        var qlResponse = await serializer.Deserialize<GraphQLResponse<TQuery>>(responseJson);
 #endif
         return qlResponse!;
     }

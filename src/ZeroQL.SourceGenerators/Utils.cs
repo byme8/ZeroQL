@@ -105,12 +105,6 @@ public static class Utils
         return $"{left}{text}{right}";
     }
 
-    public static string SpaceLeft(this string text, int lenght, int mult = 4)
-    {
-        var spaces = new string(' ', lenght * mult);
-        return $"{spaces}{text}";
-    }
-
     public static string JoinWithNewLine(this IEnumerable<string> values, string separator = "")
     {
         return string.Join($"{separator}{Environment.NewLine}", values);

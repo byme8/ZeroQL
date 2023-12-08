@@ -55,7 +55,9 @@ public class Program
             .AddTypeExtension<RoleGraphQLExtension>()
             .AddTypeExtension<JSONQueryExtensions>()
             .AddTypeExtension<CSharpKeywordsQueryExtensions>()
-            .AddTypeExtension<CustomScalarsMutations>();
+            .AddTypeExtension<CustomScalarsMutations>()
+            .AddTypeExtension<ErrorQuery>()
+            .AddTypeExtension<ErrorQueryWithError>();
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {

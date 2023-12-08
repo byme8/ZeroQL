@@ -31,6 +31,15 @@ type Circle implements IFigure & IEntity {
   creator: Person
 }
 
+type ContainerWithError {
+  value: String!
+}
+
+type ContainerWithoutError {
+  value: String!
+  containerWithError: ContainerWithError
+}
+
 type FigureContent {
   id: Int!
   figure: IFigure!
@@ -138,6 +147,7 @@ type Query {
   jsonUsersDocument: JsonDocument!
   int(int: Int!): Int!
   object(object: Int!): Int!
+  containerWithoutError: ContainerWithoutError
 }
 
 type Role {

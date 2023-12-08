@@ -45,11 +45,11 @@ namespace ZeroQL.TestApp
 
                 var content = new MultipartFormDataContent();
 
-                var queryJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options);
+                var queryJson = qlClient.Serialization.Serialize(queryRequest);
                 content.Add(new StringContent(queryJson), "operations");
 
                 var map = context.Uploads.ToDictionary(o => o.Index,  o => new [] { o.Path });
-                var mapJson = JsonSerializer.Serialize(map, ZeroQLJsonOptions.Options);
+                var mapJson = qlClient.Serialization.Serialize(map);
                 content.Add(new StringContent(mapJson), "map");
                 foreach(var uploadInfo in context.Uploads)
                 {
@@ -71,20 +71,11 @@ namespace ZeroQL.TestApp
                 };
             }
 
-            if (qlResponse.Errors?.Length > 0)
-            {
-                return new GraphQLResult<global::GraphQL.TestServer.Mutation>
-                {
-                    Query = qlResponse.Query,
-                    Errors = qlResponse.Errors,
-                    Extensions = qlResponse.Extensions
-                };
-            }
-
             return new GraphQLResult<global::GraphQL.TestServer.Mutation>
             {
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
+                Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,
                 Extensions = qlResponse.Extensions
             };
         }

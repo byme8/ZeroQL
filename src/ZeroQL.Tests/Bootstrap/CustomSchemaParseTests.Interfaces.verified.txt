@@ -174,33 +174,49 @@
     }
 ,
   converter:
-    internal class ZeroQLIFigureConverter : InterfaceJsonConverter<IFigure?>
+    internal class ZeroQLIFigureConverter(JsonSerializerOptions options) : InterfaceJsonConverter<IFigure?>
     {
         public override IFigure? Deserialize(string typeName, JsonObject json) => typeName switch
         {
-            "Circle" => json.Deserialize<Circle>(ZeroQLJsonOptions.Options),
-            "Point" => json.Deserialize<Point>(ZeroQLJsonOptions.Options),
-            "Square" => json.Deserialize<Square>(ZeroQLJsonOptions.Options),
-            _ => json.Deserialize<IFigureStub>(ZeroQLJsonOptions.Options)
+            "Circle" => json.Deserialize<Circle>(options),
+            "Point" => json.Deserialize<Point>(options),
+            "Square" => json.Deserialize<Square>(options),
+            _ => json.Deserialize<IFigureStub>(options)
         };
     }
 ,
   initializers:
-
-    internal static class JsonConvertersInitializers
+    internal static class GraphQLClientJsonInitializer
     {
-        [global::System.Runtime.CompilerServices.ModuleInitializer]
-        public static void Init()
+        public static IZeroQLSerializer Configure(Action<JsonSerializerOptions> optionsFactory)
         {
-#if NET8_0
-                    global::ZeroQL.Json.ZeroQLJsonOptions.AddJsonContext(new ZeroQLJsonSerializationContext());
-#endif
+            var options = CreateOptions();
+            optionsFactory(options);
 
-
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.IFigure)] = new ZeroQLIFigureConverter();
-            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::TestApp.IUser)] = new ZeroQLIUserConverter();
-
+            return new ZeroQLSystemJsonSerializer(options);
         }
+
+        public static IZeroQLSerializer CreateSerializer(JsonSerializerOptions? options = null)
+        {
+            return new ZeroQLSystemJsonSerializer(options ?? CreateOptions());
+        }
+
+        public static JsonSerializerOptions CreateOptions()
+        {
+            var options = ZeroQLJsonOptions.Create();
+            options.TypeInfoResolver = new ZeroQLJsonSerializationContext();
+            var converters = new Dictionary<Type, JsonConverter>
+            {
+
+
+                { typeof(global::TestApp.IFigure), new ZeroQLIFigureConverter(options) },
+                { typeof(global::TestApp.IUser), new ZeroQLIUserConverter(options) },
+            };
+
+            options.Converters.Insert(0, new ZeroQLConverter(converters));
+            return options;
+        }
+
     }
 
 }

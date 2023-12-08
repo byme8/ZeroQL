@@ -26,8 +26,7 @@ public class FullQueryPipeline(IZeroQLSerializer serialization) : IGraphQLQueryP
         var response = await httpHandler.SendAsync(request, cancellationToken);
 #if DEBUG
         var responseJson = await response.Content.ReadAsStringAsync();
-        var bytes = System.Text.Encoding.UTF8.GetBytes(responseJson);
-        var qlResponse = serialization.Deserialize<GraphQLResponse<TQuery>>(bytes);
+        var qlResponse = serialization.Deserialize<GraphQLResponse<TQuery>>(responseJson);
 #elif NETSTANDARD
         var responseJson = await response.Content.ReadAsStreamAsync();
         var qlResponse = await serialization.Deserialize<GraphQLResponse<TQuery>>(

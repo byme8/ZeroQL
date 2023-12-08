@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ZeroQL.Bootstrap.Generators;
 using ZeroQL.Core.Enums;
 using ZeroQL.Schema;
 
@@ -25,4 +26,8 @@ public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility V
     
     public string GetDefinitionFullTypeName(string definition)
         => $"global::{definition}";
+    
+    public string JsonInitializerName => $"{GraphQLClientGenerator.ClientName(ClientName)}JsonInitializer";
+    
+    public string ZeroQLJsonSerializationContext => "ZeroQLJsonSerializationContext";
 }

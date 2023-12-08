@@ -40,7 +40,7 @@ namespace ZeroQL.TestApp
             var qlResponse = await qlClient.QueryPipeline.ExecuteAsync<global::GraphQL.TestServer.Query>(qlClient.HttpHandler, context.QueryKey, context.Variables, context.CancellationToken, queryRequest => 
             {
                 
-                var requestJson = JsonSerializer.Serialize(queryRequest, ZeroQLJsonOptions.Options); 
+                var requestJson = qlClient.Serialization.Serialize(queryRequest); 
                 var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
                 return content;
             });
@@ -56,20 +56,11 @@ namespace ZeroQL.TestApp
                 };
             }
 
-            if (qlResponse.Errors?.Length > 0)
-            {
-                return new GraphQLResult<global::GraphQL.TestServer.Query>
-                {
-                    Query = qlResponse.Query,
-                    Errors = qlResponse.Errors,
-                    Extensions = qlResponse.Extensions
-                };
-            }
-
             return new GraphQLResult<global::GraphQL.TestServer.Query>
             {
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
+                Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,
                 Extensions = qlResponse.Extensions
             };
         }
