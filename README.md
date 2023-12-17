@@ -45,7 +45,7 @@ cd QLClient
 # create manifest file to track nuget tools
 dotnet new tool-manifest 
 # add ZeroQL.CLI nuget tool
-dotnet tool install ZeroQL.CLI
+dotnet tool install ZeroQL.CLI # or 'dotnet tool restore' once you pulled the existing repository
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
 # fetch graphql schema from server(creates schema.graphql file)
