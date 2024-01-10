@@ -1,3 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using BuildZeroQL.Client;
+using BuildZeroQL2.Client;
 
-Console.WriteLine("Hello, World!");
+var httpClient = new HttpClient();
+var client = new BuildZeroQLClient(httpClient);
+var client2 = new BuildZeroQLClient2(httpClient);
+
+Console.WriteLine(await client.Query(q => q.Me(o => o.FirstName)));
+Console.WriteLine(await client2.Query(q => q.Me(o => o.FirstName)));

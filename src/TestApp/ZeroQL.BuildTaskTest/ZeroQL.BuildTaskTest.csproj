@@ -5,11 +5,14 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-<!--        <ZeroQLCLIValidation>False</ZeroQLCLIValidation>-->
+        <!--        <ZeroQLCLIValidation>False</ZeroQLCLIValidation>-->
+        <ZeroQLDebug>True</ZeroQLDebug>
     </PropertyGroup>
 
     <ItemGroup>
-<!--      <PackageReference Include="ZeroQL" Version="999.2310.1417.326" />-->
+        <ProjectReference Include="..\..\ZeroQL.MSBuild\ZeroQL.MSBuild.csproj"/>
+        <ProjectReference Include="..\..\ZeroQL.Runtime\ZeroQL.Runtime.csproj"/>
     </ItemGroup>
-    
+
+    <Import Project="..\..\ZeroQL.MSBuild\ZeroQL.props"/>
 </Project>

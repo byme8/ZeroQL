@@ -185,6 +185,16 @@ public class CustomSchemaParseTests
               
             type Query {
               perVariant: Limit!
+              maybePerVariant: Limit
+              perVariants: [Limit!]!
+              maybePerVariants: [Limit!]
+              limit: Container!
+              limits: [Container!]!
+              userIds(limit: Limit!) : [Long!]!
+            }
+
+            type Container {
+              limit: Limit!
             }
 
             type Limit {
@@ -202,7 +212,7 @@ public class CustomSchemaParseTests
             .Select(o => o.Identifier.ValueText)
             .ToArray();
 
-        await Verify(clases);
+        await Verify(syntaxTree.ToString());
     }
 
     [Fact]

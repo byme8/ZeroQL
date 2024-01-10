@@ -45,6 +45,7 @@ type Query {
   jsonUsersDocument: JsonDocument!
   int(int: Int!): Int!
   object(object: Int!): Int!
+  containerWithoutError: ContainerWithoutError
 }
 
 type Mutation {
@@ -82,6 +83,9 @@ type Person implements IPerson {
   firstName: String!
   lastName: String!
 }
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
 
 type TypesContainer {
   text: String!
@@ -192,9 +196,6 @@ type ImageContent {
 
 union PostContent = FigureContent | TextContent | ImageContent
 
-"The `DateTime` scalar represents an ISO-8601 compliant date time type."
-scalar DateTime
-
 "The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
 scalar TimeSpan
 
@@ -275,6 +276,15 @@ scalar JSON
 
 type JsonDocument {
   rootElement: JSON!
+}
+
+type ContainerWithoutError {
+  value: String!
+  containerWithError: ContainerWithError
+}
+
+type ContainerWithError {
+  value: String!
 }
 
 interface IPerson {

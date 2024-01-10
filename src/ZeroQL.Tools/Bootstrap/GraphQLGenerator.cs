@@ -248,9 +248,18 @@ public static class GraphQLGenerator
             .OfType<IdentifierNameSyntax>()
             .ToArray();
         
+        var arrayFromNullable = types
+            .OfType<NullableTypeSyntax>()
+            .Select(o => o.ElementType)
+            .OfType<ArrayTypeSyntax>()
+            .Select(o => o.ElementType)
+            .OfType<IdentifierNameSyntax>()
+            .ToArray();
+        
         var identifies = identifiersFromIdentifiers
             .Concat(identifiersFromArray)
             .Concat(identifiersFromNullable)
+            .Concat(arrayFromNullable)
             .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
             .ToArray();
 

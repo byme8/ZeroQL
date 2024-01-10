@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "zeroql.cli": {
+      "version": "999.2311.510.1958",
+      "commands": [
+        "zeroql"
+      ]
+    }
+  }
+}

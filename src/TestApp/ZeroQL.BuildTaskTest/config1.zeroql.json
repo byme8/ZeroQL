@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/byme8/ZeroQL/main/schema.verified.json",
+  "graphql": "../ZeroQL.TestApp/schema.graphql",
+  "namespace": "BuildZeroQL.Client",
+  "clientName": "BuildZeroQLClient"
+}
