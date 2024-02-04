@@ -92,6 +92,10 @@ type Person implements IPerson {
   lastName: String!
 }
 
+type JsonDocument {
+  rootElement: JSON!
+}
+
 scalar JSON
 
 type Square implements IFigure & IEntity {
@@ -138,10 +142,6 @@ scalar Date
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime
 
-type JsonDocument {
-  rootElement: JSON!
-}
-
 type Role {
   id: Int!
   name: String!
@@ -172,6 +172,7 @@ type User {
   lastName: String!
   userKind: UserKind!
   role: Role
+  loginAttempts: [UserLoginAttempt!]!
 }
 
 input UserFilterInput {
@@ -291,6 +292,11 @@ scalar UUID
 input KeyValuePairOfStringAndStringInput {
   key: String!
   value: String!
+}
+
+type UserLoginAttempt {
+  time: DateTime!
+  success: Boolean!
 }
 
 type KeyValuePairOfStringAndString {

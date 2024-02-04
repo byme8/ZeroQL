@@ -211,6 +211,12 @@ type User {
   lastName: String!
   userKind: UserKind!
   role: Role
+  loginAttempts: [UserLoginAttempt!]!
+}
+
+type UserLoginAttempt {
+  time: DateTime!
+  success: Boolean!
 }
 
 type lower_case_type_name {

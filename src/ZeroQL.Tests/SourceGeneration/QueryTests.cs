@@ -320,15 +320,15 @@ public class QueryTests : IntegrationTest
         var response = await project.Execute();
         await Verify(response);
     }
-    
+
     [Fact]
     public async Task SupportsOptionalArguments()
     {
         var csharpQuery = """
-                var page = 0;
-                var filter = "test"; 
-                var response = await qlClient.Query(q => q.UsersIds(page: page, filter: filter));
-                """;
+                          var page = 0;
+                          var filter = "test";
+                          var response = await qlClient.Query(q => q.UsersIds(page: page, filter: filter));
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
@@ -337,13 +337,48 @@ public class QueryTests : IntegrationTest
 
         await Verify(response);
     }
-    
+
+    [Fact]
+    public async Task ReportsLinqMethodsAsErrors()
+    {
+        var types = """
+                    public record MyUser(string Id, string Name, string Username, MyLogin? LastLogin = null);
+
+                    public record MyLogin(DateTimeOffset Time, bool Success);
+                    """;
+
+        var csharpQuery = """
+                          var response = await qlClient.Query(static q => q
+                                     .Me(o => new MyUser(
+                                         o.Id,
+                                         o.FirstName,
+                                         o.LastName,
+                                         o.LoginAttempts(oo => new MyLogin(
+                                             oo.Time,
+                                             oo.Success
+                                         )).FirstOrDefault()
+                                     )));
+                          """;
+
+        var exception = await Assert.ThrowsAsync<Exception>(async () =>
+        {
+            var project = await TestProject.Project
+                .ReplacePartOfDocumentAsync("Program.cs",
+                    (TestProject.PlaceToReplaceInClassProgram, types),
+                    (TestProject.FullLine, csharpQuery));
+
+            await project.Execute();
+        });
+
+        await Verify(exception.Message);
+    }
+
     [Fact]
     public async Task SupportsOptionalArgumentsWithOnlySelector()
     {
         var csharpQuery = """
-                var response = await qlClient.Query(q => q.Users(selector: o => o.FirstName));
-                """;
+                          var response = await qlClient.Query(q => q.Users(selector: o => o.FirstName));
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
@@ -357,9 +392,9 @@ public class QueryTests : IntegrationTest
     public async Task SupportsLocalStaticFunctionAsFragment()
     {
         var csharpQuery = """
-                var response = await qlClient.Query(static q => q.Me(GetFirstName));
-                static string GetFirstName(User user) => user.FirstName;
-                """;
+                          var response = await qlClient.Query(static q => q.Me(GetFirstName));
+                          static string GetFirstName(User user) => user.FirstName;
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
@@ -373,9 +408,9 @@ public class QueryTests : IntegrationTest
     public async Task SupportForVariablesPassedViaClosure()
     {
         var csharpQuery = """
-                var userIds = new[] { 1 };
-                var response = await qlClient.Query(q => q.UsersByIds(userIds, o => o.FirstName));
-                """;
+                          var userIds = new[] { 1 };
+                          var response = await qlClient.Query(q => q.UsersByIds(userIds, o => o.FirstName));
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
@@ -389,9 +424,9 @@ public class QueryTests : IntegrationTest
     public async Task NamedArgumentsAreSupported()
     {
         var csharpQuery = """
-            var cts = new CancellationTokenSource();
-            var response = await qlClient.Query(cancellationToken: cts.Token, query: static q => q.Me(o => o.FirstName));
-        """;
+                              var cts = new CancellationTokenSource();
+                              var response = await qlClient.Query(cancellationToken: cts.Token, query: static q => q.Me(o => o.FirstName));
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
@@ -399,45 +434,45 @@ public class QueryTests : IntegrationTest
         var response = await project.Execute();
         await Verify(response);
     }
-    
+
     [Fact]
     public async Task CombinationNullableAndNonNullable()
     {
         var csharpQuery = """
-            var limit = new LimitInputZeroQL(); 
-            var response = await qlClient.Mutation(m => new 
-            {
-                Limit2 = m.AddLimitNullable(limit, o => o.Limit),
-                Limit = m.AddLimit(limit, o => o.Limit)
-            });
-        """;
+                              var limit = new LimitInputZeroQL();
+                              var response = await qlClient.Mutation(m => new
+                              {
+                                  Limit2 = m.AddLimitNullable(limit, o => o.Limit),
+                                  Limit = m.AddLimit(limit, o => o.Limit)
+                              });
+                          """;
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
 
         var response = await project.Execute();
-        
+
         var csharpQuery2 = """
-            var limit = new LimitInputZeroQL(); 
-            var response = await qlClient.Mutation(m => new 
-            {
-                Limit = m.AddLimit(limit, o => o.Limit),
-                Limit2 = m.AddLimitNullable(limit, o => o.Limit)
-            });
-        """;
+                               var limit = new LimitInputZeroQL();
+                               var response = await qlClient.Mutation(m => new
+                               {
+                                   Limit = m.AddLimit(limit, o => o.Limit),
+                                   Limit2 = m.AddLimitNullable(limit, o => o.Limit)
+                               });
+                           """;
 
         var project2 = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery2));
 
         var response2 = await project2.Execute();
-        
+
         await Verify(new
         {
             response,
             response2
         });
     }
-    
+
     [Fact]
     public async Task QueryDataIsReturnedWhenErrorHappens()
     {

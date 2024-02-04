@@ -329,7 +329,7 @@ public static class GraphQLQueryResolver
 
         if (results.Any(o => o.Error))
         {
-            return results.First().Error!;
+            return results.FirstOrDefault(o => o.Error)?.Error!;
         }
 
         return results.Select(o => o.Value!).Join(" ");
