@@ -26,6 +26,17 @@ public class QueryTests : IntegrationTest
 
         result.Data.Should().Be("Jon");
     }
+    
+    [Fact]
+    public async Task QueryToWrongUrl()
+    {
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", ("http://localhost:10000/graphql", "http://localhost:10000"));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
 
     [Fact]
     public async Task SupportForAnonymousType()

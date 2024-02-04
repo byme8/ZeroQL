@@ -55,13 +55,13 @@ public class FileUploadTests : IntegrationTest
     public async Task UploadFileAsAnonymousType()
     {
         var csharpQuery = "Mutation(new { File = new Upload(\"image.png\", new MemoryStream(new byte[42])) }, static (i, m) => m.AddMyProfileImage(i.File))";
-        var graphqlQuery = @"mutation ($file: Upload!) { addMyProfileImage(file: $file)}";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
 
-        var result = (GraphQLResult<int>)await project.Validate(graphqlQuery);
-        result.Data.Should().Be(42);
+        var result = await project.Execute();
+
+        await Verify(result);
     }
 
     [Fact]

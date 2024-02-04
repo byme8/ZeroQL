@@ -39,7 +39,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
         request.Content = content;
         var response = await httpHandler.SendAsync(request, cancellationToken);
-        var qlResponse = await ReadResponse<TQuery>(response);
+        var qlResponse = await response.ReadGraphQLResponse<TQuery>(request, cancellationToken);
 
         if (qlResponse.Errors is null)
         {
