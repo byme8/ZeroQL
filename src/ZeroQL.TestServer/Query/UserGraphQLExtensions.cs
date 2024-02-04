@@ -2,7 +2,7 @@
 
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class UserGraphQLExtensions
 {
     public static Dictionary<int, User> Users = new()

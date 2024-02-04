@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class JSONQueryExtensions
 {
     public JsonElement GetJsonUsersElement() => JsonSerializer.SerializeToElement(UserGraphQLExtensions.Users.Values.ToArray());

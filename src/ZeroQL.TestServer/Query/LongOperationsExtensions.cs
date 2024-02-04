@@ -1,6 +1,6 @@
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class LongOperationsExtensions
 {
     public async Task<int> GetLongOperation()

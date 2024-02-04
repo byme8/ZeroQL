@@ -89,7 +89,7 @@ public class Circle : IFigure, IEntity
     public IPerson? Creator { get; set; }
 }
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class InterfacesExtensions
 {
     public IEntity[] GetEntities()

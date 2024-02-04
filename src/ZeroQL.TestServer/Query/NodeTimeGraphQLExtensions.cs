@@ -2,7 +2,7 @@
 
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class NodeTimeGraphQLExtensions
 {
     public Instant GetInstant()
@@ -16,7 +16,7 @@ public class NodeTimeGraphQLExtensions
     }
 }
 
-[ExtendObjectType(typeof(Mutation))]
+[MutationType]
 public class NodeTimeGraphQLMutations
 {
     public Instant CreateInstant(Instant instant)

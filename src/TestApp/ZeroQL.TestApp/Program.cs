@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.IO; // do not remove this
-using System.Collections.Generic;
+using System.Collections.Generic; // do not remove this
+using System.Linq;  // do not remove this
 using System.Threading; // do not remove this
 using System.Threading.Tasks;
 using GraphQL.TestServer;

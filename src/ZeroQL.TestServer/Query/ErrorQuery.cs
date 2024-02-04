@@ -1,6 +1,6 @@
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class ErrorQuery
 {
     public ContainerWithoutError? GetContainerWithoutError() => new ContainerWithoutError { Value = "Hello" };

@@ -39,7 +39,7 @@ public class FigureContent : IPostContent
     public User Author { get; set; }
 }
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class UnionExtensions
 {
     public IPostContent[] GetPosts()
