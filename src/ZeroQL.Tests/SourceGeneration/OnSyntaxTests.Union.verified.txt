@@ -1,10 +1,10 @@
 ﻿{
-  Query: query { posts { ... on ImageContent { imageUrl height } ... on TextContent { text } ... on FigureContent { figure { ... on Circle { radius } __typename }  } __typename } },
+  Query: query { posts { ... on ImageContent { imageUrl resolution } ... on TextContent { text } ... on FigureContent { figure { ... on Circle { radius } __typename }  } __typename } },
   Data: [
     {
       Image: {
         ImageUrl: http://example.com/image.png,
-        Height: 1920
+        Resolution: _3840x2160
       }
     },
     {

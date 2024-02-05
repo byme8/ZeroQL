@@ -150,7 +150,7 @@ type Role {
 type ImageContent {
   id: Int!
   imageUrl: String!
-  height: Int!
+  resolution: ImageResolution!
   author: User!
 }
 
@@ -307,6 +307,13 @@ type KeyValuePairOfStringAndString {
 input PageInput {
   count: Int!
   size: Int!
+}
+
+enum ImageResolution {
+  _1360X720
+  _1920X1080
+  _2560X1440
+  _3840X2160
 }
 
 type Point implements IFigure & IEntity {

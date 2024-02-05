@@ -33,9 +33,16 @@ public static class StringExtensions
             return value.FirstToUpper();
         }
         
-        return value
+        var pascalCaseName = value
             .Split("_", StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())
             .Join(string.Empty);
+
+        if (char.IsDigit(pascalCaseName[0]))
+        {
+            pascalCaseName = "_" + pascalCaseName;
+        }
+        
+        return pascalCaseName;
     }
 }

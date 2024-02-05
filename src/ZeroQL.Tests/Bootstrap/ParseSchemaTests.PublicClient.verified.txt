@@ -142,9 +142,9 @@ namespace GraphQLClient
         [JsonPropertyName("imageUrl")]
         public string ImageUrl { get; set; }
 
-        [ZeroQL.GraphQLName("height")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
+        [ZeroQL.GraphQLName("resolution")]
+        [JsonPropertyName("resolution")]
+        public ImageResolution Resolution { get; set; }
 
         [JsonPropertyName("author")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -1372,6 +1372,19 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public enum ImageResolution
+    {
+        [ZeroQL.GraphQLName("_1360X720")]
+        _1360x720,
+        [ZeroQL.GraphQLName("_1920X1080")]
+        _1920x1080,
+        [ZeroQL.GraphQLName("_2560X1440")]
+        _2560x1440,
+        [ZeroQL.GraphQLName("_3840X2160")]
+        _3840x2160
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     public enum UserKind
     {
         [ZeroQL.GraphQLName("SUPPER_GOOD")]
@@ -1448,6 +1461,7 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.Instant)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.Instant>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.uuid)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.uuid>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ImageResolution)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.ImageResolution>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.ImageResolution>{{"_1360X720", global::GraphQLClient.ImageResolution._1360x720}, {"_1920X1080", global::GraphQLClient.ImageResolution._1920x1080}, {"_2560X1440", global::GraphQLClient.ImageResolution._2560x1440}, {"_3840X2160", global::GraphQLClient.ImageResolution._3840x2160}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.ImageResolution, string>{{global::GraphQLClient.ImageResolution._1360x720, "_1360X720"}, {global::GraphQLClient.ImageResolution._1920x1080, "_1920X1080"}, {global::GraphQLClient.ImageResolution._2560x1440, "_2560X1440"}, {global::GraphQLClient.ImageResolution._3840x2160, "_3840X2160"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind>{{"SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood}, {"GOOD", global::GraphQLClient.UserKind.Good}, {"BAD", global::GraphQLClient.UserKind.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string>{{global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD"}, {global::GraphQLClient.UserKind.Good, "GOOD"}, {global::GraphQLClient.UserKind.Bad, "BAD"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal>{{"default", global::GraphQLClient.UserKindPascal.Default}, {"SupperGood", global::GraphQLClient.UserKindPascal.SupperGood}, {"Good", global::GraphQLClient.UserKindPascal.Good}, {"Bad", global::GraphQLClient.UserKindPascal.Bad}, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string>{{global::GraphQLClient.UserKindPascal.Default, "default"}, {global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood"}, {global::GraphQLClient.UserKindPascal.Good, "Good"}, {global::GraphQLClient.UserKindPascal.Bad, "Bad"}, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.IEntity)] = new ZeroQLIEntityConverter();

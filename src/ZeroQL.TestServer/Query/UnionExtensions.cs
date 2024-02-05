@@ -25,10 +25,19 @@ public class ImageContent : IPostContent
 
     public string ImageUrl { get; set; }
 
-    public int Height { get; set; }
+    public ImageResolution Resolution { get; set; }
 
     public User Author { get; set; }
 }
+
+public enum ImageResolution
+{
+    _1360x720,
+    _1920x1080,
+    _2560x1440,
+    _3840x2160
+}
+
 
 public class FigureContent : IPostContent
 {
@@ -60,7 +69,7 @@ public class UnionExtensions
             Id = 1,
             Author = User.Create(),
             ImageUrl = "http://example.com/image.png",
-            Height = 1920
+            Resolution = ImageResolution._3840x2160 
         };
 
     public TextContent GetText() =>
