@@ -170,20 +170,39 @@ public static class TypeGenerator
     {
         if (RequireSelector(field))
         {
-            var backedField = BackedField(field);
-            var parameters = field.Arguments
-                .Select(o => Parameter(Identifier(o.Name.EnsureNotKeyword()))
-                    .WithType(ParseTypeName(o.TypeName))
-                    .AddAttributeLists(AttributeList()
-                        .AddAttributes(Attribute(IdentifierName(ZeroQLGenerationInfo.GraphQLTypeAttribute))
-                            .WithArgumentList(ParseAttributeArgumentList($@"(""{o.GraphQLName}"")"))))
-                    .AddForcedDefault())
-                .ToArray();
+            if (field.DominatedInterface is not null)
+            {
+                var parameters = field.Arguments
+                    .Select(o => Parameter(Identifier(o.Name.EnsureNotKeyword()))
+                        .WithType(ParseTypeName(o.TypeName))
+                        .AddAttributeLists(AttributeList()
+                            .AddAttributes(Attribute(IdentifierName(ZeroQLGenerationInfo.GraphQLTypeAttribute))
+                                .WithArgumentList(ParseAttributeArgumentList($@"(""{o.GraphQLName}"")"))))
+                        .AddForcedDefault())
+                    .ToArray();
 
-            var selector = GenerateQueryPropertyDeclaration(field, parameters, interfaceField);
-            selector = selector.CopyDirectives(field);
+                var selector = GenerateQueryPropertyDeclaration(field, parameters, interfaceField)
+                    .CopyDirectives(field);
 
-            return new[] { backedField, selector };
+                return [selector];
+            }
+
+            {
+                var backedField = BackedField(field);
+                var parameters = field.Arguments
+                    .Select(o => Parameter(Identifier(o.Name.EnsureNotKeyword()))
+                        .WithType(ParseTypeName(o.TypeName))
+                        .AddAttributeLists(AttributeList()
+                            .AddAttributes(Attribute(IdentifierName(ZeroQLGenerationInfo.GraphQLTypeAttribute))
+                                .WithArgumentList(ParseAttributeArgumentList($@"(""{o.GraphQLName}"")"))))
+                        .AddForcedDefault())
+                    .ToArray();
+
+                var selector = GenerateQueryPropertyDeclaration(field, parameters, interfaceField)
+                    .CopyDirectives(field);
+
+                return [backedField, selector];
+            }
         }
 
         var property = CSharpHelper
@@ -217,12 +236,9 @@ public static class TypeGenerator
             list = list.Add(selectorParameter);
         }
 
-        var genericMethodWithType = MethodDeclaration(
-                IdentifierName(returnType),
-                Identifier(name.EnsureNotKeyword()))
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
-            .WithParameterList(ParameterList(list));
+        var genericMethodWithType = field.DominatedInterface is null
+            ? NotDominatedMethod()
+            : DominatedMethod();
 
         if (interfaceField)
         {
@@ -236,6 +252,19 @@ public static class TypeGenerator
 
         return genericMethodWithType
             .WithBody(body);
+
+        MethodDeclarationSyntax NotDominatedMethod() =>
+            MethodDeclaration(IdentifierName(returnType), Identifier(name.EnsureNotKeyword()))
+                .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
+                .WithParameterList(ParameterList(list));
+
+        MethodDeclarationSyntax DominatedMethod() =>
+            MethodDeclaration(IdentifierName(returnType.Replace("?", "")), Identifier(name.EnsureNotKeyword()))
+                .WithExplicitInterfaceSpecifier(
+                    ExplicitInterfaceSpecifier(IdentifierName(field.DominatedInterface.Name)))
+                .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute, field.GraphQLName)
+                .WithParameterList(ParameterList(list));
     }
 
     private static bool RequireSelector(TypeDefinition typeDefinition)
@@ -340,7 +369,6 @@ public static class TypeGenerator
         }
     }
 
- 
 
     private static string? GetDefaultValue(GraphQLInputValueDefinition field)
     {
@@ -398,12 +426,12 @@ public static class TypeGenerator
     }
 
 
-    public static FieldDefinition[] CreatePropertyDefinition(
-        this TypeContext typeContext,
+    public static FieldDefinition[] CreatePropertyDefinition(this TypeContext typeContext,
         Definition parent,
-        GraphQLFieldsDefinition? fields)
+        GraphQLFieldsDefinition? fields,
+        FieldDefinition[] interfacesFields)
     {
-        return fields?.Select(field =>
+        var fieldsFromType = fields?.Select(field =>
             {
                 var type = typeContext.GetTypeDefinition(field.Type);
                 var graphQLName = field.Name.StringValue;
@@ -435,5 +463,61 @@ public static class TypeGenerator
                     null);
             })
             .ToArray() ?? Array.Empty<FieldDefinition>();
+
+        var fieldsFromInterfaces = interfacesFields
+            .Where(o => fieldsFromType.All(oo => DifferentFieldFromInterface(o, oo)))
+            .ToArray();
+
+        if (fieldsFromInterfaces.Length == 0)
+        {
+            return fieldsFromType;
+        }
+
+        for (int i = 0; i < fieldsFromInterfaces.Length; i++)
+        {
+            var interfaceField = fieldsFromInterfaces[i];
+            fieldsFromInterfaces[i] = interfaceField with
+            {
+                Parent = parent,
+                DominatedInterface = interfaceField.Parent
+            };
+        }
+
+        return fieldsFromType
+            .Concat(fieldsFromInterfaces)
+            .ToArray();
+    }
+
+    private static bool DifferentFieldFromInterface(FieldDefinition left, FieldDefinition right)
+    {
+        if (left.Name != right.Name)
+        {
+            return true;
+        }
+
+        if (left.Arguments.Length != right.Arguments.Length)
+        {
+            return true;
+        }
+
+        for (var i = 0; i < left.Arguments.Length; i++)
+        {
+            if (left.Arguments[i].Name != right.Arguments[i].Name)
+            {
+                return true;
+            }
+
+            if (left.Arguments[i].TypeName != right.Arguments[i].TypeName)
+            {
+                return true;
+            }
+
+            if (left.Arguments[i].GraphQLName != right.Arguments[i].GraphQLName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

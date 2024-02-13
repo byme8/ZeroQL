@@ -99,11 +99,11 @@ type JsonDocument {
 scalar JSON
 
 type Square implements IFigure & IEntity {
+  creator(name: String): IPerson
   id: Int
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
-  creator: IPerson
 }
 
 type Circle implements IFigure & IEntity {

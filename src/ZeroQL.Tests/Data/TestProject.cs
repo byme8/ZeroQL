@@ -49,6 +49,14 @@ public static class TestProject
 
         return response;
     }
+    
+    public static async Task<object> Execute(this Project project, string csharpQuery)
+    {
+        project = await project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+
+        return await project.Execute();
+    }
 
     public static async Task<IGraphQLResult> Validate(this Project project, string? graphqlQuery,
         bool checkError = true)

@@ -167,11 +167,11 @@ public static class GraphQLGenerator
                 .FirstOrDefault(x => x.Operation == OperationType.Mutation)?
                 .Type?
                 .Name
-                .StringValue;;
+                .StringValue;
 
             return (queryTypeFromSchema, mutationTypeFromSchema);
         }
-        
+
         var queryType = document.Definitions
             .OfType<GraphQLObjectTypeDefinition>()
             .FirstOrDefault(x => x.Name.StringValue == "Query");
@@ -235,19 +235,19 @@ public static class GraphQLGenerator
             .OfType<IdentifierNameSyntax>()
             .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
             .ToArray();
-        
+
         var identifiersFromArray = types
             .OfType<ArrayTypeSyntax>()
             .Select(o => o.ElementType)
             .OfType<IdentifierNameSyntax>()
             .ToArray();
-        
+
         var identifiersFromNullable = types
             .OfType<NullableTypeSyntax>()
             .Select(o => o.ElementType)
             .OfType<IdentifierNameSyntax>()
             .ToArray();
-        
+
         var arrayFromNullable = types
             .OfType<NullableTypeSyntax>()
             .Select(o => o.ElementType)
@@ -255,7 +255,7 @@ public static class GraphQLGenerator
             .Select(o => o.ElementType)
             .OfType<IdentifierNameSyntax>()
             .ToArray();
-        
+
         var identifies = identifiersFromIdentifiers
             .Concat(identifiersFromArray)
             .Concat(identifiersFromNullable)
@@ -272,7 +272,7 @@ public static class GraphQLGenerator
 
         return unit;
     }
-    
+
     private static string SubstringGenericName(string name)
     {
         var index = name.IndexOf('<');
@@ -287,14 +287,14 @@ public static class GraphQLGenerator
     private static MemberDeclarationSyntax GenerateNetstandardCompatibility()
     {
         var moduleInitializer = """
-            namespace System.Runtime.CompilerServices
-            {
-                [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-                public sealed class ModuleInitializerAttribute : Attribute
-                {
-                }
-            }
-           """;
+                                 namespace System.Runtime.CompilerServices
+                                 {
+                                     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+                                     public sealed class ModuleInitializerAttribute : Attribute
+                                     {
+                                     }
+                                 }
+                                """;
 
         var moduleInitializerSyntax = ParseCompilationUnit(moduleInitializer)
             .WithLeadingTrivia(Comment("// Netstandard compatibility"))
@@ -313,9 +313,13 @@ public static class GraphQLGenerator
             .Select(o => interfaces[o.Name.StringValue])
             .ToList() ?? new List<InterfaceDefinition>();
 
+        var interfacesFields = typeInterfaces
+            .SelectMany(o => o.Properties)
+            .ToArray();
+
         var classFields = new List<FieldDefinition>();
         var classDefinition = new ClassDefinition(type.Name.StringValue, classFields, typeInterfaces);
-        var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields);
+        var fields = typeContext.CreatePropertyDefinition(classDefinition, type.Fields, interfacesFields);
         classFields.AddRange(fields);
 
         return classDefinition;
@@ -326,7 +330,11 @@ public static class GraphQLGenerator
     {
         var interfaceFields = new List<FieldDefinition>();
         var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
-        var fields = typeContext.CreatePropertyDefinition(interfaceDefinition, definition.Fields);
+        var fields = typeContext.CreatePropertyDefinition(
+            interfaceDefinition,
+            definition.Fields,
+            Array.Empty<FieldDefinition>());
+
         interfaceFields.AddRange(fields);
 
         return interfaceDefinition;

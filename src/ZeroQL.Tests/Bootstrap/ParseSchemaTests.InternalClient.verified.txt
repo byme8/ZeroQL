@@ -825,6 +825,16 @@ namespace GraphQLClient
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal class Square : IFigure, IEntity
     {
+        [JsonPropertyName("creator")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public IPerson? __Creator { get; set; }
+
+        [ZeroQL.GraphQLName("creator")]
+        public T? Creator<T>([ZeroQL.GraphQLType("String")] string? name = default !, Func<IPerson, T> selector = default !)
+        {
+            return __Creator is null ? default : selector(__Creator);
+        }
+
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
         public int? Id { get; set; }
@@ -853,12 +863,8 @@ namespace GraphQLClient
         [JsonPropertyName("perimeter")]
         public double Perimeter { get; set; }
 
-        [JsonPropertyName("creator")]
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public IPerson? __Creator { get; set; }
-
         [ZeroQL.GraphQLName("creator")]
-        public T? Creator<T>(Func<IPerson, T> selector = default !)
+        T IFigure.Creator<T>(Func<IPerson, T> selector = default !)
         {
             return __Creator is null ? default : selector(__Creator);
         }
