@@ -60,9 +60,9 @@ namespace GraphQLClient
             return __Creator is null ? default : selector(__Creator);
         }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         IPerson? IFigure.__Creator { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -483,14 +483,14 @@ namespace GraphQLClient
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         int? IFigure.Id { get; set; }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         int? IEntity.Id { get; set; }
 
         [ZeroQL.GraphQLName("x")]
@@ -515,9 +515,9 @@ namespace GraphQLClient
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         IPerson? IFigure.__Creator { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]

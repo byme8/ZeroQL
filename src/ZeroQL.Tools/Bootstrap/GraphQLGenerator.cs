@@ -325,11 +325,16 @@ public static class GraphQLGenerator
         return classDefinition;
     }
 
-    private static InterfaceDefinition CreateInterfaceDefinition(TypeContext typeContext,
+    private static InterfaceDefinition CreateInterfaceDefinition(
+        TypeContext typeContext,
         GraphQLInterfaceTypeDefinition definition)
     {
+        var names = definition.Interfaces?.Items
+            .Select(o => o.Name.StringValue)
+            .ToArray() ?? Array.Empty<string>();
+
         var interfaceFields = new List<FieldDefinition>();
-        var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, interfaceFields);
+        var interfaceDefinition = new InterfaceDefinition(definition.Name.StringValue, names, interfaceFields);
         var fields = typeContext.CreatePropertyDefinition(
             interfaceDefinition,
             definition.Fields,
@@ -367,7 +372,11 @@ public static class GraphQLGenerator
 
         foreach (var union in unions)
         {
-            var unionInterface = new InterfaceDefinition(union.Name, Array.Empty<FieldDefinition>());
+            var unionInterface = new InterfaceDefinition(
+                union.Name,
+                Array.Empty<string>(),
+                Array.Empty<FieldDefinition>());
+
             interfaces.Add(union.Name, unionInterface);
             foreach (var unionType in union.Types)
             {

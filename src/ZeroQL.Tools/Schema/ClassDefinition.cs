@@ -7,7 +7,7 @@ public record Definition(string Name);
 public record ClassDefinition(string Name, IReadOnlyList<FieldDefinition> Properties, List<InterfaceDefinition> Implements)
     : Definition(Name);
 
-public record InterfaceDefinition(string Name, IReadOnlyList<FieldDefinition> Properties)
+public record InterfaceDefinition(string Name, IReadOnlyList<string> Implemented , IReadOnlyList<FieldDefinition> Properties)
     : Definition(Name);
 
 public record UnionDefinition(string Name, string[] Types)

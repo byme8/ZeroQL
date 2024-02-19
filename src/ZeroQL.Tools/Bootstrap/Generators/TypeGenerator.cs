@@ -107,7 +107,7 @@ public static class TypeGenerator
                             .WithExplicitInterfaceSpecifier(
                                 ExplicitInterfaceSpecifier(
                                     IdentifierName(interfaceField.Parent.Name)))
-                            .WithComment(Constants.WarningAboutCovariantTypes));
+                            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.DeprecatedAttribute, Constants.WarningAboutCovariantTypes));
                         break;
 
                     case MethodDeclarationSyntax method:
