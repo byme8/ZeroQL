@@ -219,7 +219,7 @@ You need to create a record from the base record `` GraphQL<TOperationType, TRes
 
 # Benchmarks
 
-The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs).
+The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/RawVsZeroQLBenchmark.cs).
 
 The short version looks like this:
 ``` csharp
