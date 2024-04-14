@@ -237,13 +237,19 @@ public class QueryTests : IntegrationTest
     [Fact]
     public async Task SupportForEnums()
     {
-        var csharpQuery = "static q => q.Me(o => o.UserKind)";
-        var graphqlQuery = @"query { me { userKind } }";
-
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
-
-        await project.Validate(graphqlQuery);
+        var query = "q => q.Me(o => new { o.Id, o.UserKind })";
+        var response = await TestProject.Project.Execute(query);
+        
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task SupportForEnumsWithCast()
+    {
+        var query = "q => q.Me(o => new { Id = o.Id, UserKind = (UserKind)o.UserKind })";
+        var response = await TestProject.Project.Execute(query);
+        
+        await Verify(response);
     }
 
     [Fact]
