@@ -30,6 +30,14 @@ public static partial class QueryFragments
             Role = user.Role(o => o.Name)
         };
     }
+    
+    [GraphQLFragment]
+    public static UserRead AsUserRead(this User user) 
+        => new UserRead()
+        {
+            Id = user.Id,
+            Kind2 = (UserKind2)user.UserKind
+        };
 
     [GraphQLFragment]
     public static UserModel AsUserWithRoleNameExpression(this User user)
