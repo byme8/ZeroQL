@@ -123,9 +123,9 @@
             return __Creator is null ? throw new NullReferenceException("Creator is null but it should not be null. Schema can be outdated.") : selector(__Creator);
         }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         IUser IFigure.__Creator { get; set; }
 
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -145,9 +145,9 @@
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        // This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [System.ObsoleteAttribute("This member is not indented to be used. https://github.com/byme8/ZeroQL/issues/58")]
         int? IFigure.Id { get; set; }
 
         [ZeroQL.GraphQLName("x")]

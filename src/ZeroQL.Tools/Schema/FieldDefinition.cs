@@ -7,4 +7,5 @@ public record FieldDefinition(
     TypeDefinition TypeDefinition,
     ArgumentDefinition[] Arguments,
     DirectiveDefinition[]? Directives,
-    string? DefaultValue = null);
+    string? DefaultValue = null,
+    Definition? DominatedInterface = null);

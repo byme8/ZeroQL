@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Bootstrap;
 using ZeroQL.Extensions;
+using ZeroQL.Tests.Core;
+using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.Bootstrap;
 
@@ -213,6 +215,55 @@ public class CustomSchemaParseTests
             .ToArray();
 
         await Verify(syntaxTree.ToString());
+    }
+    
+    [Fact]
+    public async Task BrokenSchemaFromWP()
+    {
+        var rawSchema = @"
+            schema {
+              query: RootQuery
+            }
+              
+            type RootQuery {
+              product(id: ID!): Product
+            }
+
+            interface Product {
+              id: ID!
+              key: ID!
+            }
+            
+            interface ProductConnectionEdge {
+              cursor: String
+              node: Product!
+            }
+
+            type ProductToPreviewConnectionEdge implements OneToOneConnection & Edge & ProductConnectionEdge {
+              cursor: String
+              node: Product!
+            }
+
+            interface OneToOneConnection {
+              cursor: String
+              node: Node!
+            }
+            
+            interface Edge {
+              cursor: String
+              node: Node!
+            }
+
+            interface Node {
+              id: ID!
+            }
+        ";
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestAppWP", "WPGraphQLClient");
+        _ = await TestProject.Project
+          .AddDocument("WPGraphQLClient.cs", csharp)
+          .Project
+          .CompileToRealAssembly();
     }
 
     [Fact]

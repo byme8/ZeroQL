@@ -1,0 +1,8 @@
+﻿{
+  Query: query { me { id userKind } },
+  Data: {
+    Id: {
+      Value: 1
+    }
+  }
+}

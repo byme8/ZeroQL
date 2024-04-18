@@ -156,11 +156,11 @@ type Role {
 }
 
 type Square implements IFigure & IEntity {
+  creator(name: String): IPerson
   id: Int
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
-  creator: IPerson
 }
 
 type TextContent {

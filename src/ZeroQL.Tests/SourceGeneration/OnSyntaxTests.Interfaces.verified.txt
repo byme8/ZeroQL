@@ -17,7 +17,6 @@
     {
       Id: 31,
       Perimeter: 40.0,
-      CreatorId: 1,
       Square: {
         TopLeft: {
           Id: 1,
