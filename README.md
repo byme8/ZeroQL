@@ -226,27 +226,68 @@ The short version looks like this:
 [Benchmark]
 public async Task<string> Raw()
 {
-    var rawQuery = @"{ ""query"": ""query { me { firstName }}"" }";
+    var rawQuery = 
+        $$"""
+        {
+            "variables": { "id": {{id}} }, 
+            "query": "query GetUser($id: Int!){ user(id: $id) { id firstName lastName } }" 
+        }
+        """;
     var response = await httpClient.PostAsync("", new StringContent(rawQuery, Encoding.UTF8, "application/json"));
     var responseJson = await response.Content.ReadAsStreamAsync();
     var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-    return qlResponse["data"]["me"]["firstName"].GetValue<string>();
+    return qlResponse!["data"]!["user"]!["firstName"]!.GetValue<string>();
 }
 
 [Benchmark]
 public async Task<string> StrawberryShake()
 {
-    var firstname = await strawberryShake.Me.ExecuteAsync();
-    return firstname.Data.Me.FirstName;
+    // query GetUser($id: Int!) {
+    //   user(id: $id) {
+    //       id
+    //       firstName
+    //       lastName
+    //   }
+    // }
+    var firstname = await strawberryShake.GetUser.ExecuteAsync(id);
+    return firstname.Data!.User!.FirstName;
 }
 
 [Benchmark]
-public async Task<string> ZeroQL()
+public async Task<string> ZeroQLLambdaWithoutClosure()
 {
-    var firstname = await zeroQLClient.Query(static q => q.Me(o => o.FirstName));
+    var variables = new { Id = id };
+    var firstname = await zeroQLClient.Query(
+        variables, static (i, q)
+            => q.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
 
-    return firstname.Data;
+    return firstname.Data!.FirstName;
+}
+
+[Benchmark]
+public async Task<string> ZeroQLLambdaWithClosure()
+{
+    var id  = this.id;
+    var firstname = await zeroQLClient.Query( q
+            => q.User(id, o => new { o.Id, o.FirstName, o.LastName }));
+
+    return firstname.Data!.FirstName;
+}
+
+[Benchmark]
+public async Task<string> ZeroQLRequest()
+{
+    var firstname = await zeroQLClient.Execute(new GetUserQuery(id));
+
+    return firstname.Data!.FirstName;
+}
+
+// ..
+public record GetUserQuery(int id) : GraphQL<Query, User?>
+{
+    public override User? Execute(Query query)
+        => query.User(id, o => new User(o.Id, o.FirstName, o.LastName));
 }
 ```
 
@@ -261,12 +302,13 @@ Apple M1, 1 CPU, 8 logical and 8 physical cores
 
 
 ```
-| Method          |     Mean |   Error |  StdDev |   Gen0 | Allocated |
-|-----------------|---------:|--------:|--------:|-------:|----------:|
-| Raw             | 111.3 μs | 0.77 μs | 0.68 μs | 0.7324 |   5.29 KB |
-| StrawberryShake | 119.3 μs | 1.61 μs | 1.51 μs | 1.7090 |  11.55 KB |
-| ZeroQLLambda    | 112.4 μs | 2.04 μs | 1.91 μs | 0.9766 |    6.7 KB |
-| ZeroQLRequest   | 112.9 μs | 1.22 μs | 1.14 μs | 0.9766 |   6.27 KB |
+| Method                     |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|----------------------------|---------:|--------:|--------:|-------:|----------:|
+| Raw                        | 111.3 us | 0.77 us | 0.68 us | 0.7324 |   5.29 KB |
+| StrawberryShake            | 119.3 us | 1.61 us | 1.51 us | 1.7090 |  11.55 KB |
+| ZeroQLLambdaWithoutClosure | 112.4 us | 2.04 us | 1.91 us | 0.9766 |    6.7 KB |
+| ZeroQLLambdaWithClosure    | 113.7 us | 1.80 us | 1.68 us | 0.9766 |   7.18 KB |
+| ZeroQLRequest              | 112.9 us | 1.22 us | 1.14 us | 0.9766 |   6.27 KB |
 
 As you can see, the ``Raw`` method is the fastest.
 The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 

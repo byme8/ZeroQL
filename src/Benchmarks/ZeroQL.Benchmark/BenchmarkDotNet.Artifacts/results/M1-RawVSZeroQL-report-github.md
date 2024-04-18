@@ -8,9 +8,10 @@ Apple M1, 1 CPU, 8 logical and 8 physical cores
 
 
 ```
-| Method          |     Mean |   Error |  StdDev |   Gen0 | Allocated |
-|-----------------|---------:|--------:|--------:|-------:|----------:|
-| Raw             | 111.3 μs | 0.77 μs | 0.68 μs | 0.7324 |   5.29 KB |
-| StrawberryShake | 119.3 μs | 1.61 μs | 1.51 μs | 1.7090 |  11.55 KB |
-| ZeroQLLambda    | 112.4 μs | 2.04 μs | 1.91 μs | 0.9766 |    6.7 KB |
-| ZeroQLRequest   | 112.9 μs | 1.22 μs | 1.14 μs | 0.9766 |   6.27 KB |
+| Method                     |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|----------------------------|---------:|--------:|--------:|-------:|----------:|
+| Raw                        | 111.3 us | 0.77 us | 0.68 us | 0.7324 |   5.29 KB |
+| StrawberryShake            | 119.3 us | 1.61 us | 1.51 us | 1.7090 |  11.55 KB |
+| ZeroQLLambdaWithoutClosure | 112.4 us | 2.04 us | 1.91 us | 0.9766 |    6.7 KB |
+| ZeroQLLambdaWithClosure    | 113.7 us | 1.80 us | 1.68 us | 0.9766 |   7.18 KB |
+| ZeroQLRequest              | 112.9 us | 1.22 us | 1.14 us | 0.9766 |   6.27 KB |
