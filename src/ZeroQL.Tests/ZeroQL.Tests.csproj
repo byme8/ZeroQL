@@ -29,16 +29,4 @@
         <ProjectReference Include="..\ZeroQL.TestServer\ZeroQL.TestServer.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="SourceGeneration\OptionalParametersDetectionTests.AppliedToWrongType.verified.txt">
-        <ParentFile>OnSyntaxTests</ParentFile>
-        <DependentUpon>OptionalParametersDetectionTests.cs</DependentUpon>
-      </None>
-      <None Update="SourceGeneration\OptionalParametersDetectionTests.Union.verified.txt">
-        <ParentFile>OnSyntaxTests</ParentFile>
-        <DependentUpon>OptionalParametersDetectionTests.cs</DependentUpon>
-      </None>
-      <None Remove="SourceGeneration\OptionalParametersDetectionTests.Interfaces.verified.txt" />
-    </ItemGroup>
-
 </Project>
