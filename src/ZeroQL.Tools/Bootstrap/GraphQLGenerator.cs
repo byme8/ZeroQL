@@ -186,7 +186,8 @@ public static class GraphQLGenerator
     private static CompilationUnitSyntax FixTypeNamingWhenNameEqualsMemberName(
         CompilationUnitSyntax unit)
     {
-        var classesWhenClassNameEqualsToPropertyName = unit.DescendantNodes()
+        var classesWhenClassNameEqualsToPropertyName = unit
+            .DescendantNodes()
             .OfType<ClassDeclarationSyntax>()
             .Where(o => o.Members
                             .OfType<PropertyDeclarationSyntax>()
@@ -203,23 +204,27 @@ public static class GraphQLGenerator
         unit = unit.ReplaceNodes(classesWhenClassNameEqualsToPropertyName,
             (oldNode, _) => changedClasses[oldNode.Identifier.Text]);
 
-        var propertyTypes = unit.DescendantNodes()
+        var propertyTypes = unit
+            .DescendantNodes()
             .OfType<PropertyDeclarationSyntax>()
             .Select(o => o.Type)
             .ToArray();
 
-        var methodTypes = unit.DescendantNodes()
+        var methodTypes = unit
+            .DescendantNodes()
             .OfType<MethodDeclarationSyntax>()
             .Select(o => o.ReturnType)
             .ToArray();
 
-        var methodParameters = unit.DescendantNodes()
+        var methodParameters = unit
+            .DescendantNodes()
             .OfType<MethodDeclarationSyntax>()
             .SelectMany(o => o.ParameterList.Parameters)
             .Select(o => o.Type)
             .ToArray();
 
-        var genericTypes = unit.DescendantNodes()
+        var genericTypes = unit
+            .DescendantNodes()
             .OfType<GenericNameSyntax>()
             .Select(o => o.TypeArgumentList.Arguments)
             .SelectMany(o => o)
@@ -231,35 +236,8 @@ public static class GraphQLGenerator
             .Concat(genericTypes)
             .ToArray();
 
-        var identifiersFromIdentifiers = types
-            .OfType<IdentifierNameSyntax>()
-            .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
-            .ToArray();
-
-        var identifiersFromArray = types
-            .OfType<ArrayTypeSyntax>()
-            .Select(o => o.ElementType)
-            .OfType<IdentifierNameSyntax>()
-            .ToArray();
-
-        var identifiersFromNullable = types
-            .OfType<NullableTypeSyntax>()
-            .Select(o => o.ElementType)
-            .OfType<IdentifierNameSyntax>()
-            .ToArray();
-
-        var arrayFromNullable = types
-            .OfType<NullableTypeSyntax>()
-            .Select(o => o.ElementType)
-            .OfType<ArrayTypeSyntax>()
-            .Select(o => o.ElementType)
-            .OfType<IdentifierNameSyntax>()
-            .ToArray();
-
-        var identifies = identifiersFromIdentifiers
-            .Concat(identifiersFromArray)
-            .Concat(identifiersFromNullable)
-            .Concat(arrayFromNullable)
+        var identifies = types
+            .SelectMany(GetIdentifiers)
             .Where(o => changedClasses.ContainsKey(o.Identifier.Text))
             .ToArray();
 
@@ -271,6 +249,17 @@ public static class GraphQLGenerator
             (oldNode, _) => changedIdentifiers[oldNode]);
 
         return unit;
+    }
+
+    private static IdentifierNameSyntax[] GetIdentifiers(TypeSyntax? typeSyntax)
+    {
+        return typeSyntax switch
+        {
+            IdentifierNameSyntax identifierNameSyntax => [identifierNameSyntax],
+            ArrayTypeSyntax arrayTypeSyntax => GetIdentifiers(arrayTypeSyntax.ElementType),
+            NullableTypeSyntax nullableTypeSyntax => GetIdentifiers(nullableTypeSyntax.ElementType),
+            _ => Array.Empty<IdentifierNameSyntax>()
+        };
     }
 
     private static string SubstringGenericName(string name)

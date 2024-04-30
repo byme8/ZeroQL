@@ -295,6 +295,37 @@ public class CustomSchemaParseTests
 
         await Verify(clases);
     }
+    
+    [Fact]
+    public async Task IdenticalNamesForArrayReplaced()
+    {
+      var rawSchema = @"
+            schema {
+              query: Query
+            }
+              
+            type Query {
+              staff: Staff!
+            }
+
+            type Staff {
+              id: Int!
+              staff: [Staff]
+            }
+        ";
+
+      var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+      var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+      var clases = (await syntaxTree.GetRootAsync())
+        .DescendantNodes()
+        .OfType<ClassDeclarationSyntax>()
+        .Where(o => o.Identifier.ValueText.Contains("Staff"))
+        .Select(o => o.ToFullString())
+        .ToArray();
+
+      await Verify(clases);
+    }
 
     [Fact]
     public async Task InputTypeNameIdenticalToPropertyName()
