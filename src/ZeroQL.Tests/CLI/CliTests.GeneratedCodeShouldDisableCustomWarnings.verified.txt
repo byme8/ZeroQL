@@ -1,0 +1,1 @@
+#pragma warning disable CS0168, CS0219

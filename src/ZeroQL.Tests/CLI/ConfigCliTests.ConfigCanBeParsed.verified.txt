@@ -5,6 +5,7 @@
   ClientName: ServiceZeroQLClient,
   Output: QL.g.cs,
   Visibility: Internal,
+  WarningsToIgnore: CS0168,CS0219,
   Scalars: [
     {
       Point: Geometry.Point

@@ -38,6 +38,16 @@
         }
       ]
     },
+    "warningsToIgnore": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "The warnings to ignore when generating the client",
+      "items": {
+        "type": "string"
+      }
+    },
     "scalars": {
       "type": [
         "null",

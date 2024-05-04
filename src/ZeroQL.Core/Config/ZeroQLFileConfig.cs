@@ -44,6 +44,11 @@ public class ZeroQLFileConfig
     public ClientVisibility? Visibility { get; set; }
 
     /// <summary>
+    /// The warnings to ignore when generating the client
+    /// </summary>
+    public string[]? WarningsToIgnore { get; set; }
+
+    /// <summary>
     /// The custom scalars to use when generating the client
     /// </summary>
     public Dictionary<string, string>? Scalars { get; set; }
