@@ -5,7 +5,6 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
-[UsesVerify]
 public class UserScalarTests: IntegrationTest
 {
     [Fact]

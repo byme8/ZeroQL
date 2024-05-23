@@ -42,3 +42,13 @@ public class GraphQLQueryTemplate : Attribute
 
     public string Query { get; }
 }
+
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter)]
+public class GraphQLLambda : Attribute
+{
+}
+
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter)]
+public class StaticLambda : Attribute
+{
+}

@@ -11,6 +11,10 @@ public class SourceGeneratorInfo
     public static string GraphQLSyntaxAttribute { get; } = "ZeroQL.GraphQLSyntax";
 
     public static string GraphQLNameAttribute { get; } = "ZeroQL.GraphQLNameAttribute";
+
+    public static string StaticLambdaAttribute { get; } = "ZeroQL.StaticLambda";
+
+    public static string GraphQLLambdaAttribute { get; } = "ZeroQL.GraphQLLambda";
     
     public static string GraphQLTypeAttribute { get; } = "ZeroQL.GraphQLTypeAttribute";
 

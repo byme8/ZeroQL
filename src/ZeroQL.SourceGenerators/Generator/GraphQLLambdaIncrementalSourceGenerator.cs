@@ -15,7 +15,8 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var invocations = context.SyntaxProvider
-            .CreateSyntaxProvider(FindMethods, (c, _) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
+            .CreateSyntaxProvider(FindMethods,
+                (c, _) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
         var collectedInvocations = invocations.Collect();
 
@@ -42,10 +43,11 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax invocation, SemanticModel semanticModel, HashSet<string> processed)
+    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax invocation,
+        SemanticModel semanticModel, HashSet<string> processed)
     {
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContext, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+        var (lambdaContexts, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
         if (error)
         {
             if (error is ErrorWithData<Diagnostic> errorWithData)
@@ -76,22 +78,25 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var source = GraphQLSourceResolver.Resolve(
-            semanticModel,
-            lambdaContext);
-
-        if (context.CancellationToken.IsCancellationRequested)
+        foreach (var lambdaContext in lambdaContexts)
         {
-            return;
-        }
+            var source = GraphQLSourceResolver.Resolve(
+                semanticModel,
+                lambdaContext);
 
-        if (processed.Contains(lambdaContext.KeyHash))
-        {
-            return;
-        }
+            if (context.CancellationToken.IsCancellationRequested)
+            {
+                continue;
+            }
 
-        processed.Add(lambdaContext.KeyHash);
-        context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source);
+            if (processed.Contains(lambdaContext.KeyHash))
+            {
+                continue;
+            }
+
+            processed.Add(lambdaContext.KeyHash);
+            context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source);
+        }
     }
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
@@ -105,19 +110,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         {
             return false;
         }
-        
-        if(memberAccess.Name is IdentifierNameSyntax identifierName &&
-           identifierName.Identifier.Text is ("Query" or "Mutation"))
-        {
-            return true;
-        }
 
-        if (memberAccess.Name is GenericNameSyntax genericName &&
-            genericName.Identifier.Text is "Materialize")
-        {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 }

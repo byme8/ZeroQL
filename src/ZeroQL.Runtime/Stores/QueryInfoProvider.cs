@@ -18,7 +18,7 @@ public class QueryInfo
 public class QueryInfoProvider
 {
     public static QueryInfo Materialize<TQuery>(
-        Func<TQuery, object> query,
+        [GraphQLLambda]Func<TQuery, object> query,
         [CallerArgumentExpression(nameof(query))] string queryKey = "")
     {
         var normalizedKey = QueryKey.Normalize(queryKey);

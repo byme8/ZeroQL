@@ -13,6 +13,7 @@ public static class TestExtensions
 {
     public static ImmutableArray<DiagnosticAnalyzer> Analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(
 
+        new StaticLambdaAnalyzer(),
         new QueryLambdaAnalyzer(),
         new OptionalParametersAnalyzer(),
         new QueryRequestAnalyzer(),

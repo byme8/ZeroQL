@@ -27,14 +27,19 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
     private void Handle(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not InvocationExpressionSyntax invocation ||
-            invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.ValueText is not ("Query" or "Mutation" or "Materialize"))
+            invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return;
         }
 
-        var method = QueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
-        if (method is null)
+        var graphQLLambdaAttribute =
+            context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
+        var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
+            context.Compilation,
+            invocation,
+            graphQLLambdaAttribute);
+
+        if (graphQLLambdas.Empty())
         {
             return;
         }
@@ -44,51 +49,25 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var possibleLambdaQuery = invocation.ArgumentList.Arguments
-            .LastOrDefault(o => o.Expression is LambdaExpressionSyntax)?
-            .Expression;
-        if (possibleLambdaQuery is not LambdaExpressionSyntax lambda)
-        {
-            return;
-        }
-
-        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda
-            && !parenthesizedLambda.Modifiers.Any(SyntaxKind.StaticKeyword))
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptors.OnlyStaticLambda,
-                lambda.GetLocation()));
-        }
-
-        if (context.CancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
-        var innerLambdas = lambda
-            .DescendantNodes()
-            .OfType<LambdaExpressionSyntax>()
+        var lambdas = graphQLLambdas
+            .Select(o => invocation.ArgumentList.Arguments[o.Index])
+            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Where(o => o.Expression is not null)
             .ToArray();
 
-        foreach (var innerLambda in innerLambdas)
+        if (lambdas.Empty())
         {
-            if (context.CancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
+            return;
+        }
 
-            if (QueryAnalyzerHelper.IsOpenLambda(innerLambda))
-            {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.OpenLambdaIsNotAllowed,
-                        innerLambda.GetLocation()));
-            }
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
         }
 
         var semanticModel = context.SemanticModel;
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContext, resolveError) =
+        var (lambdaContexts, resolveError) =
             resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
 
         if (context.CancellationToken.IsCancellationRequested)
@@ -112,15 +91,17 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            Descriptors.GraphQLQueryPreview,
-            memberAccess.Name.GetLocation(),
-            lambdaContext.OperationQuery));
+        foreach (var lambdaContext in lambdaContexts)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                Descriptors.GraphQLQueryPreview,
+                memberAccess.Name.GetLocation(),
+                lambdaContext.OperationQuery));
+        }
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
         = ImmutableArray.Create(
-            Descriptors.OnlyStaticLambda,
             Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUseOutScopeValues,
