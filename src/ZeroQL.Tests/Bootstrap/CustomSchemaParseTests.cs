@@ -8,7 +8,6 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.Bootstrap;
 
-[UsesVerify]
 public class CustomSchemaParseTests
 {
     [Fact]

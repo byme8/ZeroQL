@@ -3,7 +3,6 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
-[UsesVerify]
 public class QueryInfoProviderTests
 {
     [Fact]

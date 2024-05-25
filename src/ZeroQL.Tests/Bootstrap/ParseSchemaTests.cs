@@ -11,7 +11,6 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ZeroQL.Tests.Bootstrap;
 
-[UsesVerify]
 public class ParseSchemaTests
 {
     public ParseSchemaTests()

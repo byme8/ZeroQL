@@ -2,7 +2,8 @@
 using System.Net.Http;
 using System.IO; // do not remove this
 using System.Collections.Generic; // do not remove this
-using System.Linq;  // do not remove this
+using System.Linq;
+using System.Runtime.CompilerServices; // do not remove this
 using System.Threading; // do not remove this
 using System.Threading.Tasks;
 using GraphQL.TestServer;
@@ -11,6 +12,7 @@ using ZeroQL.Json; // do not remove this
 using ZeroQL.Pipelines; // do not remove this
 using ZeroQL.Stores; // do not remove this
 using ZeroQL.TestApp.Models;
+using ZeroQL.TestApp.Services;
 
 namespace ZeroQL.TestApp;
 
@@ -42,6 +44,15 @@ public class Program
         var response = await qlClient.Query(static q => q.Me(o => o.FirstName));
 
         return response;
+    }
+    
+    public static async Task<T?> MakeQuery<T, TQuery, TMutation>(
+        GraphQLClient<TQuery, TMutation> client, 
+        [GraphQLLambda]Func<TQuery, T> query,
+        [CallerArgumentExpression(nameof(query))] string queryKey = "")
+        where T : class
+    {
+        return await GraphQLClientMethodWrapper.MakeQuery(client, query, queryKey);
     }
 }
 

@@ -7,7 +7,6 @@ using static ZeroQL.Tests.Data.TestProject;
 
 namespace ZeroQL.Tests.SourceGeneration;
 
-[UsesVerify]
 public class RequestTests : IntegrationTest
 {
     [Fact]

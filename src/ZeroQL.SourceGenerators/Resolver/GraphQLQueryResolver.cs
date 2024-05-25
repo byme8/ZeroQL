@@ -133,7 +133,7 @@ public static class GraphQLQueryResolver
                 semanticModel.GetTypeInfo(o.Type!).Type!))
             .ToArray();
 
-        var availableVariables = !variables.Any()
+        var availableVariables = variables.Empty()
             ? new Dictionary<string, GraphQLQueryVariable>()
             : variables.ToDictionary(o => o.Name);
 
@@ -470,7 +470,7 @@ public static class GraphQLQueryResolver
     {
         if (QueryAnalyzerHelper.IsOpenLambda(simpleLambda))
         {
-            return Failed(simpleLambda);
+            return Failed(simpleLambda, Descriptors.OpenLambdaIsNotAllowed);
         }
 
         var parameter = simpleLambda.Parameter.Identifier.ValueText;

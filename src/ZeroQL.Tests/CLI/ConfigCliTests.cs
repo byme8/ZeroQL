@@ -4,7 +4,6 @@ using ZeroQL.Tests.Core;
 
 namespace ZeroQL.Tests.CLI;
 
-[UsesVerify]
 public class ConfigCliTests
 {
     [Fact]
