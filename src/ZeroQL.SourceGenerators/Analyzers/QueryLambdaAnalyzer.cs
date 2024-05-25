@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using ZeroQL.SourceGenerators.Extensions;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
@@ -26,8 +27,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
     private void Handle(SyntaxNodeAnalysisContext context)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation ||
-            invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        if (context.Node is not InvocationExpressionSyntax invocation)
         {
             return;
         }
@@ -67,7 +67,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
         var semanticModel = context.SemanticModel;
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContexts, resolveError) =
+        var (result, resolveError) =
             resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
 
         if (context.CancellationToken.IsCancellationRequested)
@@ -86,16 +86,21 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic
                 .Create(
                     Descriptors.FailedToConvert,
-                    memberAccess.Name.GetLocation(),
+                    invocation.GetLocationForPreview(),
                     resolveError.Message));
             return;
         }
 
-        foreach (var lambdaContext in lambdaContexts)
+        if (result.LambdaContexts is null)
+        {
+            return;
+        }
+
+        foreach (var lambdaContext in result.LambdaContexts)
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 Descriptors.GraphQLQueryPreview,
-                memberAccess.Name.GetLocation(),
+                invocation.GetLocationForPreview(),
                 lambdaContext.OperationQuery));
         }
     }

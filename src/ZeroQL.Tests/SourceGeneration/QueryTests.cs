@@ -171,17 +171,25 @@ public class QueryTests : IntegrationTest
     public async Task QueryPreviewGenerated()
     {
         var csharpQuery = "static q => new { Me = q.Me(o => new { o.FirstName }) }";
-        var graphqlQuery = @"query { me { firstName } }";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzers();
         var queryPreview = diagnostics
-            .Where(o => o.Id == Descriptors.GraphQLQueryPreview.Id)
-            .Select(o => o.GetMessage());
+            .Where(o => o.Location.SourceTree!.ToString().Contains("Program"))
+            .First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
 
-        queryPreview.Should().Contain(graphqlQuery);
+        var startLinePosition = queryPreview.Location.GetLineSpan().StartLinePosition;
+        var line = startLinePosition.Line;
+        var character = startLinePosition.Character;
+        var source = queryPreview.Location.SourceTree!
+            .ToString()
+            .Split('\r', '\n');
+
+        var lineWithPreview = source[line].Insert(character, "^");
+        
+        await Verify(lineWithPreview);
     }
 
     [Fact]

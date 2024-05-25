@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
+using ZeroQL.SourceGenerators.Generator;
 
 namespace ZeroQL.Tests.Core;
 
@@ -19,6 +20,13 @@ public static class TestExtensions
         new QueryRequestAnalyzer(),
         new QueryOnSyntaxAnalyzer()
     );
+
+    public static IIncrementalGenerator[] Generators =>
+    [
+        new GraphQLLambdaIncrementalSourceGenerator(),
+        new GraphQLRequestIncrementalSourceGenerator(),
+        new GraphQLFragmentTemplateIncrementalSourceGenerator(),
+    ];
 
     public static async Task<Project> ReplacePartOfDocumentAsync(this Project project,
         string documentName,
@@ -73,6 +81,13 @@ public static class TestExtensions
         var newName = $"{project.Name}.Guid{Guid.NewGuid():N}";
         var fixedProject = project.WithAssemblyName(newName);
         var compilation = await fixedProject.GetCompilationAsync();
+
+        var generationResult = await project.ApplyGenerator(Generators);
+        if (generationResult.Diagnostics.Any())
+        {
+            throw new Exception(generationResult.Diagnostics.First().GetMessage());
+        }
+        
         var analyzerResults = await compilation!
             .WithAnalyzers(Analyzers)
             .GetAllDiagnosticsAsync();
@@ -103,7 +118,7 @@ public static class TestExtensions
         return result;
     }
 
-    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project, IIncrementalGenerator generator)
+    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project, params IIncrementalGenerator[] generator)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
 
@@ -161,5 +176,5 @@ public static class TestExtensions
     {
         settingsTask.AddScrubber(o => o.Replace(value, name));
         return settingsTask;
-    } 
+    }
 }

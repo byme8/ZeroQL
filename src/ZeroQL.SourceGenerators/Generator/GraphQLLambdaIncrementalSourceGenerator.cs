@@ -43,21 +43,19 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static void GenerateFile(SourceProductionContext context, InvocationExpressionSyntax invocation,
-        SemanticModel semanticModel, HashSet<string> processed)
+    private static void GenerateFile(
+        SourceProductionContext context, 
+        InvocationExpressionSyntax invocation,
+        SemanticModel semanticModel, 
+        HashSet<string> processed)
     {
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContexts, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+        var (result, error) = resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
         if (error)
         {
             if (error is ErrorWithData<Diagnostic> errorWithData)
             {
                 context.ReportDiagnostic(errorWithData.Data);
-                return;
-            }
-
-            if (error == resolver.WrongMethod)
-            {
                 return;
             }
 
@@ -78,7 +76,12 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        foreach (var lambdaContext in lambdaContexts)
+        if (result.LambdaContexts is null)
+        {
+            return;
+        }
+
+        foreach (var lambdaContext in result.LambdaContexts)
         {
             var source = GraphQLSourceResolver.Resolve(
                 semanticModel,
@@ -101,12 +104,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
 
     private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
     {
-        if (syntaxNode is not InvocationExpressionSyntax invocation)
-        {
-            return false;
-        }
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        if (syntaxNode is not InvocationExpressionSyntax)
         {
             return false;
         }

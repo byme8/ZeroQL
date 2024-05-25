@@ -18,12 +18,8 @@ public class QueryAnalyzerHelper
         INamedTypeSymbol attributeType)
     {
         var semanticModel = compilation.GetSemanticModel(invocation.SyntaxTree);
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return [];
-        }
 
-        var possibleMethod = semanticModel.GetSymbolInfo(memberAccess.Name);
+        var possibleMethod = semanticModel.GetSymbolInfo(invocation.Expression);
         if (possibleMethod.Symbol is not IMethodSymbol method)
         {
             return [];
@@ -60,12 +56,6 @@ public class QueryAnalyzerHelper
         }
 
         return graphQLLambdas;
-
-        // var queryInfoProvider = compilation.GetTypeByMetadataName("ZeroQL.Stores.QueryInfoProvider");
-        // if (SymbolEqualityComparer.Default.Equals(containingType,  queryInfoProvider))
-        // {
-        //     return method;
-        // }
     }
 
     public static bool IsOpenLambda(LambdaExpressionSyntax lambda)

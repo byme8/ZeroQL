@@ -19,11 +19,18 @@ public class UploadInfoByType
     public IPropertySymbol[] UploadProperties { get; set; }
 }
 
+public class GraphQLLambdaResolverResult
+{
+    public IReadOnlyList<GraphQLSourceGenerationContext>? LambdaContexts { get; set; }
+
+    public bool VariablePassThrough { get; set; }
+
+    public bool NoGraphQLLambda { get; set; }
+}
+
 public class GraphQLLambdaLikeContextResolver
 {
-    public Error WrongMethod = new Error("Could not find query method");
-
-    public Result<IReadOnlyList<GraphQLSourceGenerationContext>> Resolve(
+    public Result<GraphQLLambdaResolverResult> Resolve(
         InvocationExpressionSyntax invocation,
         SemanticModel semanticModel,
         CancellationToken cancellationToken)
@@ -32,7 +39,10 @@ public class GraphQLLambdaLikeContextResolver
         var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation, graphQLLambdaAttribute);
         if (graphQLLambdas.Empty())
         {
-            return WrongMethod;
+            return new GraphQLLambdaResolverResult
+            {
+                NoGraphQLLambda = true
+            };
         }
 
         if (cancellationToken.IsCancellationRequested)
@@ -48,7 +58,10 @@ public class GraphQLLambdaLikeContextResolver
 
         if (lambdas.Empty())
         {
-            return new Error("Could not find lambda");
+            return new GraphQLLambdaResolverResult()
+            {
+                VariablePassThrough = true
+            };
         }
 
         var contexts = new List<GraphQLSourceGenerationContext>();
@@ -68,11 +81,6 @@ public class GraphQLLambdaLikeContextResolver
             if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol graphQLMethodSymbol)
             {
                 return new Error("Could not find lambda symbol");
-            }
-
-            if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-            {
-                return new Error("Could not find member access");
             }
 
             var queryType = graphQLMethodSymbol.Parameters.Last().Type;
@@ -139,7 +147,10 @@ public class GraphQLLambdaLikeContextResolver
                 uploadProperties));
         }
         
-        return contexts;
+        return new GraphQLLambdaResolverResult
+        {
+            LambdaContexts = contexts
+        };
     }
 
     private Result<string?> ResolveName(InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol)

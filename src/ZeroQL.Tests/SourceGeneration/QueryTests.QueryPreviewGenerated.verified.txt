@@ -1,0 +1,1 @@
+﻿        var response = await qlClient.^Query(static q => new { Me = q.Me(o => new { o.FirstName }) });

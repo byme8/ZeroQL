@@ -43,7 +43,7 @@ public static class TestProject
 
     public static async Task<object> Execute(this Project project, CancellationToken token = default)
     {
-        project = await project.RemoveSyntaxTreesFromReferences();
+        project = await project.RemoveSyntaxTreesFromReferences();;
         var assembly = await project.CompileToRealAssembly();
         var response = await assembly.Execute(token);
 
