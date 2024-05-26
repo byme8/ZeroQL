@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($file: Upload!) { addMyProfileImage(file: $file)},
+  Data: 42
+}

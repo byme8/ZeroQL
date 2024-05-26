@@ -29,10 +29,60 @@ public class OnSyntaxTests : IntegrationTest
                     })
                 """;
 
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
+        var result = await TestProject.Project.Execute(csharpQuery);
 
-        var result = await project.Execute();
+        await Verify(result);
+    }
+    
+    [Fact]
+    public async Task InterfacesDominatedPropertyAndInterfaceProperty()
+    {
+        var csharpQuery = """
+                          static q => q.Figures(
+                              o => new
+                              {
+                                  CreatorId = o.Creator(oo => oo.Id),
+                                  SquareCreatorId = o.On<Square>()
+                                      .Select(oo => oo.Creator("name", ooo => ooo.Id))
+                              })
+                          """;
+
+        var result = await TestProject.Project.Execute(csharpQuery);
+
+        await Verify(result);
+    }
+    
+    [Fact]
+    public async Task InterfacesInterfaceProperty()
+    {
+        var csharpQuery = """
+                          static q => q.Figures(
+                              o => new
+                              {
+                                  CreatorId = o.Creator(oo => oo.Id),
+                                  SquareCreatorId = o.On<Square>()
+                                      .Select(oo => oo.Creator("name", ooo => ooo.Id))
+                              })
+                          """;
+
+        var result = await TestProject.Project.Execute(csharpQuery);
+
+        await Verify(result);
+    }
+    
+    [Fact]
+    public async Task InterfacesDominatedProperty()
+    {
+        var csharpQuery = """
+                          static q => q.Figures(
+                              o => new
+                              {
+                                  SquareCreatorId = o.On<Square>()
+                                      .Select(oo => oo.Creator("name", ooo => ooo.Id))
+                              })
+                          """;
+
+        var result = await TestProject.Project.Execute(csharpQuery);
 
         await Verify(result);
     }
@@ -45,7 +95,7 @@ public class OnSyntaxTests : IntegrationTest
                 o => new
                 {
                     Image = o.On<ImageContent>()
-                        .Select(oo => new { oo.ImageUrl, oo.Height }),
+                        .Select(oo => new { oo.ImageUrl, oo.Resolution }),
                     Text = o.On<TextContent>()
                         .Select(oo => new { oo.Text }),
                     Figure = o.On<FigureContent>()
@@ -69,7 +119,7 @@ public class OnSyntaxTests : IntegrationTest
                 o => new
                 {
                     Circle = o.On<ImageContent>()
-                        .Select(oo => new { oo.ImageUrl, oo.Height }),
+                        .Select(oo => new { oo.ImageUrl, oo.Resolution }),
                 })
                 """;
 

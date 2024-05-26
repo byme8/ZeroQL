@@ -1,0 +1,16 @@
+﻿{
+  Query: query { me { firstName } },
+  Errors: [
+    {
+      Message: HTTP request failed unexpectedly with status code 404. Look at the Extensions.ZeroQLError extension for more details
+    }
+  ],
+  Extensions: {
+    ZeroQLError: {
+      Uri: http://localhost:10000/,
+      HttpStatusCode: 404,
+      ReasonPhrase: Not Found,
+      ResponseContent: 
+    }
+  }
+}

@@ -3,7 +3,7 @@ using ZeroQL.TestServer.Query.Models;
 
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Mutation))]
+[MutationType]
 public class UserGraphQLMutations
 {
     public User AddUser(string firstName, string lastName)

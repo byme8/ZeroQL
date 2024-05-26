@@ -30,7 +30,7 @@ public class PersistedQueryPipeline(IZeroQLSerializer serializer, bool tryToAddP
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
         request.Content = content;
         var response = await httpHandler.SendAsync(request, cancellationToken);
-        var qlResponse = await ReadResponse<TQuery>(response);
+        var qlResponse = await response.ReadGraphQLResponse<TQuery>(request, serializer, cancellationToken);
 
         if (qlResponse.Errors is null)
         {

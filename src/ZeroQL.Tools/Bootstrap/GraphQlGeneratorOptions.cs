@@ -12,6 +12,8 @@ public record GraphQlGeneratorOptions(string ClientNamespace, ClientVisibility V
 
     public Dictionary<string, string>? Scalars { get; init; }
 
+    public string[]? WarningsToIgnore { get; set; }
+
     public string AccessLevel => Visibility switch
     {
         ClientVisibility.Public => "public",

@@ -117,6 +117,6 @@ public static class GraphQLClientLambdaExtensions
             .Where(o => !o.Name.StartsWith("<>"))
             .ToDictionary(o => o.Name, o => o.GetValue(query.Target));
         
-        return variables;
+        return variables!;
     }
 }

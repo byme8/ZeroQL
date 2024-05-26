@@ -55,7 +55,7 @@ public static class JsonGenerators
                        {{typesForJsonContext
                                .Select(o => $"[global::System.Text.Json.Serialization.JsonSerializable(typeof({o}))]")
                                .JoinWithNewLine()
-                               .SpaceLeft(2)
+                               .SpaceLeft(1)
                        }}
                            internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
                            {

@@ -71,7 +71,14 @@ public class Square : IFigure, IEntity
 
     public float Perimeter => Math.Abs(TopLeft.Y - BottomRight.Y) * 2 + Math.Abs(BottomRight.Y - TopLeft.Y) * 2;
 
-    public IPerson? Creator { get; set; }
+    IPerson? IFigure.Creator { get; set; }
+    
+    public IPerson? GetCreator(string? name = null) => name is null ? null : new Person()
+    {
+        Id = 1,
+        FirstName = name,
+        LastName = "Smith",
+    };
 }
 
 public class Circle : IFigure, IEntity
@@ -89,7 +96,7 @@ public class Circle : IFigure, IEntity
     public IPerson? Creator { get; set; }
 }
 
-[ExtendObjectType(typeof(Query))]
+[QueryType]
 public class InterfacesExtensions
 {
     public IEntity[] GetEntities()
@@ -128,8 +135,7 @@ public class InterfacesExtensions
             {
                 Id = o + 30,
                 TopLeft = new Point { Id = o, X = o, Y = o },
-                BottomRight = new Point { Id = o + 20, X = o + 10, Y = o + 10 },
-                Creator = Person.Create(),
+                BottomRight = new Point { Id = o + 20, X = o + 10, Y = o + 10 }
             })
             .ToArray();
     }

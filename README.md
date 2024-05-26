@@ -45,7 +45,7 @@ cd QLClient
 # create manifest file to track nuget tools
 dotnet new tool-manifest 
 # add ZeroQL.CLI nuget tool
-dotnet tool install ZeroQL.CLI
+dotnet tool install ZeroQL.CLI # or 'dotnet tool restore' once you pulled the existing repository
 # add ZeroQL nuget package
 dotnet add package ZeroQL 
 # fetch graphql schema from server(creates schema.graphql file)
@@ -219,53 +219,96 @@ You need to create a record from the base record `` GraphQL<TOperationType, TRes
 
 # Benchmarks
 
-The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/Program.cs).
+The complete benchmark source code you can find [here](https://github.com/byme8/ZeroQL/blob/main/src/Benchmarks/ZeroQL.Benchmark/RawVsZeroQLBenchmark.cs).
 
 The short version looks like this:
 ``` csharp
 [Benchmark]
 public async Task<string> Raw()
 {
-    var rawQuery = @"{ ""query"": ""query { me { firstName }}"" }";
+    var rawQuery = 
+        $$"""
+        {
+            "variables": { "id": {{id}} }, 
+            "query": "query GetUser($id: Int!){ user(id: $id) { id firstName lastName } }" 
+        }
+        """;
     var response = await httpClient.PostAsync("", new StringContent(rawQuery, Encoding.UTF8, "application/json"));
     var responseJson = await response.Content.ReadAsStreamAsync();
     var qlResponse = JsonSerializer.Deserialize<JsonObject>(responseJson, options);
 
-    return qlResponse["data"]["me"]["firstName"].GetValue<string>();
+    return qlResponse!["data"]!["user"]!["firstName"]!.GetValue<string>();
 }
 
 [Benchmark]
 public async Task<string> StrawberryShake()
 {
-    var firstname = await strawberryShake.Me.ExecuteAsync();
-    return firstname.Data.Me.FirstName;
+    // query GetUser($id: Int!) {
+    //   user(id: $id) {
+    //       id
+    //       firstName
+    //       lastName
+    //   }
+    // }
+    var firstname = await strawberryShake.GetUser.ExecuteAsync(id);
+    return firstname.Data!.User!.FirstName;
 }
 
 [Benchmark]
-public async Task<string> ZeroQL()
+public async Task<string> ZeroQLLambdaWithoutClosure()
 {
-    var firstname = await zeroQLClient.Query(static q => q.Me(o => o.FirstName));
+    var variables = new { Id = id };
+    var firstname = await zeroQLClient.Query(
+        variables, static (i, q)
+            => q.User(i.Id, o => new { o.Id, o.FirstName, o.LastName }));
 
-    return firstname.Data;
+    return firstname.Data!.FirstName;
+}
+
+[Benchmark]
+public async Task<string> ZeroQLLambdaWithClosure()
+{
+    var id  = this.id;
+    var firstname = await zeroQLClient.Query( q
+            => q.User(id, o => new { o.Id, o.FirstName, o.LastName }));
+
+    return firstname.Data!.FirstName;
+}
+
+[Benchmark]
+public async Task<string> ZeroQLRequest()
+{
+    var firstname = await zeroQLClient.Execute(new GetUserQuery(id));
+
+    return firstname.Data!.FirstName;
+}
+
+// ..
+public record GetUserQuery(int id) : GraphQL<Query, User?>
+{
+    public override User? Execute(Query query)
+        => query.User(id, o => new User(o.Id, o.FirstName, o.LastName));
 }
 ```
 
 Here results:
 ``` ini
-BenchmarkDotNet=v0.13.2, OS=macOS 13.2.1 (22D68) [Darwin 22.3.0]
+
+BenchmarkDotNet=v0.13.2, OS=macOS 14.3.1 (23D60) [Darwin 23.3.0]
 Apple M1, 1 CPU, 8 logical and 8 physical cores
-.NET SDK=7.0.200
-  [Host]     : .NET 7.0.3 (7.0.323.6910), Arm64 RyuJIT AdvSIMD
-  DefaultJob : .NET 7.0.3 (7.0.323.6910), Arm64 RyuJIT AdvSIMD
+.NET SDK=8.0.100
+  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+  DefaultJob : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+
+
 ```
-|              Method |     Mean |   Error |  StdDev |   Gen0 | Allocated |
-|-------------------- |---------:|--------:|--------:|-------:|----------:|
-|                 Raw | 172.2 μs | 1.49 μs | 1.40 μs | 0.7324 |   4.96 KB |
-|     StrawberryShake | 175.0 μs | 1.18 μs | 1.05 μs | 1.4648 |   9.32 KB |
-|        ZeroQLLambda | 174.2 μs | 1.26 μs | 1.17 μs | 0.7324 |    5.5 KB |
-|       ZeroQLRequest | 174.8 μs | 1.68 μs | 1.49 μs | 0.7324 |   5.88 KB |
-|  ZeroQLLambdaUpload | 208.5 μs | 2.06 μs | 1.83 μs | 1.4648 |  10.34 KB |
-| ZeroQLRequestUpload | 208.9 μs | 3.02 μs | 2.83 μs | 1.7090 |  10.43 KB |
+| Method                     |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|----------------------------|---------:|--------:|--------:|-------:|----------:|
+| Raw                        | 111.3 us | 0.77 us | 0.68 us | 0.7324 |   5.29 KB |
+| StrawberryShake            | 119.3 us | 1.61 us | 1.51 us | 1.7090 |  11.55 KB |
+| ZeroQLLambdaWithoutClosure | 112.4 us | 2.04 us | 1.91 us | 0.9766 |    6.7 KB |
+| ZeroQLLambdaWithClosure    | 113.7 us | 1.80 us | 1.68 us | 0.9766 |   7.18 KB |
+| ZeroQLRequest              | 112.9 us | 1.22 us | 1.14 us | 0.9766 |   6.27 KB |
 
 As you can see, the ``Raw`` method is the fastest.
 The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 

@@ -1,0 +1,21 @@
+﻿[  
+    [ZeroQL.GraphQLType("Staff")]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
+    public class StaffZeroQL
+    {
+        [ZeroQL.GraphQLName("id")]
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("staff")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public StaffZeroQL?[]? __Staff { get; set; }
+
+        [ZeroQL.GraphQLName("staff")]
+        public T?[]? Staff<T>(Func<StaffZeroQL, T> selector = default!)
+        {
+            return __Staff?.Select(o => o is null ? default : selector(o)).ToArray();
+        }
+    }
+
+]

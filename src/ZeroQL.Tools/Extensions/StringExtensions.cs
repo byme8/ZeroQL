@@ -10,7 +10,7 @@ public static class StringExtensions
     public static string SpaceLeft(this string text, int length, int mult = 4)
     {
         var spaces = new string(' ', length * mult);
-        var lines = text.Split(new []{ '\r', '\n' });
+        var lines = text.Split(Environment.NewLine);
         var sb = new StringBuilder();
         foreach (var line in lines)
         {
@@ -54,9 +54,16 @@ public static class StringExtensions
             return value.FirstToUpper();
         }
         
-        return value
+        var pascalCaseName = value
             .Split("_", StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())
             .Join(string.Empty);
+
+        if (char.IsDigit(pascalCaseName[0]))
+        {
+            pascalCaseName = "_" + pascalCaseName;
+        }
+        
+        return pascalCaseName;
     }
 }

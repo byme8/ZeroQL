@@ -57,6 +57,15 @@ public class FragmentTests : IntegrationTest
     }
     
     [Fact]
+    public async Task CanApplyFragmentWithEnumCast()
+    {
+        var csharpQuery = "q => q.Me(o => o.AsUserRead())";
+        var result = await TestProject.Project.Execute(csharpQuery);
+
+        await Verify(result);
+    }
+    
+    [Fact]
     public async Task CanApplyFragmentWithArgument()
     {
         var csharpQuery = "static (i, q) => q.GetUserById(i.Id)";

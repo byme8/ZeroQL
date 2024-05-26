@@ -4,7 +4,7 @@ using ZeroQL.TestServer.Query.Models;
 
 namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Mutation))]
+[MutationType]
 public class CustomScalarsMutations
 {
     public Uuid CreateUserId(Uuid id)

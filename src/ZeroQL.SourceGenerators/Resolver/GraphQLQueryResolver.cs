@@ -293,6 +293,10 @@ public static class GraphQLQueryResolver
             {
                 return ResolveQuery(context.WithParent(arrowExpression), arrowExpression.Expression);
             }
+            case CastExpressionSyntax cast:
+            {
+                return HandleEnumCast(context, cast);
+            }
         }
 
         return Failed(node);
@@ -329,7 +333,7 @@ public static class GraphQLQueryResolver
 
         if (results.Any(o => o.Error))
         {
-            return results.First().Error!;
+            return results.FirstOrDefault(o => o.Error)?.Error!;
         }
 
         return results.Select(o => o.Value!).Join(" ");
@@ -370,8 +374,9 @@ public static class GraphQLQueryResolver
         {
             return variable.GraphQLValue;
         }
-        
-        var possibleMethodSymbol = context.SemanticModel.GetSymbolInfo(argument.Parent!.Parent!, context.CancellationToken);
+
+        var possibleMethodSymbol =
+            context.SemanticModel.GetSymbolInfo(argument.Parent!.Parent!, context.CancellationToken);
         if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
         {
             return Failed(argument);
@@ -915,6 +920,23 @@ public static class GraphQLQueryResolver
         }
 
         return stringBuilder.ToString();
+    }
+
+    private static Result<string> HandleEnumCast(GraphQLResolveContext context, CastExpressionSyntax cast)
+    {
+        var castedTo = context.SemanticModel.GetTypeInfo(cast.Type);
+        if (castedTo.Type is null)
+        {
+            return Failed(cast);
+        }
+
+        var type = castedTo.Type;
+        if (type.TypeKind != TypeKind.Enum)
+        {
+            return Failed(cast);
+        }
+                
+        return ResolveQuery(context.WithParent(cast), cast.Expression);
     }
 
     private static bool IsUnionType(GraphQLResolveContext context, INamedTypeSymbol namedTypeSymbol)

@@ -1,6 +1,6 @@
 ﻿namespace ZeroQL.TestServer.Query;
 
-[ExtendObjectType(typeof(Mutation))]
+[MutationType]
 public class DateMutation
 {
     public DateTime GetDateTime(DateTime dateTime) => dateTime;

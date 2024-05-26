@@ -4,8 +4,8 @@ using CliFx.Infrastructure;
 using ZeroQL.Bootstrap;
 using ZeroQL.CLI.Converters;
 using ZeroQL.Config;
-using ZeroQL.Core.Config;
 using ZeroQL.Core.Enums;
+using ZeroQL.Extensions;
 using ZeroQL.Internal;
 
 namespace ZeroQL.CLI.Commands;
@@ -40,6 +40,11 @@ public class GenerateCommand : ICommand
 
     [CommandOption("visibility", 'v', Description = "The visibility within the assembly for the generated client")]
     public ClientVisibility? Visibility { get; set; }
+
+    [CommandOption(
+        "warnings-to-ignore",
+        Description = "The warnings to ignore when generating the client. Example: --warnings-to-ignore=CS0168,CS0219")]
+    public string? WarningsToIgnore { get; set; }
 
     [CommandOption(
         "scalars",
@@ -90,7 +95,8 @@ public class GenerateCommand : ICommand
         {
             ClientName = ClientName,
             NetstandardCompatibility = NetstandardCompatibility,
-            Scalars = scalars
+            Scalars = scalars,
+            WarningsToIgnore = WarningsToIgnore?.Split(","),
         };
 
         var outputPath = Path.IsPathRooted(Output) ? Output : Path.GetFullPath(Output);
@@ -117,6 +123,7 @@ public class GenerateCommand : ICommand
             Directory.CreateDirectory(outputFolder);
         }
 
+        Exception? exception = null;
         var count = 10;
         for (int i = 0; i < count; i++)
         {
@@ -129,10 +136,17 @@ public class GenerateCommand : ICommand
             }
             catch (Exception e)
             {
+                exception = e;
                 await console.Error.WriteLineAsync($"Failed write to '{outputPath}'");
                 await console.Error.WriteLineAsync($"Attempting in 1 second. {i + 1} / {count}");
                 await Task.Delay(1000);
             }
+        }
+        
+        if (exception is not null)
+        {
+            await console.Error.WriteLineAsync("Failed to write to file.");
+            await console.Error.WriteLineAsync(exception.Message);
         }
     }
 
@@ -204,6 +218,11 @@ public class GenerateCommand : ICommand
         if (!Visibility.HasValue)
         {
             Visibility = config.Visibility;
+        }
+        
+        if (WarningsToIgnore is null)
+        {
+            WarningsToIgnore = config.WarningsToIgnore?.Join(",");
         }
 
         if (string.IsNullOrEmpty(Output) && !string.IsNullOrEmpty(config.Output))

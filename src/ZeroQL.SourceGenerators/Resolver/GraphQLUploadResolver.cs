@@ -171,6 +171,7 @@ public class GraphQLUploadResolver
                 {processSource}
 
                 var content = new MultipartFormDataContent();
+                content.Headers.Add(""GraphQL-preflight"", ""1"");
 
                 var queryJson = qlClient.Serialization.Serialize(queryRequest);
                 content.Add(new StringContent(queryJson), ""operations"");

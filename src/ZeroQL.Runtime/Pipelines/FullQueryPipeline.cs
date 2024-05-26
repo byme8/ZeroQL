@@ -9,8 +9,12 @@ namespace ZeroQL.Pipelines;
 
 public class FullQueryPipeline(IZeroQLSerializer serialization) : IGraphQLQueryPipeline
 {
-    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(IHttpHandler httpHandler, string queryKey,
-        object? variables, CancellationToken cancellationToken, Func<GraphQLRequest, HttpContent> contentCreator)
+    public async Task<GraphQLResponse<TQuery>> ExecuteAsync<TQuery>(
+        IHttpHandler httpHandler,
+        string queryKey,
+        object? variables,
+        CancellationToken cancellationToken,
+        Func<GraphQLRequest, HttpContent> contentCreator)
     {
         var queryInfo = GraphQLQueryStore<TQuery>.Query[queryKey];
         var query = queryInfo.Query;
@@ -23,27 +27,11 @@ public class FullQueryPipeline(IZeroQLSerializer serialization) : IGraphQLQueryP
         var content = contentCreator(qlRequest);
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri("", UriKind.Relative));
         request.Content = content;
+        
         var response = await httpHandler.SendAsync(request, cancellationToken);
-#if DEBUG
-        var responseJson = await response.Content.ReadAsStringAsync();
-        var qlResponse = serialization.Deserialize<GraphQLResponse<TQuery>>(responseJson);
-#elif NETSTANDARD
-        var responseJson = await response.Content.ReadAsStreamAsync();
-        var qlResponse = await serialization.Deserialize<GraphQLResponse<TQuery>>(
-            responseJson,
-            cancellationToken);
-#else
-        var responseJson = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var qlResponse = await serialization.Deserialize<GraphQLResponse<TQuery>>(
-                responseJson,
-                cancellationToken);
-#endif
+        var qlResponse = await response.ReadGraphQLResponse<TQuery>(request, serialization, cancellationToken);
 
-        if (qlResponse is not null)
-        {
-            qlResponse.Query = query;
-        }
-
-        return qlResponse!;
+        qlResponse.Query = query;
+        return qlResponse;
     }
 }

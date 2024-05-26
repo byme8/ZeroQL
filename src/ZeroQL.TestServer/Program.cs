@@ -36,28 +36,12 @@ public class Program
             .AddSha256DocumentHashProvider(HashFormat.Hex);
 
         var graphQLServer = builder.Services.AddGraphQLServer()
-            .AddQueryType<Query.Query>()
-            .AddMutationType<Mutation>()
+            .AddTestServerTypes()
             .AddType<UploadType>()
             .AddType<InstantType>()
-            .BindRuntimeType<Uuid, UuidType>()
             .AddType<ZonedDateTimeType>()
             .AddType<IInterfaceThatNeverGetsUsed>()
-            .AddType<Person>()
-            .AddTypeExtension<LongOperationsExtensions>()
-            .AddTypeExtension<UnionExtensions>()
-            .AddTypeExtension<InterfacesExtensions>()
-            .AddTypeExtension<NodeTimeGraphQLExtensions>()
-            .AddTypeExtension<NodeTimeGraphQLMutations>()
-            .AddTypeExtension<UserGraphQLExtensions>()
-            .AddTypeExtension<DateMutation>()
-            .AddTypeExtension<UserGraphQLMutations>()
-            .AddTypeExtension<RoleGraphQLExtension>()
-            .AddTypeExtension<JSONQueryExtensions>()
-            .AddTypeExtension<CSharpKeywordsQueryExtensions>()
-            .AddTypeExtension<CustomScalarsMutations>()
-            .AddTypeExtension<ErrorQuery>()
-            .AddTypeExtension<ErrorQueryWithError>();
+            .AddType<Person>().BindRuntimeType<Uuid, UuidType>();
 
         if (string.IsNullOrEmpty(context.QueriesPath))
         {
@@ -71,7 +55,7 @@ public class Program
                 .UsePersistedQueryPipeline()
                 .AddFileSystemQueryStorage(context.QueriesPath);
         }
-        
+
         var app = builder.Build();
 
         app.MapGraphQL();

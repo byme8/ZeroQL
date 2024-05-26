@@ -1,0 +1,9 @@
+{
+  Query: query { figures { creator { id __typename }  ... on Square { creator(name: "name") { id __typename }  } __typename } },
+  Data: [
+    {
+      CreatorId: 1
+    },
+    {}
+  ]
+}

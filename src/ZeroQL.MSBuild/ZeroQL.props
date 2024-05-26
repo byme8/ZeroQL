@@ -19,7 +19,7 @@
         </Exec>
 
         <Error Condition="'$(ZeroQLErrorCode)' != '0' And $(ZeroQLCLIValidation) != 'False'"
-               Text="ZeroQL CLI could not be found. Please install it before proceeding."/>
+               Text="ZeroQL CLI could not be found. Please install or restore it before proceeding."/>
 
         <Exec Command="dotnet zeroql config output -c ./%(ZeroQLConfig.Identity)" ConsoleToMSBuild="true">
             <Output ItemName="ZeroQLOutput" TaskParameter="ConsoleOutput"/>

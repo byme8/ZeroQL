@@ -49,7 +49,7 @@ type FigureContent {
 type ImageContent {
   id: Int!
   imageUrl: String!
-  height: Int!
+  resolution: ImageResolution!
   author: User!
 }
 
@@ -77,13 +77,14 @@ type Limit3 {
 }
 
 type Mutation {
-  createInstant(instant: Instant!): Instant!
+  createUserId(id: uuid!): uuid!
   dateTime(dateTime: DateTime!): DateTime!
   dateTimes(dateTime: [DateTime]): [DateTime]
   dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
   timeSpan(timeSpan: TimeSpan!): TimeSpan!
   dateOnly(dateOnly: Date!): Date!
   timeOnly(timeOnly: TimeSpan!): TimeSpan!
+  createInstant(instant: Instant!): Instant!
   addUser(firstName: String! lastName: String!): User!
   doError: Int!
   addUserProfileImage(USER_ID: Int! file: Upload!): Int!
@@ -99,7 +100,6 @@ type Mutation {
   addLimits(limit: [Limit2Input!]!): [Limit2!]!
   addLowerCaseTypeName(value: lower_case_type_nameInput!): lower_case_type_name!
   addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
-  createUserId(id: uuid!): uuid!
 }
 
 type Person implements IPerson {
@@ -117,17 +117,22 @@ type Point implements IFigure & IEntity {
 }
 
 type Query {
-  longOperation: Int!
-  posts: [PostContent!]!
-  image: ImageContent!
-  text: TextContent!
-  figure: FigureContent!
+  int(int: Int!): Int!
+  object(object: Int!): Int!
+  containerWithoutError: ContainerWithoutError
   entities: [IEntity!]!
   figures: [IFigure!]!
   circles: [Circle!]!
   squares: [Square!]!
+  jsonUsersElement: JSON!
+  jsonUsersDocument: JsonDocument!
+  longOperation: Int!
   instant: Instant!
   zonedDateTime: ZonedDateTime!
+  posts: [PostContent!]!
+  image: ImageContent!
+  text: TextContent!
+  figure: FigureContent!
   me: User!
   currentUser: User! @deprecated(reason: "Use Me instead")
   MEWITHSUPPERCASING: User!
@@ -143,11 +148,6 @@ type Query {
   userKind(id: Int!): UserKind!
   admin(id: Int!): User
   container: TypesContainer!
-  jsonUsersElement: JSON!
-  jsonUsersDocument: JsonDocument!
-  int(int: Int!): Int!
-  object(object: Int!): Int!
-  containerWithoutError: ContainerWithoutError
 }
 
 type Role {
@@ -156,11 +156,11 @@ type Role {
 }
 
 type Square implements IFigure & IEntity {
+  creator(name: String): IPerson
   id: Int
   topLeft: Point!
   bottomRight: Point!
   perimeter: Float!
-  creator: IPerson
 }
 
 type TextContent {
@@ -211,13 +211,19 @@ type User {
   lastName: String!
   userKind: UserKind!
   role: Role
+  loginAttempts: [UserLoginAttempt!]!
+}
+
+type UserLoginAttempt {
+  time: DateTime!
+  success: Boolean!
 }
 
 type lower_case_type_name {
   value: Int!
 }
 
-union PostContent = FigureContent | TextContent | ImageContent
+union PostContent = ImageContent | TextContent | FigureContent
 
 input AddUsersInput {
   user: UserInfoInput
@@ -260,6 +266,13 @@ input UserInfoInput {
 
 input lower_case_type_nameInput {
   value: Int!
+}
+
+enum ImageResolution {
+  _1360X720
+  _1920X1080
+  _2560X1440
+  _3840X2160
 }
 
 enum UserKind {
