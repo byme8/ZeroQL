@@ -15,7 +15,7 @@ public static class DownloadHelper
         CancellationToken cancellationToken)
     {
         var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
-        await using var stream = File.OpenWrite(output);
+        await using var stream = File.Create(output);
         await IntrospectionClient.Default.DownloadSchemaAsync(client, stream, cancellationToken);
     }
 
