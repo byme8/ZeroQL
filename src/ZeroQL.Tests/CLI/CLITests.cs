@@ -6,7 +6,6 @@ using ZeroQL.Tests.Data;
 
 namespace ZeroQL.Tests.CLI;
 
-[UsesVerify]
 public class CliTests : IntegrationTest
 {
     const string GeneratedFileName = "GraphQL.g.cs";
@@ -149,12 +148,12 @@ public class CliTests : IntegrationTest
     }
 
     [Fact]
-    public async Task ExtractMutationAndQuery()
+    public async Task ExtractMutationAndQueryTest()
     {
-        await ExtractQueriesCommand();
+        await ExtractMutationAndQuery();
     }
 
-    public static async Task<ExtractQueriesCommand> ExtractQueriesCommand()
+    public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
         var uniqueId = Guid.NewGuid().ToString("N");
         var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";
@@ -178,7 +177,7 @@ public class CliTests : IntegrationTest
 
         console.ReadErrorString().Should().BeEmpty();
         Directory.EnumerateFiles(command.Output).Should().NotBeEmpty();
-
+        
         return command;
     }
 }

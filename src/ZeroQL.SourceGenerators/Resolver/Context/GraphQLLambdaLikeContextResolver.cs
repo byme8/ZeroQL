@@ -19,19 +19,30 @@ public class UploadInfoByType
     public IPropertySymbol[] UploadProperties { get; set; }
 }
 
+public class GraphQLLambdaResolverResult
+{
+    public IReadOnlyList<GraphQLSourceGenerationContext>? LambdaContexts { get; set; }
+
+    public bool VariablePassThrough { get; set; }
+
+    public bool NoGraphQLLambda { get; set; }
+}
+
 public class GraphQLLambdaLikeContextResolver
 {
-    public Error WrongMethod = new Error("Could not find query method");
-
-    public Result<GraphQLSourceGenerationContext> Resolve(
+    public Result<GraphQLLambdaResolverResult> Resolve(
         InvocationExpressionSyntax invocation,
         SemanticModel semanticModel,
         CancellationToken cancellationToken)
     {
-        var queryMethod = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation);
-        if (queryMethod is null)
+        var graphQLLambdaAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
+        var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation, graphQLLambdaAttribute);
+        if (graphQLLambdas.Empty())
         {
-            return WrongMethod;
+            return new GraphQLLambdaResolverResult
+            {
+                NoGraphQLLambda = true
+            };
         }
 
         if (cancellationToken.IsCancellationRequested)
@@ -39,88 +50,107 @@ public class GraphQLLambdaLikeContextResolver
             return new Error("Cancelled");
         }
 
-        var graphqlLambda = invocation.ArgumentList.Arguments
-            .Last(o => o.Expression is LambdaExpressionSyntax);
-        var key = graphqlLambda.ToString();
-        var nameColon = graphqlLambda.NameColon?.ToString();
-        if (nameColon is not null)
+        var lambdas = graphQLLambdas
+            .Select(o => invocation.ArgumentList.Arguments[o.Index])
+            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Where(o => o.Expression is not null)
+            .ToArray();
+
+        if (lambdas.Empty())
         {
-            key = key.Replace(nameColon, string.Empty).Trim();
+            return new GraphQLLambdaResolverResult()
+            {
+                VariablePassThrough = true
+            };
         }
 
-        var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda.Expression);
-        if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol graphQLMethodSymbol)
+        var contexts = new List<GraphQLSourceGenerationContext>();
+        foreach (var graphqlLambdaWithIndex in lambdas)
         {
-            return new Error("Could not find lambda symbol");
-        }
+            var parameter = graphqlLambdaWithIndex.Argument;
+            var graphqlLambda = graphqlLambdaWithIndex.Expression!;
 
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+            var key = graphqlLambda.ToString();
+            var nameColon = parameter.NameColon?.ToString();
+            if (nameColon is not null)
+            {
+                key = key.Replace(nameColon, string.Empty).Trim();
+            }
+
+            var possibleGraphQLLambdaSymbol = semanticModel.GetSymbolInfo(graphqlLambda);
+            if (possibleGraphQLLambdaSymbol.Symbol is not IMethodSymbol graphQLMethodSymbol)
+            {
+                return new Error("Could not find lambda symbol");
+            }
+
+            var queryType = graphQLMethodSymbol.Parameters.Last().Type;
+            var operationKind = queryType.AllInterfaces.Any(o => o.Name == "IQuery")
+                ? "query"
+                : "mutation";
+
+            var possibleMethodSymbol = semanticModel.GetSymbolInfo(invocation);
+            if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
+            {
+                return new Error("Could not find method symbol");
+            }
+
+            var (name, nameError) = ResolveName(invocation, methodSymbol).Unwrap();
+            if (nameError)
+            {
+                return nameError;
+            }
+
+            var (graphQLMethodInputType, executionStrategy) =
+                GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
+            if (graphQLMethodInputType is null)
+            {
+                return new Error("Could not find input type");
+            }
+
+            var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType
+                ? graphQLMethodInputType.BaseType!
+                : graphQLMethodInputType;
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return new Error("Cancelled");
+            }
+
+            var (result, error) = GraphQLQueryResolver
+                .Resolve(semanticModel, graphqlLambda, cancellationToken)
+                .Unwrap();
+
+            if (error)
+            {
+                return error;
+            }
+
+            var (uploadType, uploadProperties) =
+                FindAllUploadProperties(graphQLMethodInputType, result.Variables, semanticModel);
+            var query = $"{operationKind} {name ?? string.Empty}{result.Query}";
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return new Error("Cancelled");
+            }
+
+            contexts.Add(new GraphQLSourceGenerationContext(
+                key,
+                executionStrategy,
+                name,
+                operationKind,
+                query,
+                result.Query,
+                queryType.ToGlobalName(),
+                graphQLMethodInputType,
+                requestExecutorInputArgumentSymbol,
+                uploadType,
+                uploadProperties));
+        }
+        
+        return new GraphQLLambdaResolverResult
         {
-            return new Error("Could not find member access");
-        }
-
-        var queryType = graphQLMethodSymbol.Parameters.Last().Type;
-        var operationKind = queryType.AllInterfaces.Any(o => o.Name == "IQuery")
-            ? "query"
-            : "mutation";
-
-        var possibleMethodSymbol = semanticModel.GetSymbolInfo(invocation);
-        if (possibleMethodSymbol.Symbol is not IMethodSymbol methodSymbol)
-        {
-            return new Error("Could not find method symbol");
-        }
-
-        var (name, nameError) = ResolveName(invocation, methodSymbol).Unwrap();
-        if (nameError)
-        {
-            return nameError;
-        }
-
-        var (graphQLMethodInputType, executionStrategy) =
-            GetInputSymbol(graphQLMethodSymbol, semanticModel.Compilation);
-        if (graphQLMethodInputType is null)
-        {
-            return new Error("Could not find input type");
-        }
-
-        var requestExecutorInputArgumentSymbol = graphQLMethodInputType.IsAnonymousType
-            ? graphQLMethodInputType.BaseType!
-            : graphQLMethodInputType;
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return new Error("Cancelled");
-        }
-
-        var (result, error) = GraphQLQueryResolver
-            .Resolve(semanticModel, graphqlLambda.Expression, cancellationToken)
-            .Unwrap();
-
-        if (error)
-        {
-            return error;
-        }
-
-        var (uploadType, uploadProperties) =
-            FindAllUploadProperties(graphQLMethodInputType, result.Variables, semanticModel);
-        var query = $"{operationKind} {name ?? string.Empty}{result.Query}";
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return new Error("Cancelled");
-        }
-
-        return new GraphQLSourceGenerationContext(
-            key,
-            executionStrategy,
-            name,
-            operationKind,
-            query,
-            result.Query,
-            queryType.ToGlobalName(),
-            graphQLMethodInputType,
-            requestExecutorInputArgumentSymbol,
-            uploadType,
-            uploadProperties);
+            LambdaContexts = contexts
+        };
     }
 
     private Result<string?> ResolveName(InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol)

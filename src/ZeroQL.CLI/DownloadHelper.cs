@@ -16,7 +16,7 @@ public static class DownloadHelper
         CancellationToken cancellationToken)
     {
         var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
-        await using var stream = File.OpenWrite(output);
+        await using var stream = File.Create(output);
         var document = await IntrospectionClient.IntrospectServerAsync(client,  cancellationToken);
         await document.PrintToAsync(stream, cancellationToken: cancellationToken, indented: true);
     }

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using ZeroQL.SourceGenerators.Extensions;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
@@ -26,15 +27,19 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
 
     private void Handle(SyntaxNodeAnalysisContext context)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation ||
-            invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-            memberAccess.Name.Identifier.ValueText is not ("Query" or "Mutation" or "Materialize"))
+        if (context.Node is not InvocationExpressionSyntax invocation)
         {
             return;
         }
 
-        var method = QueryAnalyzerHelper.ExtractQueryMethod(context.Compilation, invocation);
-        if (method is null)
+        var graphQLLambdaAttribute =
+            context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
+        var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
+            context.Compilation,
+            invocation,
+            graphQLLambdaAttribute);
+
+        if (graphQLLambdas.Empty())
         {
             return;
         }
@@ -44,51 +49,25 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var possibleLambdaQuery = invocation.ArgumentList.Arguments
-            .LastOrDefault(o => o.Expression is LambdaExpressionSyntax)?
-            .Expression;
-        if (possibleLambdaQuery is not LambdaExpressionSyntax lambda)
-        {
-            return;
-        }
-
-        if (lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda
-            && !parenthesizedLambda.Modifiers.Any(SyntaxKind.StaticKeyword))
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptors.OnlyStaticLambda,
-                lambda.GetLocation()));
-        }
-
-        if (context.CancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
-        var innerLambdas = lambda
-            .DescendantNodes()
-            .OfType<LambdaExpressionSyntax>()
+        var lambdas = graphQLLambdas
+            .Select(o => invocation.ArgumentList.Arguments[o.Index])
+            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Where(o => o.Expression is not null)
             .ToArray();
 
-        foreach (var innerLambda in innerLambdas)
+        if (lambdas.Empty())
         {
-            if (context.CancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
+            return;
+        }
 
-            if (QueryAnalyzerHelper.IsOpenLambda(innerLambda))
-            {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.OpenLambdaIsNotAllowed,
-                        innerLambda.GetLocation()));
-            }
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
         }
 
         var semanticModel = context.SemanticModel;
         var resolver = new GraphQLLambdaLikeContextResolver();
-        var (lambdaContext, resolveError) =
+        var (result, resolveError) =
             resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
 
         if (context.CancellationToken.IsCancellationRequested)
@@ -107,20 +86,27 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic
                 .Create(
                     Descriptors.FailedToConvert,
-                    memberAccess.Name.GetLocation(),
+                    invocation.GetLocationForPreview(),
                     resolveError.Message));
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(
-            Descriptors.GraphQLQueryPreview,
-            memberAccess.Name.GetLocation(),
-            lambdaContext.OperationQuery));
+        if (result.LambdaContexts is null)
+        {
+            return;
+        }
+
+        foreach (var lambdaContext in result.LambdaContexts)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                Descriptors.GraphQLQueryPreview,
+                invocation.GetLocationForPreview(),
+                lambdaContext.OperationQuery));
+        }
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
         = ImmutableArray.Create(
-            Descriptors.OnlyStaticLambda,
             Descriptors.FragmentsWithoutSyntaxTree,
             Descriptors.OpenLambdaIsNotAllowed,
             Descriptors.DontUseOutScopeValues,

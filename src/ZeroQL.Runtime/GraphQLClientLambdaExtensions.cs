@@ -15,6 +15,8 @@ public static class GraphQLClientLambdaExtensions
         this GraphQLClient<TQuery, TMutation> client,
         string name,
         TVariables variables,
+        [StaticLambda]
+        [GraphQLLambda] 
         Func<TVariables, TQuery, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
@@ -25,6 +27,8 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Query<TVariables, TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         TVariables variables,
+        [StaticLambda]
+        [GraphQLLambda] 
         Func<TVariables, TQuery, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
@@ -35,7 +39,7 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Query<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         string name,
-        Func<TQuery, TResult> query,
+        [GraphQLLambda] Func<TQuery, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
@@ -49,7 +53,7 @@ public static class GraphQLClientLambdaExtensions
 
     public static async Task<GraphQLResult<TResult>> Query<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
-        Func<TQuery, TResult> query,
+        [GraphQLLambda] Func<TQuery, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
@@ -65,6 +69,8 @@ public static class GraphQLClientLambdaExtensions
         this GraphQLClient<TQuery, TMutation> client,
         string name,
         TVariables variables,
+        [StaticLambda]
+        [GraphQLLambda]
         Func<TVariables, TMutation, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
@@ -75,6 +81,8 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Mutation<TVariables, TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         TVariables variables,
+        [StaticLambda]
+        [GraphQLLambda]
         Func<TVariables, TMutation, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
@@ -85,7 +93,7 @@ public static class GraphQLClientLambdaExtensions
     public static async Task<GraphQLResult<TResult>> Mutation<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
         string name,
-        Func<TMutation, TResult> query,
+        [GraphQLLambda] Func<TMutation, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {
@@ -99,7 +107,7 @@ public static class GraphQLClientLambdaExtensions
 
     public static async Task<GraphQLResult<TResult>> Mutation<TQuery, TMutation, TResult>(
         this GraphQLClient<TQuery, TMutation> client,
-        Func<TMutation, TResult> query,
+        [GraphQLLambda] Func<TMutation, TResult> query,
         CancellationToken cancellationToken = default,
         [CallerArgumentExpression(nameof(query))] string queryKey = null!)
     {

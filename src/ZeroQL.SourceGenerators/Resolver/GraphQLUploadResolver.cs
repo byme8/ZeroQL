@@ -10,7 +10,7 @@ public class GraphQLUploadResolver
 {
     public static string GenerateUploadsSelectors(GraphQLQueryExecutionStrategy executionStrategy, UploadInfoByType[] types, INamedTypeSymbol uploadType)
     {
-        if (!types.Any())
+        if (types.Empty())
         {
             return string.Empty;
         }
@@ -155,7 +155,7 @@ public class GraphQLUploadResolver
 
     public static string GenerateRequestPreparations(string inputType, GraphQLQueryExecutionStrategy executionStrategy, Dictionary<string, UploadInfoByType> infoForTypes)
     {
-        if (!infoForTypes.Any())
+        if (infoForTypes.Empty())
         {
             return RequestWithoutUpload();
         }

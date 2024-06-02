@@ -1,10 +1,7 @@
-using ZeroQL.CLI;
 using ZeroQL.Config;
-using ZeroQL.Core.Config;
 
 namespace ZeroQL.Tests.CLI;
 
-[UsesVerify]
 public class JsonSchema
 {
     [Fact]

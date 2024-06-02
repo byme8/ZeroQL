@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace ZeroQL.SourceGenerators.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionalParametersAnalyzer : DiagnosticAnalyzer
+public class StaticLambdaAnalyzer : DiagnosticAnalyzer
 {
 #pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
@@ -40,45 +40,46 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var nameAttribute = context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLNameAttribute)!;
-        if (!method.GetAttributes().Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, nameAttribute)))
+        var staticLambdaAttribute =
+            context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.StaticLambdaAttribute)!;
+        var staticLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
+            context.Compilation,
+            invocation,
+            staticLambdaAttribute);
+
+        if (staticLambdas.Empty())
         {
             return;
         }
 
-        var requiredParameters = method.Parameters
-            .Select((o, i) => (Parameter: o, Index: i))
-            .Where(o => o.Parameter.Type.NullableAnnotation == NullableAnnotation.NotAnnotated)
+        if (context.CancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var lambdas = staticLambdas
+            .Select(o => invocation.ArgumentList.Arguments[o.Index])
+            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Where(o => o.Expression is not null)
             .ToArray();
 
-        if (requiredParameters.Length == 0)
+        if (lambdas.Empty())
         {
             return;
         }
 
-        var arguments = invocation.ArgumentList.Arguments;
-        for (int i = 0; i < requiredParameters.Length; i++)
+        foreach (var lambda in lambdas)
         {
-            var requiredParameter = requiredParameters[i];
-            var requiredParameterNamed = arguments
-                .Any(o => o.NameColon?.Name.Identifier.ValueText == requiredParameter.Parameter.Name);
-
-            if (requiredParameterNamed)
-            {
-                continue;
-            }
-
-            if (arguments.Count <= requiredParameter.Index)
+            if (lambda.Expression is ParenthesizedLambdaExpressionSyntax parenthesizedLambda
+                && !parenthesizedLambda.Modifiers.Any(SyntaxKind.StaticKeyword))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    Descriptors.GraphQLQueryRequiredParameter,
-                    memberAccess.Name.GetLocation(),
-                    method.Name,
-                    requiredParameter.Parameter.Name));
+                    Descriptors.OnlyStaticLambda,
+                    lambda.Expression.GetLocation()));
             }
         }
     }
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
-        = ImmutableArray.Create(Descriptors.GraphQLQueryRequiredParameter);
+        = ImmutableArray.Create(Descriptors.OnlyStaticLambda);
 }
