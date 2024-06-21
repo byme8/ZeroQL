@@ -71,7 +71,7 @@ public class FileUploadTests : IntegrationTest
             new() { FirstName = ""John"", LastName = ""Smith"", Avatar = new Upload(""image.png"", new MemoryStream(new byte[42])) },
             new() { FirstName = ""Ben"", LastName = ""Smith"", Avatar = new Upload(""image.png"", new MemoryStream(new byte[42])) }
         };";
-        var csharpQuery = "Mutation(new { Users = users }, static (i, m) => m.AddUsersInfo(i.Users))";
+        var csharpQuery = "Mutation(m => m.AddUsersInfo(users))";
 
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",

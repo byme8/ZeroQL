@@ -15,8 +15,8 @@ public class DateTests : IntegrationTest
     public async Task Dates(string name, string creator)
     {
         var csharpQuery = $$"""
-            var input = new { Input = {{creator}} };
-            var response = await qlClient.Mutation(input, static (i, m) => m.{{name}}(i.Input));
+            var input = {{creator}};
+            var response = await qlClient.Mutation(m => m.{{name}}(input));
         """;
 
         var project = await TestProject.Project

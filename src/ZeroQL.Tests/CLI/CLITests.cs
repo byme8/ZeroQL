@@ -153,7 +153,7 @@ public class CliTests : IntegrationTest
         await ExtractMutationAndQuery();
     }
 
-    public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
+    public static async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
         var uniqueId = Guid.NewGuid().ToString("N");
         var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";

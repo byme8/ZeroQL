@@ -551,7 +551,7 @@ namespace GraphQLClient
         public int __Int { get; set; }
 
         [ZeroQL.GraphQLName("int")]
-        public int Int([ZeroQL.GraphQLType("Int!")] int @int = default !)
+        public int Int([ZeroQL.GraphQLType("Int!")] int @int = default!)
         {
             return __Int;
         }
@@ -561,7 +561,7 @@ namespace GraphQLClient
         public int __Object { get; set; }
 
         [ZeroQL.GraphQLName("object")]
-        public int Object([ZeroQL.GraphQLType("Int!")] int @object = default !)
+        public int Object([ZeroQL.GraphQLType("Int!")] int @object = default!)
         {
             return __Object;
         }
@@ -571,7 +571,7 @@ namespace GraphQLClient
         public ContainerWithoutError? __ContainerWithoutError { get; set; }
 
         [ZeroQL.GraphQLName("containerWithoutError")]
-        public T? ContainerWithoutError<T>(Func<ContainerWithoutError, T> selector = default !)
+        public T? ContainerWithoutError<T>(Func<ContainerWithoutError, T> selector = default!)
         {
             return __ContainerWithoutError is null ? default : selector(__ContainerWithoutError);
         }
@@ -625,7 +625,7 @@ namespace GraphQLClient
         public JsonDocument __JsonUsersDocument { get; set; }
 
         [ZeroQL.GraphQLName("jsonUsersDocument")]
-        public T JsonUsersDocument<T>(Func<JsonDocument, T> selector = default !)
+        public T JsonUsersDocument<T>(Func<JsonDocument, T> selector = default!)
         {
             return __JsonUsersDocument is null ? throw new NullReferenceException("JsonUsersDocument is null but it should not be null. Schema can be outdated.") : selector(__JsonUsersDocument);
         }
@@ -647,7 +647,7 @@ namespace GraphQLClient
         public PostContent[] __Posts { get; set; }
 
         [ZeroQL.GraphQLName("posts")]
-        public T[] Posts<T>(Func<PostContent, T> selector = default !)
+        public T[] Posts<T>(Func<PostContent, T> selector = default!)
         {
             return __Posts is null ? throw new NullReferenceException("Posts is null but it should not be null. Schema can be outdated.") : __Posts.Select(o => o is null ? throw new NullReferenceException("Posts is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
@@ -657,7 +657,7 @@ namespace GraphQLClient
         public ImageContent __Image { get; set; }
 
         [ZeroQL.GraphQLName("image")]
-        public T Image<T>(Func<ImageContent, T> selector = default !)
+        public T Image<T>(Func<ImageContent, T> selector = default!)
         {
             return __Image is null ? throw new NullReferenceException("Image is null but it should not be null. Schema can be outdated.") : selector(__Image);
         }
@@ -667,7 +667,7 @@ namespace GraphQLClient
         public TextContent __Text { get; set; }
 
         [ZeroQL.GraphQLName("text")]
-        public T Text<T>(Func<TextContent, T> selector = default !)
+        public T Text<T>(Func<TextContent, T> selector = default!)
         {
             return __Text is null ? throw new NullReferenceException("Text is null but it should not be null. Schema can be outdated.") : selector(__Text);
         }
@@ -677,7 +677,7 @@ namespace GraphQLClient
         public FigureContent __Figure { get; set; }
 
         [ZeroQL.GraphQLName("figure")]
-        public T Figure<T>(Func<FigureContent, T> selector = default !)
+        public T Figure<T>(Func<FigureContent, T> selector = default!)
         {
             return __Figure is null ? throw new NullReferenceException("Figure is null but it should not be null. Schema can be outdated.") : selector(__Figure);
         }
@@ -844,7 +844,7 @@ namespace GraphQLClient
         public IPerson? __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        public T? Creator<T>([ZeroQL.GraphQLType("String")] string? name = default !, Func<IPerson, T> selector = default !)
+        public T? Creator<T>([ZeroQL.GraphQLType("String")] string? name = default!, Func<IPerson, T> selector = default!)
         {
             return __Creator is null ? default : selector(__Creator);
         }
@@ -878,7 +878,7 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
-        T IFigure.Creator<T>(Func<IPerson, T> selector = default !)
+        T IFigure.Creator<T>(Func<IPerson, T> selector = default!)
         {
             return __Creator is null ? default : selector(__Creator);
         }
@@ -1103,14 +1103,14 @@ namespace GraphQLClient
         public UserLoginAttempt[] __LoginAttempts { get; set; }
 
         [ZeroQL.GraphQLName("loginAttempts")]
-        public T[] LoginAttempts<T>(Func<UserLoginAttempt, T> selector = default !)
+        public T[] LoginAttempts<T>(Func<UserLoginAttempt, T> selector = default!)
         {
             return __LoginAttempts is null ? throw new NullReferenceException("LoginAttempts is null but it should not be null. Schema can be outdated.") : __LoginAttempts.Select(o => o is null ? throw new NullReferenceException("LoginAttempts is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
         }
     }
 
     [ZeroQL.GraphQLType("UserLoginAttempt")]
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     internal class UserLoginAttempt
     {
         [ZeroQL.GraphQLName("time")]
@@ -1391,7 +1391,7 @@ namespace GraphQLClient
         public static implicit operator string(ZonedDateTime scalar) => scalar.Value;
     }
 
-    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [System.CodeDom.Compiler.GeneratedCode("ZeroQL", "1.0.0.0")]
     internal enum ImageResolution
     {
         [ZeroQL.GraphQLName("_1360X720")]
@@ -1571,30 +1571,40 @@ namespace GraphQLClient
     }
 
 #if NET8_0
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(IFigureStub))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Circle))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Point))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Square))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(IEntityStub))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Circle))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Point))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Square))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(PostContentStub))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(FigureContent))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(ImageContent))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(TextContent))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(IPersonStub))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Person))]
-    [global::System.Text.Json.Serialization.JsonSerializable(typeof(InterfaceThatNeverGetsUsedStub))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(AddUsersInput))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(byte))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(DateOnly))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(DateTimeOffset))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(decimal))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(double))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(global::GraphQLClient.Instant))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(global::GraphQLClient.uuid))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(global::ZeroQL.Upload))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Guid))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Guid[]))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(int))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(int[]))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(KeyValuePairOfStringAndStringInput))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(KeyValuePairOfStringAndStringInput[]))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Limit2Input))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Limit2Input[]))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(LimitInputZeroQL))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(long))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(lower_case_type_nameInput))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(short))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(string))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(TimeSpan))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(UserInfoInput[]))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(UserKind))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(UserKindPascal))]
     [global::System.Text.Json.Serialization.JsonSerializable(typeof(ZeroQL.Internal.GraphQLRequest))]
     [global::System.Text.Json.Serialization.JsonSerializable(typeof(ZeroQL.GraphQLResponse<Query>))]
     [global::System.Text.Json.Serialization.JsonSerializable(typeof(ZeroQL.GraphQLResponse<Mutation>))]
     [global::System.Text.Json.Serialization.JsonSerializable(typeof(Dictionary<string, object>))]
+    [global::System.Text.Json.Serialization.JsonSerializable(typeof(Dictionary<int, string[]>))]
     internal partial class ZeroQLJsonSerializationContext : JsonSerializerContext
     {
         
     }
 #endif
 }
-#pragma warning restore CS1066
-#pragma warning restore 8618

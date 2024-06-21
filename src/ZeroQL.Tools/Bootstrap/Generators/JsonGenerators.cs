@@ -11,7 +11,7 @@ public static class JsonGenerators
     public static string GenerateJsonInitializers(this GraphQlGeneratorOptions options,
         IReadOnlyCollection<ScalarDefinition> customScalars,
         IReadOnlyCollection<EnumDefinition> enums,
-        IReadOnlyCollection<InterfaceDefinition> interfaces, 
+        IReadOnlyCollection<InterfaceDefinition> interfaces,
         string[] typesForJsonContext)
     {
         var customScalarInitializers = CustomScalarInitializers(options, customScalars);

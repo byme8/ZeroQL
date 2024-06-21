@@ -59,7 +59,7 @@ public class PersistentQueryTest
     [Fact]
     public async Task CanSendPersistedQueryWhenServerHasIt()
     {
-        var command = await CliTests.ExtractQueriesCommand();
+        var command = await CliTests.ExtractMutationAndQuery();
 
         var context = await RunServer(10_001, command.Output);
 
