@@ -434,6 +434,11 @@ public static class GraphQLQueryResolver
                         return Failed(identifierName, Descriptors.GraphQLVariableShouldBeLocal);
                     }
 
+                    case ILocalSymbol { HasConstantValue: true } localSymbol:
+                    {
+                        var constantValue = localSymbol.ConstantValue!;
+                        return GraphQLConstantResolver.ToGraphQL(localSymbol.Type, constantValue);
+                    }
                     case ILocalSymbol localSymbol:
                     {
                         var graphQLType = parameter.ToGraphQLType();
