@@ -180,14 +180,7 @@ public class QueryTests : IntegrationTest
             .Where(o => o.Location.SourceTree!.ToString().Contains("Program"))
             .First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
 
-        var startLinePosition = queryPreview.Location.GetLineSpan().StartLinePosition;
-        var line = startLinePosition.Line;
-        var character = startLinePosition.Character;
-        var source = queryPreview.Location.SourceTree!
-            .ToString()
-            .Split('\r', '\n');
-
-        var lineWithPreview = source[line].Insert(character, "^");
+        var lineWithPreview = queryPreview.Location.Preview();
         
         await Verify(lineWithPreview);
     }
@@ -423,6 +416,39 @@ public class QueryTests : IntegrationTest
         var csharpQuery = """
                           var userIds = new[] { 1 };
                           var response = await qlClient.Query(q => q.UsersByIds(userIds, o => o.FirstName));
+                          """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task SupportForConstants()
+    {
+        var csharpQuery = """
+                          const string firstName = "John";
+                          const string lastName = "Smith";
+                          var response = await qlClient.Mutation(m => m.AddUser(firstName, lastName, o => o.Id));
+                          """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task SupportForEnumConstants()
+    {
+        var csharpQuery = """
+                          const UserKindPascal kind = UserKindPascal.Good;
+                          var response = await qlClient.Mutation(m => m.AddUserKindPascal(kind));
                           """;
 
         var project = await TestProject.Project
