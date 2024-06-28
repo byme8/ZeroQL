@@ -294,21 +294,21 @@ public record GetUserQuery(int id) : GraphQL<Query, User?>
 Here results:
 ``` ini
 
-BenchmarkDotNet=v0.13.2, OS=macOS 14.3.1 (23D60) [Darwin 23.3.0]
-Apple M1, 1 CPU, 8 logical and 8 physical cores
-.NET SDK=8.0.100
-  [Host]     : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
-  DefaultJob : .NET 8.0.0 (8.0.23.53103), Arm64 RyuJIT AdvSIMD
+BenchmarkDotNet=v0.13.2, OS=macOS 14.5 (23F79) [Darwin 23.5.0]
+Apple M3 Max, 1 CPU, 14 logical and 14 physical cores
+.NET SDK=8.0.301
+  [Host]     : .NET 8.0.6 (8.0.624.26715), Arm64 RyuJIT AdvSIMD
+  DefaultJob : .NET 8.0.6 (8.0.624.26715), Arm64 RyuJIT AdvSIMD
 
 
 ```
-| Method                     |     Mean |   Error |  StdDev |   Gen0 | Allocated |
-|----------------------------|---------:|--------:|--------:|-------:|----------:|
-| Raw                        | 111.3 us | 0.77 us | 0.68 us | 0.7324 |   5.29 KB |
-| StrawberryShake            | 119.3 us | 1.61 us | 1.51 us | 1.7090 |  11.55 KB |
-| ZeroQLLambdaWithoutClosure | 112.4 us | 2.04 us | 1.91 us | 0.9766 |    6.7 KB |
-| ZeroQLLambdaWithClosure    | 113.7 us | 1.80 us | 1.68 us | 0.9766 |   7.18 KB |
-| ZeroQLRequest              | 112.9 us | 1.22 us | 1.14 us | 0.9766 |   6.27 KB |
+|                     Method |     Mean |    Error |   StdDev |   Gen0 | Allocated |
+|--------------------------- |---------:|---------:|---------:|-------:|----------:|
+|                        Raw | 68.65 μs | 0.277 μs | 0.231 μs | 0.6104 |   5.34 KB |
+|            StrawberryShake | 73.48 μs | 0.362 μs | 0.321 μs | 1.3428 |  11.58 KB |
+| ZeroQLLambdaWithoutClosure | 69.55 μs | 0.376 μs | 0.351 μs | 0.7324 |   6.74 KB |
+|    ZeroQLLambdaWithClosure | 70.43 μs | 0.439 μs | 0.410 μs | 0.8545 |   7.22 KB |
+|              ZeroQLRequest | 69.95 μs | 0.439 μs | 0.366 μs | 0.7324 |   6.32 KB |
 
 As you can see, the ``Raw`` method is the fastest.
 The ``ZeroQL`` method is a bit faster than the ``StrawberryShake`` method. 
