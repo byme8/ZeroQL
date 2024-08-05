@@ -14,16 +14,21 @@ public class QueryTests : IntegrationTest
     {
         await TestProject.Project.CompileToRealAssembly();
     }
+    
+    [Fact]
+    public async Task ResponseHeadersAvailable()
+    {
+        var result = (IGraphQLResult)await TestProject.Project.Execute();
+
+        result.HttpResponseMessage.Headers.Should().ContainKey("trace-id");
+    }
 
     [Fact]
     public async Task SimpleQuery()
     {
-        var graphqlQuery = @"query { me { firstName } }";
-        var project = TestProject.Project;
+        var result = await TestProject.Project.Execute();
 
-        var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
-
-        result.Data.Should().Be("Jon");
+        await Verify(result);
     }
     
     [Fact]

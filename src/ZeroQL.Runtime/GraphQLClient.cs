@@ -89,11 +89,11 @@ public class GraphQLClient<TQuery, TMutation> : IGraphQLClient, IDisposable
 
         if (result.Data is null)
         {
-            return new GraphQLResult<TResult>(result.Query, default, result.Errors, result.Extensions);
+            return new GraphQLResult<TResult>(result.HttpResponseMessage, result.Query, default, result.Errors, result.Extensions);
         }
         
         var mappedData = queryMapper(variables, result.Data);
-        return new GraphQLResult<TResult>(result.Query, mappedData, result.Errors, result.Extensions);
+        return new GraphQLResult<TResult>(result.HttpResponseMessage, result.Query, mappedData, result.Errors, result.Extensions);
     }
 
     public void Dispose()

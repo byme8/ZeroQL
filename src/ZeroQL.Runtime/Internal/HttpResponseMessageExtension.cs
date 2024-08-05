@@ -15,16 +15,19 @@ public static class HttpResponseMessageExtension
         CancellationToken cancellationToken)
     {
         const string responseContentTypeStartWith = "application/graphql-response";
-        if (!response.IsSuccessStatusCode && !(response.Content.Headers.ContentType?.MediaType?.StartsWith(responseContentTypeStartWith) ?? false))
+        var graphqlResponse = response.Content.Headers.ContentType?.MediaType?.StartsWith(responseContentTypeStartWith);
+        if (!response.IsSuccessStatusCode && !(graphqlResponse ?? false))
         {
             var responseContent = await response.Content.ReadAsStringAsync();
             return new GraphQLResponse<TQuery>
             {
+                HttpResponseMessage = response,
                 Errors =
                 [
                     new()
                     {
-                        Message = $"""HTTP request failed unexpectedly with status code {(int)response.StatusCode}. Look at the Extensions.ZeroQLError extension for more details""",
+                        Message =
+                            $"""HTTP request failed unexpectedly with status code {(int)response.StatusCode}. Look at the Extensions.ZeroQLError extension for more details""",
                     }
                 ],
                 Extensions = new()
@@ -39,7 +42,7 @@ public static class HttpResponseMessageExtension
                 }
             };
         }
-        
+
 #if DEBUG
         var responseJson = await response.Content.ReadAsStringAsync();
         var qlResponse =
@@ -62,11 +65,13 @@ public static class HttpResponseMessageExtension
         {
             return new GraphQLResponse<TQuery>
             {
+                HttpResponseMessage = response,
                 Errors =
                 [
                     new()
                     {
-                        Message = """Failed to deserialize the response from the server. Look at the Extensions.ZeroQLError extension for more details""",
+                        Message =
+                            """Failed to deserialize the response from the server. Look at the Extensions.ZeroQLError extension for more details""",
                     }
                 ],
                 Extensions = new()
@@ -80,7 +85,10 @@ public static class HttpResponseMessageExtension
                 }
             };
         }
-        
-        return qlResponse;
-    } 
+
+        return qlResponse with
+        {
+            HttpResponseMessage = response
+        };
+    }
 }

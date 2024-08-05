@@ -1,0 +1,4 @@
+﻿{
+  Query: query { me { firstName } },
+  Data: Jon
+}

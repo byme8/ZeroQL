@@ -188,7 +188,7 @@ public static class TestExtensions
         var character = span.StartLinePosition.Character;
         var source = sourceTree
             .ToString()
-            .Split('\r', '\n');
+            .Split('\r');
 
         var lineWithPreview = source[line].Insert(character, "^");
         

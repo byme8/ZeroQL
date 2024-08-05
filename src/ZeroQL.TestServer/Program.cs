@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using HotChocolate.Language;
 using HotChocolate.Types.NodaTime;
@@ -57,6 +58,14 @@ public class Program
         }
 
         var app = builder.Build();
+
+        app.Use(async (context, next) =>
+        {
+            var traceId = Guid.NewGuid().ToString();
+            context.Response.Headers.TryAdd("trace-id", traceId);
+
+            await next();
+        });
 
         app.MapGraphQL();
 
