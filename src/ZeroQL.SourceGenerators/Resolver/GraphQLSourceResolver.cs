@@ -61,6 +61,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
             {{
                 return new GraphQLResult<{context.QueryTypeName}>
                 {{
+                    HttpResponseMessage = qlResponse.HttpResponseMessage,
                     Errors = new[]
                     {{
                         new GraphQueryError {{ Message = ""Failed to deserialize response"" }}
@@ -70,6 +71,7 @@ namespace {semanticModel.Compilation.Assembly.Name}
 
             return new GraphQLResult<{context.QueryTypeName}>
             {{
+                HttpResponseMessage = qlResponse.HttpResponseMessage,
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
                 Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,

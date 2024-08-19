@@ -14,16 +14,21 @@ public class QueryTests : IntegrationTest
     {
         await TestProject.Project.CompileToRealAssembly();
     }
+    
+    [Fact]
+    public async Task ResponseHeadersAvailable()
+    {
+        var result = (IGraphQLResult)await TestProject.Project.Execute();
+
+        result.HttpResponseMessage.Headers.Should().ContainKey("trace-id");
+    }
 
     [Fact]
     public async Task SimpleQuery()
     {
-        var graphqlQuery = @"query { me { firstName } }";
-        var project = TestProject.Project;
+        var result = await TestProject.Project.Execute();
 
-        var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
-
-        result.Data.Should().Be("Jon");
+        await Verify(result);
     }
     
     [Fact]
@@ -180,14 +185,7 @@ public class QueryTests : IntegrationTest
             .Where(o => o.Location.SourceTree!.ToString().Contains("Program"))
             .First(o => o.Id == Descriptors.GraphQLQueryPreview.Id);
 
-        var startLinePosition = queryPreview.Location.GetLineSpan().StartLinePosition;
-        var line = startLinePosition.Line;
-        var character = startLinePosition.Character;
-        var source = queryPreview.Location.SourceTree!
-            .ToString()
-            .Split('\r', '\n');
-
-        var lineWithPreview = source[line].Insert(character, "^");
+        var lineWithPreview = queryPreview.Location.Preview();
         
         await Verify(lineWithPreview);
     }
@@ -423,6 +421,39 @@ public class QueryTests : IntegrationTest
         var csharpQuery = """
                           var userIds = new[] { 1 };
                           var response = await qlClient.Query(q => q.UsersByIds(userIds, o => o.FirstName));
+                          """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task SupportForConstants()
+    {
+        var csharpQuery = """
+                          const string firstName = "John";
+                          const string lastName = "Smith";
+                          var response = await qlClient.Mutation(m => m.AddUser(firstName, lastName, o => o.Id));
+                          """;
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var response = await project.Execute();
+
+        await Verify(response);
+    }
+    
+    [Fact]
+    public async Task SupportForEnumConstants()
+    {
+        var csharpQuery = """
+                          const UserKindPascal kind = UserKindPascal.Good;
+                          var response = await qlClient.Mutation(m => m.AddUserKindPascal(kind));
                           """;
 
         var project = await TestProject.Project

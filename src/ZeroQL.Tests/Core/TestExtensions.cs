@@ -98,7 +98,9 @@ public static class TestExtensions
 
         if (error != null)
         {
-            throw new Exception(error.GetMessage());
+            var message = error.GetMessage();
+            var preview = error.Location.Preview();
+            throw new Exception($"{message} {preview}");
         }
 
         using var memoryStream = new MemoryStream();
@@ -176,5 +178,20 @@ public static class TestExtensions
     {
         settingsTask.AddScrubber(o => o.Replace(value, name));
         return settingsTask;
+    }
+
+    public static string Preview(this Location location)
+    {
+        var sourceTree = location.SourceTree!;
+        var span = location.GetLineSpan();
+        var line = span.StartLinePosition.Line;
+        var character = span.StartLinePosition.Character;
+        var source = sourceTree
+            .ToString()
+            .Split('\r');
+
+        var lineWithPreview = source[line].Insert(character, "^");
+        
+        return lineWithPreview;
     }
 }

@@ -49,6 +49,7 @@ namespace ZeroQL.TestApp
             {
                 return new GraphQLResult<global::GraphQL.TestServer.Query>
                 {
+                    HttpResponseMessage = qlResponse.HttpResponseMessage,
                     Errors = new[]
                     {
                         new GraphQueryError { Message = "Failed to deserialize response" }
@@ -58,6 +59,7 @@ namespace ZeroQL.TestApp
 
             return new GraphQLResult<global::GraphQL.TestServer.Query>
             {
+                HttpResponseMessage = qlResponse.HttpResponseMessage,
                 Query = qlResponse.Query,
                 Data = qlResponse.Data,
                 Errors = qlResponse.Errors?.Length > 0 ? qlResponse.Errors : null,
