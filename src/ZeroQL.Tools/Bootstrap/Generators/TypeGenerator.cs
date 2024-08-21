@@ -160,6 +160,8 @@ public static class TypeGenerator
             .Property("__" + field.Name, field.TypeDefinition, null)
             .AddAttributeWithStringParameter(
                 ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName)
+            .AddAttributeWithStringParameter(
+                ZeroQLGenerationInfo.ObsoleteAttribute, "This property is for internal use only.")
             .AddAttributeWithRawParameters(
                 ZeroQLGenerationInfo.EditorBrowsableAttribute,
                 ZeroQLGenerationInfo.EditorBrowsableNeverParameter);

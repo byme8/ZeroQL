@@ -96,7 +96,7 @@ public static class GraphQLGenerator
         namespaceDeclaration = namespaceDeclaration
             .WithMembers(members);
 
-        var warningCodes = options.WarningsToIgnore ?? new[] { "8618", "CS8603", "CS1066" };
+        var warningCodes = options.WarningsToIgnore ?? new[] { "8618", "CS8603", "CS1066", "CS0618" };
         var disableWarning = PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)
             .WithErrorCodes(
                 SeparatedList<ExpressionSyntax>(warningCodes

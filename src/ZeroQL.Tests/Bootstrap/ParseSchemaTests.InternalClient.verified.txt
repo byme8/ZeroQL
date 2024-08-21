@@ -4,7 +4,7 @@
 //
 // Do not modify this file manually. Any changes will be lost after regeneration.
 // </auto-generated>
-#pragma warning disable 8618, CS8603, CS1066
+#pragma warning disable 8618, CS8603, CS1066, CS0618
 #nullable enable
 namespace GraphQLClient
 {
@@ -36,6 +36,7 @@ namespace GraphQLClient
         public int? Id { get; set; }
 
         [JsonPropertyName("center")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __Center { get; set; }
 
@@ -54,6 +55,7 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Person? __Creator { get; set; }
 
@@ -94,6 +96,7 @@ namespace GraphQLClient
         public string Value { get; set; }
 
         [JsonPropertyName("containerWithError")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public ContainerWithError? __ContainerWithError { get; set; }
 
@@ -113,6 +116,7 @@ namespace GraphQLClient
         public int Id { get; set; }
 
         [JsonPropertyName("figure")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IFigure __Figure { get; set; }
 
@@ -123,6 +127,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("author")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Author { get; set; }
 
@@ -150,6 +155,7 @@ namespace GraphQLClient
         public ImageResolution Resolution { get; set; }
 
         [JsonPropertyName("author")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Author { get; set; }
 
@@ -204,6 +210,7 @@ namespace GraphQLClient
         public int Value { get; set; }
 
         [JsonPropertyName("limit2")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit2ZeroQL __Limit2 { get; set; }
 
@@ -237,6 +244,7 @@ namespace GraphQLClient
     internal class Mutation : global::ZeroQL.Internal.IMutation
     {
         [JsonPropertyName("createUserId")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public global::GraphQLClient.uuid __CreateUserId { get; set; }
 
@@ -247,6 +255,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("dateTime")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public DateTimeOffset __DateTime { get; set; }
 
@@ -257,6 +266,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("dateTimes")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public DateTimeOffset? []? __DateTimes { get; set; }
 
@@ -267,6 +277,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("dateTimeOffset")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public DateTimeOffset __DateTimeOffset { get; set; }
 
@@ -277,6 +288,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("timeSpan")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public TimeSpan __TimeSpan { get; set; }
 
@@ -287,6 +299,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("dateOnly")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public DateOnly __DateOnly { get; set; }
 
@@ -297,6 +310,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("timeOnly")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public TimeSpan __TimeOnly { get; set; }
 
@@ -307,6 +321,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("createInstant")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public global::GraphQLClient.Instant __CreateInstant { get; set; }
 
@@ -317,6 +332,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addUser")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __AddUser { get; set; }
 
@@ -331,6 +347,7 @@ namespace GraphQLClient
         public int DoError { get; set; }
 
         [JsonPropertyName("addUserProfileImage")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddUserProfileImage { get; set; }
 
@@ -341,6 +358,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addMyProfileImage")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddMyProfileImage { get; set; }
 
@@ -351,6 +369,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addUsersInfo")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddUsersInfo { get; set; }
 
@@ -361,6 +380,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addUsersInfoWithEmails")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddUsersInfoWithEmails { get; set; }
 
@@ -371,6 +391,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addUserKindPascal")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddUserKindPascal { get; set; }
 
@@ -381,6 +402,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimit")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL __AddLimit { get; set; }
 
@@ -391,6 +413,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimitNullable")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL? __AddLimitNullable { get; set; }
 
@@ -401,6 +424,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimit2")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit2ZeroQL __AddLimit2 { get; set; }
 
@@ -411,6 +435,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimit2Nullable")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit2ZeroQL? __AddLimit2Nullable { get; set; }
 
@@ -421,6 +446,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimit3")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit3? __AddLimit3 { get; set; }
 
@@ -431,6 +457,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLimits")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Limit2ZeroQL[] __AddLimits { get; set; }
 
@@ -441,6 +468,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addLowerCaseTypeName")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public lower_case_type_name __AddLowerCaseTypeName { get; set; }
 
@@ -451,6 +479,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("addValues")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __AddValues { get; set; }
 
@@ -509,6 +538,7 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IPerson __Creator { get; set; }
 
@@ -536,6 +566,7 @@ namespace GraphQLClient
     internal class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("int")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __Int { get; set; }
 
@@ -546,6 +577,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("object")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int __Object { get; set; }
 
@@ -556,6 +588,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("containerWithoutError")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public ContainerWithoutError? __ContainerWithoutError { get; set; }
 
@@ -566,6 +599,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("entities")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IEntity[] __Entities { get; set; }
 
@@ -576,6 +610,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("figures")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IFigure[] __Figures { get; set; }
 
@@ -586,6 +621,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("circles")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Circle[] __Circles { get; set; }
 
@@ -596,6 +632,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("squares")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Square[] __Squares { get; set; }
 
@@ -610,6 +647,7 @@ namespace GraphQLClient
         public global::System.Text.Json.JsonElement JsonUsersElement { get; set; }
 
         [JsonPropertyName("jsonUsersDocument")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public JsonDocument __JsonUsersDocument { get; set; }
 
@@ -632,6 +670,7 @@ namespace GraphQLClient
         public global::GraphQLClient.ZonedDateTime ZonedDateTime { get; set; }
 
         [JsonPropertyName("posts")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public PostContent[] __Posts { get; set; }
 
@@ -642,6 +681,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("image")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public ImageContent __Image { get; set; }
 
@@ -652,6 +692,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("text")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public TextContent __Text { get; set; }
 
@@ -662,6 +703,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("figure")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public FigureContent __Figure { get; set; }
 
@@ -672,6 +714,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("me")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Me { get; set; }
 
@@ -682,6 +725,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("currentUser")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __CurrentUser { get; set; }
 
@@ -693,6 +737,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("MEWITHSUPPERCASING")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __MEWITHSUPPERCASING { get; set; }
 
@@ -703,6 +748,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("MeWithPascalCasing")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __MeWithPascalCasing { get; set; }
 
@@ -713,6 +759,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("users")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User[] __Users { get; set; }
 
@@ -731,6 +778,7 @@ namespace GraphQLClient
         public UserKindPascal[] UserKindPascals { get; set; }
 
         [JsonPropertyName("usersMatrix")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User[][] __UsersMatrix { get; set; }
 
@@ -741,6 +789,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("usersByKind")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User[] __UsersByKind { get; set; }
 
@@ -751,6 +800,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("usersIds")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public int[] __UsersIds { get; set; }
 
@@ -761,6 +811,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("user")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User? __User { get; set; }
 
@@ -771,6 +822,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("usersByIds")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User[] __UsersByIds { get; set; }
 
@@ -781,6 +833,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("userKind")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public UserKind __UserKind { get; set; }
 
@@ -791,6 +844,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("admin")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User? __Admin { get; set; }
 
@@ -801,6 +855,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("container")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public TypesContainer __Container { get; set; }
 
@@ -829,6 +884,7 @@ namespace GraphQLClient
     internal class Square : IFigure, IEntity
     {
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IPerson? __Creator { get; set; }
 
@@ -843,6 +899,7 @@ namespace GraphQLClient
         public int? Id { get; set; }
 
         [JsonPropertyName("topLeft")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __TopLeft { get; set; }
 
@@ -853,6 +910,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("bottomRight")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __BottomRight { get; set; }
 
@@ -886,6 +944,7 @@ namespace GraphQLClient
         public string Text { get; set; }
 
         [JsonPropertyName("author")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Author { get; set; }
 
@@ -1009,6 +1068,7 @@ namespace GraphQLClient
         public Guid[]? Value26 { get; set; }
 
         [JsonPropertyName("value27")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public KeyValuePairOfStringAndString[] __Value27 { get; set; }
 
@@ -1019,6 +1079,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("value28")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public KeyValuePairOfStringAndString[]? __Value28 { get; set; }
 
@@ -1029,6 +1090,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("value29")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public KeyValuePairOfStringAndString __Value29 { get; set; }
 
@@ -1039,6 +1101,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("value30")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public KeyValuePairOfStringAndString? __Value30 { get; set; }
 
@@ -1078,6 +1141,7 @@ namespace GraphQLClient
         public UserKind UserKind { get; set; }
 
         [JsonPropertyName("role")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Role? __Role { get; set; }
 
@@ -1088,6 +1152,7 @@ namespace GraphQLClient
         }
 
         [JsonPropertyName("loginAttempts")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public UserLoginAttempt[] __LoginAttempts { get; set; }
 
@@ -1139,6 +1204,7 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IPerson? __Creator { get; set; }
 
@@ -1158,6 +1224,7 @@ namespace GraphQLClient
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IPerson? __Creator { get; set; }
 
