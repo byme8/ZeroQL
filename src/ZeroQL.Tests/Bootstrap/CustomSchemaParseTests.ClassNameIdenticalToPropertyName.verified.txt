@@ -4,7 +4,7 @@
 //
 // Do not modify this file manually. Any changes will be lost after regeneration.
 // </auto-generated>
-#pragma warning disable 8618, CS8603, CS1066
+#pragma warning disable 8618, CS8603, CS1066, CS0618
 #nullable enable
 namespace TestApp
 {
@@ -32,6 +32,7 @@ namespace TestApp
     public class Container
     {
         [JsonPropertyName("limit")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL __Limit { get; set; }
 
@@ -56,6 +57,7 @@ namespace TestApp
     public class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("perVariant")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL __PerVariant { get; set; }
 
@@ -66,6 +68,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("maybePerVariant")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL? __MaybePerVariant { get; set; }
 
@@ -76,6 +79,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("perVariants")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL[] __PerVariants { get; set; }
 
@@ -86,6 +90,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("maybePerVariants")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public LimitZeroQL[]? __MaybePerVariants { get; set; }
 
@@ -96,6 +101,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("limit")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Container __Limit { get; set; }
 
@@ -106,6 +112,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("limits")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Container[] __Limits { get; set; }
 
@@ -116,6 +123,7 @@ namespace TestApp
         }
 
         [JsonPropertyName("userIds")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public long[] __UserIds { get; set; }
 

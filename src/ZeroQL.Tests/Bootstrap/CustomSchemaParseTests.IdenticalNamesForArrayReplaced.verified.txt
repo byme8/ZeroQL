@@ -8,6 +8,7 @@
         public int Id { get; set; }
 
         [JsonPropertyName("staff")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public StaffZeroQL? []? __Staff { get; set; }
 

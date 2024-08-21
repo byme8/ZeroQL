@@ -12,6 +12,7 @@
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -32,6 +33,7 @@
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -52,6 +54,7 @@
         public int? Id { get; set; }
 
         [JsonPropertyName("topLeft")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __TopLeft { get; set; }
 
@@ -62,6 +65,7 @@
         }
 
         [JsonPropertyName("bottomRight")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __BottomRight { get; set; }
 
@@ -76,6 +80,7 @@
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
@@ -96,6 +101,7 @@
         public int? Id { get; set; }
 
         [JsonPropertyName("center")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public Point __Center { get; set; }
 
@@ -114,6 +120,7 @@
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public User __Creator { get; set; }
 
@@ -163,6 +170,7 @@
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
+        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         public IUser __Creator { get; set; }
 
