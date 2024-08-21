@@ -160,11 +160,11 @@ public static class TypeGenerator
             .Property("__" + field.Name, field.TypeDefinition, null)
             .AddAttributeWithStringParameter(
                 ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName)
-            .AddAttributeWithStringParameter(
-                ZeroQLGenerationInfo.ObsoleteAttribute, "This property is for internal use only.")
             .AddAttributeWithRawParameters(
                 ZeroQLGenerationInfo.EditorBrowsableAttribute,
-                ZeroQLGenerationInfo.EditorBrowsableNeverParameter);
+                ZeroQLGenerationInfo.EditorBrowsableNeverParameter)
+            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.ObsoleteAttribute,
+                "This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.");
     }
 
     public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field,
