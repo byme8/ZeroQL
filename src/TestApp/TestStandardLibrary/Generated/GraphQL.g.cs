@@ -36,8 +36,8 @@ namespace GraphQL.TestServer
         public int? Id { get; set; }
 
         [JsonPropertyName("center")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __Center { get; set; }
 
         [ZeroQL.GraphQLName("center")]
@@ -55,8 +55,8 @@ namespace GraphQL.TestServer
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Person? __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -96,8 +96,8 @@ namespace GraphQL.TestServer
         public string Value { get; set; }
 
         [JsonPropertyName("containerWithError")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public ContainerWithError? __ContainerWithError { get; set; }
 
         [ZeroQL.GraphQLName("containerWithError")]
@@ -116,8 +116,8 @@ namespace GraphQL.TestServer
         public int Id { get; set; }
 
         [JsonPropertyName("figure")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IFigure __Figure { get; set; }
 
         [ZeroQL.GraphQLName("figure")]
@@ -127,8 +127,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("author")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __Author { get; set; }
 
         [ZeroQL.GraphQLName("author")]
@@ -155,8 +155,8 @@ namespace GraphQL.TestServer
         public ImageResolution Resolution { get; set; }
 
         [JsonPropertyName("author")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __Author { get; set; }
 
         [ZeroQL.GraphQLName("author")]
@@ -210,8 +210,8 @@ namespace GraphQL.TestServer
         public int Value { get; set; }
 
         [JsonPropertyName("limit2")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Limit2ZeroQL __Limit2 { get; set; }
 
         [ZeroQL.GraphQLName("limit2")]
@@ -244,8 +244,8 @@ namespace GraphQL.TestServer
     public class Mutation : global::ZeroQL.Internal.IMutation
     {
         [JsonPropertyName("createUserId")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public global::GraphQL.TestServer.uuid __CreateUserId { get; set; }
 
         [ZeroQL.GraphQLName("createUserId")]
@@ -255,8 +255,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("dateTime")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public DateTimeOffset __DateTime { get; set; }
 
         [ZeroQL.GraphQLName("dateTime")]
@@ -266,8 +266,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("dateTimes")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public DateTimeOffset? []? __DateTimes { get; set; }
 
         [ZeroQL.GraphQLName("dateTimes")]
@@ -277,8 +277,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("dateTimeOffset")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public DateTimeOffset __DateTimeOffset { get; set; }
 
         [ZeroQL.GraphQLName("dateTimeOffset")]
@@ -288,8 +288,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("timeSpan")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public TimeSpan __TimeSpan { get; set; }
 
         [ZeroQL.GraphQLName("timeSpan")]
@@ -299,8 +299,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("dateOnly")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public DateOnly __DateOnly { get; set; }
 
         [ZeroQL.GraphQLName("dateOnly")]
@@ -310,8 +310,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("timeOnly")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public TimeSpan __TimeOnly { get; set; }
 
         [ZeroQL.GraphQLName("timeOnly")]
@@ -321,8 +321,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("createInstant")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public global::GraphQL.TestServer.Instant __CreateInstant { get; set; }
 
         [ZeroQL.GraphQLName("createInstant")]
@@ -332,8 +332,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addUser")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __AddUser { get; set; }
 
         [ZeroQL.GraphQLName("addUser")]
@@ -347,8 +347,8 @@ namespace GraphQL.TestServer
         public int DoError { get; set; }
 
         [JsonPropertyName("addUserProfileImage")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddUserProfileImage { get; set; }
 
         [ZeroQL.GraphQLName("addUserProfileImage")]
@@ -358,8 +358,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addMyProfileImage")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddMyProfileImage { get; set; }
 
         [ZeroQL.GraphQLName("addMyProfileImage")]
@@ -369,8 +369,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addUsersInfo")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddUsersInfo { get; set; }
 
         [ZeroQL.GraphQLName("addUsersInfo")]
@@ -380,8 +380,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addUsersInfoWithEmails")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddUsersInfoWithEmails { get; set; }
 
         [ZeroQL.GraphQLName("addUsersInfoWithEmails")]
@@ -391,8 +391,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addUserKindPascal")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddUserKindPascal { get; set; }
 
         [ZeroQL.GraphQLName("addUserKindPascal")]
@@ -402,8 +402,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimit")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL __AddLimit { get; set; }
 
         [ZeroQL.GraphQLName("addLimit")]
@@ -413,8 +413,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimitNullable")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL? __AddLimitNullable { get; set; }
 
         [ZeroQL.GraphQLName("addLimitNullable")]
@@ -424,8 +424,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimit2")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Limit2ZeroQL __AddLimit2 { get; set; }
 
         [ZeroQL.GraphQLName("addLimit2")]
@@ -435,8 +435,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimit2Nullable")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Limit2ZeroQL? __AddLimit2Nullable { get; set; }
 
         [ZeroQL.GraphQLName("addLimit2Nullable")]
@@ -446,8 +446,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimit3")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Limit3? __AddLimit3 { get; set; }
 
         [ZeroQL.GraphQLName("addLimit3")]
@@ -457,8 +457,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLimits")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Limit2ZeroQL[] __AddLimits { get; set; }
 
         [ZeroQL.GraphQLName("addLimits")]
@@ -468,8 +468,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addLowerCaseTypeName")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public lower_case_type_name __AddLowerCaseTypeName { get; set; }
 
         [ZeroQL.GraphQLName("addLowerCaseTypeName")]
@@ -479,8 +479,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("addValues")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __AddValues { get; set; }
 
         [ZeroQL.GraphQLName("addValues")]
@@ -538,8 +538,8 @@ namespace GraphQL.TestServer
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IPerson __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -566,8 +566,8 @@ namespace GraphQL.TestServer
     public class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("int")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __Int { get; set; }
 
         [ZeroQL.GraphQLName("int")]
@@ -577,8 +577,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("object")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int __Object { get; set; }
 
         [ZeroQL.GraphQLName("object")]
@@ -588,8 +588,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("containerWithoutError")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public ContainerWithoutError? __ContainerWithoutError { get; set; }
 
         [ZeroQL.GraphQLName("containerWithoutError")]
@@ -599,8 +599,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("entities")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IEntity[] __Entities { get; set; }
 
         [ZeroQL.GraphQLName("entities")]
@@ -610,8 +610,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("figures")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IFigure[] __Figures { get; set; }
 
         [ZeroQL.GraphQLName("figures")]
@@ -621,8 +621,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("circles")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Circle[] __Circles { get; set; }
 
         [ZeroQL.GraphQLName("circles")]
@@ -632,8 +632,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("squares")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Square[] __Squares { get; set; }
 
         [ZeroQL.GraphQLName("squares")]
@@ -647,8 +647,8 @@ namespace GraphQL.TestServer
         public global::System.Text.Json.JsonElement JsonUsersElement { get; set; }
 
         [JsonPropertyName("jsonUsersDocument")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public JsonDocument __JsonUsersDocument { get; set; }
 
         [ZeroQL.GraphQLName("jsonUsersDocument")]
@@ -670,8 +670,8 @@ namespace GraphQL.TestServer
         public global::GraphQL.TestServer.ZonedDateTime ZonedDateTime { get; set; }
 
         [JsonPropertyName("posts")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public PostContent[] __Posts { get; set; }
 
         [ZeroQL.GraphQLName("posts")]
@@ -681,8 +681,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("image")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public ImageContent __Image { get; set; }
 
         [ZeroQL.GraphQLName("image")]
@@ -692,8 +692,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("text")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public TextContent __Text { get; set; }
 
         [ZeroQL.GraphQLName("text")]
@@ -703,8 +703,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("figure")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public FigureContent __Figure { get; set; }
 
         [ZeroQL.GraphQLName("figure")]
@@ -714,8 +714,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("me")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __Me { get; set; }
 
         [ZeroQL.GraphQLName("me")]
@@ -725,8 +725,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("currentUser")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __CurrentUser { get; set; }
 
         [ZeroQL.GraphQLName("currentUser")]
@@ -737,8 +737,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("MEWITHSUPPERCASING")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __MEWITHSUPPERCASING { get; set; }
 
         [ZeroQL.GraphQLName("MEWITHSUPPERCASING")]
@@ -748,8 +748,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("MeWithPascalCasing")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __MeWithPascalCasing { get; set; }
 
         [ZeroQL.GraphQLName("MeWithPascalCasing")]
@@ -759,8 +759,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("users")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User[] __Users { get; set; }
 
         [ZeroQL.GraphQLName("users")]
@@ -778,8 +778,8 @@ namespace GraphQL.TestServer
         public UserKindPascal[] UserKindPascals { get; set; }
 
         [JsonPropertyName("usersMatrix")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User[][] __UsersMatrix { get; set; }
 
         [ZeroQL.GraphQLName("usersMatrix")]
@@ -789,8 +789,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("usersByKind")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User[] __UsersByKind { get; set; }
 
         [ZeroQL.GraphQLName("usersByKind")]
@@ -800,8 +800,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("usersIds")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public int[] __UsersIds { get; set; }
 
         [ZeroQL.GraphQLName("usersIds")]
@@ -811,8 +811,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("user")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User? __User { get; set; }
 
         [ZeroQL.GraphQLName("user")]
@@ -822,8 +822,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("usersByIds")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User[] __UsersByIds { get; set; }
 
         [ZeroQL.GraphQLName("usersByIds")]
@@ -833,8 +833,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("userKind")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public UserKind __UserKind { get; set; }
 
         [ZeroQL.GraphQLName("userKind")]
@@ -844,8 +844,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("admin")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User? __Admin { get; set; }
 
         [ZeroQL.GraphQLName("admin")]
@@ -855,8 +855,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("container")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public TypesContainer __Container { get; set; }
 
         [ZeroQL.GraphQLName("container")]
@@ -884,8 +884,8 @@ namespace GraphQL.TestServer
     public class Square : IFigure, IEntity
     {
         [JsonPropertyName("creator")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IPerson? __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -899,8 +899,8 @@ namespace GraphQL.TestServer
         public int? Id { get; set; }
 
         [JsonPropertyName("topLeft")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __TopLeft { get; set; }
 
         [ZeroQL.GraphQLName("topLeft")]
@@ -910,8 +910,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("bottomRight")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLName("bottomRight")]
@@ -944,8 +944,8 @@ namespace GraphQL.TestServer
         public string Text { get; set; }
 
         [JsonPropertyName("author")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __Author { get; set; }
 
         [ZeroQL.GraphQLName("author")]
@@ -1068,8 +1068,8 @@ namespace GraphQL.TestServer
         public Guid[]? Value26 { get; set; }
 
         [JsonPropertyName("value27")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public KeyValuePairOfStringAndString[] __Value27 { get; set; }
 
         [ZeroQL.GraphQLName("value27")]
@@ -1079,8 +1079,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("value28")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public KeyValuePairOfStringAndString[]? __Value28 { get; set; }
 
         [ZeroQL.GraphQLName("value28")]
@@ -1090,8 +1090,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("value29")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public KeyValuePairOfStringAndString __Value29 { get; set; }
 
         [ZeroQL.GraphQLName("value29")]
@@ -1101,8 +1101,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("value30")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public KeyValuePairOfStringAndString? __Value30 { get; set; }
 
         [ZeroQL.GraphQLName("value30")]
@@ -1141,8 +1141,8 @@ namespace GraphQL.TestServer
         public UserKind UserKind { get; set; }
 
         [JsonPropertyName("role")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Role? __Role { get; set; }
 
         [ZeroQL.GraphQLName("role")]
@@ -1152,8 +1152,8 @@ namespace GraphQL.TestServer
         }
 
         [JsonPropertyName("loginAttempts")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public UserLoginAttempt[] __LoginAttempts { get; set; }
 
         [ZeroQL.GraphQLName("loginAttempts")]
@@ -1204,8 +1204,8 @@ namespace GraphQL.TestServer
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IPerson? __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -1224,8 +1224,8 @@ namespace GraphQL.TestServer
         public double Perimeter { get; set; }
 
         [JsonPropertyName("creator")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IPerson? __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
