@@ -1,0 +1,4 @@
+﻿{
+  Query: mutation ($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { firstName } },
+  Data: Jon
+}

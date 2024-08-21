@@ -67,13 +67,14 @@ public class FragmentTests : IntegrationTest
     [Fact]
     public async Task CanApplyFragmentWithArgument()
     {
-        var csharpQuery = "static (i, q) => q.GetUserById(i.Id)";
-        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
+        var csharpQuery = """
+          var id = 1;
+          var response = await qlClient.Query(q => q.GetUserById(id));
+      """;
 
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "new { Id = 1 }, " + csharpQuery));
-
-        await Validate(project, graphqlQuery);
+        var response = await TestProject.Project.ExecuteFullLine(csharpQuery);
+        
+        await Verify(response);
     }
     
     [Fact]
@@ -120,13 +121,14 @@ public class FragmentTests : IntegrationTest
     [Fact]
     public async Task CanLoadFragmentFromDifferentProjectWitharguments()
     {
-        var csharpQuery = "new { Id = 1 }, static (i, q) => q.AsUserFromDifferentAssembly(i.Id)";
-        var graphqlQuery = @"query ($id: Int!) { user(id: $id) { firstName lastName role { name }  } }";
+        var csharpQuery = """
+                              var id = 1;
+                              var response = await qlClient.Query(q => q.AsUserFromDifferentAssembly(id));
+                          """;
 
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, csharpQuery));
-
-        await Validate(project, graphqlQuery);
+        var response = await TestProject.Project.ExecuteFullLine(csharpQuery);
+        
+        await Verify(response);
     }    
     
     [Fact]

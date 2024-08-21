@@ -23,16 +23,15 @@ public class MutationTests : IntegrationTest
     [Fact]
     public async Task MutationWithVariables()
     {
-        var csharpQuery =
-            "Mutation(new { FirstName = \"Jon\", LastName = \"Smith\"}, static (v, m) => m.AddUser(v.FirstName, v.LastName, o => o.FirstName))";
-        var graphqlQuery =
-            @"mutation ($firstName: String!, $lastName: String!) { addUser(firstName: $firstName, lastName: $lastName) { firstName } }";
+        var csharpQuery = """
+                              var firstName = "Jon";
+                              var lastName = "Smith";
+                              var response = await qlClient.Mutation(m => m.AddUser(firstName, lastName, o => o.FirstName));
+                          """;
 
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
-
-        var result = (GraphQLResult<string>)await project.Validate(graphqlQuery);
-        result.Data.Should().Be("Jon");
+        var response = await TestProject.Project.ExecuteFullLine(csharpQuery);
+        
+        await Verify(response);
     }
 
     [Fact]
@@ -51,33 +50,13 @@ public class MutationTests : IntegrationTest
     [Fact]
     public async Task MutationWithCustomEnumsAsVariable()
     {
-        var csharpQuery =
-            "Mutation(new { Input = UserKindPascal.SupperGood }, static (v, m) => m.AddUserKindPascal(v.Input))";
-
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullMeQuery, csharpQuery));
-
-        var result = await project.Execute();
-
-        await Verify(result);
-    }
-
-    [Fact]
-    public async Task SupportedDifferentCSharpQueriesButIdenticalGraphQLQueries()
-    {
         var csharpQuery = """
-                var variables = new { Id = UserKindPascal.SupperGood };
-                var response1 = await qlClient.Mutation(variables, static (i, q) => q.AddUserKindPascal(i.Id));
+                              var input = UserKindPascal.SupperGood;
+                              var response = await qlClient.Mutation(m => m.AddUserKindPascal(input));
+                          """;
 
-                var id = UserKindPascal.SupperGood;
-                var response = await qlClient.Mutation(q => q.AddUserKindPascal(id));
-                """;
-
-        var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
-
-        var response = await project.Execute();
-
+        var response = await TestProject.Project.ExecuteFullLine(csharpQuery);
+        
         await Verify(response);
     }
 

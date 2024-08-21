@@ -27,6 +27,21 @@ public class TypeContext
         { "JSON", "global::System.Text.Json.JsonElement" },
     };
 
+    public string[] DefaultJsonTypes = [
+        "int",
+        "short",
+        "byte",
+        "long",
+        "double",
+        "decimal",
+        "DateTime",
+        "DateTimeOffset",
+        "TimeSpan",
+        "DateOnly",
+        "TimeOnly",
+        "Guid",
+    ];
+
     public TypeContext(
         GraphQlGeneratorOptions options,
         HashSet<string> enums,

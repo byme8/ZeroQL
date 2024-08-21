@@ -103,7 +103,7 @@ public static class GraphQLGenerator
         var checksum = ChecksumHelper.GenerateChecksumFromInlineSchema(graphql, options);
         var fixedRoot = CreateFile(options, checksum, warningCodes, members);
 
-        var graphQLParameters = GetUniqueGraphQLParameters(fixedRoot);
+        var graphQLParameters = GetUniqueGraphQLParameters(context, fixedRoot);
 
         var typesForJsonContext = graphQLParameters
             .Concat(new[]
@@ -181,8 +181,11 @@ public static class GraphQLGenerator
         return fixedRoot;
     }
 
-    private static IEnumerable<string> GetUniqueGraphQLParameters(SyntaxNode node)
+    private static IEnumerable<string> GetUniqueGraphQLParameters(TypeContext context, SyntaxNode node)
     {
+        var defaultJsonTypes = context.DefaultJsonTypes;
+        var arrays = defaultJsonTypes.Select(o => $"IEnumerable<{o}>").ToArray();
+        
         var graphQLTypeAttributes = node
             .DescendantNodes()
             .OfType<ParameterSyntax>()
@@ -197,7 +200,11 @@ public static class GraphQLGenerator
             .Order()
             .ToArray();
 
-        return graphQLTypeAttributes;
+        return defaultJsonTypes
+            .Concat(arrays)
+            .Concat(graphQLTypeAttributes)
+            .Distinct()
+            .ToArray();
     }
 
     private static (string? Query, string? Mutation) GetQueryAndMutation(GraphQLDocument document)
