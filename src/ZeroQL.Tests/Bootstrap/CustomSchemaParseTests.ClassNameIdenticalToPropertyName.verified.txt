@@ -32,8 +32,8 @@ namespace TestApp
     public class Container
     {
         [JsonPropertyName("limit")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL __Limit { get; set; }
 
         [ZeroQL.GraphQLName("limit")]
@@ -57,8 +57,8 @@ namespace TestApp
     public class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("perVariant")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL __PerVariant { get; set; }
 
         [ZeroQL.GraphQLName("perVariant")]
@@ -68,8 +68,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("maybePerVariant")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL? __MaybePerVariant { get; set; }
 
         [ZeroQL.GraphQLName("maybePerVariant")]
@@ -79,8 +79,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("perVariants")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL[] __PerVariants { get; set; }
 
         [ZeroQL.GraphQLName("perVariants")]
@@ -90,8 +90,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("maybePerVariants")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public LimitZeroQL[]? __MaybePerVariants { get; set; }
 
         [ZeroQL.GraphQLName("maybePerVariants")]
@@ -101,8 +101,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("limit")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Container __Limit { get; set; }
 
         [ZeroQL.GraphQLName("limit")]
@@ -112,8 +112,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("limits")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Container[] __Limits { get; set; }
 
         [ZeroQL.GraphQLName("limits")]
@@ -123,8 +123,8 @@ namespace TestApp
         }
 
         [JsonPropertyName("userIds")]
-        [global::System.ObsoleteAttribute("This property is for internal use only.")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public long[] __UserIds { get; set; }
 
         [ZeroQL.GraphQLName("userIds")]
