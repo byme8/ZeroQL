@@ -235,6 +235,16 @@ public class GraphQLLambdaLikeContextResolver
         {
             case INamedTypeSymbol namedTypeSymbol:
             {
+                if (SymbolEqualityComparer.Default.Equals(namedTypeSymbol, upload))
+                {
+                    return ImmutableArray.Create(new UploadInfoByType
+                    {
+                        SafeName = namedTypeSymbol.ToSafeGlobalName(),
+                        Type = namedTypeSymbol,
+                        UploadProperties = []
+                    });
+                }
+                
                 return HandleNamedType(namedTypeSymbol, upload, processedTypes);
             }
             case IArrayTypeSymbol arrayTypeSymbol:

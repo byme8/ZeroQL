@@ -33,14 +33,9 @@ public class GraphQLFragment : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-public class GraphQLQueryTemplate : Attribute
+public class GraphQLQueryTemplate(string query) : Attribute
 {
-    public GraphQLQueryTemplate(string query)
-    {
-        Query = query;
-    }
-
-    public string Query { get; }
+    public string Query { get; } = query;
 }
 
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter)]
@@ -51,4 +46,10 @@ public class GraphQLLambda : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.GenericParameter)]
 public class StaticLambda : Attribute
 {
+}
+
+[AttributeUsage(AttributeTargets.All)]
+public class ErrorAttribute(string message) : Attribute
+{
+    public string Message { get; } = message;
 }
