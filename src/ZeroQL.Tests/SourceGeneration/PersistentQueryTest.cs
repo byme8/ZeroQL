@@ -12,8 +12,8 @@ public class PersistentQueryTest
     public async Task CanPushPersistedQueryWhenServerDoesntHaveIt()
     {
         var context = await RunServer(10_001);
-
-        var query = "8ed4d3e773b6f87d986cc128a716cfc85d030c5fe6a5b585ab0c0820ac5d9728:query { me { firstName } }";
+        using var source = context.CancellationTokenSource;
+        
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
                 (
@@ -25,17 +25,18 @@ public class PersistentQueryTest
                     "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline());"
                 ));
 
-        await project.Validate(query);
-
+        var result = await project.Execute();
         context.CancellationTokenSource.Cancel();
+        
+        await Verify(result);
     }
 
     [Fact]
     public async Task FailsWhenPersistedQueryIsMissing()
     {
         var context = await RunServer(10_001);
-
-        var query = "8ed4d3e773b6f87d986cc128a716cfc85d030c5fe6a5b585ab0c0820ac5d9728:query { me { firstName } }";
+        using var source = context.CancellationTokenSource;
+        
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
                 (
@@ -47,13 +48,10 @@ public class PersistentQueryTest
                     "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline(false));"
                 ));
 
-        var result = await project.Validate(query, false);
-        result.Errors!
-            .Select(o => o.Message)
-            .Should()
-            .Contain("PersistedQueryNotFound");
-
+        var result = await project.Execute();
         context.CancellationTokenSource.Cancel();
+
+        await Verify(result);
     }
 
     [Fact]
@@ -63,8 +61,8 @@ public class PersistentQueryTest
         var command = await cli.ExtractMutationAndQuery();
 
         var context = await RunServer(10_001, command.Output);
+        using var source = context.CancellationTokenSource;
 
-        var query = "8ed4d3e773b6f87d986cc128a716cfc85d030c5fe6a5b585ab0c0820ac5d9728:query { me { firstName } }";
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs",
                 (
@@ -76,9 +74,10 @@ public class PersistentQueryTest
                     "var qlClient = new TestServerClient(httpClient, new PersistedQueryPipeline(false));"
                 ));
 
-        await project.Validate(query);
-
+        var result = await project.Execute();
         context.CancellationTokenSource.Cancel();
+
+        await Verify(result);
     }
 
     private static async Task<Program.ServerContext> RunServer(int port, string? queriesPath = null)
@@ -90,7 +89,17 @@ public class PersistentQueryTest
             Port = port
         };
 
-        _ = Program.StartServer(context);
+        if (await Program.VerifyServiceIsRunning(context))
+        {
+            throw new InvalidOperationException("Server is running");
+        }
+
+        var app = await Program.StartServer(context);
+        context.CancellationTokenSource.Token.Register(async () =>
+        {
+            await app.DisposeAsync();
+        });
+        
         if (!await Program.VerifyServiceIsRunning(context))
         {
             throw new InvalidOperationException("Server failed to bootstrap");

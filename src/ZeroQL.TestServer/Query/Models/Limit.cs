@@ -12,7 +12,7 @@ public class Limit_2
 {
     public int Value { get; set; }
 
-    public Limit_2 Limit2 { get; set; }
+    public Limit_2? Limit2 { get; set; }
 }
 
 [GraphQLName("Limit3")]

@@ -212,12 +212,12 @@ namespace GraphQLClient
         [JsonPropertyName("limit2")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
         [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
-        public Limit2ZeroQL __Limit2 { get; set; }
+        public Limit2ZeroQL? __Limit2 { get; set; }
 
         [ZeroQL.GraphQLName("limit2")]
-        public T Limit2<T>(Func<Limit2ZeroQL, T> selector = default !)
+        public T? Limit2<T>(Func<Limit2ZeroQL, T> selector = default !)
         {
-            return __Limit2 is null ? throw new NullReferenceException("Limit2 is null but it should not be null. Schema can be outdated.") : selector(__Limit2);
+            return __Limit2 is null ? default : selector(__Limit2);
         }
     }
 
@@ -1325,7 +1325,7 @@ namespace GraphQLClient
 
         [JsonPropertyName("limit2")]
         [ZeroQL.GraphQLName("limit2")]
-        public Limit2Input Limit2 { get; set; }
+        public Limit2Input? Limit2 { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]

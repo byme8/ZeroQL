@@ -1,5 +1,5 @@
 ﻿{
-  Query: mutation ($input: [DateTime!]!) { dateTimes(dateTime: $input)},
+  Query: mutation ($input: [DateTime]) { dateTimes(dateTime: $input)},
   Data: [
     2042-12-11 09:09:08.007 +0
   ]
