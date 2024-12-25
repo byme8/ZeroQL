@@ -21,12 +21,14 @@ public class Program
         });
     }
 
-    public static async Task StartServer(ServerContext context)
+    public static async Task<WebApplication> StartServer(ServerContext context)
     {
         var builder = WebApplication.CreateBuilder(context.Arguments);
         var app = CreateApp(context, builder);
 
-        await app.RunAsync(context.CancellationTokenSource.Token);
+        _ = app.RunAsync(context.CancellationTokenSource.Token);
+
+        return app;
     }
 
     public static WebApplication CreateApp(ServerContext context, WebApplicationBuilder builder)
@@ -47,14 +49,14 @@ public class Program
         if (string.IsNullOrEmpty(context.QueriesPath))
         {
             graphQLServer
-                .UseAutomaticPersistedQueryPipeline()
-                .AddInMemoryQueryStorage();
+                .UsePersistedOperationPipeline()
+                .AddInMemoryOperationDocumentStorage();
         }
         else
         {
             graphQLServer
-                .UsePersistedQueryPipeline()
-                .AddFileSystemQueryStorage(context.QueriesPath);
+                .UsePersistedOperationPipeline()
+                .AddFileSystemOperationDocumentStorage(context.QueriesPath);
         }
 
         var app = builder.Build();

@@ -51,7 +51,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
             return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
 
-        if (qlResponse.Errors.All(o => o.Message != "PersistedQueryNotFound"))
+        if (qlResponse.Errors.All(FailedToFindPersistedQuery))
         {
             return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
@@ -64,6 +64,14 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
         qlResponse = await ReadResponse<TQuery>(response);
 
         return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
+    }
+
+    private static bool FailedToFindPersistedQuery(GraphQueryError o)
+    {
+        var hotChocolateV13Way = o.Message == "PersistedQueryNotFound";
+        var hotChocolateV14Way = o.Extensions?.ContainsKey("HC0020") ?? false;
+        
+        return hotChocolateV13Way || hotChocolateV14Way;
     }
 
     private static string FormatPersistedQuery(QueryInfo queryInfo)

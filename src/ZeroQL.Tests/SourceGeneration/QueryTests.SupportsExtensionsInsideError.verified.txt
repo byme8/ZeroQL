@@ -3,6 +3,11 @@
   Errors: [
     {
       Message: Error,
+      Path: [
+        {
+          ValueKind: String
+        }
+      ],
       Extensions: {
         message: {
           ValueKind: String

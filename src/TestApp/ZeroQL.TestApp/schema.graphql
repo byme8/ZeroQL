@@ -69,7 +69,7 @@ type Limit {
 
 type Limit2 {
   value: Int!
-  limit2: Limit2!
+  limit2: Limit2
 }
 
 type Limit3 {
@@ -86,11 +86,11 @@ type Mutation {
   timeOnly(timeOnly: TimeSpan!): TimeSpan!
   createInstant(instant: Instant!): Instant!
   addUser(firstName: String! lastName: String!): User!
-  doError: Int!
-  addUserProfileImage(USER_ID: Int! file: Upload!): Int!
-  addMyProfileImage(file: Upload!): Int!
-  addUsersInfo(users: [UserInfoInput!]!): Int!
-  addUsersInfoWithEmails(input: AddUsersInput!): Int!
+  doError: Int! @cost(weight: "10")
+  addUserProfileImage(USER_ID: Int! file: Upload!): Int! @cost(weight: "10")
+  addMyProfileImage(file: Upload!): Int! @cost(weight: "10")
+  addUsersInfo(users: [UserInfoInput!]!): Int! @cost(weight: "10")
+  addUsersInfoWithEmails(input: AddUsersInput!): Int! @cost(weight: "10")
   addUserKindPascal(userKindPascal: UserKindPascal!): Int!
   addLimit(limit: LimitInput!): Limit!
   addLimitNullable(limit: LimitInput): Limit
@@ -99,7 +99,7 @@ type Mutation {
   addLimit3(limit: Limit3Input): Limit3
   addLimits(limit: [Limit2Input!]!): [Limit2!]!
   addLowerCaseTypeName(value: lower_case_type_nameInput!): lower_case_type_name!
-  addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
+  addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int! @cost(weight: "10")
 }
 
 type Person implements IPerson {
@@ -126,7 +126,7 @@ type Query {
   squares: [Square!]!
   jsonUsersElement: JSON!
   jsonUsersDocument: JsonDocument!
-  longOperation: Int!
+  longOperation: Int! @cost(weight: "10")
   instant: Instant!
   zonedDateTime: ZonedDateTime!
   posts: [PostContent!]!
@@ -236,7 +236,7 @@ input KeyValuePairOfStringAndStringInput {
 
 input Limit2Input {
   value: Int!
-  limit2: Limit2Input!
+  limit2: Limit2Input
 }
 
 input Limit3Input {
@@ -288,6 +288,12 @@ enum UserKindPascal {
   Bad
 }
 
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
 "The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
 scalar Byte
 
@@ -297,10 +303,18 @@ scalar Date
 "The `DateTime` scalar represents an ISO-8601 compliant date time type."
 scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
 
-"The built-in `Decimal` scalar type."
+"The `Decimal` scalar type represents a decimal floating-point number."
 scalar Decimal
 
-"Represents an instant on the global timeline, with nanosecond resolution."
+"""
+Represents an instant on the global timeline, with nanosecond resolution.
+
+Allowed patterns:
+- `YYYY-MM-DDThh:mm:ss.sssssssss±hh:mm`
+
+Examples:
+- `2000-01-01T20:00:00.999999999Z`
+"""
 scalar Instant
 
 scalar JSON
@@ -319,7 +333,10 @@ scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")
 "The `Upload` scalar type represents a file upload."
 scalar Upload
 
-"A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.\nA ZonedDateTime is global, in that it maps to a single Instant."
+"""
+A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.
+A ZonedDateTime is global, in that it maps to a single Instant.
+"""
 scalar ZonedDateTime
 
 scalar uuid

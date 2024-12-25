@@ -5,6 +5,120 @@
 
 scalar uuid
 
+type Mutation {
+  createUserId(id: uuid!): uuid!
+  dateTime(dateTime: DateTime!): DateTime!
+  dateTimes(dateTime: [DateTime]): [DateTime]
+  dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
+  timeSpan(timeSpan: TimeSpan!): TimeSpan!
+  dateOnly(dateOnly: Date!): Date!
+  timeOnly(timeOnly: TimeSpan!): TimeSpan!
+  createInstant(instant: Instant!): Instant!
+  addUser(firstName: String! lastName: String!): User!
+  doError: Int!
+  addUserProfileImage(USER_ID: Int! file: Upload!): Int!
+  addMyProfileImage(file: Upload!): Int!
+  addUsersInfo(users: [UserInfoInput!]!): Int!
+  addUsersInfoWithEmails(input: AddUsersInput!): Int!
+  addUserKindPascal(userKindPascal: UserKindPascal!): Int!
+  addLimit(limit: LimitInput!): Limit!
+  addLimitNullable(limit: LimitInput): Limit
+  addLimit2(limit: Limit2Input!): Limit2!
+  addLimit2Nullable(limit: Limit2Input): Limit2
+  addLimit3(limit: Limit3Input): Limit3
+  addLimits(limit: [Limit2Input!]!): [Limit2!]!
+  addLowerCaseTypeName(value: lower_case_type_nameInput!): lower_case_type_name!
+  addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
+}
+
+type TextContent {
+  id: Int!
+  text: String!
+  author: User!
+}
+
+interface IPerson {
+  id: Int!
+  firstName: String!
+  lastName: String!
+}
+
+type Limit2 {
+  value: Int!
+  limit2: Limit2
+}
+
+type JsonDocument {
+  rootElement: JSON!
+}
+
+input AddUsersInput {
+  user: UserInfoInput
+}
+
+input UserFilterInput {
+  userKind: UserKind!
+  page: PageInput
+}
+
+input lower_case_type_nameInput {
+  value: Int!
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+type Role {
+  id: Int!
+  name: String!
+}
+
+type Limit3 {
+  limit3Input: Int!
+}
+
+"The `Upload` scalar type represents a file upload."
+scalar Upload
+
+input Limit3Input {
+  limit3Input: Int!
+}
+
+"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
+scalar Short
+
+type Person implements IPerson {
+  id: Int!
+  firstName: String!
+  lastName: String!
+}
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+type Limit {
+  limit: Int!
+  limitInput: Int!
+}
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  userKind: UserKind!
+  role: Role
+  loginAttempts: [UserLoginAttempt!]!
+}
+
+enum ImageResolution {
+  _1360X720
+  _1920X1080
+  _2560X1440
+  _3840X2160
+}
+
+scalar UUID
+
 type Query {
   int(int: Int!): Int!
   object(object: Int!): Int!
@@ -37,153 +151,6 @@ type Query {
   userKind(id: Int!): UserKind!
   admin(id: Int!): User
   container: TypesContainer!
-}
-
-type Mutation {
-  createUserId(id: uuid!): uuid!
-  dateTime(dateTime: DateTime!): DateTime!
-  dateTimes(dateTime: [DateTime]): [DateTime]
-  dateTimeOffset(dateTimeOffset: DateTime!): DateTime!
-  timeSpan(timeSpan: TimeSpan!): TimeSpan!
-  dateOnly(dateOnly: Date!): Date!
-  timeOnly(timeOnly: TimeSpan!): TimeSpan!
-  createInstant(instant: Instant!): Instant!
-  addUser(firstName: String! lastName: String!): User!
-  doError: Int!
-  addUserProfileImage(USER_ID: Int! file: Upload!): Int!
-  addMyProfileImage(file: Upload!): Int!
-  addUsersInfo(users: [UserInfoInput!]!): Int!
-  addUsersInfoWithEmails(input: AddUsersInput!): Int!
-  addUserKindPascal(userKindPascal: UserKindPascal!): Int!
-  addLimit(limit: LimitInput!): Limit!
-  addLimitNullable(limit: LimitInput): Limit
-  addLimit2(limit: Limit2Input!): Limit2!
-  addLimit2Nullable(limit: Limit2Input): Limit2
-  addLimit3(limit: Limit3Input): Limit3
-  addLimits(limit: [Limit2Input!]!): [Limit2!]!
-  addLowerCaseTypeName(value: lower_case_type_nameInput!): lower_case_type_name!
-  addValues(text: String! value1: Byte! value2: Byte value3: Short! value4: Short value5: Int! value6: Int value7: Long! value8: Long value9: Float! value10: Float value11: Float! value12: Float value13: Decimal! value14: Decimal value15: DateTime! value16: DateTime value17: Date! value18: Date value19: UUID! value20: UUID value21: [UUID!]! value22: [UUID!] value23: [UUID!]! value24: [UUID!] value25: [UUID!]! value26: [UUID!] value27: [KeyValuePairOfStringAndStringInput!]! value28: [KeyValuePairOfStringAndStringInput!] value29: KeyValuePairOfStringAndStringInput! value30: KeyValuePairOfStringAndStringInput value31: DateTime! value32: DateTime): Int!
-}
-
-"The `Upload` scalar type represents a file upload."
-scalar Upload
-
-"Represents an instant on the global timeline, with nanosecond resolution."
-scalar Instant
-
-"A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.\nA ZonedDateTime is global, in that it maps to a single Instant."
-scalar ZonedDateTime
-
-interface InterfaceThatNeverGetsUsed {
-  id: Int!
-}
-
-interface IPerson {
-  id: Int!
-  firstName: String!
-  lastName: String!
-}
-
-union PostContent = ImageContent | TextContent | FigureContent
-
-type Person implements IPerson {
-  id: Int!
-  firstName: String!
-  lastName: String!
-}
-
-type JsonDocument {
-  rootElement: JSON!
-}
-
-scalar JSON
-
-type Square implements IFigure & IEntity {
-  creator(name: String): IPerson
-  id: Int
-  topLeft: Point!
-  bottomRight: Point!
-  perimeter: Float!
-}
-
-type Circle implements IFigure & IEntity {
-  id: Int
-  center: Point!
-  radius: Float!
-  perimeter: Float!
-  creator: Person
-}
-
-interface IFigure {
-  id: Int
-  perimeter: Float!
-  creator: IPerson
-}
-
-interface IEntity {
-  id: Int
-}
-
-type ContainerWithError {
-  value: String!
-}
-
-type ContainerWithoutError {
-  value: String!
-  containerWithError: ContainerWithError
-}
-
-"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
-scalar TimeSpan
-
-"The `Date` scalar represents an ISO-8601 compliant date type."
-scalar Date
-
-"The `DateTime` scalar represents an ISO-8601 compliant date time type."
-scalar DateTime
-
-type Role {
-  id: Int!
-  name: String!
-}
-
-type ImageContent {
-  id: Int!
-  imageUrl: String!
-  resolution: ImageResolution!
-  author: User!
-}
-
-type TextContent {
-  id: Int!
-  text: String!
-  author: User!
-}
-
-type FigureContent {
-  id: Int!
-  figure: IFigure!
-  author: User!
-}
-
-type User {
-  id: ID!
-  firstName: String!
-  lastName: String!
-  userKind: UserKind!
-  role: Role
-  loginAttempts: [UserLoginAttempt!]!
-}
-
-input UserFilterInput {
-  userKind: UserKind!
-  page: PageInput
-}
-
-enum UserKind {
-  SUPPER_GOOD
-  GOOD
-  BAD
 }
 
 enum UserKindPascal {
@@ -229,19 +196,49 @@ type TypesContainer {
   value32: DateTime
 }
 
-input UserInfoInput {
-  firstName: String!
-  lastName: String!
-  avatar: Upload!
+type ImageContent {
+  id: Int!
+  imageUrl: String!
+  resolution: ImageResolution!
+  author: User!
 }
 
-input AddUsersInput {
-  user: UserInfoInput
+interface InterfaceThatNeverGetsUsed {
+  id: Int!
 }
 
-type Limit {
-  limit: Int!
-  limitInput: Int!
+"The `Date` scalar represents an ISO-8601 compliant date type."
+scalar Date
+
+type ContainerWithError {
+  value: String!
+}
+
+type FigureContent {
+  id: Int!
+  figure: IFigure!
+  author: User!
+}
+
+type Square implements IFigure & IEntity {
+  creator(name: String): IPerson
+  id: Int
+  topLeft: Point!
+  bottomRight: Point!
+  perimeter: Float!
+}
+
+type lower_case_type_name {
+  value: Int!
+}
+
+"A LocalDateTime in a specific time zone and with a particular offset to distinguish between otherwise-ambiguous instants.\nA ZonedDateTime is global, in that it maps to a single Instant."
+scalar ZonedDateTime
+
+interface IFigure {
+  id: Int
+  perimeter: Float!
+  creator: IPerson
 }
 
 input LimitInput {
@@ -249,49 +246,14 @@ input LimitInput {
   limitInput: Int!
 }
 
-type Limit2 {
-  value: Int!
-  limit2: Limit2!
-}
-
-input Limit2Input {
-  value: Int!
-  limit2: Limit2Input!
-}
-
-type Limit3 {
-  limit3Input: Int!
-}
-
-input Limit3Input {
-  limit3Input: Int!
-}
-
-type lower_case_type_name {
-  value: Int!
-}
-
-input lower_case_type_nameInput {
-  value: Int!
-}
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
 
 "The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
 scalar Byte
 
-"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
-scalar Short
-
-"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
-scalar Long
-
-"The built-in `Decimal` scalar type."
-scalar Decimal
-
-scalar UUID
-
-input KeyValuePairOfStringAndStringInput {
-  key: String!
-  value: String!
+interface IEntity {
+  id: Int
 }
 
 type UserLoginAttempt {
@@ -299,21 +261,22 @@ type UserLoginAttempt {
   success: Boolean!
 }
 
-type KeyValuePairOfStringAndString {
-  key: String!
-  value: String!
-}
-
 input PageInput {
   count: Int!
   size: Int!
 }
 
-enum ImageResolution {
-  _1360X720
-  _1920X1080
-  _2560X1440
-  _3840X2160
+type KeyValuePairOfStringAndString {
+  key: String!
+  value: String!
+}
+
+"Represents an instant on the global timeline, with nanosecond resolution.\n\nAllowed patterns:\n- `YYYY-MM-DDThh:mm:ss.sssssssss±hh:mm`\n\nExamples:\n- `2000-01-01T20:00:00.999999999Z`"
+scalar Instant
+
+type ContainerWithoutError {
+  value: String!
+  containerWithError: ContainerWithError
 }
 
 type Point implements IFigure & IEntity {
@@ -323,3 +286,43 @@ type Point implements IFigure & IEntity {
   perimeter: Float!
   creator: IPerson!
 }
+
+scalar JSON
+
+union PostContent = ImageContent | TextContent | FigureContent
+
+input UserInfoInput {
+  firstName: String!
+  lastName: String!
+  avatar: Upload!
+}
+
+"The `TimeSpan` scalar represents an ISO-8601 compliant duration type."
+scalar TimeSpan
+
+input Limit2Input {
+  value: Int!
+  limit2: Limit2Input
+}
+
+enum UserKind {
+  SUPPER_GOOD
+  GOOD
+  BAD
+}
+
+type Circle implements IFigure & IEntity {
+  id: Int
+  center: Point!
+  radius: Float!
+  perimeter: Float!
+  creator: Person
+}
+
+input KeyValuePairOfStringAndStringInput {
+  key: String!
+  value: String!
+}
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION

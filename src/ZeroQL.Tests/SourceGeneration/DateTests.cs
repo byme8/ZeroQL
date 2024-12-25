@@ -6,7 +6,7 @@ namespace ZeroQL.Tests.SourceGeneration;
 public class DateTests : IntegrationTest
 {
     [Theory]
-    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7)")]
+    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7, DateTimeKind.Local)")]
     [InlineData("DateTimes", "new [] { new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1)) }")]
     [InlineData("DateTimeOffset", "new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1))")]
     [InlineData("TimeSpan", "new TimeSpan(7, 6, 5, 4, 3)")]
@@ -15,8 +15,8 @@ public class DateTests : IntegrationTest
     public async Task Dates(string name, string creator)
     {
         var csharpQuery = $$"""
-            var input = new { Input = {{creator}} };
-            var response = await qlClient.Mutation(input, static (i, m) => m.{{name}}(i.Input));
+            var input = {{creator}};
+            var response = await qlClient.Mutation(m => m.{{name}}(input));
         """;
 
         var project = await TestProject.Project
