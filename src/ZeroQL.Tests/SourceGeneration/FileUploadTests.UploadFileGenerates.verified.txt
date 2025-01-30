@@ -61,18 +61,6 @@ namespace ZeroQL.TestApp
                 return content;
             });
 
-            if (qlResponse is null)
-            {
-                return new GraphQLResult<global::GraphQL.TestServer.Mutation>
-                {
-                    HttpResponseMessage = qlResponse.HttpResponseMessage,
-                    Errors = new[]
-                    {
-                        new GraphQueryError { Message = "Failed to deserialize response" }
-                    }
-                };
-            }
-
             return new GraphQLResult<global::GraphQL.TestServer.Mutation>
             {
                 HttpResponseMessage = qlResponse.HttpResponseMessage,
