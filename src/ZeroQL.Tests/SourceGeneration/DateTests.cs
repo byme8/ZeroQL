@@ -6,7 +6,7 @@ namespace ZeroQL.Tests.SourceGeneration;
 public class DateTests : IntegrationTest
 {
     [Theory]
-    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7)")]
+    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7, DateTimeKind.Local)")]
     [InlineData("DateTimes", "new [] { new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1)) }")]
     [InlineData("DateTimeOffset", "new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1))")]
     [InlineData("TimeSpan", "new TimeSpan(7, 6, 5, 4, 3)")]

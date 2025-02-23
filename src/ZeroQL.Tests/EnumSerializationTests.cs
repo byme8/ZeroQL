@@ -1,6 +1,5 @@
 using System.Text.Json;
 using FluentAssertions;
-using Xunit;
 using ZeroQL.Json;
 
 namespace ZeroQL.Tests;

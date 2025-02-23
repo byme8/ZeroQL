@@ -162,7 +162,9 @@ public static class TypeGenerator
                 ZeroQLGenerationInfo.JsonPropertyNameAttribute, field.GraphQLName)
             .AddAttributeWithRawParameters(
                 ZeroQLGenerationInfo.EditorBrowsableAttribute,
-                ZeroQLGenerationInfo.EditorBrowsableNeverParameter);
+                ZeroQLGenerationInfo.EditorBrowsableNeverParameter)
+            .AddAttributeWithStringParameter(ZeroQLGenerationInfo.ObsoleteAttribute,
+                "This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.");
     }
 
     public static MemberDeclarationSyntax[] GeneratePropertiesDeclarations(this FieldDefinition field,

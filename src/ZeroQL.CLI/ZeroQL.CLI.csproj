@@ -4,6 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>ZeroQL.Cli</PackageId>
@@ -15,7 +16,8 @@
 
     <ItemGroup>
         <PackageReference Include="CliFx" Version="2.3.5" />
-        <PackageReference Include="HotChocolate.Utilities.Introspection" Version="13.7.0" />
+        <PackageReference Include="HotChocolate.Utilities.Introspection" Version="14.3.0" />
+        <PackageReference Include="HotChocolate.Utilities.Introspection" Version="14.1.0" />
     </ItemGroup>
 
     <ItemGroup>

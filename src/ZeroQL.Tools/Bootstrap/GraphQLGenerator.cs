@@ -87,7 +87,11 @@ public static class GraphQLGenerator
         var (interfaceInitializers, interfacesForSerialization) =
             interfaces.GenerateInterfaceInitializers(options, types);
 
-        var warningCodes = options.WarningsToIgnore ?? new[] { "8618", "CS8603", "CS1066" };
+        var warningCodes = options.WarningsToIgnore ?? new[] { "8618", "CS8603", "CS1066", "CS0618" };
+        var disableWarning = PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true)
+            .WithErrorCodes(
+                SeparatedList<ExpressionSyntax>(warningCodes
+                    .Select(IdentifierName)));
 
         var members = new List<IEnumerable<string>>()
         {

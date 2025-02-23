@@ -17,8 +17,9 @@ public static class DownloadHelper
     {
         var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
         await using var stream = File.Create(output);
-        var document = await IntrospectionClient.IntrospectServerAsync(client,  cancellationToken);
-        await document.PrintToAsync(stream, cancellationToken: cancellationToken, indented: true);
+        var node = await IntrospectionClient.IntrospectServerAsync(client, cancellationToken);
+
+        await node.PrintToAsync(stream, cancellationToken: cancellationToken);
     }
 
     private static HttpClient CreateHttpClient(

@@ -7,6 +7,6 @@ public static class ModuleInitializer
     [ModuleInitializer]
     public static void Initialize()
     {
-        VerifyNodaTime.Enable();
+        VerifyNodaTime.Initialize();
     }
 }

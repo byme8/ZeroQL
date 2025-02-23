@@ -13,6 +13,7 @@
 
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -33,6 +34,7 @@
 
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -53,6 +55,7 @@
 
         [JsonPropertyName("topLeft")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __TopLeft { get; set; }
 
         [ZeroQL.GraphQLName("topLeft")]
@@ -63,6 +66,7 @@
 
         [JsonPropertyName("bottomRight")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __BottomRight { get; set; }
 
         [ZeroQL.GraphQLName("bottomRight")]
@@ -77,6 +81,7 @@
 
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -97,6 +102,7 @@
 
         [JsonPropertyName("center")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public Point __Center { get; set; }
 
         [ZeroQL.GraphQLName("center")]
@@ -115,6 +121,7 @@
 
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public User __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
@@ -164,6 +171,7 @@
 
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
         public IUser __Creator { get; set; }
 
         [ZeroQL.GraphQLName("creator")]
