@@ -1,4 +1,5 @@
-﻿namespace ZeroQL.TestServer.Query.Models;
+﻿// ReSharper disable InconsistentNaming
+namespace ZeroQL.TestServer.Query.Models;
 
 [GraphQLName("Limit")]
 public class Limit_1

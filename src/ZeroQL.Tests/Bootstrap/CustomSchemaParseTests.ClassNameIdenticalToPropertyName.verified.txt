@@ -15,6 +15,7 @@ namespace TestApp
     using System.Text.Json;
     using ZeroQL;
     using ZeroQL.Json;
+    using ZeroQL.Internal;
 
     public class GraphQLClient : global::ZeroQL.GraphQLClient<Query, ZeroQL.Unit>
     {

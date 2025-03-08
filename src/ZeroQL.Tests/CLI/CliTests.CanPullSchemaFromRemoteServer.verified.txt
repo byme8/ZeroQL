@@ -106,6 +106,7 @@ type User {
   firstName: String!
   lastName: String!
   userKind: UserKind!
+  kind: __TypeKind!
   role: Role
   loginAttempts: [UserLoginAttempt!]!
 }

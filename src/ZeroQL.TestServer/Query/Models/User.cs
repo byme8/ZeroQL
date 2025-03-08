@@ -10,6 +10,8 @@ public class User
     public string LastName { get; set; }
 
     public UserKind UserKind { get; set; }
+    
+    public TypeKind Kind { get; set; } = TypeKind.Object;
 
     public static User Create() => new User()
     {
