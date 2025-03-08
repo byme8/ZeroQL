@@ -1,1 +1,1 @@
-﻿[{"Id":1,"FirstName":"Jon","LastName":"Smith","UserKind":0},{"Id":2,"FirstName":"Ben","LastName":"Smith","UserKind":2}]
+﻿[{"Id":1,"FirstName":"Jon","LastName":"Smith","UserKind":0,"Kind":1},{"Id":2,"FirstName":"Ben","LastName":"Smith","UserKind":2,"Kind":1}]

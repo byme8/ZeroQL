@@ -111,6 +111,7 @@ public static class GraphQLGenerator
             "System.Text.Json",
             "ZeroQL",
             "ZeroQL.Json",
+            "ZeroQL.Internal"
         };
         var checksum = ChecksumHelper.GenerateChecksumFromInlineSchema(graphql, options);
 

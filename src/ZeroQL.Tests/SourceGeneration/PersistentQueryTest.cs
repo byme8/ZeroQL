@@ -94,7 +94,7 @@ public class PersistentQueryTest
             throw new InvalidOperationException("Server is running");
         }
 
-        var app = await Program.StartServer(context);
+        var (app, _) = await Program.StartServer(context);
         context.CancellationTokenSource.Token.Register(async () =>
         {
             await app.DisposeAsync();

@@ -210,7 +210,7 @@ public class ParseSchemaTests
     [Fact]
     public void UserDetected()
     {
-        var propertiesNames = new[] { "Id", "FirstName", "LastName", "UserKind" };
+        var propertiesNames = new[] { "Id", "FirstName", "LastName", "UserKind", "Kind" };
 
         var query = SyntaxTree.GetClass("User")!;
 
@@ -219,7 +219,7 @@ public class ParseSchemaTests
             .OfType<PropertyDeclarationSyntax>()
             .Where(o => !o.Identifier.ValueText.StartsWith("__"))
             .Select(o => o.Identifier.ValueText).Should()
-            .Contain(propertiesNames).And.HaveCount(4);
+            .Contain(propertiesNames).And.HaveCount(5);
     }
 
     [Fact]

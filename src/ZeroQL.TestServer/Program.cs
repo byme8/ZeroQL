@@ -14,21 +14,23 @@ public class Program
 
     public static async Task Main(string[] args)
     {
-        await StartServer(new ServerContext
+        var (_, task) = await StartServer(new ServerContext
         {
             Arguments = args,
             Port = 10_000,
         });
+
+        await task;
     }
 
-    public static async Task<WebApplication> StartServer(ServerContext context)
+    public static async Task<(WebApplication App, Task Running)> StartServer(ServerContext context)
     {
         var builder = WebApplication.CreateBuilder(context.Arguments);
         var app = CreateApp(context, builder);
 
-        _ = app.RunAsync(context.CancellationTokenSource.Token);
+        var runningTask = app.RunAsync(context.CancellationTokenSource.Token);
 
-        return app;
+        return (app, runningTask);
     }
 
     public static WebApplication CreateApp(ServerContext context, WebApplicationBuilder builder)

@@ -8,6 +8,11 @@ namespace ZeroQL.Internal;
 
 public class TypeContext
 {
+    public HashSet<string> PredefinedEnums =
+    [
+        "__TypeKind"
+    ];
+    
     public Dictionary<string, string> GraphQLToCsharpScalarTypes = new()
     {
         { "String", "string" },
@@ -92,6 +97,11 @@ public class TypeContext
     
     private TypeDefinition GetTypeDefinition(GraphQLNamedType namedType)
     {
+        if (PredefinedEnums.Contains(namedType.Name.StringValue))
+        {
+            return new EnumTypeDefinition(namedType.Name.StringValue);
+        }
+        
         if (Enums.Contains(namedType.Name.StringValue))
         {
             return new EnumTypeDefinition(namedType.Name.StringValue);
