@@ -11,7 +11,7 @@ Here's a quick rundown of what ZeroQL can do at the moment:
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries and mutations
     - [x] ["Lambda" like syntax](#graphql-lambda-syntax)
-    - [x] ["Request" like syntax](#graphql-request-syntax)
+    - ~~[x] ["Request" like syntax](#graphql-request-syntax)~~ Deprecated
 - [ ] Support for subscriptions
 - [x] [Support for fragments](https://github.com/byme8/ZeroQL/wiki/Fragments)
 - [x] [Support for interfaces](https://github.com/byme8/ZeroQL/wiki/Interfaces)
@@ -197,6 +197,8 @@ Console.WriteLine($"{response.Data.Id}: {response.Data.FirstName} {response.Data
 
 ## GraphQL request syntax
 
+> Request syntax is deprecated because it is not compatible with AOT runtimes and will be removed in future releases.
+
 In more complex queries, the "lambda" syntax may look verbose, and extracting requests into a separate entity would be nice. Now it is possible to do it via the "request" syntax. Here is an example:
 ``` csharp
 
@@ -215,7 +217,7 @@ Console.WriteLine(response.Data); // UserModel { Id = 2, FirstName = Ben, LastNa
 
 ```
 
-You need to create a record from the base record `` GraphQL<TOperationType, TResult> ``. Where the `` TOperationType `` is a root query type(`` Query ``, `` Mutation ``) that is associated with the `` GraphQLClient<TQuery, TMutataion> `` instance.
+You need to create a record from the base record `` GraphQL<TOperationType, TResult> ``. Where the `` TOperationType `` is a root query type(`` Query ``, `` Mutation ``) that is associated with the `` GraphQLClient<TQuery, TMutataion> `` instance.~~
 
 # Benchmarks
 
