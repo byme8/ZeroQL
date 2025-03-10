@@ -40,6 +40,12 @@ public class TypeContext
     {
         Enums = enums;
         CustomScalars = new List<ScalarDefinition>();
+        
+        if (options.NetstandardCompatibility == true)
+        {
+            GraphQLToCsharpScalarTypes["Date"] = "DateTime";
+        }
+        
         foreach (var scalar in customScalarsFromSchema)
         {
             if (GraphQLToCsharpScalarTypes.ContainsKey(scalar) || scalarsToOverride.ContainsKey(scalar))
