@@ -393,6 +393,61 @@ public class CustomSchemaParseTests
             mutation = mutation.Identifier.ToFullString() + mutation.BaseList!.ToFullString(),
         });
     }
+    
+    [Fact]
+    public async Task NetstandardCompatibilityUsesDateTimeInsteadOfDateOnly()
+    {
+        var rawSchema = @"
+            type Query {
+              dateField: Date!
+              dateTimeField: DateTime!
+            }
+
+            type User {
+              birthDate: Date
+              createdAt: DateTime
+            }
+        ";
+
+        // Generate with standard settings (should use DateOnly)
+        var standardOptions = new GraphQlGeneratorOptions("TestApp", ZeroQL.Core.Enums.ClientVisibility.Public)
+        {
+            ClientName = "GraphQLClient"
+        };
+        var standardCSharp = GraphQLGenerator.ToCSharp(rawSchema, standardOptions);
+        var standardSyntaxTree = CSharpSyntaxTree.ParseText(standardCSharp);
+        
+        // Generate with netstandard compatibility (should use DateTime)
+        var netstandardOptions = new GraphQlGeneratorOptions("TestApp", ZeroQL.Core.Enums.ClientVisibility.Public)
+        {
+            ClientName = "GraphQLClient",
+            NetstandardCompatibility = true
+        };
+        var netstandardCSharp = GraphQLGenerator.ToCSharp(rawSchema, netstandardOptions);
+        var netstandardSyntaxTree = CSharpSyntaxTree.ParseText(netstandardCSharp);
+
+        // Extract User class from both trees to compare
+        var standardUserClass = standardSyntaxTree.GetClass("User")!;
+        var netstandardUserClass = netstandardSyntaxTree.GetClass("User")!;
+        
+        // Extract Query class from both trees to compare
+        var standardQueryClass = standardSyntaxTree.GetClass("Query")!;
+        var netstandardQueryClass = netstandardSyntaxTree.GetClass("Query")!;
+
+        await Verify(new
+        {
+            WithDateOnly = new
+            {
+                User = standardUserClass.ToFullString(),
+                Query = standardQueryClass.ToFullString()
+            },
+            WithDateTime = new
+            {
+                User = netstandardUserClass.ToFullString(),
+                Query = netstandardQueryClass.ToFullString()
+            }
+        });
+    }
 
     private void VerifyProperty(PropertyDeclarationSyntax property, SyntaxKind syntaxKind, object exprectedDefaultValue)
     {

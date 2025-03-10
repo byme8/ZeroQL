@@ -1,0 +1,62 @@
+﻿{
+  WithDateOnly: {
+    User:
+    [ZeroQL.GraphQLType("User")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class User
+    {
+        [ZeroQL.GraphQLName("birthDate")]
+        [JsonPropertyName("birthDate")]
+        public DateOnly? BirthDate { get; set; }
+
+        [ZeroQL.GraphQLName("createdAt")]
+        [JsonPropertyName("createdAt")]
+        public DateTimeOffset? CreatedAt { get; set; }
+    }
+,
+    Query:
+    [ZeroQL.GraphQLType("Query")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Query : global::ZeroQL.Internal.IQuery
+    {
+        [ZeroQL.GraphQLName("dateField")]
+        [JsonPropertyName("dateField")]
+        public DateOnly DateField { get; set; }
+
+        [ZeroQL.GraphQLName("dateTimeField")]
+        [JsonPropertyName("dateTimeField")]
+        public DateTimeOffset DateTimeField { get; set; }
+    }
+
+  },
+  WithDateTime: {
+    User:
+    [ZeroQL.GraphQLType("User")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class User
+    {
+        [ZeroQL.GraphQLName("birthDate")]
+        [JsonPropertyName("birthDate")]
+        public DateTime? BirthDate { get; set; }
+
+        [ZeroQL.GraphQLName("createdAt")]
+        [JsonPropertyName("createdAt")]
+        public DateTimeOffset? CreatedAt { get; set; }
+    }
+,
+    Query:
+    [ZeroQL.GraphQLType("Query")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    public class Query : global::ZeroQL.Internal.IQuery
+    {
+        [ZeroQL.GraphQLName("dateField")]
+        [JsonPropertyName("dateField")]
+        public DateTime DateField { get; set; }
+
+        [ZeroQL.GraphQLName("dateTimeField")]
+        [JsonPropertyName("dateTimeField")]
+        public DateTimeOffset DateTimeField { get; set; }
+    }
+
+  }
+}
