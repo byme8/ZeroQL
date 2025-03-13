@@ -11,7 +11,7 @@ Here's a quick rundown of what ZeroQL can do at the moment:
 - [x] Bootstrap client from schema.graphql file
 - [x] Support for queries and mutations
     - [x] ["Lambda" like syntax](#graphql-lambda-syntax)
-    - ~~[x] ["Request" like syntax](#graphql-request-syntax)~~ Deprecated
+    - ~~["Request" like syntax](#graphql-request-syntax)~~ Deprecated
 - [ ] Support for subscriptions
 - [x] [Support for fragments](https://github.com/byme8/ZeroQL/wiki/Fragments)
 - [x] [Support for interfaces](https://github.com/byme8/ZeroQL/wiki/Interfaces)
