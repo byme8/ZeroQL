@@ -7,8 +7,8 @@
         <RootNamespace>ZeroQL</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Condition="$(TargetFramework) == 'netstandard2.0'" Include="System.Text.Json" Version="7.0.2" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <PackageReference Include="System.Text.Json" Version="9.0.2" />
     </ItemGroup>
 
 </Project>
