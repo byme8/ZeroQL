@@ -15,6 +15,7 @@
 - **Testing**: Use xUnit with Verify for snapshot tests
 - **Source Generation**: Prefer source generators over reflection for performance
 - **GraphQL Style**: Use LINQ-like syntax for queries, organize fragments in separate files
+- **Git**: Before commit verify that git has files to commit
 
 ## Project Structure
 ZeroQL is a high-performance C# GraphQL client using source generation and LINQ-like syntax for type-safe queries.
