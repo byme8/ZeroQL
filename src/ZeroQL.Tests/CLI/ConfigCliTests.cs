@@ -59,6 +59,7 @@ public class ConfigCliTests
               "visibility": "Internal",
               "output": "QL.g.cs",
               "warningsToIgnore": ["CS0168", "CS0219"],
+              "schemaDownloadTimeoutInSeconds": 60,
               "scalars": {
                 "Point": "Geometry.Point",
                 "Rect": "Geometry.Rect"

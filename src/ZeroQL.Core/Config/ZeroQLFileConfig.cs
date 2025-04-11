@@ -65,4 +65,9 @@ public class ZeroQLFileConfig
     /// Enables netstandard compatibility during generation
     /// </summary>
     public bool? NetstandardCompatibility { get; set; }
+    
+    /// <summary>
+    /// The timeout in seconds for schema download operations
+    /// </summary>
+    public int? SchemaDownloadTimeoutInSeconds { get; set; }
 }

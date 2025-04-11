@@ -31,6 +31,19 @@ public class PullSchemaCommand : ICommand
         Converter = typeof(HeaderConverter))]
     public KeyValuePair<string, string>[]? CustomHeaders { get; set; }
     
+    [CommandOption(
+        "timeout",
+        Description = "Timeout in seconds for the schema download operation. Use 0 for no timeout.",
+        IsRequired = false)]
+    public int? TimeoutInSeconds { get; set; }
+    
+    [CommandOption(
+        "config",
+        'c',
+        Description =
+            "The generation config file. For example, './zeroql.json'. Config will be used to read timeout if not specified directly.")]
+    public string? Config { get; set; }
+    
     public async ValueTask ExecuteAsync(IConsole console)
     {
         if (Url is null)
@@ -39,7 +52,24 @@ public class PullSchemaCommand : ICommand
             return;
         }
         
+        var timeout = TimeoutInSeconds;
+        if (timeout == null && !string.IsNullOrEmpty(Config))
+        {
+            try
+            {
+                var configResult = ZeroQL.Config.ZeroQLConfigReader.ReadConfig(Config);
+                if (!configResult.Error)
+                {
+                    timeout = configResult.Value?.SchemaDownloadTimeoutInSeconds;
+                }
+            }
+            catch (Exception ex)
+            {
+                await console.Error.WriteLineAsync($"Error reading config file: {ex.Message}");
+            }
+        }
+        
         var cancellationToken = console.RegisterCancellationHandler();
-        await DownloadHelper.DownloadSchema(Url, Output, AccessToken, AuthScheme, CustomHeaders, cancellationToken);
+        await DownloadHelper.DownloadSchema(Url, Output, AccessToken, AuthScheme, CustomHeaders, timeout, cancellationToken);
     }
 }

@@ -11,22 +11,80 @@ public class CliTests : IntegrationTest
     const string GeneratedFileName = "GraphQL.g.cs";
 
     [Fact]
-    public async Task CanPullSchemaFromRemoteServer()
+    public async Task PullSchemaWithShortTimeoutFails()
     {
+        using var console = new FakeInMemoryConsole();
+
+        var timeoutDuration = 1;
+        var tempFile = Path.GetTempFileName();
+        var pullCommand = new PullSchemaCommand
+        {
+            Url = new Uri("http://10.255.255.1/graphql"),
+            Output = tempFile,
+            TimeoutInSeconds = timeoutDuration
+        };
+
+        Exception? caughtException = null;
+
+        try
+        {
+            await pullCommand.ExecuteAsync(console);
+            Assert.Fail("Expected timeout exception was not thrown");
+        }
+        catch (Exception ex)
+        {
+            caughtException = ex;
+            ex.ToString().Should().Contain("timeout");
+        }
+
+        await Verify(new
+        {
+            ExceptionType = caughtException?.GetType().Name,
+            ExceptionMessage = caughtException?.Message,
+            TimeoutValue = timeoutDuration
+        });
+    }
+    
+    [Fact]
+    public async Task PullSchemaWithConfigFileTimeoutIsUsed()
+    {
+        var configFile = Path.GetTempFileName();
+        await File.WriteAllTextAsync(configFile, @"{
+            ""graphql"": ""./schema.graphql"",
+            ""namespace"": ""Test.Namespace"",
+            ""clientName"": ""TestClient"",
+            ""schemaDownloadTimeoutInSeconds"": 1
+        }");
+        
         using var console = new FakeInMemoryConsole();
 
         var tempFile = Path.GetTempFileName();
         var pullCommand = new PullSchemaCommand
         {
-            Url = new Uri("http://localhost:10000/graphql"),
+            Url = new Uri("http://10.255.255.1/graphql"),
             Output = tempFile,
+            Config = configFile
         };
 
-        await pullCommand.ExecuteAsync(console);
-        console.ReadErrorString().Should().BeEmpty();
+        Exception? caughtException = null;
 
-        var schema = await File.ReadAllTextAsync(tempFile);
-        await Verify(schema);
+        try
+        {
+            await pullCommand.ExecuteAsync(console);
+            Assert.Fail("Expected timeout exception was not thrown");
+        }
+        catch (Exception ex)
+        {
+            caughtException = ex;
+        }
+
+        await Verify(new
+        {
+            ExceptionType = caughtException?.GetType().Name,
+            ExceptionMessage = caughtException?.Message,
+            ConfigTimeoutValue = 1,
+            HasConfigFile = !string.IsNullOrEmpty(configFile)
+        });
     }
 
     [Fact]

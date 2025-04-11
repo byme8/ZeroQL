@@ -72,6 +72,14 @@
         "null"
       ],
       "description": "Enables netstandard compatibility during generation"
+    },
+    "schemaDownloadTimeoutInSeconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The timeout in seconds for schema download operations",
+      "format": "int32"
     }
   },
   "definitions": {
