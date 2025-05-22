@@ -65,4 +65,17 @@ public class ZeroQLFileConfig
     /// Enables netstandard compatibility during generation
     /// </summary>
     public bool? NetstandardCompatibility { get; set; }
+
+    /// <summary>
+    /// The URL to pull the schema from
+    /// </summary>
+    /// <example>
+    /// https://server.com/graphql
+    /// </example>
+    public string? Url { get; set; }
+
+    /// <summary>
+    /// Timeout in seconds for downloading the schema
+    /// </summary>
+    public int? Timeout { get; set; }
 }

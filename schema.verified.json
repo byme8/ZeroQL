@@ -72,6 +72,22 @@
         "null"
       ],
       "description": "Enables netstandard compatibility during generation"
+    },
+    "url": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "description": "The URL to pull the schema from",
+      "x-example": "https://server.com/graphql"
+    },
+    "timeout": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Timeout in seconds for downloading the schema",
+      "format": "int32"
     }
   },
   "definitions": {
