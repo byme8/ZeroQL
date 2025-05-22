@@ -1,10 +1,12 @@
 .vs
 .vscode
 .idea
+.claude
 
 bin
 obj
 nugets
+claude
 
 .DS_Store
 *.log

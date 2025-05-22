@@ -13,9 +13,10 @@ public static class DownloadHelper
         string? accessToken,
         string? authScheme,
         KeyValuePair<string, string>[]? customHeaders,
+          int? timeout,
         CancellationToken cancellationToken)
     {
-        var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders);
+        var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders, timeout);
         await using var stream = File.Create(output);
         var node = await IntrospectionClient.IntrospectServerAsync(client, cancellationToken);
 
@@ -26,11 +27,12 @@ public static class DownloadHelper
         Uri uri,
         string? token,
         string? scheme,
-        KeyValuePair<string, string>[]? customHeaders)
+        KeyValuePair<string, string>[]? customHeaders,
+        int? timeout)
     {
         var httpClient = new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(15),
+            Timeout = TimeSpan.FromSeconds(timeout ?? 30),
             BaseAddress = uri
         };
 
