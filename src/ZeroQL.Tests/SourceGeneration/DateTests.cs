@@ -6,12 +6,12 @@ namespace ZeroQL.Tests.SourceGeneration;
 public class DateTests : IntegrationTest
 {
     [Theory]
-    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7, DateTimeKind.Local)")]
+    [InlineData("DateTime", "new DateTime(2042, 12, 11, 10, 9, 8, 7, DateTimeKind.Utc)")]
     [InlineData("DateTimes", "new [] { new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1)) }")]
     [InlineData("DateTimeOffset", "new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1))")]
     [InlineData("TimeSpan", "new TimeSpan(7, 6, 5, 4, 3)")]
     [InlineData("DateOnly", "new DateOnly(2042, 12, 11)")]
-    [InlineData("TimeOnly", "new TimeSpan(0, 2, 3, 4)")]
+    [InlineData("TimeOnly", "new TimeOnly(2, 3, 4)")]
     public async Task Dates(string name, string creator)
     {
         var csharpQuery = $$"""

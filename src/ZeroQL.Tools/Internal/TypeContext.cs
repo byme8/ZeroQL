@@ -27,6 +27,8 @@ public class TypeContext
         { "Date", "DateOnly" },
         { "UUID", "Guid" },
         { "ID", "ID" },
+        { "LocalDate", "DateOnly" },
+        { "LocalTime", "TimeOnly" },
         { "Boolean", "bool" },
         { "Upload", "global::ZeroQL.Upload" },
         { "JSON", "global::System.Text.Json.JsonElement" },
@@ -44,6 +46,8 @@ public class TypeContext
         if (options.NetstandardCompatibility == true)
         {
             GraphQLToCsharpScalarTypes["Date"] = "DateTime";
+            GraphQLToCsharpScalarTypes["LocalDate"] = "DateTime";
+            GraphQLToCsharpScalarTypes["LocalTime"] = "DateTime";
         }
         
         foreach (var scalar in customScalarsFromSchema)

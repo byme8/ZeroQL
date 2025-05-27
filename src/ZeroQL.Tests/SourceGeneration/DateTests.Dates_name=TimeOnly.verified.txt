@@ -1,4 +1,4 @@
 ﻿{
-  Query: mutation ($input: TimeSpan!) { timeOnly(timeOnly: $input)},
-  Data: 02:03:04
+  Query: mutation ($input: LocalTime!) { timeOnly(timeOnly: $input)},
+  Data: 2:03 AM
 }
