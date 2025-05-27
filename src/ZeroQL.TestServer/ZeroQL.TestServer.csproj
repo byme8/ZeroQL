@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HotChocolate.AspNetCore" Version="14.1.0" />
-        <PackageReference Include="HotChocolate.PersistedOperations.FileSystem" Version="14.1.0" />
-        <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="14.1.0" />
-        <PackageReference Include="HotChocolate.Types.Analyzers" Version="14.1.0" />
-        <PackageReference Include="HotChocolate.Types.NodaTime" Version="14.1.0" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.5" />
+        <PackageReference Include="HotChocolate.PersistedOperations.FileSystem" Version="15.1.5" />
+        <PackageReference Include="HotChocolate.PersistedOperations.InMemory" Version="15.1.5" />
+        <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.5" />
+        <PackageReference Include="HotChocolate.Types.NodaTime" Version="15.1.5" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
     </ItemGroup>
 

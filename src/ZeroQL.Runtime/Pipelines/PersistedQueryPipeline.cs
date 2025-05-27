@@ -68,9 +68,16 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
 
     private static bool FailedToFindPersistedQuery(GraphQueryError o)
     {
+        if (o.Extensions?.TryGetValue("code", out var code) is true 
+            && code is JsonElement jsonElement 
+            && jsonElement.GetString() is "HC0020")
+        {
+            return false;
+        }
+        
         var hotChocolateV13Way = o.Message == "PersistedQueryNotFound";
         var hotChocolateV14Way = o.Extensions?.ContainsKey("HC0020") ?? false;
-        
+
         return hotChocolateV13Way || hotChocolateV14Way;
     }
 
