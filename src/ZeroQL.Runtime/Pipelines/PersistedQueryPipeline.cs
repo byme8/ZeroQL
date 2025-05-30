@@ -80,12 +80,12 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
             return false;
         }
         
-        // var hotChocolateV15Way = o.Extensions.TryGetValue("code", out var code);
-        // var codeString = code?.ToString();
-        // if (hotChocolateV15Way && (codeString?.Equals("HC0020") ?? false))
-        // {
-        //     return true;
-        // }
+        var hotChocolateV15Way = o.Extensions.TryGetValue("code", out var code);
+        var codeString = code?.ToString();
+        if (hotChocolateV15Way && (codeString?.Equals("HC0020") ?? false))
+        {
+            return true;
+        }
         
         var hotChocolateV14Way = o.Extensions.ContainsKey("HC0020");
         return hotChocolateV14Way;

@@ -34,7 +34,7 @@ public class PersistentQueryTest
     [Fact]
     public async Task FailsPushPersistedQueryWhenServerWhenServerDoesntSupportIt()
     {
-        var context = await RunServer(10_001);
+        var context = await RunServer(10_001, autoPersisted: false);
         using var source = context.CancellationTokenSource;
         
         var project = await TestProject.Project
