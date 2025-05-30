@@ -124,9 +124,9 @@ public static class GraphQLGenerator
                 Comment("// Do not modify this file manually. Any changes will be lost after regeneration."),
                 Comment("// </auto-generated>"),
                 Trivia(disableWarning),
-                CarriageReturnLineFeed,
+                LineFeed,
                 Trivia(NullableDirectiveTrivia(Token(SyntaxKind.EnableKeyword), true)),
-                CarriageReturnLineFeed)
+                LineFeed)
             .WithUsings(
                 List(namespacesToImport
                     .Select(o => UsingDirective(IdentifierName(o)))));
@@ -143,7 +143,9 @@ public static class GraphQLGenerator
 
         var formattedSource = unit
             .NormalizeWhitespace()
-            .ToFullString();
+            .ToFullString()
+            .Replace("\r\n", "\n")
+            .Replace("\r", "\n");
 
         return formattedSource;
     }
@@ -286,7 +288,7 @@ public static class GraphQLGenerator
 
         var moduleInitializerSyntax = ParseCompilationUnit(moduleInitializer)
             .WithLeadingTrivia(Comment("// Netstandard compatibility"))
-            .WithTrailingTrivia(CarriageReturnLineFeed)
+            .WithTrailingTrivia(LineFeed)
             .Members[0];
 
         return moduleInitializerSyntax;

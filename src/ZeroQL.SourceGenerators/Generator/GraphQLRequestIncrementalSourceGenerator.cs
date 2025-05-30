@@ -88,7 +88,7 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
         }
 
         processed.Add(requestLikeContext.KeyHash);
-        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.KeyHash}.g.cs", source);
+        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.KeyHash}.g.cs", source.NormalizeLineEndings());
     }
 
     private bool FindGraphQLRequests(SyntaxNode node, CancellationToken cancellationToken)

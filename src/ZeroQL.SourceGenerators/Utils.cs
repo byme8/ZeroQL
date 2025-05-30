@@ -276,4 +276,9 @@ public static class Utils
 
         return sb.ToString();
     }
+
+    public static string NormalizeLineEndings(this string source)
+    {
+        return source.Replace("\r\n", "\n").Replace("\r", "\n");
+    }
 }

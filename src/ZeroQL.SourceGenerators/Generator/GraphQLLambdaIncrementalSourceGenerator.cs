@@ -98,7 +98,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             }
 
             processed.Add(lambdaContext.KeyHash);
-            context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source);
+            context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source.NormalizeLineEndings());
         }
     }
 
