@@ -11,7 +11,7 @@ public class DateTests : IntegrationTest
     [InlineData("DateTimeOffset", "new DateTimeOffset(2042, 12, 11, 10, 9, 8, 7, TimeSpan.FromHours(1))")]
     [InlineData("TimeSpan", "new TimeSpan(7, 6, 5, 4, 3)")]
     [InlineData("DateOnly", "new DateOnly(2042, 12, 11)")]
-    [InlineData("TimeOnly", "new TimeSpan(0, 2, 3, 4)")]
+    [InlineData("TimeOnly", "new TimeOnly(1, 2, 3, 4)")]
     public async Task Dates(string name, string creator)
     {
         var csharpQuery = $$"""

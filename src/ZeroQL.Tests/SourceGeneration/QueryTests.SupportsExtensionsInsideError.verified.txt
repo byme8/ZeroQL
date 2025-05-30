@@ -4,14 +4,10 @@
     {
       Message: Error,
       Path: [
-        {
-          ValueKind: String
-        }
+        doError
       ],
       Extensions: {
-        message: {
-          ValueKind: String
-        }
+        message: This is an error
       }
     }
   ]

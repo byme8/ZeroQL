@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -51,7 +52,7 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
             return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
 
-        if (qlResponse.Errors.All(FailedToFindPersistedQuery))
+        if (!qlResponse.Errors.All(FailedToFindPersistedQuery))
         {
             return qlResponse with { Query = FormatPersistedQuery(queryInfo) };
         }
@@ -69,9 +70,25 @@ public class PersistedQueryPipeline : IGraphQLQueryPipeline
     private static bool FailedToFindPersistedQuery(GraphQueryError o)
     {
         var hotChocolateV13Way = o.Message == "PersistedQueryNotFound";
-        var hotChocolateV14Way = o.Extensions?.ContainsKey("HC0020") ?? false;
+        if (hotChocolateV13Way)
+        {
+            return true;
+        }
         
-        return hotChocolateV13Way || hotChocolateV14Way;
+        if (o.Extensions is null)
+        {
+            return false;
+        }
+        
+        // var hotChocolateV15Way = o.Extensions.TryGetValue("code", out var code);
+        // var codeString = code?.ToString();
+        // if (hotChocolateV15Way && (codeString?.Equals("HC0020") ?? false))
+        // {
+        //     return true;
+        // }
+        
+        var hotChocolateV14Way = o.Extensions.ContainsKey("HC0020");
+        return hotChocolateV14Way;
     }
 
     private static string FormatPersistedQuery(QueryInfo queryInfo)

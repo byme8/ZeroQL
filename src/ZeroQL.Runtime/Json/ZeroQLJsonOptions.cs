@@ -22,6 +22,7 @@ public static class ZeroQLJsonOptions
             new ZeroQLTimeSpanConverter(),
 #if !NETSTANDARD
             new ZeroQLDateOnlyConverter(),
+            new ZeroQLTimeOnlyConverter(),
 #endif
             new ZeroQLIDJsonConverter()
         },
