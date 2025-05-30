@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -18,19 +19,27 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(FindMethods,
                 (c, _) => (Invocation: (InvocationExpressionSyntax)c.Node, c.SemanticModel));
 
-        var collectedInvocations = invocations.Collect();
+        IncrementalValueProvider<string?> rootNamespace = context.AnalyzerConfigOptionsProvider
+            .Select((AnalyzerConfigOptionsProvider c, CancellationToken _) =>
+                c.GlobalOptions.TryGetValue("build_property.RootNamespace", out var nameSpace)
+                    ? nameSpace
+                    : null);
+
+        var collectedInvocations = invocations.Combine(rootNamespace)
+            .Select((item, token) => (item.Left.Invocation, item.Left.SemanticModel, item.Right))
+            .Collect();
 
         context.RegisterImplementationSourceOutput(collectedInvocations, GenerateSource);
     }
 
     private void GenerateSource(
         SourceProductionContext context,
-        ImmutableArray<(InvocationExpressionSyntax Invocation, SemanticModel SemanticModel)> invocations)
+        ImmutableArray<(InvocationExpressionSyntax Invocation, SemanticModel SemanticModel, string? RootNamespace)> invocations)
     {
         var processed = new HashSet<string>();
         foreach (var input in invocations)
         {
-            var (invocation, semanticModel) = input;
+            var (invocation, semanticModel, rootNamespace) = input;
             if (context.CancellationToken.IsCancellationRequested)
             {
                 return;
@@ -39,13 +48,14 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             Utils.ErrorWrapper(
                 context,
                 invocation,
-                () => GenerateFile(context, invocation, semanticModel, processed));
+                () => GenerateFile(context, invocation, rootNamespace ?? semanticModel.Compilation.Assembly.Name, semanticModel, processed));
         }
     }
 
     private static void GenerateFile(
         SourceProductionContext context, 
         InvocationExpressionSyntax invocation,
+        string rootNamespace,
         SemanticModel semanticModel, 
         HashSet<string> processed)
     {
@@ -84,7 +94,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         foreach (var lambdaContext in result.LambdaContexts)
         {
             var source = GraphQLSourceResolver.Resolve(
-                semanticModel,
+                rootNamespace,
                 lambdaContext);
 
             if (context.CancellationToken.IsCancellationRequested)
