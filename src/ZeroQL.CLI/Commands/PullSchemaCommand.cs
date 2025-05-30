@@ -59,7 +59,12 @@ public class PullSchemaCommand : ICommand
         }
         
         var cancellationToken = console.RegisterCancellationHandler();
-        await DownloadHelper.DownloadSchema(Url, Output, AccessToken, AuthScheme, CustomHeaders, Timeout, cancellationToken);
+        var (_, error) = await DownloadHelper.DownloadSchema(Url, Output, AccessToken, AuthScheme, CustomHeaders, Timeout, cancellationToken).Unwrap();
+        if (error)
+        {
+            using var errorColor = console.WithForegroundColor(ConsoleColor.Red);
+            await console.Error.WriteLineAsync(error.Message);
+        }
     }
     
     private async Task<bool> ReadConfig(IConsole console)
