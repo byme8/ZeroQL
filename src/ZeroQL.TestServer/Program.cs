@@ -48,13 +48,14 @@ public class Program
             .AddType<IInterfaceThatNeverGetsUsed>()
             .AddType<Person>().BindRuntimeType<Uuid, UuidType>();
 
-        if (string.IsNullOrEmpty(context.QueriesPath) && context.AutoPersisted)
+        if (context.AutoPersisted)
         {
             graphQLServer
                 .UseAutomaticPersistedOperationPipeline()
-                .AddInMemoryOperationDocumentStorage();
+                .AddInMemoryOperationDocumentStorage();;
         }
-        else
+        
+        if(!string.IsNullOrEmpty(context.QueriesPath)) 
         {
             graphQLServer
                 .UsePersistedOperationPipeline()
