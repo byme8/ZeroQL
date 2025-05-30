@@ -21,6 +21,7 @@ public static class StringExtensions
         return values.Join(Environment.NewLine);
     }
 
+#if !NETSTANDARD
     public static string FirstToUpper(this string value)
     {
         return value[..1].ToUpper() + value[1..];
@@ -34,7 +35,7 @@ public static class StringExtensions
         }
         
         var pascalCaseName = value
-            .Split("_", StringSplitOptions.RemoveEmptyEntries)
+            .Split(['_'], StringSplitOptions.RemoveEmptyEntries)
             .Select(o => o.ToLower().FirstToUpper())
             .Join(string.Empty);
 
@@ -44,5 +45,11 @@ public static class StringExtensions
         }
         
         return pascalCaseName;
+    }
+#endif
+
+    public static string NormalizeLineEndings(this string source)
+    {
+        return source.Replace("\r\n", "\n").Replace("\r", "\n");
     }
 }

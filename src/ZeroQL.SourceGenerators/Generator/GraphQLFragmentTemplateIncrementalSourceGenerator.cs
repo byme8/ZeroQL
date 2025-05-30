@@ -4,6 +4,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ZeroQL.Extensions;
 using ZeroQL.SourceGenerators.Resolver;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 

@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using ZeroQL.Bootstrap;
+using ZeroQL.Extensions;
 
 namespace ZeroQL.Internal;
 
@@ -36,7 +37,8 @@ public static class ChecksumHelper
     
     public static string Checksum(string text)
     {
-        return Checksum(Encoding.UTF8.GetBytes(text));
+        var normalized = text.NormalizeLineEndings();
+        return Checksum(Encoding.UTF8.GetBytes(normalized));
     }
 
     /// <summary>
