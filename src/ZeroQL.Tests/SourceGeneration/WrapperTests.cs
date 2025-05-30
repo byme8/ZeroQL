@@ -50,4 +50,20 @@ public class WrapperTests : IntegrationTest
         
         await Verify(result);
     }
+
+    [Fact]
+    public async Task HaveDashInAssemblyName()
+    {
+        var csharpQuery = """
+                          var response = await MakeQuery(qlClient, q => q.Me(o => o.FirstName));
+                          """;
+
+        var project = await TestProject.Project
+            .WithAssemblyName("some-dash-name")
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, csharpQuery));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
 }

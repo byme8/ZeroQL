@@ -8,7 +8,7 @@ namespace ZeroQL.SourceGenerators.Resolver;
 public class GraphQLSourceResolver
 {
     public static string Resolve(
-        SemanticModel semanticModel,
+        string namespaceName,
         GraphQLSourceGenerationContext context)
     {
         var inputTypeName = context.GraphQLMethodInputSymbol.ToSafeGlobalName();
@@ -29,7 +29,7 @@ using ZeroQL.Internal;
 
 #nullable enable
 
-namespace {semanticModel.Compilation.Assembly.Name}
+namespace {namespaceName}
 {{
     {SourceGeneratorInfo.CodeGenerationAttribute}
     internal static class ZeroQLModuleInitializer_{context.KeyHash}
