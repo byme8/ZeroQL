@@ -48,7 +48,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             Utils.ErrorWrapper(
                 context,
                 invocation,
-                () => GenerateFile(context, invocation, rootNamespace ?? semanticModel.Compilation.Assembly.Name, semanticModel, processed));
+                () => GenerateFile(context, invocation, (rootNamespace ?? semanticModel.Compilation.Assembly.Name).ToSafeNamespace(), semanticModel, processed));
         }
     }
 
