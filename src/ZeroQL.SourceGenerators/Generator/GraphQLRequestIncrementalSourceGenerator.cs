@@ -45,7 +45,7 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             Utils.ErrorWrapper(
                 context,
                 record,
-                () => GenerateFile(context, rootNamespace ?? semanticModel.Compilation.Assembly.Name, semanticModel, record, processed));
+                () => GenerateFile(context, (rootNamespace ?? semanticModel.Compilation.Assembly.Name).ToSafeNamespace(), semanticModel, record, processed));
         }
     }
 

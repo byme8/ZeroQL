@@ -246,6 +246,13 @@ public static class Utils
             .Replace(".", "");
     }
 
+    public static string ToSafeNamespace(this string namespaceName)
+    {
+        return namespaceName
+            .Replace("-", "_")
+            .Replace("^", "_");
+    }
+
     public static void ErrorWrapper(SourceProductionContext context, CSharpSyntaxNode location, Action action)
     {
 #if !DEBUG

@@ -78,7 +78,7 @@ public static class TestExtensions
 
     public static async Task<byte[]> CompileToRealAssemblyAsBytes(this Project project)
     {
-        var newName = $"{project.Name}.Guid{Guid.NewGuid():N}";
+        var newName = $"{project.AssemblyName}.Guid{Guid.NewGuid():N}";
         var fixedProject = project.WithAssemblyName(newName);
         var compilation = await fixedProject.GetCompilationAsync();
 
