@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ZeroQL.Extensions;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.SourceGenerators.Resolver.Context;
@@ -21,26 +22,34 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(FindGraphQLRequests,
                 (c, ct) => (Record: (RecordDeclarationSyntax)c.Node, c.SemanticModel));
 
-        var collectedInvocations = invocations.Collect();
+        IncrementalValueProvider<string?> rootNamespace = context.AnalyzerConfigOptionsProvider
+            .Select((AnalyzerConfigOptionsProvider c, CancellationToken _) =>
+                c.GlobalOptions.TryGetValue("build_property.RootNamespace", out var nameSpace)
+                    ? nameSpace
+                    : null);
+
+        var collectedInvocations = invocations.Combine(rootNamespace)
+            .Select((item, token) => (item.Left.Record, item.Left.SemanticModel, item.Right))
+            .Collect();
 
         context.RegisterImplementationSourceOutput(collectedInvocations, GenerateSource);
     }
 
     private void GenerateSource(SourceProductionContext context,
-        ImmutableArray<(RecordDeclarationSyntax Record, SemanticModel SemanticModel)> invocations)
+        ImmutableArray<(RecordDeclarationSyntax Record, SemanticModel SemanticModel, string? RootNamespace)> invocations)
     {
         var processed = new HashSet<string>();
         foreach (var input in invocations)
         {
-            var (record, semanticModel) = input;
+            var (record, semanticModel, rootNamespace) = input;
             Utils.ErrorWrapper(
                 context,
                 record,
-                () => GenerateFile(context, semanticModel, record, processed));
+                () => GenerateFile(context, rootNamespace ?? semanticModel.Compilation.Assembly.Name, semanticModel, record, processed));
         }
     }
 
-    private void GenerateFile(SourceProductionContext context, SemanticModel semanticModel, RecordDeclarationSyntax record, HashSet<string> processed)
+    private void GenerateFile(SourceProductionContext context, string rootNamespace, SemanticModel semanticModel, RecordDeclarationSyntax record, HashSet<string> processed)
     {
         var recordSymbol = semanticModel.GetDeclaredSymbol(record);
         var graphQLRequest = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.GraphQL`2");
@@ -76,7 +85,7 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
             return;
         }
 
-        var source = GraphQLSourceResolver.Resolve(semanticModel, requestLikeContext);
+        var source = GraphQLSourceResolver.Resolve(rootNamespace, requestLikeContext);
 
         if (context.CancellationToken.IsCancellationRequested)
         {
