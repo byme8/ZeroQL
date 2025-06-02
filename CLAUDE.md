@@ -65,6 +65,33 @@ The library supports two syntax styles:
 - **Lambda syntax**: `client.Query(q => q.User(42, o => new { o.Id, o.Name }))`
 - **Request syntax**: Being deprecated in favor of lambda syntax
 
+## Release Notes Template
+
+When generating release notes for a new version:
+
+1. Find the latest non-preview tag: `git tag --sort=-version:refname | grep -v preview | head -1`
+2. Get commits since last release: `git log <last-tag>..HEAD --oneline`
+3. Organize changes into categories:
+
+```markdown
+## Release Notes for vX.Y.Z
+
+### 🚀 Features
+- **Feature Name** - Brief description of what was added
+- List new capabilities, integrations, or major improvements
+
+### 🐛 Bug Fixes
+- **Fix Description** - What issue was resolved
+- Focus on user-facing fixes
+
+### 🔧 Improvements
+- **Improvement Area** - How it was enhanced
+- Include performance, testing, or development experience improvements
+
+### 📝 Configuration (if applicable)
+- Document any new configuration options with examples
+```
+
 ## Shortcut Commands
 
 Here would be a list of commands that can be used in promt. Pay attention to them and activate appropriate flow when neccesary
