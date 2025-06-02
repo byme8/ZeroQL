@@ -25,6 +25,8 @@ public class TypeContext
         { "DateTime", "DateTimeOffset" },
         { "TimeSpan", "TimeSpan" },
         { "Date", "DateOnly" },
+        { "LocalDate", "DateOnly" },
+        { "LocalTime", "TimeOnly" },
         { "UUID", "Guid" },
         { "ID", "ID" },
         { "Boolean", "bool" },
@@ -44,6 +46,8 @@ public class TypeContext
         if (options.NetstandardCompatibility == true)
         {
             GraphQLToCsharpScalarTypes["Date"] = "DateTime";
+            GraphQLToCsharpScalarTypes["LocalDate"] = "DateTime";
+            GraphQLToCsharpScalarTypes["LocalTime"] = "DateTime";
         }
         
         foreach (var scalar in customScalarsFromSchema)

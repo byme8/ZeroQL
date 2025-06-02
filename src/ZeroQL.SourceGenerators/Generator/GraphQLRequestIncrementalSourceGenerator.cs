@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
+using ZeroQL.Extensions;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -97,7 +98,7 @@ public class GraphQLRequestIncrementalSourceGenerator : IIncrementalGenerator
         }
 
         processed.Add(requestLikeContext.KeyHash);
-        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.KeyHash}.g.cs", source);
+        context.AddSource($"ZeroQLModuleInitializer.{requestLikeContext.KeyHash}.g.cs", source.NormalizeLineEndings());
     }
 
     private bool FindGraphQLRequests(SyntaxNode node, CancellationToken cancellationToken)

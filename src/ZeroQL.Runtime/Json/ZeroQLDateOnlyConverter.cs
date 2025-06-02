@@ -25,4 +25,21 @@ public class ZeroQLDateOnlyConverter : JsonConverter<DateOnly>
         writer.WriteStringValue(text);
     }
 }
+
+public class ZeroQLTimeOnlyConverter : JsonConverter<TimeOnly>
+{
+    private readonly string serializationFormat = "HH:mm:ss";
+    
+    public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.GetString();
+        return TimeOnly.Parse(value!);
+    }
+
+    public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
+    {
+        var text = value.ToString(serializationFormat);
+        writer.WriteStringValue(text);
+    }
+}
 #endif

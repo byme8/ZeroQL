@@ -7,20 +7,36 @@ namespace ZeroQL.CLI;
 
 public static class DownloadHelper
 {
-    public static async Task DownloadSchema(
+    public static async Task<Result<Unit>> DownloadSchema(
         Uri schemaUri,
         string output,
         string? accessToken,
         string? authScheme,
         KeyValuePair<string, string>[]? customHeaders,
-          int? timeout,
+        int? timeout,
         CancellationToken cancellationToken)
     {
-        var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders, timeout);
-        await using var stream = File.Create(output);
-        var node = await IntrospectionClient.IntrospectServerAsync(client, cancellationToken);
+        try
+        {
+            var client = CreateHttpClient(schemaUri, accessToken, authScheme, customHeaders, timeout);
+            await using var stream = File.Create(output);
+            var node = await IntrospectionClient.IntrospectServerAsync(client, cancellationToken);
 
-        await node.PrintToAsync(stream, cancellationToken: cancellationToken);
+            await node.PrintToAsync(stream, cancellationToken: cancellationToken);
+            return Unit.Default;
+        }
+        catch (HttpRequestException ex)
+        {
+            return new Error(ex.Message);
+        }
+        catch (TaskCanceledException)
+        {
+            return new Error("Download schema timed out");
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     private static HttpClient CreateHttpClient(

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
+using ZeroQL.Extensions;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -108,7 +109,7 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             }
 
             processed.Add(lambdaContext.KeyHash);
-            context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source);
+            context.AddSource($"ZeroQLModuleInitializer.{lambdaContext.KeyHash}.g.cs", source.NormalizeLineEndings());
         }
     }
 

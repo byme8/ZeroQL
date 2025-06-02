@@ -10,6 +10,7 @@
     <ItemGroup>
         <Compile Include="..\ZeroQL.Runtime\Internal\QueryKey.cs" />
         <Compile Include="..\ZeroQL.Core\Result.cs" />
+        <Compile Include="..\ZeroQL.Tools\Extensions\StringExtensions.cs" />
     </ItemGroup>
     
     <ItemGroup>

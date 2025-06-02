@@ -48,13 +48,14 @@ public class Program
             .AddType<IInterfaceThatNeverGetsUsed>()
             .AddType<Person>().BindRuntimeType<Uuid, UuidType>();
 
-        if (string.IsNullOrEmpty(context.QueriesPath))
+        if (context.AutoPersisted)
         {
             graphQLServer
-                .UsePersistedOperationPipeline()
-                .AddInMemoryOperationDocumentStorage();
+                .UseAutomaticPersistedOperationPipeline()
+                .AddInMemoryOperationDocumentStorage();;
         }
-        else
+        
+        if(!string.IsNullOrEmpty(context.QueriesPath)) 
         {
             graphQLServer
                 .UsePersistedOperationPipeline()
@@ -113,5 +114,7 @@ public class Program
         public CancellationTokenSource CancellationTokenSource { get; set; } = new();
 
         public string? QueriesPath { get; set; }
+        
+        public bool AutoPersisted { get; set; }
     }
 }
