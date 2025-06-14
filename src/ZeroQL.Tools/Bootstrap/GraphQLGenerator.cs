@@ -276,22 +276,40 @@ public static class GraphQLGenerator
 
     private static MemberDeclarationSyntax GenerateNetstandardCompatibility()
     {
-        var moduleInitializer = """
-                                 namespace System.Runtime.CompilerServices
-                                 {
-                                     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-                                     public sealed class ModuleInitializerAttribute : Attribute
-                                     {
-                                     }
-                                 }
-                                """;
+        // Create the namespace declaration first
+        var namespaceDeclaration = NamespaceDeclaration(IdentifierName("System.Runtime.CompilerServices"));
+        
+        // Create the attribute class
+        var attributeClass = ClassDeclaration("ModuleInitializerAttribute")
+            .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword))
+            .AddBaseListTypes(SimpleBaseType(IdentifierName("Attribute")))
+            .AddAttributeLists(AttributeList()
+                .AddAttributes(Attribute(IdentifierName("AttributeUsage"))
+                    .AddArgumentListArguments(
+                        AttributeArgument(MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("AttributeTargets"),
+                            IdentifierName("Method"))),
+                        AttributeArgument(LiteralExpression(SyntaxKind.FalseLiteralExpression))
+                            .WithNameEquals(NameEquals("Inherited")))));
 
-        var moduleInitializerSyntax = ParseCompilationUnit(moduleInitializer)
-            .WithLeadingTrivia(Comment("// Netstandard compatibility"))
-            .WithTrailingTrivia(LineFeed)
-            .Members[0];
+        // Add the class to the namespace
+        namespaceDeclaration = namespaceDeclaration.AddMembers(attributeClass);
 
-        return moduleInitializerSyntax;
+        // Wrap with conditional compilation directives - include both NETSTANDARD2_0 and NETSTANDARD2_1
+        var conditionalNamespace = namespaceDeclaration
+            .WithLeadingTrivia(
+                Comment("// Netstandard compatibility"),
+                LineFeed,
+                Trivia(IfDirectiveTrivia(
+                    BinaryExpression(SyntaxKind.LogicalOrExpression,
+                        IdentifierName("NETSTANDARD2_0"),
+                        IdentifierName("NETSTANDARD2_1")), true, false, false)))
+            .WithTrailingTrivia(
+                Trivia(EndIfDirectiveTrivia(true)),
+                LineFeed);
+
+        return conditionalNamespace;
     }
 
     private static ClassDefinition CreateTypesDefinition(
