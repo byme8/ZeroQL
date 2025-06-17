@@ -281,7 +281,7 @@ public static class GraphQLGenerator
         
         // Create the attribute class
         var attributeClass = ClassDeclaration("ModuleInitializerAttribute")
-            .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword))
+            .AddModifiers(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.SealedKeyword))
             .AddBaseListTypes(SimpleBaseType(IdentifierName("Attribute")))
             .AddAttributeLists(AttributeList()
                 .AddAttributes(Attribute(IdentifierName("AttributeUsage"))
