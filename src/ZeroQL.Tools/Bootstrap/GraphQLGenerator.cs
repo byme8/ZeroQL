@@ -134,7 +134,10 @@ public static class GraphQLGenerator
         var unit = CompilationUnit()
             .WithMembers(SingletonList<MemberDeclarationSyntax>(namespaceDeclaration));
 
+        if (options.NetstandardCompatibility is true)
+        {
         unit = unit.AddMembers(GenerateNetstandardCompatibility());
+        }
 
         unit = FixTypeNamingWhenNameEqualsMemberName(unit);
 
