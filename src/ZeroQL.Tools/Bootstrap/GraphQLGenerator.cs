@@ -136,7 +136,7 @@ public static class GraphQLGenerator
 
         if (options.NetstandardCompatibility is true)
         {
-        unit = unit.AddMembers(GenerateNetstandardCompatibility());
+            unit = unit.AddMembers(GenerateNetstandardCompatibility());
         }
 
         unit = FixTypeNamingWhenNameEqualsMemberName(unit);
