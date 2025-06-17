@@ -134,10 +134,7 @@ public static class GraphQLGenerator
         var unit = CompilationUnit()
             .WithMembers(SingletonList<MemberDeclarationSyntax>(namespaceDeclaration));
 
-        if (options.NetstandardCompatibility is true)
-        {
-            unit = unit.AddMembers(GenerateNetstandardCompatibility());
-        }
+        unit = unit.AddMembers(GenerateNetstandardCompatibility());
 
         unit = FixTypeNamingWhenNameEqualsMemberName(unit);
 
@@ -281,7 +278,7 @@ public static class GraphQLGenerator
         
         // Create the attribute class
         var attributeClass = ClassDeclaration("ModuleInitializerAttribute")
-            .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.SealedKeyword))
+            .AddModifiers(Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.SealedKeyword))
             .AddBaseListTypes(SimpleBaseType(IdentifierName("Attribute")))
             .AddAttributeLists(AttributeList()
                 .AddAttributes(Attribute(IdentifierName("AttributeUsage"))
