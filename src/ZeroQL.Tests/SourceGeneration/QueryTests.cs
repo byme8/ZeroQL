@@ -335,6 +335,18 @@ public class QueryTests : IntegrationTest
     }
 
     [Fact]
+    public async Task SupportsNameofWithMethodName()
+    {
+        var csharpQuery = "static q => q.Me(o => o.FirstName)";
+        var graphqlQuery = @"query GetLanguages{ me { firstName } }";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(GetLanguages), " + csharpQuery));
+
+        await project.Validate(graphqlQuery);
+    }
+
+    [Fact]
     public async Task SupportsExtensionsInsideError()
     {
         var csharpQuery = "Mutation(static m => m.DoError)";
