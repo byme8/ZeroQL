@@ -94,7 +94,7 @@ public class GraphQLLambdaLikeContextResolver
                 return new Error("Could not find method symbol");
             }
 
-            var (name, nameError) = ResolveName(invocation, methodSymbol).Unwrap();
+            var (name, nameError) = ResolveName(invocation, methodSymbol, semanticModel).Unwrap();
             if (nameError)
             {
                 return nameError;
@@ -153,24 +153,39 @@ public class GraphQLLambdaLikeContextResolver
         };
     }
 
-    private Result<string?> ResolveName(InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol)
+    private Result<string?> ResolveName(InvocationExpressionSyntax invocation, IMethodSymbol methodSymbol, SemanticModel semanticModel)
     {
         var hasName = methodSymbol.Parameters.First().Name == "name";
         if (hasName)
         {
             var expression = invocation.ArgumentList.Arguments.First().Expression;
-            if (expression is not LiteralExpressionSyntax literal)
+            
+            // Handle string literals
+            if (expression is LiteralExpressionSyntax literal)
             {
-                var diagnostic = Diagnostic.Create(
-                    Descriptors.GraphQLQueryNameShouldBeLiteral,
-                    expression.GetLocation());
-
-                return new ErrorWithData<Diagnostic>(
-                    "GraphQLQueryNameShouldBeLiteral",
-                    diagnostic);
+                return literal.Token.ValueText;
             }
+            
+            // Handle nameof() expressions
+            if (expression is InvocationExpressionSyntax nameofExpression &&
+                nameofExpression.Expression is IdentifierNameSyntax { Identifier.ValueText: "nameof" })
+            {
+                // Get the constant value from the semantic model
+                var constantValue = semanticModel.GetConstantValue(nameofExpression);
+                if (constantValue.HasValue && constantValue.Value is string nameofValue)
+                {
+                    return nameofValue;
+                }
+            }
+            
+            // If not a literal or valid nameof, create diagnostic
+            var diagnostic = Diagnostic.Create(
+                Descriptors.GraphQLQueryNameShouldBeLiteral,
+                expression.GetLocation());
 
-            return literal.Token.ValueText;
+            return new ErrorWithData<Diagnostic>(
+                "GraphQLQueryNameShouldBeLiteral",
+                diagnostic);
         }
 
         return (string?)null;

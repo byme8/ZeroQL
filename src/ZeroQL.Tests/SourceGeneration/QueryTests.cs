@@ -314,11 +314,24 @@ public class QueryTests : IntegrationTest
         var csharpQuery = "static q => q.Me(o => o.FirstName)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(Execute), " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"GetQueryName(), " + csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzers();
 
         diagnostics.Should().Contain(o => o.Id == Descriptors.GraphQLQueryNameShouldBeLiteral.Id);
+    }
+
+    [Fact]
+    public async Task SupportsNameofQueryName()
+    {
+        var csharpQuery = "static q => q.Me(o => o.FirstName)";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(Execute), " + csharpQuery));
+
+        var diagnostics = await project.ApplyAnalyzers();
+
+        diagnostics.Should().NotContain(o => o.Id == Descriptors.GraphQLQueryNameShouldBeLiteral.Id);
     }
 
     [Fact]
