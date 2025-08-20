@@ -338,10 +338,10 @@ public class QueryTests : IntegrationTest
     public async Task SupportsNameofWithMethodName()
     {
         var csharpQuery = "static q => q.Me(o => o.FirstName)";
-        var graphqlQuery = @"query GetLanguages{ me { firstName } }";
+        var graphqlQuery = @"query SimpleQuery{ me { firstName } }";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(GetLanguages), " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(SimpleQuery), " + csharpQuery));
 
         await project.Validate(graphqlQuery);
     }
