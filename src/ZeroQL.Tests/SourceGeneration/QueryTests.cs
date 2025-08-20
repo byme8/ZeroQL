@@ -309,12 +309,25 @@ public class QueryTests : IntegrationTest
     }
 
     [Fact]
-    public async Task SupportsOnlyLiteralQueryName()
+    public async Task SupportsNameofQueryName()
     {
         var csharpQuery = "static q => q.Me(o => o.FirstName)";
 
         var project = await TestProject.Project
-            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"nameof(Execute), " + csharpQuery));
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, "nameof(Execute), " + csharpQuery));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
+
+    [Fact]
+    public async Task RejectsNonLiteralNonNameofQueryName()
+    {
+        var csharpQuery = "static q => q.Me(o => o.FirstName)";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.MeQuery, @"string.Empty, " + csharpQuery));
 
         var diagnostics = await project.ApplyAnalyzers();
 

@@ -113,7 +113,7 @@ public class PersistentQueryTest
             AutoPersisted = autoPersisted,
         };
 
-        if (await Program.VerifyServiceIsRunning(context))
+        if (await Program.VerifyServiceIsRunning(context, true))
         {
             throw new InvalidOperationException("Server is running");
         }

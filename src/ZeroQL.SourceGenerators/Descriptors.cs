@@ -78,8 +78,8 @@ public class Descriptors
     
     public static readonly DiagnosticDescriptor GraphQLQueryNameShouldBeLiteral = new(
         "ZQL0010",
-        "GraphQL query name should be literal.",
-        "GraphQL query name should be literal.",
+        "GraphQL query name should be literal or nameof expression.",
+        "GraphQL query name should be literal or nameof expression.",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);

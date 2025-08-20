@@ -77,7 +77,7 @@ public class Program
         return app;
     }
 
-    public static async Task<bool> VerifyServiceIsRunning(ServerContext context)
+    public static async Task<bool> VerifyServiceIsRunning(ServerContext context, bool onlyFirstCall = false)
     {
         var httpClient = new HttpClient();
         for (var i = 0; i < 5; i++)
@@ -92,6 +92,10 @@ public class Program
             }
             catch
             {
+                if (onlyFirstCall)
+                {
+                    return false;
+                }
             }
 
             await Task.Delay(500);

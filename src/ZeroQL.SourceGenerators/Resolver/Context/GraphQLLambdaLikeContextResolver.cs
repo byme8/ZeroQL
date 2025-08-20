@@ -159,18 +159,38 @@ public class GraphQLLambdaLikeContextResolver
         if (hasName)
         {
             var expression = invocation.ArgumentList.Arguments.First().Expression;
-            if (expression is not LiteralExpressionSyntax literal)
+            
+            // Handle string literals
+            if (expression is LiteralExpressionSyntax literal)
             {
-                var diagnostic = Diagnostic.Create(
-                    Descriptors.GraphQLQueryNameShouldBeLiteral,
-                    expression.GetLocation());
-
-                return new ErrorWithData<Diagnostic>(
-                    "GraphQLQueryNameShouldBeLiteral",
-                    diagnostic);
+                return literal.Token.ValueText;
             }
+            
+            // Handle nameof() expressions
+            if (expression is InvocationExpressionSyntax nameofInvocation && 
+                nameofInvocation.Expression is IdentifierNameSyntax nameofIdentifier &&
+                nameofIdentifier.Identifier.ValueText == "nameof" &&
+                nameofInvocation.ArgumentList.Arguments.Count == 1)
+            {
+                var nameofArgument = nameofInvocation.ArgumentList.Arguments.First().Expression;
+                if (nameofArgument is IdentifierNameSyntax identifier)
+                {
+                    return identifier.Identifier.ValueText;
+                }
+                if (nameofArgument is MemberAccessExpressionSyntax memberAccess)
+                {
+                    return memberAccess.Name.Identifier.ValueText;
+                }
+            }
+            
+            // If neither string literal nor nameof(), show error
+            var diagnostic = Diagnostic.Create(
+                Descriptors.GraphQLQueryNameShouldBeLiteral,
+                expression.GetLocation());
 
-            return literal.Token.ValueText;
+            return new ErrorWithData<Diagnostic>(
+                "GraphQLQueryNameShouldBeLiteral",
+                diagnostic);
         }
 
         return (string?)null;
