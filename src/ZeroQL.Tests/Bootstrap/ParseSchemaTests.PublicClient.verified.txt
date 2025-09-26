@@ -17,7 +17,7 @@ namespace GraphQLClient
     using ZeroQL.Json;
     using ZeroQL.Internal;
 
-    public class TestApp : global::ZeroQL.GraphQLClient<Query, Mutation>
+    public partial class TestApp : global::ZeroQL.GraphQLClient<Query, Mutation>
     {
         public TestApp(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
         {
@@ -30,7 +30,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Circle")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Circle : IFigure, IEntity
+    public partial class Circle : IFigure, IEntity
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -81,7 +81,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("ContainerWithError")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class ContainerWithError
+    public partial class ContainerWithError
     {
         [ZeroQL.GraphQLName("value")]
         [JsonPropertyName("value")]
@@ -90,7 +90,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("ContainerWithoutError")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class ContainerWithoutError
+    public partial class ContainerWithoutError
     {
         [ZeroQL.GraphQLName("value")]
         [JsonPropertyName("value")]
@@ -110,7 +110,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("FigureContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class FigureContent : PostContent
+    public partial class FigureContent : PostContent
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -141,7 +141,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("ImageContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class ImageContent : PostContent
+    public partial class ImageContent : PostContent
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -169,7 +169,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("JsonDocument")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class JsonDocument
+    public partial class JsonDocument
     {
         [ZeroQL.GraphQLName("rootElement")]
         [JsonPropertyName("rootElement")]
@@ -178,7 +178,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("KeyValuePairOfStringAndString")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class KeyValuePairOfStringAndString
+    public partial class KeyValuePairOfStringAndString
     {
         [ZeroQL.GraphQLName("key")]
         [JsonPropertyName("key")]
@@ -191,7 +191,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Limit")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class LimitZeroQL
+    public partial class LimitZeroQL
     {
         [ZeroQL.GraphQLName("limit")]
         [JsonPropertyName("limit")]
@@ -204,7 +204,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Limit2")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Limit2ZeroQL
+    public partial class Limit2ZeroQL
     {
         [ZeroQL.GraphQLName("value")]
         [JsonPropertyName("value")]
@@ -224,7 +224,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Limit3")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Limit3
+    public partial class Limit3
     {
         [ZeroQL.GraphQLName("limit3Input")]
         [JsonPropertyName("limit3Input")]
@@ -233,7 +233,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("lower_case_type_name")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class lower_case_type_name
+    public partial class lower_case_type_name
     {
         [ZeroQL.GraphQLName("value")]
         [JsonPropertyName("value")]
@@ -242,7 +242,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Mutation")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Mutation : global::ZeroQL.Internal.IMutation
+    public partial class Mutation : global::ZeroQL.Internal.IMutation
     {
         [JsonPropertyName("createUserId")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -493,7 +493,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Person")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Person : IPerson
+    public partial class Person : IPerson
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -510,7 +510,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Point")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Point : IFigure, IEntity
+    public partial class Point : IFigure, IEntity
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -564,7 +564,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Query")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Query : global::ZeroQL.Internal.IQuery
+    public partial class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("int")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -869,7 +869,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Role")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Role
+    public partial class Role
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -882,7 +882,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("Square")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Square : IFigure, IEntity
+    public partial class Square : IFigure, IEntity
     {
         [JsonPropertyName("creator")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -934,7 +934,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("TextContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class TextContent : PostContent
+    public partial class TextContent : PostContent
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -958,7 +958,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("TypesContainer")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class TypesContainer
+    public partial class TypesContainer
     {
         [ZeroQL.GraphQLName("text")]
         [JsonPropertyName("text")]
@@ -1123,7 +1123,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("User")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class User
+    public partial class User
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -1170,7 +1170,7 @@ namespace GraphQLClient
 
     [ZeroQL.GraphQLType("UserLoginAttempt")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class UserLoginAttempt
+    public partial class UserLoginAttempt
     {
         [ZeroQL.GraphQLName("time")]
         [JsonPropertyName("time")]
@@ -1190,7 +1190,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class IEntityStub : IEntity
+    public partial class IEntityStub : IEntity
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -1218,7 +1218,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class IFigureStub : IFigure
+    public partial class IFigureStub : IFigure
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -1249,7 +1249,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class InterfaceThatNeverGetsUsedStub : InterfaceThatNeverGetsUsed
+    public partial class InterfaceThatNeverGetsUsedStub : InterfaceThatNeverGetsUsed
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -1273,7 +1273,7 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class IPersonStub : IPerson
+    public partial class IPersonStub : IPerson
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -1294,13 +1294,13 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class PostContentStub : PostContent
+    public partial class PostContentStub : PostContent
     {
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("AddUsersInput")]
-    public class AddUsersInput
+    public partial class AddUsersInput
     {
         [JsonPropertyName("user")]
         [ZeroQL.GraphQLName("user")]
@@ -1309,7 +1309,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("KeyValuePairOfStringAndStringInput")]
-    public class KeyValuePairOfStringAndStringInput
+    public partial class KeyValuePairOfStringAndStringInput
     {
         [JsonPropertyName("key")]
         [ZeroQL.GraphQLName("key")]
@@ -1322,7 +1322,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("Limit2Input")]
-    public class Limit2Input
+    public partial class Limit2Input
     {
         [JsonPropertyName("value")]
         [ZeroQL.GraphQLName("value")]
@@ -1335,7 +1335,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("Limit3Input")]
-    public class Limit3InputZeroQL
+    public partial class Limit3InputZeroQL
     {
         [JsonPropertyName("limit3Input")]
         [ZeroQL.GraphQLName("limit3Input")]
@@ -1344,7 +1344,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("LimitInput")]
-    public class LimitInputZeroQL
+    public partial class LimitInputZeroQL
     {
         [JsonPropertyName("limit")]
         [ZeroQL.GraphQLName("limit")]
@@ -1357,7 +1357,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("lower_case_type_nameInput")]
-    public class lower_case_type_nameInput
+    public partial class lower_case_type_nameInput
     {
         [JsonPropertyName("value")]
         [ZeroQL.GraphQLName("value")]
@@ -1366,7 +1366,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("PageInput")]
-    public class PageInput
+    public partial class PageInput
     {
         [JsonPropertyName("count")]
         [ZeroQL.GraphQLName("count")]
@@ -1379,7 +1379,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("UserFilterInput")]
-    public class UserFilterInput
+    public partial class UserFilterInput
     {
         [JsonPropertyName("userKind")]
         [ZeroQL.GraphQLName("userKind")]
@@ -1392,7 +1392,7 @@ namespace GraphQLClient
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("UserInfoInput")]
-    public class UserInfoInput
+    public partial class UserInfoInput
     {
         [JsonPropertyName("firstName")]
         [ZeroQL.GraphQLName("firstName")]

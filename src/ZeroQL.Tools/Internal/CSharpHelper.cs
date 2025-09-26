@@ -16,7 +16,7 @@ internal static class CSharpHelper
     public static ClassDeclarationSyntax Class(string name, ClientVisibility visibility)
     {
         return ClassDeclaration(name)
-            .AddModifiers(ParseToken(visibility == ClientVisibility.Public ? "public" : "internal"));
+            .AddModifiers(ParseToken(visibility == ClientVisibility.Public ? "public" : "internal"), ParseToken("partial"));
     }
 
     public static InterfaceDeclarationSyntax Interface(string name, ClientVisibility visibility)
