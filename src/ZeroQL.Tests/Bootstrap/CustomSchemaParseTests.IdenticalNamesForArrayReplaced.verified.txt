@@ -1,7 +1,7 @@
 ﻿[  
     [ZeroQL.GraphQLType("Staff")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class StaffZeroQL
+    public partial class StaffZeroQL
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]

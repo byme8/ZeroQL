@@ -17,7 +17,7 @@ namespace TestApp
     using ZeroQL.Json;
     using ZeroQL.Internal;
 
-    public class GraphQLClient : global::ZeroQL.GraphQLClient<Query, ZeroQL.Unit>
+    public partial class GraphQLClient : global::ZeroQL.GraphQLClient<Query, ZeroQL.Unit>
     {
         public GraphQLClient(global::System.Net.Http.HttpClient client, global::ZeroQL.Pipelines.IGraphQLQueryPipeline? queryPipeline = null) : base(client, queryPipeline)
         {
@@ -30,7 +30,7 @@ namespace TestApp
 
     [ZeroQL.GraphQLType("Container")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Container
+    public partial class Container
     {
         [JsonPropertyName("limit")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
@@ -46,7 +46,7 @@ namespace TestApp
 
     [ZeroQL.GraphQLType("Limit")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class LimitZeroQL
+    public partial class LimitZeroQL
     {
         [ZeroQL.GraphQLName("limit")]
         [JsonPropertyName("limit")]
@@ -55,7 +55,7 @@ namespace TestApp
 
     [ZeroQL.GraphQLType("Query")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Query : global::ZeroQL.Internal.IQuery
+    public partial class Query : global::ZeroQL.Internal.IQuery
     {
         [JsonPropertyName("perVariant")]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
