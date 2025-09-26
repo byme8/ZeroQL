@@ -22,7 +22,7 @@
 ,
   figureStubInterface:
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class IFigureStub : IFigure
+    public partial class IFigureStub : IFigure
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -47,7 +47,7 @@
   squareClass:
     [ZeroQL.GraphQLType("Square")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Square : IFigure
+    public partial class Square : IFigure
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -94,7 +94,7 @@
   circleClass:
     [ZeroQL.GraphQLType("Circle")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Circle : IFigure
+    public partial class Circle : IFigure
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]
@@ -146,7 +146,7 @@
   point:
     [ZeroQL.GraphQLType("Point")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Point : IFigure
+    public partial class Point : IFigure
     {
         [ZeroQL.GraphQLName("id")]
         [JsonPropertyName("id")]

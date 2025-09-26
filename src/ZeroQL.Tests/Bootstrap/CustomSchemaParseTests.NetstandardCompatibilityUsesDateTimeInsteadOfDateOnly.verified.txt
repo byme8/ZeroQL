@@ -3,7 +3,7 @@
     User:
     [ZeroQL.GraphQLType("User")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class User
+    public partial class User
     {
         [ZeroQL.GraphQLName("birthDate")]
         [JsonPropertyName("birthDate")]
@@ -17,7 +17,7 @@
     Query:
     [ZeroQL.GraphQLType("Query")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Query : global::ZeroQL.Internal.IQuery
+    public partial class Query : global::ZeroQL.Internal.IQuery
     {
         [ZeroQL.GraphQLName("dateField")]
         [JsonPropertyName("dateField")]
@@ -33,7 +33,7 @@
     User:
     [ZeroQL.GraphQLType("User")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class User
+    public partial class User
     {
         [ZeroQL.GraphQLName("birthDate")]
         [JsonPropertyName("birthDate")]
@@ -47,7 +47,7 @@
     Query:
     [ZeroQL.GraphQLType("Query")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class Query : global::ZeroQL.Internal.IQuery
+    public partial class Query : global::ZeroQL.Internal.IQuery
     {
         [ZeroQL.GraphQLName("dateField")]
         [JsonPropertyName("dateField")]

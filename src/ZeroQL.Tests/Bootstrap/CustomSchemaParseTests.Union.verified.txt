@@ -8,7 +8,7 @@
   textContentClass:
     [ZeroQL.GraphQLType("TextContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class TextContent : PostContent
+    public partial class TextContent : PostContent
     {
         [ZeroQL.GraphQLName("text")]
         [JsonPropertyName("text")]
@@ -18,7 +18,7 @@
   imageClass:
     [ZeroQL.GraphQLType("ImageContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
-    public class ImageContent : PostContent
+    public partial class ImageContent : PostContent
     {
         [ZeroQL.GraphQLName("imageUrl")]
         [JsonPropertyName("imageUrl")]
