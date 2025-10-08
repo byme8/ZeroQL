@@ -14,10 +14,10 @@ public class QueryAnalyzerHelper
 {
     public static ArgumentAndIndex[] ExtractQueryMethod(
         Compilation compilation,
-        InvocationExpressionSyntax invocation,
-        INamedTypeSymbol attributeType)
+        InvocationExpressionSyntax invocation)
     {
         var semanticModel = compilation.GetSemanticModel(invocation.SyntaxTree);
+        var attributeType = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
 
         var possibleMethod = semanticModel.GetSymbolInfo(invocation.Expression);
         if (possibleMethod.Symbol is not IMethodSymbol method)

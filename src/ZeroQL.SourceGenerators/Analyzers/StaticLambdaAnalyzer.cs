@@ -34,18 +34,9 @@ public class StaticLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var possibleMethod = context.SemanticModel.GetSymbolInfo(invocation);
-        if (possibleMethod.Symbol is not IMethodSymbol method)
-        {
-            return;
-        }
-
-        var staticLambdaAttribute =
-            context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.StaticLambdaAttribute)!;
         var staticLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
             context.Compilation,
-            invocation,
-            staticLambdaAttribute);
+            invocation);
 
         if (staticLambdas.Empty())
         {

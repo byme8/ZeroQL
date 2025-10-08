@@ -18,7 +18,8 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0" />
+        <PackageReference Condition="!$([MSBuild]::VersionLessThan('$(NETCoreSdkVersion)', '9.0'))" Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0" />
+        <PackageReference Condition="!$([MSBuild]::VersionGreaterThanOrEquals('$(NETCoreSdkVersion)', '9.0'))" Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     </ItemGroup>
 
 </Project>

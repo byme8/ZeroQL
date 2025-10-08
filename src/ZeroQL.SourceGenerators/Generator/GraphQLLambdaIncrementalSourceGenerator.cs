@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using ZeroQL.Extensions;
+using ZeroQL.SourceGenerators.Extensions;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -35,7 +36,8 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
 
     private void GenerateSource(
         SourceProductionContext context,
-        ImmutableArray<(InvocationExpressionSyntax Invocation, SemanticModel SemanticModel, string? RootNamespace)> invocations)
+        ImmutableArray<(InvocationExpressionSyntax Invocation, SemanticModel SemanticModel, string? RootNamespace)>
+            invocations)
     {
         var processed = new HashSet<string>();
         foreach (var input in invocations)
@@ -49,15 +51,17 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
             Utils.ErrorWrapper(
                 context,
                 invocation,
-                () => GenerateFile(context, invocation, (rootNamespace ?? semanticModel.Compilation.Assembly.Name).ToSafeNamespace(), semanticModel, processed));
+                () => GenerateFile(context, invocation,
+                    (rootNamespace ?? semanticModel.Compilation.Assembly.Name).ToSafeNamespace(), semanticModel,
+                    processed));
         }
     }
 
     private static void GenerateFile(
-        SourceProductionContext context, 
+        SourceProductionContext context,
         InvocationExpressionSyntax invocation,
         string rootNamespace,
-        SemanticModel semanticModel, 
+        SemanticModel semanticModel,
         HashSet<string> processed)
     {
         var resolver = new GraphQLLambdaLikeContextResolver();
@@ -113,13 +117,13 @@ public class GraphQLLambdaIncrementalSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
+    public static bool FindMethods(SyntaxNode syntaxNode, CancellationToken cancellationToken)
     {
-        if (syntaxNode is not InvocationExpressionSyntax)
+        if (syntaxNode is InvocationExpressionSyntax invocation)
         {
-            return false;
+            return invocation.PotentialGraphQLLambda();
         }
-
-        return true;
+        
+        return false;
     }
 }
