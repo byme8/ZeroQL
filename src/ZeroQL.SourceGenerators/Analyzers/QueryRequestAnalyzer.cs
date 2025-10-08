@@ -21,10 +21,22 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
 #endif
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
                                                GeneratedCodeAnalysisFlags.ReportDiagnostics);
-        context.RegisterSyntaxNodeAction(Handle, SyntaxKind.RecordDeclaration);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var graphQLRequest = compilationContext.Compilation.GetTypeByMetadataName("ZeroQL.GraphQL`2");
+
+            if (graphQLRequest == null)
+            {
+                return; // ZeroQL not referenced in this compilation
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                ctx => Handle(ctx, graphQLRequest),
+                SyntaxKind.RecordDeclaration);
+        });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context)
+    private void Handle(SyntaxNodeAnalysisContext context, INamedTypeSymbol graphQLRequest)
     {
         if (context.Node is not RecordDeclarationSyntax record)
         {
@@ -33,7 +45,6 @@ public class QueryRequestAnalyzer : DiagnosticAnalyzer
 
         var semanticModel = context.SemanticModel;
         var recordSymbol = semanticModel.GetDeclaredSymbol(record);
-        var graphQLRequest = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.GraphQL`2");
 
         if (!SymbolEqualityComparer.Default.Equals(recordSymbol!.BaseType!.ConstructedFrom, graphQLRequest))
         {
