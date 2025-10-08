@@ -19,10 +19,25 @@ public class QueryOnSyntaxAnalyzer : DiagnosticAnalyzer
 #endif
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
                                                GeneratedCodeAnalysisFlags.ReportDiagnostics);
-        context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var onMethod = compilationContext.Compilation.GetTypeByMetadataName("ZeroQL.GraphQLSyntaxExtensions")?
+                .GetMembers("On")
+                .OfType<IMethodSymbol>()
+                .FirstOrDefault();
+
+            if (onMethod == null)
+            {
+                return; // ZeroQL not referenced in this compilation
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                ctx => Handle(ctx, onMethod),
+                SyntaxKind.InvocationExpression);
+        });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context)
+    private void Handle(SyntaxNodeAnalysisContext context, IMethodSymbol onMethod)
     {
         if (context.Node is not InvocationExpressionSyntax
             {
@@ -37,11 +52,6 @@ public class QueryOnSyntaxAnalyzer : DiagnosticAnalyzer
         {
             return;
         }
-
-        var onMethod = context.Compilation.GetTypeByMetadataName("ZeroQL.GraphQLSyntaxExtensions")?
-            .GetMembers("On")
-            .OfType<IMethodSymbol>()
-            .FirstOrDefault();
 
         if (!SymbolEqualityComparer.Default.Equals(onMethod, method.ReducedFrom))
         {

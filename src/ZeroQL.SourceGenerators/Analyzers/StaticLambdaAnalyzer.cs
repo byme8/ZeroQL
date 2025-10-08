@@ -19,7 +19,21 @@ public class StaticLambdaAnalyzer : DiagnosticAnalyzer
 #endif
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
                                                GeneratedCodeAnalysisFlags.ReportDiagnostics);
-        context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression);
+
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            // Check if ZeroQL types are available in this compilation
+            var graphQLClient = compilationContext.Compilation.GetTypeByMetadataName("ZeroQL.IGraphQLClient");
+
+            if (graphQLClient == null)
+            {
+                return; // ZeroQL not referenced in this compilation
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                Handle,
+                SyntaxKind.InvocationExpression);
+        });
     }
 
     private void Handle(SyntaxNodeAnalysisContext context)

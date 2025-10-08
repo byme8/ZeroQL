@@ -19,10 +19,23 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
 #endif
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze |
                                                GeneratedCodeAnalysisFlags.ReportDiagnostics);
-        context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var nameAttribute = compilationContext.Compilation
+                .GetTypeByMetadataName(SourceGeneratorInfo.GraphQLNameAttribute);
+
+            if (nameAttribute == null)
+            {
+                return; // ZeroQL not referenced in this compilation
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                ctx => Handle(ctx, nameAttribute),
+                SyntaxKind.InvocationExpression);
+        });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context)
+    private void Handle(SyntaxNodeAnalysisContext context, INamedTypeSymbol nameAttribute)
     {
         if (context.Node is not InvocationExpressionSyntax invocation)
         {
@@ -40,7 +53,6 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var nameAttribute = context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLNameAttribute)!;
         if (!method.GetAttributes().Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, nameAttribute)))
         {
             return;
