@@ -32,12 +32,9 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var graphQLLambdaAttribute =
-            context.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
         var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
             context.Compilation,
-            invocation,
-            graphQLLambdaAttribute);
+            invocation);
 
         if (graphQLLambdas.Empty())
         {

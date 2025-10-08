@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ZeroQL.SourceGenerators.Extensions;
 
 #pragma warning disable CS8618
 
@@ -35,8 +36,13 @@ public class GraphQLLambdaLikeContextResolver
         SemanticModel semanticModel,
         CancellationToken cancellationToken)
     {
-        var graphQLLambdaAttribute = semanticModel.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute)!;
-        var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation, graphQLLambdaAttribute);
+        var isPotentialGraphQLLambda = invocation.PotentialGraphQLLambda();
+        if (!isPotentialGraphQLLambda)
+        {
+            return new GraphQLLambdaResolverResult { NoGraphQLLambda = true };
+        }
+
+        var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(semanticModel.Compilation, invocation);
         if (graphQLLambdas.Empty())
         {
             return new GraphQLLambdaResolverResult
