@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using ZeroQL.Tests.CLI;
+﻿using ZeroQL.Tests.CLI;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 using ZeroQL.TestServer;

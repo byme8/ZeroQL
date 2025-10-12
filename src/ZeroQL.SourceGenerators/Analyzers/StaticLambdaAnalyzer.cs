@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -24,33 +25,40 @@ public class StaticLambdaAnalyzer : DiagnosticAnalyzer
         {
             // Check if ZeroQL types are available in this compilation
             var graphQLClient = compilationContext.Compilation.GetTypeByMetadataName("ZeroQL.IGraphQLClient");
+            var graphQLLambdaAttribute = compilationContext.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute);
 
-            if (graphQLClient == null)
+            if (graphQLClient == null || graphQLLambdaAttribute == null)
             {
                 return; // ZeroQL not referenced in this compilation
             }
 
-            compilationContext.RegisterSyntaxNodeAction(
-                Handle,
-                SyntaxKind.InvocationExpression);
+            compilationContext.RegisterOperationAction(
+                ctx => Handle(ctx, graphQLLambdaAttribute),
+                OperationKind.Invocation);
         });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context)
+    private void Handle(OperationAnalysisContext context, INamedTypeSymbol graphQLLambdaAttribute)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation)
+        if (context.Operation is not IInvocationOperation invocation)
         {
             return;
         }
 
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+        if (invocation.Syntax is not InvocationExpressionSyntax invocationSyntax)
+        {
+            return;
+        }
+
+        if (invocationSyntax.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return;
         }
 
         var staticLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
-            context.Compilation,
-            invocation);
+            invocation.TargetMethod,
+            graphQLLambdaAttribute,
+            invocationSyntax);
 
         if (staticLambdas.Empty())
         {
@@ -62,9 +70,11 @@ public class StaticLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        var arguments = invocationSyntax.ArgumentList.Arguments;
         var lambdas = staticLambdas
-            .Select(o => invocation.ArgumentList.Arguments[o.Index])
-            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Where(o => o.Index < arguments.Count)
+            .Select(o => (ArgumentInfo: o, Argument: arguments[o.Index]))
+            .Select(o => (o.Argument, Expression: o.Argument.Expression as LambdaExpressionSyntax))
             .Where(o => o.Expression is not null)
             .ToArray();
 

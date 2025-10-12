@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -29,31 +29,32 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
                 return; // ZeroQL not referenced in this compilation
             }
 
-            compilationContext.RegisterSyntaxNodeAction(
+            compilationContext.RegisterOperationAction(
                 ctx => Handle(ctx, nameAttribute),
-                SyntaxKind.InvocationExpression);
+                OperationKind.Invocation);
         });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context, INamedTypeSymbol nameAttribute)
+    private void Handle(OperationAnalysisContext context, INamedTypeSymbol nameAttribute)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation)
+        if (context.Operation is not IInvocationOperation invocation)
         {
             return;
         }
 
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return;
-        }
-
-        var possibleMethod = context.SemanticModel.GetSymbolInfo(invocation);
-        if (possibleMethod.Symbol is not IMethodSymbol method)
-        {
-            return;
-        }
-
+        var method = invocation.TargetMethod;
         if (!method.GetAttributes().Any(o => SymbolEqualityComparer.Default.Equals(o.AttributeClass, nameAttribute)))
+        {
+            return;
+        }
+
+        // Get the syntax node for location reporting
+        if (invocation.Syntax is not InvocationExpressionSyntax invocationSyntax)
+        {
+            return;
+        }
+
+        if (invocationSyntax.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return;
         }
@@ -68,7 +69,7 @@ public class OptionalParametersAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var arguments = invocation.ArgumentList.Arguments;
+        var arguments = invocationSyntax.ArgumentList.Arguments;
         for (int i = 0; i < requiredParameters.Length; i++)
         {
             var requiredParameter = requiredParameters[i];

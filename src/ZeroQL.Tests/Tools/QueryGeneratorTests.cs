@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Xunit;
 using ZeroQL.SourceGenerators.Resolver;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;

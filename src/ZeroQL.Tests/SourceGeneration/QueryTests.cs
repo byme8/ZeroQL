@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.CodeAnalysis;
 using ZeroQL.SourceGenerators;
 using ZeroQL.SourceGenerators.Generator;

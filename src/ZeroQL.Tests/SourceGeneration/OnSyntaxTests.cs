@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 

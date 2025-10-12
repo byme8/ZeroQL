@@ -2,9 +2,9 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 using ZeroQL.SourceGenerators.Extensions;
 using ZeroQL.SourceGenerators.Resolver.Context;
 
@@ -26,28 +26,35 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
         {
             // Check if ZeroQL types are available in this compilation
             var graphQLClient = compilationContext.Compilation.GetTypeByMetadataName("ZeroQL.IGraphQLClient");
+            var graphQLLambdaAttribute = compilationContext.Compilation.GetTypeByMetadataName(SourceGeneratorInfo.GraphQLLambdaAttribute);
 
-            if (graphQLClient == null)
+            if (graphQLClient == null || graphQLLambdaAttribute == null)
             {
                 return; // ZeroQL not referenced in this compilation
             }
 
-            compilationContext.RegisterSyntaxNodeAction(
-                Handle,
-                SyntaxKind.InvocationExpression);
+            compilationContext.RegisterOperationAction(
+                ctx => Handle(ctx, graphQLLambdaAttribute),
+                OperationKind.Invocation);
         });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context)
+    private void Handle(OperationAnalysisContext context, INamedTypeSymbol graphQLLambdaAttribute)
     {
-        if (context.Node is not InvocationExpressionSyntax invocation)
+        if (context.Operation is not IInvocationOperation invocation)
+        {
+            return;
+        }
+
+        if (invocation.Syntax is not InvocationExpressionSyntax invocationSyntax)
         {
             return;
         }
 
         var graphQLLambdas = QueryAnalyzerHelper.ExtractQueryMethod(
-            context.Compilation,
-            invocation);
+            invocation.TargetMethod,
+            graphQLLambdaAttribute,
+            invocationSyntax);
 
         if (graphQLLambdas.Empty())
         {
@@ -59,9 +66,10 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        var arguments = invocationSyntax.ArgumentList.Arguments;
         var lambdas = graphQLLambdas
-            .Select(o => invocation.ArgumentList.Arguments[o.Index])
-            .Select(o => (Argument: o, Expression: o.Expression as LambdaExpressionSyntax))
+            .Select(o => (ArgumentInfo: o, Argument: arguments[o.Index]))
+            .Select(o => (o.Argument, Expression: o.Argument.Expression as LambdaExpressionSyntax))
             .Where(o => o.Expression is not null)
             .ToArray();
 
@@ -75,10 +83,15 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var semanticModel = context.SemanticModel;
+        var semanticModel = invocation.SemanticModel;
+        if (semanticModel == null)
+        {
+            return;
+        }
+
         var resolver = new GraphQLLambdaLikeContextResolver();
         var (result, resolveError) =
-            resolver.Resolve(invocation, semanticModel, context.CancellationToken).Unwrap();
+            resolver.Resolve(invocationSyntax, semanticModel, context.CancellationToken).Unwrap();
 
         if (context.CancellationToken.IsCancellationRequested)
         {
@@ -96,7 +109,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic
                 .Create(
                     Descriptors.FailedToConvert,
-                    invocation.GetLocationForPreview(),
+                    invocationSyntax.GetLocationForPreview(),
                     resolveError.Message));
             return;
         }
@@ -110,7 +123,7 @@ public class QueryLambdaAnalyzer : DiagnosticAnalyzer
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 Descriptors.GraphQLQueryPreview,
-                invocation.GetLocationForPreview(),
+                invocationSyntax.GetLocationForPreview(),
                 lambdaContext.OperationQuery));
         }
     }

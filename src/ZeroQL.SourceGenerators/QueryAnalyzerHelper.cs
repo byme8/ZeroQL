@@ -25,11 +25,21 @@ public class QueryAnalyzerHelper
             return [];
         }
 
-        var graphQLLambdas = method.Parameters
-            .Select((o, i) => new ArgumentAndIndex { Index = i, Parameter = o })
+        return ExtractQueryMethod(method, attributeType, invocation);
+    }
+
+    public static ArgumentAndIndex[] ExtractQueryMethod(
+        IMethodSymbol method,
+        INamedTypeSymbol graphQLLambdaAttribute,
+        InvocationExpressionSyntax invocation)
+    {
+        var isExtensionMethod = method.IsExtensionMethod;
+        var currentMethod =  method.ReducedFrom ?? method;
+        var graphQLLambdas = currentMethod.Parameters
+            .Select((o, i) => new ArgumentAndIndex { Index = isExtensionMethod ? i - 1 : i, Parameter = o })
             .Where(o => o.Parameter
                 .GetAttributes()
-                .Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeType)))
+                .Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, graphQLLambdaAttribute)))
             .ToArray();
 
         var namedArguments = invocation.ArgumentList.Arguments
@@ -51,7 +61,7 @@ public class QueryAnalyzerHelper
             {
                 continue;
             }
-            
+
             namedGraphQlLambda.Index = namedArgument.Index;
         }
 
