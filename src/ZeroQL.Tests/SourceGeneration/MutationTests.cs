@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Xunit;
+﻿using AwesomeAssertions;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 

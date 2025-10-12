@@ -1,5 +1,4 @@
 ﻿using ZeroQL.TestServer;
-using Xunit;
 
 namespace ZeroQL.Tests.Core.Fixtures;
 

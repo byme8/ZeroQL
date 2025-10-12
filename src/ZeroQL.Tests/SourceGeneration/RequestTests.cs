@@ -1,6 +1,5 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using ZeroQL.SourceGenerators;
-using ZeroQL.SourceGenerators.Analyzers;
 using ZeroQL.Tests.Core;
 using ZeroQL.Tests.Data;
 using static ZeroQL.Tests.Data.TestProject;

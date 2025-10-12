@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using ZeroQL.Extensions;
 
 namespace ZeroQL.Tests.SourceGeneration;

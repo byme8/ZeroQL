@@ -1,5 +1,5 @@
 using CliFx.Infrastructure;
-using FluentAssertions;
+using AwesomeAssertions;
 using ZeroQL.Tests.Core;
 using ZeroQL.CLI.Commands;
 using ZeroQL.Tests.Data;

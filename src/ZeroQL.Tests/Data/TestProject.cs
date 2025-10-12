@@ -1,7 +1,7 @@
 using System.Reflection;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
-using FluentAssertions;
+using AwesomeAssertions;
 using ZeroQL.Tests.Core;
 using Microsoft.CodeAnalysis;
 

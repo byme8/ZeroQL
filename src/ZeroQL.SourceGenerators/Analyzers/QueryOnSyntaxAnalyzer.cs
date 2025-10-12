@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
+using ZeroQL.SourceGenerators.Extensions;
 
 namespace ZeroQL.SourceGenerators.Analyzers;
 
@@ -31,41 +32,47 @@ public class QueryOnSyntaxAnalyzer : DiagnosticAnalyzer
                 return; // ZeroQL not referenced in this compilation
             }
 
-            compilationContext.RegisterSyntaxNodeAction(
+            compilationContext.RegisterOperationAction(
                 ctx => Handle(ctx, onMethod),
-                SyntaxKind.InvocationExpression);
+                OperationKind.Invocation);
         });
     }
 
-    private void Handle(SyntaxNodeAnalysisContext context, IMethodSymbol onMethod)
+    private void Handle(OperationAnalysisContext context, IMethodSymbol onMethod)
     {
-        if (context.Node is not InvocationExpressionSyntax
-            {
-                Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "On" } memberAccess
-            } invocation)
+        if (context.Operation is not IInvocationOperation invocation)
         {
             return;
         }
 
-        var possibleMethod = context.SemanticModel.GetSymbolInfo(invocation);
-        if (possibleMethod.Symbol is not IMethodSymbol method)
+        var method = invocation.TargetMethod;
+
+        // Check if this is the "On" method we're looking for
+        if (!SymbolEqualityComparer.Default.Equals(onMethod, method.ConstructedFrom))
         {
             return;
         }
 
-        if (!SymbolEqualityComparer.Default.Equals(onMethod, method.ReducedFrom))
-        {
-            return;
-        }
-
+        var targetOperation = invocation.FirstRecursive(o => o is IParameterReferenceOperation);
         var typeArgument = method.TypeArguments.FirstOrDefault();
         if (typeArgument is null)
         {
             return;
         }
 
-        var type = context.SemanticModel.GetTypeInfo(memberAccess.Expression);
-        if (type.Type is not INamedTypeSymbol targetType)
+        // Get the receiver type (the expression that .On() is called on)
+        if (targetOperation?.Type is not INamedTypeSymbol targetType)
+        {
+            return;
+        }
+
+        // Get the syntax node for location reporting
+        if (invocation.Syntax is not InvocationExpressionSyntax invocationSyntax)
+        {
+            return;
+        }
+
+        if (invocationSyntax.Expression is not MemberAccessExpressionSyntax memberAccess)
         {
             return;
         }

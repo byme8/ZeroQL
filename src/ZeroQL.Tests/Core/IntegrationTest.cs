@@ -1,5 +1,4 @@
-﻿using Xunit;
-using ZeroQL.Tests.Core.Fixtures;
+﻿using ZeroQL.Tests.Core.Fixtures;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 

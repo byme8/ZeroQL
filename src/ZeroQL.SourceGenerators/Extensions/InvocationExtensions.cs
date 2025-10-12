@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ZeroQL.SourceGenerators.Extensions;
@@ -23,5 +26,30 @@ public static class InvocationExtensions
         }
 
         return false;
+    }
+}
+
+
+public static class OperationExtensions
+{
+    public static IOperation? FirstRecursive(this IOperation operation, Func<IOperation, bool> predicate)
+    {
+        var next = new Queue<IOperation>();
+        next.Enqueue(operation);
+        while (next.Count > 0)
+        {
+            var current = next.Dequeue();
+            if (predicate(current))
+            {
+                return current;
+            }
+            
+            foreach (var nextOperation in current.ChildOperations)
+            {
+                next.Enqueue(nextOperation);
+            }
+        }
+
+        return null;
     }
 }
