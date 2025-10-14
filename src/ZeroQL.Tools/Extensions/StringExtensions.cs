@@ -18,7 +18,7 @@ public static class StringExtensions
 
     public static string JoinWithNewLine(this IEnumerable<string>? values, int gap = 0)
     {
-        return values.Join(Environment.NewLine);
+        return values.Join("\n");
     }
 
 #if !NETSTANDARD

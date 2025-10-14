@@ -18,7 +18,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.14.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.8" />
         <PackageReference Include="Buildalyzer" Version="5.0.0" />
         <PackageReference Include="Buildalyzer.Workspaces" Version="5.0.0" />
     </ItemGroup>

@@ -114,7 +114,7 @@ public static class Utils
 
     public static string JoinWithNewLine(this IEnumerable<string> values, string separator = "")
     {
-        return string.Join($"{separator}{Environment.NewLine}", values);
+        return string.Join($"{separator}\n", values);
     }
 
     public static string ToGraphQLType(this ISymbol symbol, bool verifyNullability = false)
