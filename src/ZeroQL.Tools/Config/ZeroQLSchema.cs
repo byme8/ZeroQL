@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 using ZeroQL.Core.Config;
@@ -13,29 +11,30 @@ public class ZeroQLSchema
 {
     public static NJsonSchema.JsonSchema GetJsonSchema()
     {
-        var jsonSchemaGeneratorSettings = new JsonSchemaGeneratorSettings()
+        var jsonSchemaGeneratorSettings = new SystemTextJsonSchemaGeneratorSettings
         {
-            SerializerSettings = GetJsonSerializerSettings()
+            SerializerOptions = GetJsonSerializerSettings()
         };
 
         var schema = NJsonSchema.JsonSchema.FromType<ZeroQLFileConfig>(jsonSchemaGeneratorSettings);
         return schema;
     }
 
-    public static JsonSerializerSettings GetJsonSerializerSettings()
+    public static JsonSerializerOptions GetJsonSerializerSettings()
     {
-        var jsonSerializerSettings = new JsonSerializerSettings
+        var jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = new List<JsonConverter>
+            
+            Converters =
             {
-                new StringEnumConverter()
+                new JsonStringEnumConverter()
             },
-            Formatting = Formatting.Indented,
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore,
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition =  JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
         };
-        return jsonSerializerSettings;
+        return jsonSerializerOptions;
     }
 
     public static string GetHumanReadableErrorMessage(ValidationErrorKind errorKind)
