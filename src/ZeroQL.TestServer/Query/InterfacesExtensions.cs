@@ -58,7 +58,7 @@ public class Point : IFigure, IEntity
 
     public float Perimeter => 0;
 
-    public IPerson Creator { get; set; }
+    public IPerson? Creator { get; set; }
 }
 
 public class Square : IFigure, IEntity

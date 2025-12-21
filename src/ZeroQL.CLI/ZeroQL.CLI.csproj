@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <PackageReference Include="CliFx" Version="2.3.6" />
-        <PackageReference Include="HotChocolate.Utilities.Introspection" Version="14.1.0" />
+        <PackageReference Include="HotChocolate.Utilities.Introspection" Version="15.1.11" />
     </ItemGroup>
 
     <ItemGroup>

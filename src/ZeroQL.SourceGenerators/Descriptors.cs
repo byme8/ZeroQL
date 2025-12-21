@@ -7,7 +7,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor UnexpectedFail = new(
         "ZQL0001",
         "Source generator failed unexpectedly",
-        "Source generator failed unexpectedly with exception message:\n{0}",
+        "Source generator failed unexpectedly with exception message:. {0}.",
         "ZeroQL",
         DiagnosticSeverity.Error,
         true);
@@ -79,7 +79,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor GraphQLQueryNameShouldBeLiteral = new(
         "ZQL0010",
         "GraphQL query name should be literal or nameof expression",
-        "GraphQL query name should be literal or nameof expression.",
+        "GraphQL query name should be literal or nameof expression",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -87,7 +87,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor GraphQLQueryInvalidUnionType = new(
         "ZQL0011",
         "Invalid union type",
-        "Type {0} has to implement {1} interface.",
+        "Type {0} has to implement {1} interface",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -95,7 +95,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor GraphQLVariableShouldBeLocal = new(
         "ZQL0012",
         "Properties and fields are not supported",
-        "Define local variable to use it in the query. For example, 'var id = this.Id;'",
+        "Define local variable to use it in the query. For example, 'var id = this.Id;'.",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -103,7 +103,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor GraphQLVariableExpected = new(
         "ZQL0013",
         "Variable expected here",
-        "Define local variable to use it in the query. For example, 'var filter = new Filter();'",
+        "Define local variable to use it in the query. For example, 'var filter = new Filter();'.",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -111,7 +111,7 @@ public class Descriptors
     public static readonly DiagnosticDescriptor GraphQLQueryRequiredParameter = new(
         "ZQL0014",
         "Query requires parameter",
-        "Query '{0}' requires parameter '{1}'.",
+        "Query '{0}' requires parameter '{1}'",
         "ZeroQL",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);

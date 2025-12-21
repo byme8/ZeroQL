@@ -1,5 +1,2 @@
-﻿Error reading config file.
-Config file is not valid.
-Errors:
-    tempFile [5:14]: No Additional Properties Allowed at #/something
-
+Error reading config file.
+Config file is not valid JSON: The JSON property 'something' could not be mapped to any .NET member contained in type 'ZeroQL.Core.Config.ZeroQLFileConfig'.

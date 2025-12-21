@@ -1,9 +1,9 @@
+using System.Text.Json;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using ZeroQL.Config;
 using ZeroQL.Core.Config;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ZeroQL.CLI.Commands;
 
@@ -45,7 +45,7 @@ public class ConfigInitCommand : ICommand
             ClientName = className
         };
 
-        var json = JsonSerializer.Serialize(config, ZeroQLSchema.GetJsonSerializerSettings());
+        var json = JsonSerializer.Serialize(config, ZeroQLJsonContext.Default.ZeroQLFileConfig);
 
         await File.WriteAllTextAsync(Output, json);
     }

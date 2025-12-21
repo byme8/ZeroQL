@@ -13,7 +13,6 @@ namespace ZeroQL.Tests.Core;
 public static class TestExtensions
 {
     public static ImmutableArray<DiagnosticAnalyzer> Analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(
-
         new StaticLambdaAnalyzer(),
         new QueryLambdaAnalyzer(),
         new OptionalParametersAnalyzer(),
@@ -79,15 +78,23 @@ public static class TestExtensions
     public static async Task<byte[]> CompileToRealAssemblyAsBytes(this Project project)
     {
         var newName = $"{project.AssemblyName}.Guid{Guid.NewGuid():N}";
-        var fixedProject = project.WithAssemblyName(newName);
-        var compilation = await fixedProject.GetCompilationAsync();
-
         var generationResult = await project.ApplyGenerator(Generators);
         if (generationResult.Diagnostics.Any())
         {
             throw new Exception(generationResult.Diagnostics.First().GetMessage());
         }
-        
+
+        var fixedProject = project.WithAssemblyName(newName);
+        foreach (var generatedTree in generationResult.GeneratedTrees)
+        {
+            fixedProject = fixedProject.AddDocument(
+                    generatedTree.FilePath,
+                    await generatedTree.GetRootAsync())
+                .Project;
+        }
+
+        var compilation = await fixedProject.GetCompilationAsync();
+
         var analyzerResults = await compilation!
             .WithAnalyzers(Analyzers)
             .GetAllDiagnosticsAsync();
@@ -120,7 +127,8 @@ public static class TestExtensions
         return result;
     }
 
-    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project, params IIncrementalGenerator[] generator)
+    public static async Task<GeneratorDriverRunResult> ApplyGenerator(this Project project,
+        params IIncrementalGenerator[] generator)
     {
         project = await project.RemoveSyntaxTreesFromReferences();
 
@@ -162,7 +170,16 @@ public static class TestExtensions
 
     public static async Task<Diagnostic[]> ApplyAnalyzers(this Project project)
     {
-        var compilation = await project.GetCompilationAsync();
+        var generationResult = await project.ApplyGenerator(Generators);
+        var fixedProject = project;
+        foreach (var generatedTree in generationResult.GeneratedTrees)
+        {
+            fixedProject = fixedProject.AddDocument(
+                    generatedTree.FilePath,
+                    await generatedTree.GetRootAsync())
+                .Project;
+        }
+        var compilation = await fixedProject.GetCompilationAsync();
         var analyzerResults = await compilation!
             .WithAnalyzers(Analyzers)
             .GetAllDiagnosticsAsync();
@@ -173,8 +190,9 @@ public static class TestExtensions
         return error.ToArray();
     }
 
-    
-    public static SettingsTask Track(this SettingsTask settingsTask, string value, [CallerArgumentExpression("value")]string name = null!)
+
+    public static SettingsTask Track(this SettingsTask settingsTask, string value,
+        [CallerArgumentExpression("value")] string name = null!)
     {
         settingsTask.AddScrubber(o => o.Replace(value, name));
         return settingsTask;
@@ -191,7 +209,7 @@ public static class TestExtensions
             .Split('\n');
 
         var lineWithPreview = source[line].Insert(character, "^");
-        
+
         return lineWithPreview;
     }
 }

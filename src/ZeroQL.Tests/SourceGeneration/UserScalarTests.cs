@@ -12,7 +12,7 @@ public class UserScalarTests: IntegrationTest
     {
         var csharpQuery = """
             var instantResponse = await qlClient.Query(static q => q.Instant);
-            var input = new { Instant = instantResponse.Data };
+            var input = new { Instant = instantResponse.Data! };
             var response = await qlClient.Mutation(input, static (i, m) => m.CreateInstant(i.Instant));
             """;
 
