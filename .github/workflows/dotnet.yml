@@ -24,7 +24,7 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./ZeroQL.sln
     - name: Build And Pack
       run: | 
         pwsh ./pack.ps1 -version ${GITHUB_REF_NAME:1}
