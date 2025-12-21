@@ -128,7 +128,7 @@ public class CliTests : IntegrationTest
     public async Task Extract()
     {
         var uniqueId = Guid.NewGuid().ToString("N");
-        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net10.0/{uniqueId}/TestApp.dll";
         var bytes = await TestProject.Project.CompileToRealAssemblyAsBytes();
 
         var path = Path.GetDirectoryName(fileName)!;
@@ -156,7 +156,7 @@ public class CliTests : IntegrationTest
     public async Task<ExtractQueriesCommand> ExtractMutationAndQuery()
     {
         var uniqueId = Guid.NewGuid().ToString("N");
-        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net6.0/{uniqueId}/TestApp.dll";
+        var fileName = $"../../../../TestApp/ZeroQL.TestApp/bin/Debug/net10.0/{uniqueId}/TestApp.dll";
         var project = await TestProject.Project
             .ReplacePartOfDocumentAsync("Program.cs", "// place to replace",
                 @"await qlClient.Mutation(static q => q.AddUser(""Jon"", ""Smith"", o => o.Id));");

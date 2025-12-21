@@ -113,7 +113,7 @@ type Point implements IFigure & IEntity {
   x: Float!
   y: Float!
   perimeter: Float!
-  creator: IPerson!
+  creator: IPerson
 }
 
 type Query {

@@ -33,10 +33,6 @@ public static class DownloadHelper
         {
             return new Error("Download schema timed out");
         }
-        catch (Exception e)
-        {
-            throw;
-        }
     }
 
     private static HttpClient CreateHttpClient(

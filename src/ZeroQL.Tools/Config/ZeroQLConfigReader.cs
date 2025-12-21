@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 using ZeroQL.Core.Config;
 
 namespace ZeroQL.Config;
@@ -20,29 +19,27 @@ public static class ZeroQLConfigReader
             return new Error($"Config file '{configFile}' does not exist. Check that file exist.");
         }
 
-        var schema = ZeroQLSchema.GetJsonSchema();
         var json = File.ReadAllText(configFile);
-        var errors = schema.Validate(json);
 
-        if (errors.Count > 0)
+        ZeroQLFileConfig? config;
+        try
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Config file is not valid.");
-            stringBuilder.AppendLine("Errors:");
-            foreach (var error in errors)
-            {
-                var humanReadableError = ZeroQLSchema.GetHumanReadableErrorMessage(error.Kind);
-                stringBuilder.AppendLine(
-                    $"    {configFile} [{error.LineNumber}:{error.LinePosition}]: {humanReadableError} at {error.Path}");
-            }
-
-            return new Error(stringBuilder.ToString());
+            config = JsonSerializer.Deserialize(json, ZeroQLJsonContext.Default.ZeroQLFileConfig);
+        }
+        catch (JsonException ex)
+        {
+            return new Error($"Config file is not valid JSON: {ex.Message}");
         }
 
-        var config = JsonConvert.DeserializeObject<ZeroQLFileConfig>(json);
         if (config is null)
         {
             return new Error("Config file is not valid. Check that file is valid.");
+        }
+
+        var validationError = ValidateConfig(config, configFile);
+        if (validationError is not null)
+        {
+            return validationError;
         }
 
         if (config.Output is null)
@@ -52,5 +49,25 @@ public static class ZeroQLConfigReader
         }
 
         return config;
+    }
+
+    private static Error? ValidateConfig(ZeroQLFileConfig config, string configFile)
+    {
+        if (string.IsNullOrWhiteSpace(config.GraphQL))
+        {
+            return new Error($"{configFile}: 'graphql' is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(config.Namespace))
+        {
+            return new Error($"{configFile}: 'namespace' is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(config.ClientName))
+        {
+            return new Error($"{configFile}: 'clientName' is required.");
+        }
+
+        return null;
     }
 }

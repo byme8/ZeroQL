@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
 using GraphQL.TestServer;
 using ZeroQL;
 using ZeroQL.Benchmark;
@@ -23,7 +23,7 @@ if (!(raw == strawberry && strawberry == zeroQLLambdaOld && zeroQLLambdaOld == z
 
 if (!File.Exists(GenerationBenchmark.SchemaFile))
 {
-    var path = new Uri(GenerationBenchmark.SchemaFile).AbsolutePath;
+    var path = Path.GetFullPath(GenerationBenchmark.SchemaFile);
     Console.WriteLine($"Unable to find schema file: {path}");
     return;
 }
@@ -33,6 +33,7 @@ var switcher = new BenchmarkSwitcher(new[]
     typeof(OldVariablesVsNewVariablesBenchmark),
     typeof(RawVsZeroQLBenchmark),
     typeof(GenerationBenchmark),
+    typeof(CliBenchmark),
 });
 
 switcher.Run(args);
