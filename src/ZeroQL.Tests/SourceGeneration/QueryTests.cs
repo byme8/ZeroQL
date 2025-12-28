@@ -496,7 +496,7 @@ public class QueryTests : IntegrationTest
     public async Task CombinationNullableAndNonNullable()
     {
         var csharpQuery = """
-                              var limit = new LimitInputZeroQL();
+                              var limit = new LimitInputZeroQL { Limit = 10, LimitInput = 20 };
                               var response = await qlClient.Mutation(m => new
                               {
                                   Limit2 = m.AddLimitNullable(limit, o => o.Limit),
@@ -510,7 +510,7 @@ public class QueryTests : IntegrationTest
         var response = await project.Execute();
 
         var csharpQuery2 = """
-                               var limit = new LimitInputZeroQL();
+                               var limit = new LimitInputZeroQL { Limit = 10, LimitInput = 20 };
                                var response = await qlClient.Mutation(m => new
                                {
                                    Limit = m.AddLimit(limit, o => o.Limit),

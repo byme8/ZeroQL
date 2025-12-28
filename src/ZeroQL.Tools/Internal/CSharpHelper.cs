@@ -57,7 +57,7 @@ internal static class CSharpHelper
                 .AddAttributes(attribute));
     }
 
-    public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, string? defaultValue)
+    public static PropertyDeclarationSyntax Property(string name, TypeDefinition type, string? defaultValue, bool isRequired = false, bool netstandardCompatibility = false)
     {
         var fullTypeName = GetPropertyType(type, false);
 
@@ -68,6 +68,14 @@ internal static class CSharpHelper
                     .WithSemicolonToken(ParseToken(";")),
                 AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                     .WithSemicolonToken(ParseToken(";")));
+
+        // Add 'required' modifier for required properties without default values
+        // Skip if netstandard compatibility is enabled (required keyword is C# 11+)
+        if (isRequired && defaultValue is null && !netstandardCompatibility)
+        {
+            propertyDeclarationSyntax = propertyDeclarationSyntax
+                .AddModifiers(Token(SyntaxKind.RequiredKeyword));
+        }
 
         var initializerExpression = GetInitializerExpression(type, defaultValue);
         if (initializerExpression is not null)

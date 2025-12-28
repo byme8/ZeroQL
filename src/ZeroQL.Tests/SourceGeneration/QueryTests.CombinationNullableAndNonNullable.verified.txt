@@ -1,10 +1,16 @@
 ﻿{
   response: {
     Query: mutation ($limit: LimitInput!) { addLimitNullable(limit: $limit) { limit }  addLimit(limit: $limit) { limit } },
-    Data: {}
+    Data: {
+      Limit2: 10,
+      Limit: 10
+    }
   },
   response2: {
     Query: mutation ($limit: LimitInput!) { addLimit(limit: $limit) { limit }  addLimitNullable(limit: $limit) { limit } },
-    Data: {}
+    Data: {
+      Limit: 10,
+      Limit2: 10
+    }
   }
 }
