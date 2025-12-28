@@ -449,6 +449,196 @@ public class CustomSchemaParseTests
         });
     }
 
+    [Fact]
+    public async Task RequiredModifierForInputProperties()
+    {
+        var rawSchema = """
+            schema {
+              mutation: Mutation
+            }
+
+            input TestInput {
+              # Required, no default - should have 'required' modifier
+              requiredField: String!
+
+              # Required, with default - should NOT have 'required' modifier
+              requiredWithDefault: String! = "default"
+
+              # Optional, no default - should NOT have 'required' modifier
+              optionalField: String
+
+              # Optional, with default - should NOT have 'required' modifier
+              optionalWithDefault: String = "default"
+
+              # Required nested input - should have 'required' modifier
+              nestedInput: NestedInput!
+
+              # Optional nested input - should NOT have 'required' modifier
+              optionalNestedInput: NestedInput
+
+              # Required list - should have 'required' modifier
+              requiredList: [String!]!
+
+              # Optional list - should NOT have 'required' modifier
+              optionalList: [String!]
+
+              # Required int - should have 'required' modifier
+              requiredInt: Int!
+
+              # Optional int - should NOT have 'required' modifier
+              optionalInt: Int
+
+              # Required int with default - should NOT have 'required' modifier
+              requiredIntWithDefault: Int! = 42
+            }
+
+            input NestedInput {
+              value: String!
+            }
+
+            type Mutation {
+              doSomething(input: TestInput!): String
+            }
+            """;
+
+        var csharp = GraphQLGenerator.ToCSharp(rawSchema, "TestApp", "GraphQLClient");
+        var syntaxTree = CSharpSyntaxTree.ParseText(csharp);
+
+        var testInputClass = syntaxTree.GetClass("TestInput")!;
+        testInputClass.Should().NotBeNull();
+
+        // Required, no default - should have 'required' modifier
+        var requiredField = testInputClass.GetProperty("RequiredField");
+        VerifyHasRequiredModifier(requiredField, hasRequired: true);
+
+        // Required, with default - should NOT have 'required' modifier
+        var requiredWithDefault = testInputClass.GetProperty("RequiredWithDefault");
+        VerifyHasRequiredModifier(requiredWithDefault, hasRequired: false);
+
+        // Optional, no default - should NOT have 'required' modifier
+        var optionalField = testInputClass.GetProperty("OptionalField");
+        VerifyHasRequiredModifier(optionalField, hasRequired: false);
+
+        // Optional, with default - should NOT have 'required' modifier
+        var optionalWithDefault = testInputClass.GetProperty("OptionalWithDefault");
+        VerifyHasRequiredModifier(optionalWithDefault, hasRequired: false);
+
+        // Required nested input - should have 'required' modifier
+        var nestedInput = testInputClass.GetProperty("NestedInput");
+        VerifyHasRequiredModifier(nestedInput, hasRequired: true);
+
+        // Optional nested input - should NOT have 'required' modifier
+        var optionalNestedInput = testInputClass.GetProperty("OptionalNestedInput");
+        VerifyHasRequiredModifier(optionalNestedInput, hasRequired: false);
+
+        // Required list - should have 'required' modifier
+        var requiredList = testInputClass.GetProperty("RequiredList");
+        VerifyHasRequiredModifier(requiredList, hasRequired: true);
+
+        // Optional list - should NOT have 'required' modifier
+        var optionalList = testInputClass.GetProperty("OptionalList");
+        VerifyHasRequiredModifier(optionalList, hasRequired: false);
+
+        // Required int - should have 'required' modifier
+        var requiredInt = testInputClass.GetProperty("RequiredInt");
+        VerifyHasRequiredModifier(requiredInt, hasRequired: true);
+
+        // Optional int - should NOT have 'required' modifier
+        var optionalInt = testInputClass.GetProperty("OptionalInt");
+        VerifyHasRequiredModifier(optionalInt, hasRequired: false);
+
+        // Required int with default - should NOT have 'required' modifier
+        var requiredIntWithDefault = testInputClass.GetProperty("RequiredIntWithDefault");
+        VerifyHasRequiredModifier(requiredIntWithDefault, hasRequired: false);
+
+        // Also verify nested input class
+        var nestedInputClass = syntaxTree.GetClass("NestedInput")!;
+        nestedInputClass.Should().NotBeNull();
+        var nestedValue = nestedInputClass.GetProperty("Value");
+        VerifyHasRequiredModifier(nestedValue, hasRequired: true);
+
+        // Verify the full generated code for snapshot
+        await Verify(new
+        {
+            TestInput = testInputClass.ToFullString(),
+            NestedInput = nestedInputClass.ToFullString()
+        });
+    }
+
+    [Fact]
+    public void RequiredModifierDisabledWithNetstandardCompatibility()
+    {
+        var rawSchema = """
+            schema {
+              mutation: Mutation
+            }
+
+            input TestInput {
+              requiredField: String!
+              requiredInt: Int!
+              nestedInput: NestedInput!
+            }
+
+            input NestedInput {
+              value: String!
+            }
+
+            type Mutation {
+              doSomething(input: TestInput!): String
+            }
+            """;
+
+        // Generate with netstandard compatibility enabled - should NOT have 'required' modifier
+        var netstandardOptions = new GraphQlGeneratorOptions("TestApp", ZeroQL.Core.Enums.ClientVisibility.Public)
+        {
+            ClientName = "GraphQLClient",
+            NetstandardCompatibility = true
+        };
+        var netstandardCSharp = GraphQLGenerator.ToCSharp(rawSchema, netstandardOptions);
+        var netstandardSyntaxTree = CSharpSyntaxTree.ParseText(netstandardCSharp);
+
+        var testInputClass = netstandardSyntaxTree.GetClass("TestInput")!;
+        testInputClass.Should().NotBeNull();
+
+        // All properties should NOT have 'required' modifier when netstandard compatibility is enabled
+        var requiredField = testInputClass.GetProperty("RequiredField");
+        VerifyHasRequiredModifier(requiredField, hasRequired: false);
+
+        var requiredInt = testInputClass.GetProperty("RequiredInt");
+        VerifyHasRequiredModifier(requiredInt, hasRequired: false);
+
+        var nestedInput = testInputClass.GetProperty("NestedInput");
+        VerifyHasRequiredModifier(nestedInput, hasRequired: false);
+
+        // Generate with standard settings (no netstandard compatibility) - should have 'required' modifier
+        var standardOptions = new GraphQlGeneratorOptions("TestApp", ZeroQL.Core.Enums.ClientVisibility.Public)
+        {
+            ClientName = "GraphQLClient"
+        };
+        var standardCSharp = GraphQLGenerator.ToCSharp(rawSchema, standardOptions);
+        var standardSyntaxTree = CSharpSyntaxTree.ParseText(standardCSharp);
+
+        var standardTestInputClass = standardSyntaxTree.GetClass("TestInput")!;
+        standardTestInputClass.Should().NotBeNull();
+
+        // All non-nullable properties should have 'required' modifier when netstandard compatibility is disabled
+        var standardRequiredField = standardTestInputClass.GetProperty("RequiredField");
+        VerifyHasRequiredModifier(standardRequiredField, hasRequired: true);
+
+        var standardRequiredInt = standardTestInputClass.GetProperty("RequiredInt");
+        VerifyHasRequiredModifier(standardRequiredInt, hasRequired: true);
+
+        var standardNestedInput = standardTestInputClass.GetProperty("NestedInput");
+        VerifyHasRequiredModifier(standardNestedInput, hasRequired: true);
+    }
+
+    private void VerifyHasRequiredModifier(PropertyDeclarationSyntax property, bool hasRequired)
+    {
+        property.Should().NotBeNull();
+        var hasRequiredModifier = property.Modifiers.Any(m => m.Kind() == SyntaxKind.RequiredKeyword);
+        Assert.Equal(hasRequired, hasRequiredModifier);
+    }
+
     private void VerifyProperty(PropertyDeclarationSyntax property, SyntaxKind syntaxKind, object exprectedDefaultValue)
     {
         property.Should().NotBeNull();

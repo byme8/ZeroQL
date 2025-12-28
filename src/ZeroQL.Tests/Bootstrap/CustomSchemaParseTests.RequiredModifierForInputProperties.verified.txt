@@ -1,0 +1,62 @@
+﻿{
+  TestInput:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [ZeroQL.GraphQLType("TestInput")]
+    public partial class TestInput
+    {
+        [JsonPropertyName("requiredField")]
+        [ZeroQL.GraphQLName("requiredField")]
+        public required string RequiredField { get; set; }
+
+        [JsonPropertyName("requiredWithDefault")]
+        [ZeroQL.GraphQLName("requiredWithDefault")]
+        public string RequiredWithDefault { get; set; } = "default";
+
+        [JsonPropertyName("optionalField")]
+        [ZeroQL.GraphQLName("optionalField")]
+        public string? OptionalField { get; set; }
+
+        [JsonPropertyName("optionalWithDefault")]
+        [ZeroQL.GraphQLName("optionalWithDefault")]
+        public string? OptionalWithDefault { get; set; } = "default";
+
+        [JsonPropertyName("nestedInput")]
+        [ZeroQL.GraphQLName("nestedInput")]
+        public required NestedInput NestedInput { get; set; }
+
+        [JsonPropertyName("optionalNestedInput")]
+        [ZeroQL.GraphQLName("optionalNestedInput")]
+        public NestedInput? OptionalNestedInput { get; set; }
+
+        [JsonPropertyName("requiredList")]
+        [ZeroQL.GraphQLName("requiredList")]
+        public required string[] RequiredList { get; set; }
+
+        [JsonPropertyName("optionalList")]
+        [ZeroQL.GraphQLName("optionalList")]
+        public string[]? OptionalList { get; set; }
+
+        [JsonPropertyName("requiredInt")]
+        [ZeroQL.GraphQLName("requiredInt")]
+        public required int RequiredInt { get; set; }
+
+        [JsonPropertyName("optionalInt")]
+        [ZeroQL.GraphQLName("optionalInt")]
+        public int? OptionalInt { get; set; }
+
+        [JsonPropertyName("requiredIntWithDefault")]
+        [ZeroQL.GraphQLName("requiredIntWithDefault")]
+        public int RequiredIntWithDefault { get; set; } = 42;
+    }
+,
+  NestedInput:
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [ZeroQL.GraphQLType("NestedInput")]
+    public partial class NestedInput
+    {
+        [JsonPropertyName("value")]
+        [ZeroQL.GraphQLName("value")]
+        public required string Value { get; set; }
+    }
+
+}

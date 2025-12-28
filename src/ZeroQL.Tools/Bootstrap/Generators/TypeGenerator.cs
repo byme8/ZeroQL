@@ -135,16 +135,21 @@ public static class TypeGenerator
         this GraphQlGeneratorOptions options,
         ClassDefinition[] inputs)
     {
+        var netstandardCompatibility = options.NetstandardCompatibility ?? false;
+
         return inputs
             .Select(o =>
             {
                 var fields = o.Properties
                     .Select(property =>
-                        CSharpHelper.Property(property.Name, property.TypeDefinition, property.DefaultValue)
+                    {
+                        var isRequired = !property.TypeDefinition.CanBeNull;
+                        return CSharpHelper.Property(property.Name, property.TypeDefinition, property.DefaultValue, isRequired, netstandardCompatibility)
                             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.JsonPropertyNameAttribute,
                                 property.GraphQLName)
                             .AddAttributeWithStringParameter(ZeroQLGenerationInfo.GraphQLNameAttribute,
-                                property.GraphQLName));
+                                property.GraphQLName);
+                    });
 
                 return CSharpHelper.Class(o.Name, options.Visibility)
                     .AddAttributeWithStringParameter(ZeroQLGenerationInfo.CodeGenerationAttribute)

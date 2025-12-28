@@ -84,7 +84,7 @@ public class MutationTests : IntegrationTest
     public async Task ReplacementTypeWorks()
     {
         var csharpQuery = """
-                var limit = new LimitInputZeroQL { Limit = 10 };
+                var limit = new LimitInputZeroQL { Limit = 10, LimitInput = 20 };
                 var response = await qlClient.Mutation(m => m.AddLimit(limit, o => o.Limit));
                 """;
 

@@ -1301,11 +1301,11 @@ namespace GraphQLClient
     {
         [JsonPropertyName("key")]
         [ZeroQL.GraphQLName("key")]
-        public string Key { get; set; }
+        public required string Key { get; set; }
 
         [JsonPropertyName("value")]
         [ZeroQL.GraphQLName("value")]
-        public string Value { get; set; }
+        public required string Value { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1314,7 +1314,7 @@ namespace GraphQLClient
     {
         [JsonPropertyName("value")]
         [ZeroQL.GraphQLName("value")]
-        public int Value { get; set; }
+        public required int Value { get; set; }
 
         [JsonPropertyName("limit2")]
         [ZeroQL.GraphQLName("limit2")]
@@ -1327,7 +1327,7 @@ namespace GraphQLClient
     {
         [JsonPropertyName("limit3Input")]
         [ZeroQL.GraphQLName("limit3Input")]
-        public int Limit3Input { get; set; }
+        public required int Limit3Input { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1336,11 +1336,11 @@ namespace GraphQLClient
     {
         [JsonPropertyName("limit")]
         [ZeroQL.GraphQLName("limit")]
-        public int Limit { get; set; }
+        public required int Limit { get; set; }
 
         [JsonPropertyName("limitInput")]
         [ZeroQL.GraphQLName("limitInput")]
-        public int LimitInput { get; set; }
+        public required int LimitInput { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1349,7 +1349,7 @@ namespace GraphQLClient
     {
         [JsonPropertyName("value")]
         [ZeroQL.GraphQLName("value")]
-        public int Value { get; set; }
+        public required int Value { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1358,11 +1358,11 @@ namespace GraphQLClient
     {
         [JsonPropertyName("count")]
         [ZeroQL.GraphQLName("count")]
-        public int Count { get; set; }
+        public required int Count { get; set; }
 
         [JsonPropertyName("size")]
         [ZeroQL.GraphQLName("size")]
-        public int Size { get; set; }
+        public required int Size { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1371,7 +1371,7 @@ namespace GraphQLClient
     {
         [JsonPropertyName("userKind")]
         [ZeroQL.GraphQLName("userKind")]
-        public UserKind UserKind { get; set; }
+        public required UserKind UserKind { get; set; }
 
         [JsonPropertyName("page")]
         [ZeroQL.GraphQLName("page")]
@@ -1384,15 +1384,15 @@ namespace GraphQLClient
     {
         [JsonPropertyName("firstName")]
         [ZeroQL.GraphQLName("firstName")]
-        public string FirstName { get; set; }
+        public required string FirstName { get; set; }
 
         [JsonPropertyName("lastName")]
         [ZeroQL.GraphQLName("lastName")]
-        public string LastName { get; set; }
+        public required string LastName { get; set; }
 
         [JsonPropertyName("avatar")]
         [ZeroQL.GraphQLName("avatar")]
-        public global::ZeroQL.Upload Avatar { get; set; }
+        public required global::ZeroQL.Upload Avatar { get; set; }
     }
 
     public sealed record Instant : ZeroQLScalar
