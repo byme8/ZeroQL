@@ -139,6 +139,26 @@ namespace GraphQLClient
         }
     }
 
+    [ZeroQL.GraphQLType("FileUploadOutput")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal partial class FileUploadOutput
+    {
+        [ZeroQL.GraphQLName("totalFiles")]
+        [JsonPropertyName("totalFiles")]
+        public int TotalFiles { get; set; }
+
+        [JsonPropertyName("uploadedFiles")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
+        public UploadedFile[] __UploadedFiles { get; set; }
+
+        [ZeroQL.GraphQLName("uploadedFiles")]
+        public T[] UploadedFiles<T>(Func<UploadedFile, T> selector = default !)
+        {
+            return __UploadedFiles is null ? throw new NullReferenceException("UploadedFiles is null but it should not be null. Schema can be outdated.") : __UploadedFiles.Select(o => o is null ? throw new NullReferenceException("UploadedFiles is null but it should not be null. Schema can be outdated.") : selector(o)).ToArray();
+        }
+    }
+
     [ZeroQL.GraphQLType("ImageContent")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal partial class ImageContent : PostContent
@@ -378,6 +398,17 @@ namespace GraphQLClient
         public int AddUsersInfo([ZeroQL.GraphQLType("[UserInfoInput!]!")] UserInfoInput[] users = default !)
         {
             return __AddUsersInfo;
+        }
+
+        [JsonPropertyName("uploadFiles")]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [global::System.ObsoleteAttribute("This property is for internal use only. Do not use it directly. It maybe be removed in the future releases.")]
+        public FileUploadOutput __UploadFiles { get; set; }
+
+        [ZeroQL.GraphQLName("uploadFiles")]
+        public T UploadFiles<T>([ZeroQL.GraphQLType("[UploadFileInput!]!")] UploadFileInput[] files = default !, [ZeroQL.GraphQLType("String!")] string folder = default !, Func<FileUploadOutput, T> selector = default !)
+        {
+            return __UploadFiles is null ? throw new NullReferenceException("UploadFiles is null but it should not be null. Schema can be outdated.") : selector(__UploadFiles);
         }
 
         [JsonPropertyName("addUsersInfoWithEmails")]
@@ -1109,6 +1140,19 @@ namespace GraphQLClient
         public DateTimeOffset? Value32 { get; set; }
     }
 
+    [ZeroQL.GraphQLType("UploadedFile")]
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal partial class UploadedFile
+    {
+        [ZeroQL.GraphQLName("id")]
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [ZeroQL.GraphQLName("downloadPath")]
+        [JsonPropertyName("downloadPath")]
+        public string DownloadPath { get; set; }
+    }
+
     [ZeroQL.GraphQLType("User")]
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     internal partial class User
@@ -1366,6 +1410,19 @@ namespace GraphQLClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    [ZeroQL.GraphQLType("UploadFileInput")]
+    internal partial class UploadFileInput
+    {
+        [JsonPropertyName("group")]
+        [ZeroQL.GraphQLName("group")]
+        public required FileGroup Group { get; set; }
+
+        [JsonPropertyName("file")]
+        [ZeroQL.GraphQLName("file")]
+        public required global::ZeroQL.Upload File { get; set; }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
     [ZeroQL.GraphQLType("UserFilterInput")]
     internal partial class UserFilterInput
     {
@@ -1438,6 +1495,15 @@ namespace GraphQLClient
 
         public static implicit operator ZonedDateTime(string value) => new ZonedDateTime(value);
         public static implicit operator string (ZonedDateTime scalar) => scalar.Value;
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
+    internal enum FileGroup
+    {
+        [ZeroQL.GraphQLName("GENERAL")]
+        General,
+        [ZeroQL.GraphQLName("AVATAR")]
+        Avatar
     }
 
     [System.CodeDom.Compiler.GeneratedCode ( "ZeroQL" ,  "1.0.0.0" )]
@@ -1530,6 +1596,7 @@ namespace GraphQLClient
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.Instant)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.Instant>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.uuid)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.uuid>();
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ZonedDateTime)] = new ZeroQLScalarJsonConverter<global::GraphQLClient.ZonedDateTime>();
+            global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.FileGroup)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.FileGroup>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.FileGroup> { { "GENERAL", global::GraphQLClient.FileGroup.General }, { "AVATAR", global::GraphQLClient.FileGroup.Avatar }, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.FileGroup, string> { { global::GraphQLClient.FileGroup.General, "GENERAL" }, { global::GraphQLClient.FileGroup.Avatar, "AVATAR" }, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.ImageResolution)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.ImageResolution>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.ImageResolution> { { "_1360X720", global::GraphQLClient.ImageResolution._1360x720 }, { "_1920X1080", global::GraphQLClient.ImageResolution._1920x1080 }, { "_2560X1440", global::GraphQLClient.ImageResolution._2560x1440 }, { "_3840X2160", global::GraphQLClient.ImageResolution._3840x2160 }, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.ImageResolution, string> { { global::GraphQLClient.ImageResolution._1360x720, "_1360X720" }, { global::GraphQLClient.ImageResolution._1920x1080, "_1920X1080" }, { global::GraphQLClient.ImageResolution._2560x1440, "_2560X1440" }, { global::GraphQLClient.ImageResolution._3840x2160, "_3840X2160" }, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKind)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKind>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKind> { { "SUPPER_GOOD", global::GraphQLClient.UserKind.SupperGood }, { "GOOD", global::GraphQLClient.UserKind.Good }, { "BAD", global::GraphQLClient.UserKind.Bad }, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKind, string> { { global::GraphQLClient.UserKind.SupperGood, "SUPPER_GOOD" }, { global::GraphQLClient.UserKind.Good, "GOOD" }, { global::GraphQLClient.UserKind.Bad, "BAD" }, });
             global::ZeroQL.Json.ZeroQLJsonSerializersStore.Converters[typeof(global::GraphQLClient.UserKindPascal)] = new global::ZeroQL.Json.ZeroQLEnumConverter<global::GraphQLClient.UserKindPascal>(new global::System.Collections.Generic.Dictionary<string, global::GraphQLClient.UserKindPascal> { { "default", global::GraphQLClient.UserKindPascal.Default }, { "SupperGood", global::GraphQLClient.UserKindPascal.SupperGood }, { "Good", global::GraphQLClient.UserKindPascal.Good }, { "Bad", global::GraphQLClient.UserKindPascal.Bad }, }, new global::System.Collections.Generic.Dictionary<global::GraphQLClient.UserKindPascal, string> { { global::GraphQLClient.UserKindPascal.Default, "default" }, { global::GraphQLClient.UserKindPascal.SupperGood, "SupperGood" }, { global::GraphQLClient.UserKindPascal.Good, "Good" }, { global::GraphQLClient.UserKindPascal.Bad, "Bad" }, });

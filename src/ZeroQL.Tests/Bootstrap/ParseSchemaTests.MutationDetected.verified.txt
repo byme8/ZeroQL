@@ -11,6 +11,7 @@
   int AddUserProfileImage([ZeroQL.GraphQLType("Int!")] int USER_ID = default !, [ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !),
   int AddMyProfileImage([ZeroQL.GraphQLType("Upload!")] global::ZeroQL.Upload file = default !),
   int AddUsersInfo([ZeroQL.GraphQLType("[UserInfoInput!]!")] UserInfoInput[] users = default !),
+  T UploadFiles<T>([ZeroQL.GraphQLType("[UploadFileInput!]!")] UploadFileInput[] files = default !, [ZeroQL.GraphQLType("String!")] string folder = default !, Func<FileUploadOutput, T> selector = default !),
   int AddUsersInfoWithEmails([ZeroQL.GraphQLType("AddUsersInput!")] AddUsersInput input = default !),
   int AddUserKindPascal([ZeroQL.GraphQLType("UserKindPascal!")] UserKindPascal userKindPascal = default !),
   T AddLimit<T>([ZeroQL.GraphQLType("LimitInput!")] LimitInputZeroQL limit = default !, Func<LimitZeroQL, T> selector = default !),

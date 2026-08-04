@@ -104,6 +104,88 @@ public class FileUploadTests : IntegrationTest
     }
     
     [Fact]
+    public async Task UploadArrayOfInputsWithClosureSyntax()
+    {
+        var filesVariable = @"var files = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.General, File = new Upload(""image.png"", new MemoryStream(new byte[42])) },
+            new() { Group = FileGroup.Avatar, File = new Upload(""avatar.png"", new MemoryStream(new byte[10])) }
+        };";
+        var csharpQuery =
+            @"Mutation(m => m.UploadFiles(files, ""uploads"", o => new { o.TotalFiles, Files = o.UploadedFiles(f => new { f.Id, f.DownloadPath }) }))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, filesVariable),
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
+
+    [Fact]
+    public async Task UploadArrayOfInputsWithClosureSyntaxAndNonUploadVariable()
+    {
+        var filesVariable = @"var folder = ""uploads"";
+        var files = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.General, File = new Upload(""image.png"", new MemoryStream(new byte[42])) },
+            new() { Group = FileGroup.Avatar, File = new Upload(""avatar.png"", new MemoryStream(new byte[10])) }
+        };";
+        var csharpQuery =
+            "Mutation(m => m.UploadFiles(files, folder, o => new { o.TotalFiles, Files = o.UploadedFiles(f => new { f.Id, f.DownloadPath }) }))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, filesVariable),
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
+
+    [Fact]
+    public async Task UploadArrayOfInputsWithVariablesSyntax()
+    {
+        var filesVariable = @"var files = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.General, File = new Upload(""image.png"", new MemoryStream(new byte[42])) },
+            new() { Group = FileGroup.Avatar, File = new Upload(""avatar.png"", new MemoryStream(new byte[10])) }
+        };";
+        var csharpQuery =
+            @"Mutation(new { Files = files, Folder = ""uploads"" }, static (i, m) => m.UploadFiles(i.Files, i.Folder, o => new { o.TotalFiles, Files = o.UploadedFiles(f => new { f.Id, f.DownloadPath }) }))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, filesVariable),
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = await project.Execute();
+
+        await Verify(result);
+    }
+
+    [Fact]
+    public async Task UploadFileAsClosureVariable()
+    {
+        var uploadVariable = @"var userId = 1;
+        var file = new Upload(""image.png"", new MemoryStream(new byte[42]));";
+        var csharpQuery = "Mutation(m => m.AddUserProfileImage(userId, file))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, uploadVariable),
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = (GraphQLResult<int>)await project.Execute();
+
+        result.Errors.Should().BeNull();
+        result.Data.Should().Be(42);
+    }
+
+    [Fact]
     public async Task UploadFileWhenValueIsNull()
     {
         var csharpQuery = """

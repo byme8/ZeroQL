@@ -46,6 +46,11 @@ type FigureContent {
   author: User!
 }
 
+type FileUploadOutput {
+  totalFiles: Int!
+  uploadedFiles: [UploadedFile!]!
+}
+
 type ImageContent {
   id: Int!
   imageUrl: String!
@@ -90,6 +95,7 @@ type Mutation {
   addUserProfileImage(USER_ID: Int! file: Upload!): Int! @cost(weight: "10")
   addMyProfileImage(file: Upload!): Int! @cost(weight: "10")
   addUsersInfo(users: [UserInfoInput!]!): Int! @cost(weight: "10")
+  uploadFiles(files: [UploadFileInput!]! folder: String!): FileUploadOutput! @cost(weight: "10")
   addUsersInfoWithEmails(input: AddUsersInput!): Int! @cost(weight: "10")
   addUserKindPascal(userKindPascal: UserKindPascal!): Int!
   addLimit(limit: LimitInput!): Limit!
@@ -205,6 +211,11 @@ type TypesContainer {
   value32: DateTime
 }
 
+type UploadedFile {
+  id: Int!
+  downloadPath: String!
+}
+
 type User {
   id: ID!
   firstName: String!
@@ -254,6 +265,11 @@ input PageInput {
   size: Int!
 }
 
+input UploadFileInput {
+  group: FileGroup!
+  file: Upload!
+}
+
 input UserFilterInput {
   userKind: UserKind!
   page: PageInput
@@ -267,6 +283,11 @@ input UserInfoInput {
 
 input lower_case_type_nameInput {
   value: Int!
+}
+
+enum FileGroup {
+  GENERAL
+  AVATAR
 }
 
 enum ImageResolution {

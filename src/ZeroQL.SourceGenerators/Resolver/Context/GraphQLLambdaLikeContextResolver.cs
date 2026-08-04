@@ -249,6 +249,16 @@ public class GraphQLLambdaLikeContextResolver
         INamedTypeSymbol upload,
         HashSet<string> processedTypes)
     {
+        if (SymbolEqualityComparer.Default.Equals(inputType, upload))
+        {
+            return ImmutableArray.Create(new UploadInfoByType
+            {
+                SafeName = upload.ToSafeGlobalName(),
+                Type = upload,
+                UploadProperties = Array.Empty<IPropertySymbol>()
+            });
+        }
+
         var inputTypeGlobalName = inputType.ToDisplayString();
         if (processedTypes.Contains(inputTypeGlobalName) || Utils.CSharpToGraphQL.ContainsKey(inputTypeGlobalName))
         {

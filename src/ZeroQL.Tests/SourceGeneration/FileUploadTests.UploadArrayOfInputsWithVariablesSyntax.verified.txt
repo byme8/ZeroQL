@@ -1,0 +1,16 @@
+﻿{
+  Query: mutation ($files: [UploadFileInput!]!, $folder: String!) { uploadFiles(files: $files, folder: $folder) { totalFiles uploadedFiles { id downloadPath }  } },
+  Data: {
+    TotalFiles: 2,
+    Files: [
+      {
+        Id: 42,
+        DownloadPath: uploads/General/image.png
+      },
+      {
+        Id: 10,
+        DownloadPath: uploads/Avatar/avatar.png
+      }
+    ]
+  }
+}

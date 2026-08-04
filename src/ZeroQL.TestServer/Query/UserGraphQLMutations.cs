@@ -66,6 +66,56 @@ public class UserGraphQLMutations
         return sum;
     }
     
+    public enum FileGroup
+    {
+        General,
+        Avatar
+    }
+
+    public class UploadFile
+    {
+        public FileGroup Group { get; set; }
+
+        public IFile File { get; set; }
+    }
+
+    public class UploadedFile
+    {
+        public int Id { get; set; }
+
+        public string DownloadPath { get; set; }
+    }
+
+    public class FileUploadOutput
+    {
+        public int TotalFiles { get; set; }
+
+        public UploadedFile[] UploadedFiles { get; set; }
+    }
+
+    public async Task<FileUploadOutput> UploadFiles(UploadFile[] files, string folder)
+    {
+        var uploadedFiles = new List<UploadedFile>();
+        foreach (var file in files)
+        {
+            var stream = file.File.OpenReadStream();
+            var streamReader = new StreamReader(stream);
+            var data = await streamReader.ReadToEndAsync();
+
+            uploadedFiles.Add(new UploadedFile
+            {
+                Id = data.Length,
+                DownloadPath = $"{folder}/{file.Group}/{file.File.Name}"
+            });
+        }
+
+        return new FileUploadOutput
+        {
+            TotalFiles = uploadedFiles.Count,
+            UploadedFiles = uploadedFiles.ToArray()
+        };
+    }
+
     public class AddUsersInput
     {
         public UserInfo? User { get; set; }

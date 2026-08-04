@@ -19,6 +19,10 @@ public class GraphQLUploadResolver
         foreach (var type in types.Where(o => o.Type is not IArrayTypeSymbol))
         {
             var name = GenerateTypeName(type.Type);
+            var body = SymbolEqualityComparer.Default.Equals(type.Type, uploadType)
+                ? GenerateUploadRegistration()
+                : type.UploadProperties.Select(o => GenerateAccessor(o, uploadType)).JoinWithNewLine();
+
             sb.AppendLine($$"""
 
                     private static void Process_{{type.SafeName}}(MultipartFormDataContentContext context, {{name}} value, string path)
@@ -27,7 +31,7 @@ public class GraphQLUploadResolver
                         {
                             return;
                         }
-                        {{type.UploadProperties.Select(o => GenerateAccessor(o, uploadType)).JoinWithNewLine()}}
+                        {{body}}
                     }
             """);
 
@@ -70,7 +74,7 @@ public class GraphQLUploadResolver
 
             sb.AppendLine("""
                                 default:
-                                    throw new global::System.InvalidOperationException("Unknown type");
+                                    break;
                             }
                         }
                     }
@@ -78,6 +82,22 @@ public class GraphQLUploadResolver
         }
 
         return sb.ToString();
+    }
+
+    private static string GenerateUploadRegistration()
+    {
+        return @"
+            {
+                var index = context.Uploads.Count;
+                var uploadEntry = new UploadEntry
+                {
+                    Index = index,
+                    Path = path,
+                    Getter = () => value,
+                };
+                context.Uploads.Add(uploadEntry);
+            }
+";
     }
 
     private static string GenerateTypeName(ITypeSymbol type)
