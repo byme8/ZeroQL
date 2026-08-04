@@ -48,7 +48,7 @@ public class ZeroQLRequestLikeContextResolver
             return queryError;
         }
 
-        var (uploadType, uploadProperties) = GraphQLLambdaLikeContextResolver.FindAllUploadProperties(recordType, queryBody.Variables, semanticModel);
+        var (uploadType, uploadProperties, uploadVariables) = GraphQLLambdaLikeContextResolver.FindAllUploadProperties(recordType, queryBody.Variables, semanticModel);
         var operationQuery = $"{operationType.ToLower()} {operationName}{queryBody.Query}";
         return new GraphQLSourceGenerationContext(
             key, 
@@ -61,7 +61,8 @@ public class ZeroQLRequestLikeContextResolver
             recordType,
             recordType,
             uploadType,
-            uploadProperties
+            uploadProperties,
+            uploadVariables
         );
     }
 

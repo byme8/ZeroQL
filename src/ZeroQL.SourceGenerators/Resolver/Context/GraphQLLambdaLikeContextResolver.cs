@@ -20,6 +20,13 @@ public class UploadInfoByType
     public IPropertySymbol[] UploadProperties { get; set; }
 }
 
+public class UploadInfoByVariable
+{
+    public string Name { get; set; }
+
+    public ITypeSymbol Type { get; set; }
+}
+
 public class GraphQLLambdaResolverResult
 {
     public IReadOnlyList<GraphQLSourceGenerationContext>? LambdaContexts { get; set; }
@@ -131,7 +138,7 @@ public class GraphQLLambdaLikeContextResolver
                 return error;
             }
 
-            var (uploadType, uploadProperties) =
+            var (uploadType, uploadProperties, uploadVariables) =
                 FindAllUploadProperties(graphQLMethodInputType, result.Variables, semanticModel);
             var query = $"{operationKind} {name ?? string.Empty}{result.Query}";
             if (cancellationToken.IsCancellationRequested)
@@ -150,7 +157,8 @@ public class GraphQLLambdaLikeContextResolver
                 graphQLMethodInputType,
                 requestExecutorInputArgumentSymbol,
                 uploadType,
-                uploadProperties));
+                uploadProperties,
+                uploadVariables));
         }
         
         return new GraphQLLambdaResolverResult
@@ -202,25 +210,37 @@ public class GraphQLLambdaLikeContextResolver
         return (string?)null;
     }
 
-    public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties) FindAllUploadProperties(
-        INamedTypeSymbol inputType,
-        Dictionary<string, GraphQLQueryVariable> variables,
-        SemanticModel semanticModel)
+    public static (INamedTypeSymbol UploadType, UploadInfoByType[] UploadProperties, UploadInfoByVariable[] UploadVariables)
+        FindAllUploadProperties(
+            INamedTypeSymbol inputType,
+            Dictionary<string, GraphQLQueryVariable> variables,
+            SemanticModel semanticModel)
     {
         var uploadType = semanticModel.Compilation.GetTypeByMetadataName("ZeroQL.Upload")!;
         var uploadPropertiesFromInputType = FindUploadPropertiesForType(inputType, uploadType, new HashSet<string>());
-        var uploadPropertiesFromVariables = variables
-            .Select(o => o.Value.TypeSymbol)
-            .SelectMany(o => FindUploadPropertiesForType(o!, uploadType, new HashSet<string>()))
+        var variablesWithUploads = variables
+            .Where(o => o.Value.TypeSymbol is not null)
+            .Select(o => (
+                Variable: o.Value,
+                Uploads: FindUploadPropertiesForType(o.Value.TypeSymbol!, uploadType, new HashSet<string>())))
+            .Where(o => o.Uploads.Any())
             .ToArray();
 
         var uploadProperties = uploadPropertiesFromInputType
-            .Concat(uploadPropertiesFromVariables)
+            .Concat(variablesWithUploads.SelectMany(o => o.Uploads))
             .GroupBy(o => o.SafeName)
             .Select(o => o.First())
             .ToArray();
 
-        return (uploadType, uploadProperties);
+        var uploadVariables = variablesWithUploads
+            .Select(o => new UploadInfoByVariable
+            {
+                Name = o.Variable.Name,
+                Type = o.Variable.TypeSymbol!
+            })
+            .ToArray();
+
+        return (uploadType, uploadProperties, uploadVariables);
     }
 
     private static (INamedTypeSymbol? InputSymbol, GraphQLQueryExecutionStrategy ExecutionStrategy) GetInputSymbol(

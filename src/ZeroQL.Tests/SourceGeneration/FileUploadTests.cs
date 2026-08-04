@@ -28,6 +28,26 @@ public class FileUploadTests : IntegrationTest
     }
     
     [Fact]
+    public async Task UploadFileWithClosureGenerates()
+    {
+        var filesVariable = @"var folder = ""uploads"";
+        var files = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.General, File = new Upload(""image.png"", new MemoryStream(new byte[42])) }
+        };";
+        var csharpQuery = "Mutation(m => m.UploadFiles(files, folder, o => o.TotalFiles))";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs",
+                (TestProject.PlaceToReplace, filesVariable),
+                (TestProject.FullMeQuery, csharpQuery));
+
+        var result = await project.ApplyGenerator(new GraphQLLambdaIncrementalSourceGenerator());
+
+        await Verify(result.GeneratedTrees.Select(o => o.ToString()));
+    }
+
+    [Fact]
     public async Task UploadFileAsClassInstance()
     {
         var csharpQuery = "Mutation(new AddProfileImage(1, new Upload(\"image.png\", new MemoryStream(new byte[42]))), static (i, m) => m.AddUserProfileImage(i.UserId, i.File))";
@@ -144,6 +164,30 @@ public class FileUploadTests : IntegrationTest
         var result = await project.Execute();
 
         await Verify(result);
+    }
+
+    [Fact]
+    public async Task UploadArrayOfInputsWithClosureSyntaxAndCapturedVariableFromAnotherQuery()
+    {
+        var query = @"var files = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.General, File = new Upload(""image.png"", new MemoryStream(new byte[42])) }
+        };
+        var otherFiles = new UploadFileInput[]
+        {
+            new() { Group = FileGroup.Avatar, File = new Upload(""avatar.png"", new MemoryStream(new byte[10])) }
+        };
+
+        var firstResponse = await qlClient.Mutation(m => m.UploadFiles(files, ""uploads"", o => o.TotalFiles));
+        var response = await qlClient.Mutation(m => m.UploadFiles(otherFiles, ""other"", o => o.TotalFiles));";
+
+        var project = await TestProject.Project
+            .ReplacePartOfDocumentAsync("Program.cs", (TestProject.FullLine, query));
+
+        var result = (GraphQLResult<int>)await project.Execute();
+
+        result.Errors.Should().BeNull();
+        result.Data.Should().Be(1);
     }
 
     [Fact]

@@ -8,7 +8,11 @@ namespace ZeroQL.SourceGenerators.Resolver;
 
 public class GraphQLUploadResolver
 {
-    public static string GenerateUploadsSelectors(GraphQLQueryExecutionStrategy executionStrategy, UploadInfoByType[] types, INamedTypeSymbol uploadType)
+    public static string GenerateUploadsSelectors(
+        GraphQLQueryExecutionStrategy executionStrategy,
+        UploadInfoByType[] types,
+        UploadInfoByVariable[] variables,
+        INamedTypeSymbol uploadType)
     {
         if (types.Empty())
         {
@@ -45,36 +49,36 @@ public class GraphQLUploadResolver
                     {
                         foreach(var (key, value) in dictionary)
                         {
-                            switch(value)
+                            switch(key)
                             {
             """);
 
-            for (var i = 0; i < types.Length; i++)
+            foreach (var variable in variables)
             {
-                var type = types[i];
-                if (type.Type is IArrayTypeSymbol arrayTypeSymbol)
+                if (variable.Type is IArrayTypeSymbol arrayTypeSymbol)
                 {
                     sb.AppendLine($$"""
-                                case {{arrayTypeSymbol.ToGlobalName()}} {{type.SafeName}}:
-                                    for(int i = 0; i < {{type.SafeName}}.Length; i++)
+                                case "{{variable.Name}}":
+                                {
+                                    var {{variable.Name}} = ({{arrayTypeSymbol.ToGlobalName()}})value;
+                                    for(int i = 0; {{variable.Name}} is not null && i < {{variable.Name}}.Length; i++)
                                     {
-                                        Process_{{arrayTypeSymbol.ElementType.ToSafeGlobalName()}}(context, {{type.SafeName}}[i], $"{path}.{key}.{i}"); 
+                                        Process_{{arrayTypeSymbol.ElementType.ToSafeGlobalName()}}(context, {{variable.Name}}[i], $"{path}.{key}.{i}");
                                     }
                                     break;
+                                }
             """);
                     continue;
                 }
 
                 sb.AppendLine($$"""
-                                case {{type.Type.ToGlobalName()}} {{type.SafeName}}:
-                                    Process_{{type.Type.ToSafeGlobalName()}}(context, {{type.SafeName}}, $"{path}.{key}"); 
+                                case "{{variable.Name}}":
+                                    Process_{{variable.Type.ToSafeGlobalName()}}(context, ({{GenerateTypeName(variable.Type)}})value, $"{path}.{key}");
                                     break;
             """);
             }
 
             sb.AppendLine("""
-                                default:
-                                    break;
                             }
                         }
                     }

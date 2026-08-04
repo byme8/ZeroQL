@@ -23,7 +23,8 @@ public class GraphQLSourceGenerationContext
         INamedTypeSymbol graphQLMethodInputSymbol,
         INamedTypeSymbol requestExecutorInputSymbol,
         INamedTypeSymbol uploadType,
-        UploadInfoByType[] uploadProperties)
+        UploadInfoByType[] uploadProperties,
+        UploadInfoByVariable[] uploadVariables)
     {
         Key = QueryKey.Normalize(key);
         KeyHash = QueryKey.ComputeHash(Key);
@@ -37,6 +38,7 @@ public class GraphQLSourceGenerationContext
         GraphQLMethodInputSymbol = graphQLMethodInputSymbol;
         RequestExecutorInputSymbol = requestExecutorInputSymbol;
         UploadProperties = uploadProperties;
+        UploadVariables = uploadVariables;
         ExecutionStrategy = executionStrategy;
     }
 
@@ -64,4 +66,6 @@ public class GraphQLSourceGenerationContext
     public INamedTypeSymbol RequestExecutorInputSymbol { get; }
 
     public UploadInfoByType[] UploadProperties { get; }
+
+    public UploadInfoByVariable[] UploadVariables { get; }
 }

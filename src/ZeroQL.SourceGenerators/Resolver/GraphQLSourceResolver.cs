@@ -67,7 +67,7 @@ namespace {namespaceName}
             }};
         }}
 
-        {GraphQLUploadResolver.GenerateUploadsSelectors(context.ExecutionStrategy, context.UploadProperties, context.UploadType)}
+        {GraphQLUploadResolver.GenerateUploadsSelectors(context.ExecutionStrategy, context.UploadProperties, context.UploadVariables, context.UploadType)}
     }}
 }}";
         return source;
